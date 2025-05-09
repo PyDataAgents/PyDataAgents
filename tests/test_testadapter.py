@@ -1,4 +1,4 @@
-from PyDataGrabber.pydatagrabber.adapter1 import Adapter1
+from PyDataGrabber.src.adapter.adapter1 import Adapter1
 
 def test_000():
     adapter = Adapter1().set_id("TEST")
