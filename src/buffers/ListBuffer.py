@@ -1,5 +1,5 @@
 import json
-from PyDataGrabber.src.buffer import Buffer
+from PyDataGrabber.src.buffers import Buffer
 
 class ListBuffer(Buffer):
     """buffer that stores its values in a capacity limited list

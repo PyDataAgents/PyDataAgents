@@ -1,45 +1,47 @@
-from abc import ABC, abstractmethod
+from PyDataGrabber.src.adapters import Adapter
 
-from PyDataGrabber.src.grabber.GrabberElement import GrabberElement
+class Adapter1(Adapter):
+    """_summary_
 
-class Adapter(GrabberElement, ABC):
-    """
-    Abstract base class for data adapters.
+    Args:
+        Adapter (_type_): _description_
     """
     
-    @abstractmethod
+    def __init__(self):
+        """_summary_"""
+        super().__init__()        
+        
     def validate(self):
         """
         validate the adapter configuration.
         """
-        pass
+        return
 
-    @abstractmethod
     def install(self):
         """
         install the adapter / initialize object.
         """
-        pass
+        return
 
-    @abstractmethod
     def connect(self):
         """
         connect to the data source.
         """
-        pass
+        return True    
     
-    @abstractmethod
     def disconnect(self):
         """
         disconnect from the data source.
         """
-        pass
+        return True
     
-    @abstractmethod
     def isConnected(self):
         """
         check if the adapter is connected to the data source.
         """
-        pass
-    
+        return True
+        
+    def run(self):
+        """_summary_"""
+        print(self.id)
     

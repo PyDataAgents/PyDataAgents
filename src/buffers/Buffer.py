@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from PyDataGrabber.src.grabber.GrabberElement import GrabberElement
+from PyDataGrabber.src.grabbers.GrabberElement import GrabberElement
 
 class Buffer(GrabberElement, ABC):
     """

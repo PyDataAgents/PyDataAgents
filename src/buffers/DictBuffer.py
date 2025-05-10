@@ -1,4 +1,4 @@
-from PyDataGrabber.src.buffer import Buffer
+from PyDataGrabber.src.buffers import Buffer
 
 class DictBuffer(Buffer):
     """buffer that stores its values in a dictionary in a table like fashion, where every key contains a list of data
