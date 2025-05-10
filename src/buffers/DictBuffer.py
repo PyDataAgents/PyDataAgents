@@ -1,4 +1,5 @@
 from PyDataGrabber.src.buffers import Buffer
+from PyDataGrabber.src.buffers.BufferException import BufferException
 
 class DictBuffer(Buffer):
     """buffer that stores its values in a dictionary in a table like fashion, where every key contains a list of data
@@ -36,12 +37,29 @@ class DictBuffer(Buffer):
                 ++k
 
         else:
-            self.data[self.id].extend(args)
+            raise BufferException("input must be the same length as dictionaries")
 
 
     def push(self, **kwargs):
         """_summary_
         """
+        if len(kwargs.items()) != len(self.data):
+            raise BufferException("input must be the same length as dictionaries")
+        
+        for k, values in kwargs.items():
+            print(k, values)
+            tooMany =  self.capacity - (len(values) + self.size())
+            if tooMany > 0:
+                rest = len(values) - tooMany
+                if rest > 0:
+                    self.data.extend(values[rest - 1:])
+                i = 0
+                while i < tooMany:
+                    self.__push1(values[rest + i])
+                    ++i
+            else:
+                self.data.extend(values)
+
         
 
     def data(self, n=None, persistent=True):
@@ -52,3 +70,4 @@ class DictBuffer(Buffer):
             n (_type_, optional): _description_. Defaults to None.
             persistent (_type_, optional): _description_. Defaults to True.
         """
+        return self.data

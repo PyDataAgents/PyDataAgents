@@ -1,5 +1,5 @@
 import json
-from PyDataGrabber.src.buffers import Buffer
+from PyDataGrabber.src.buffers.Buffer import Buffer
 
 class ListBuffer(Buffer):
     """buffer that stores its values in a capacity limited list
@@ -37,7 +37,7 @@ class ListBuffer(Buffer):
         else:
             self.data.extend(args)
 
-    def data(self, n=None, persistent=True):
+    def data(self, n=None, persistent=True) -> dict:
         """returns data from the buffer, if n is specified, then only n samples are retrieved
             if persistent = False, then the retrieved data is removed from list
 
@@ -45,14 +45,44 @@ class ListBuffer(Buffer):
             n (_type_, optional): _description_. Defaults to None.
             persistent (_type_, optional): _description_. Defaults to True.
         """
+        d = {}
+        d['values'] = self.data
+        return d
 
     def json(self, n=None, persistent=True):
-        return json.dumps(self.data(n, persistent))        
+        """_summary_
+
+        Args:
+            n (_type_, optional): _description_. Defaults to None.
+            persistent (bool, optional): _description_. Defaults to True.
+
+        Returns:
+            _type_: _description_
+        """
+        return json.dumps(self.data(n, persistent))  
+
+    def __str__(self):
+        """_summary_
+
+        Returns:
+            _type_: _description_
+        """
+        return self.json()      
 
     def size(self) -> int:
+        """_summary_
+
+        Returns:
+            int: _description_
+        """
         return len(self.data)
         
     def __push1(self, object):
+        """_summary_
+
+        Args:
+            object (_type_): _description_
+        """        
         if self.size() == self.capacity:
             self.data.pop(0)
         
