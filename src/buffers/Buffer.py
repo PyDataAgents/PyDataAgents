@@ -7,9 +7,12 @@ class Buffer(GrabberElement, ABC):
     Abstract base class for buffers.
     """
     
-    def __init__(self, id, capacity):
+    def __init__(self, id: str = None, capacity: int = 1, initial_values: any = None, description: str = None):
+        super().__init__()
         self.id = id
         self.capacity = capacity
+        self.initial_values = initial_values
+        self.description = description
     
     @abstractmethod
     def push(self, objects):
@@ -43,3 +46,13 @@ class Buffer(GrabberElement, ABC):
             persistent (bool, optional): _description_. Defaults to True.
         """
         pass
+
+    def config_options(self) -> dict:
+        d = super().config_options()
+        d["capacity"] = self.capacity
+        if self.initial_values != None:
+            d["initial_values"] = self.initial_values
+        if self.description != None:
+            d["description"] = self.description
+        return d
+        

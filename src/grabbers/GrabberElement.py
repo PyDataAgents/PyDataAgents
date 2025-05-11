@@ -1,16 +1,22 @@
 from abc import ABC, abstractmethod
 import uuid
 
+from loguru import logger
+
 class GrabberElement(ABC):
     """
     Abstract base class for grabber elements.
     """
+
+    LOGGER = logger
     
-    def __init__(self):
+    def __init__(self, id: str = None):
         """
         Initialize the grabber element and assign a unique ID.
         """
-        self.id = GrabberElement.unique_id(self)
+        self.type = self.__module__
+        if id == None:
+            self.id = GrabberElement.unique_id(self)        
     
     @staticmethod
     def unique_id(obj):
@@ -22,21 +28,8 @@ class GrabberElement(ABC):
         """
         return f"{obj.__class__.__name__} [{uuid.uuid4()}]"
         
-    def get_id(self):
-        """
-        Get the unique ID of the grabber element.
-        
-        Returns:
-            str: The unique identifier for the grabber element.
-        """
-        return self.id
-    
-    def set_id(self, id):
-        """
-        Set the unique ID of the grabber element.
-        
-        Args:
-            id (str): The unique identifier for the grabber element.
-        """
-        self.id = id
-        return self
+    def config_options(self) -> dict:
+        d = dict()
+        d["type"] = self.type
+        d["id"] = self.id
+        return d

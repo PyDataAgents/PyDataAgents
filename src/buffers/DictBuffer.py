@@ -20,9 +20,9 @@ class DictBuffer(Buffer):
         if headers == None:
             headers = (self.id)
 
-        self.data = dict(list)
+        self.buffer = dict(list)
         for h in headers:
-            self.data[h] = []
+            self.buffer[h] = []
 
     def push(self, *args):
         """_summary_
@@ -30,11 +30,11 @@ class DictBuffer(Buffer):
         Args:
             *args (_type_): _description_
         """
-        if len(args) == len(self.data):
+        if len(args) == len(self.buffer):
             k = 0
-            for key in self.data:
-                self.data[key].append(args[k])
-                ++k
+            for key in self.buffer:
+                self.buffer[key].append(args[k])
+                k = k + 1
 
         else:
             raise BufferException("input must be the same length as dictionaries")
@@ -43,7 +43,7 @@ class DictBuffer(Buffer):
     def push(self, **kwargs):
         """_summary_
         """
-        if len(kwargs.items()) != len(self.data):
+        if len(kwargs.items()) != len(self.buffer):
             raise BufferException("input must be the same length as dictionaries")
         
         for k, values in kwargs.items():
@@ -52,13 +52,13 @@ class DictBuffer(Buffer):
             if tooMany > 0:
                 rest = len(values) - tooMany
                 if rest > 0:
-                    self.data.extend(values[rest - 1:])
+                    self.buffer.extend(values[rest - 1:])
                 i = 0
                 while i < tooMany:
                     self.__push1(values[rest + i])
-                    ++i
+                    i = i + 1
             else:
-                self.data.extend(values)
+                self.buffer.extend(values)
 
         
 
@@ -70,4 +70,4 @@ class DictBuffer(Buffer):
             n (_type_, optional): _description_. Defaults to None.
             persistent (_type_, optional): _description_. Defaults to True.
         """
-        return self.data
+        return self.buffer
