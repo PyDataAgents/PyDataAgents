@@ -13,14 +13,7 @@ class Adapter(GrabberElement, ABC):
         validate the adapter configuration.
         """
         pass
-
-    @abstractmethod
-    def install(self):
-        """
-        install the adapter / initialize object.
-        """
-        pass
-
+    
     @abstractmethod
     def connect(self):
         """
