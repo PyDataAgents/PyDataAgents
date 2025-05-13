@@ -1,6 +1,5 @@
 from abc import ABC, abstractmethod
 import uuid
-
 from loguru import logger
 
 class GrabberElement(ABC):
@@ -16,7 +15,9 @@ class GrabberElement(ABC):
         """
         self.type = self.__module__
         if id == None:
-            self.id = GrabberElement.unique_id(self)        
+            self.id = GrabberElement.unique_id(self)
+        else:
+            self.id = id        
     
     @staticmethod
     def unique_id(obj):

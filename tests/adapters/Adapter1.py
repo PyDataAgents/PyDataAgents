@@ -7,22 +7,10 @@ class Adapter1(Adapter):
         Adapter (_type_): _description_
     """
     
-    def __init__(self):
+    def __init__(self, id=None):
         """_summary_"""
-        super().__init__()        
+        super().__init__(id)        
         
-    def validate(self):
-        """
-        validate the adapter configuration.
-        """
-        return
-
-    def install(self):
-        """
-        install the adapter / initialize object.
-        """
-        return
-
     def connect(self):
         """
         connect to the data source.
@@ -32,12 +20,6 @@ class Adapter1(Adapter):
     def disconnect(self):
         """
         disconnect from the data source.
-        """
-        return True
-    
-    def isConnected(self):
-        """
-        check if the adapter is connected to the data source.
         """
         return True
         

@@ -1,0 +1,42 @@
+import pyads
+from PyDataGrabber.src.adapters.AdapterException import AdapterException
+from PyDataGrabber.src.adapters.ReadAdapter import ReadAdapter
+from PyDataGrabber.src.adapters.WriteAdapter import WriteAdapter
+
+
+class AdsAdapter(ReadAdapter, WriteAdapter):
+    
+    def __init__(self, id):
+        super().__init__(id)
+        self.ads_client = None
+        
+    def ams_net_id(self, ams_net_id=None):
+        self.ams_net_id = ams_net_id
+        return self
+    
+    def connect(self) -> bool:
+        self.ads_client = pyads.Connection(self.ams_net_id, pyads.PORT_SPS1)
+        self.ads_client.open()
+        print(self.ads_client.read_state())
+        return True
+    
+    def disconnect(self):
+        self.ads_client.close()
+        self.ads_client = None
+        return True
+    
+    def readFromSource(self, buffers : dict, addresses : list):
+        if len(buffers) != len(addresses):
+            raise AdapterException("size of buffers and addresses must match")
+        b = 0
+        for key in buffers:
+            val = self.ads_client.read_by_name(addresses[b])
+            buffers[key].push(val)
+        
+    def writeToSink(self, buffers, addresses : list, persistent : bool):
+        pass
+    
+    def config_options(self) -> dict:
+        d = super().config_options()
+        d["ams_net_id"] = self.ams_net_id
+        return d

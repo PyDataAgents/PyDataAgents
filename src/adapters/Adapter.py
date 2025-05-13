@@ -8,30 +8,16 @@ class Adapter(GrabberElement, ABC):
     """
     
     @abstractmethod
-    def validate(self):
-        """
-        validate the adapter configuration.
-        """
-        pass
-    
-    @abstractmethod
-    def connect(self):
+    def connect(self) -> bool:
         """
         connect to the data source.
         """
         pass
     
     @abstractmethod
-    def disconnect(self):
+    def disconnect(self) -> bool:
         """
         disconnect from the data source.
-        """
-        pass
-    
-    @abstractmethod
-    def isConnected(self):
-        """
-        check if the adapter is connected to the data source.
         """
         pass
     
