@@ -113,7 +113,7 @@ class Mapping(GrabberElement):
         last_time = round(time.time() * 1000)
         while self.isRunning:
             current_time = round(time.time() * 1000)
-            if current_time - last_time > self.sampling_period - self.SAFETY_DIFF_TIME_UNITS:
+            if current_time - last_time > self.sampling_period - Mapping.SAFETY_DIFF_TIME_UNITS:
                 match self.mapping_type:
                     case MappingType.READ:
                         self.adapter.readFromSource(self.buffers, self.addresses, self.sampling_period)
@@ -123,10 +123,10 @@ class Mapping(GrabberElement):
                 last_time = round(time.time() * 1000)
             else:
                 # do nothing and sleep a little
-                diff = self.sampling_period - self.SAFETY_DIFF_TIME_UNITS - (current_time - last_time)
-                time.sleep(diff / 1000.0 * self.SLEEP_WITH_HOLD_FACTOR)
+                diff = self.sampling_period - Mapping.SAFETY_DIFF_TIME_UNITS - (current_time - last_time)
+                time.sleep(diff / 1000.0 * Mapping.SLEEP_WITH_HOLD_FACTOR)
         
-        self.LOGGER.info("Mapping " + self.id + " has stopped")   
+        Mapping.LOGGER.info("Mapping " + self.id + " has stopped")   
         
     
     def runMicrosecondThread(self):
@@ -136,7 +136,7 @@ class Mapping(GrabberElement):
         last_time = round(time.time() * 1000000.0)
         while self.isRunning:
             current_time = round(time.time() * 1000000.0)
-            if current_time - last_time > self.sampling_period - self.SAFETY_DIFF_TIME_UNITS:
+            if current_time - last_time > self.sampling_period - Mapping.SAFETY_DIFF_TIME_UNITS:
                 match self.mapping_type:
                     case MappingType.READ:
                         self.adapter.readFromSource(self.buffers, self.addresses, self.sampling_period)
@@ -146,10 +146,10 @@ class Mapping(GrabberElement):
                 last_time = round(time.time() * 1000000.0)
             else:
                 # do nothing and sleep a little
-                diff = self.sampling_period - self.SAFETY_DIFF_TIME_UNITS - (current_time - last_time)
-                time.sleep(diff / 1000000.0 * self.SLEEP_WITH_HOLD_FACTOR)
+                diff = self.sampling_period - Mapping.SAFETY_DIFF_TIME_UNITS - (current_time - last_time)
+                time.sleep(diff / 1000000.0 * Mapping.SLEEP_WITH_HOLD_FACTOR)
         
-        self.LOGGER.info("Mapping " + self.id + " has stopped")
+        Mapping.LOGGER.info("Mapping " + self.id + " has stopped")
         pass
     
     def runOnlyOnceThread(self):
