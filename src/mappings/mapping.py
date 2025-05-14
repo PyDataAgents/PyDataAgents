@@ -24,8 +24,8 @@ class Mapping(GrabberElement):
     SAFETY_DIFF_TIME_UNITS = 1
     SLEEP_WITH_HOLD_FACTOR = 0.9
 
-    def __init__(self):
-        super().__init__(Mapping.unique_id())
+    def __init__(self, id):
+        super().__init__(id)
         self.buffers = {}
         self.adapter = None
         self.addresses = list()

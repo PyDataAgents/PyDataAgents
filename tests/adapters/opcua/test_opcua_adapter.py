@@ -27,4 +27,3 @@ def test000():
         print(buf1.data())
         i = i + 1
         
-test000()
