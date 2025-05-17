@@ -12,8 +12,13 @@ from PyDataGrabber.src.mappings.WriteMappingObserver import WriteMappingObserver
 
 
 class Mapping(GrabberElement):
-    
-    def __init__(self, id):
+    """_summary_
+
+    Args:
+        GrabberElement (_type_): _description_
+    """
+
+    def __init__(self, id : str = None):
         super().__init__(id)
         self.buffers : dict[Buffer] = dict()
         self.adapter : Adapter = None
@@ -25,48 +30,8 @@ class Mapping(GrabberElement):
         self.persistent = True
         self.observer_thread : ObserverThread = None
 
-    def thread_type(self, thread_type = ThreadType.MILLI_SECOND):
-        self.thread_type = thread_type
-        return self
-
-    def buffer(self, buffer: Buffer):
-        self.buffers.update(buffer.id, buffer)
-        return self
-
-    def buffers(self, buffers: dict):
-        self.buffers = buffers
-        return self
-
-    def address(self, address: str):
-        self.addresses.append(address)
-        return self
-
-    def addresses(self, addresses: list):
-        self.addresses = addresses
-        return self 
-
-    def adapter(self, adapter: Adapter):
-        self.adapter = adapter
-        return self
-
-    def sampling_period(self, sampling_period : int):
-        self.sampling_period = sampling_period
-        return self 
-    
-    def n(self, n : int):
-        self.n = n
-        return self
-    
-    def persistent(self, persistent : bool = True):
-        self.persistent = persistent
-        return self
-    
-    def mapping_type(self, mapping_type : MappingType):
-        self.mapping_type = mapping_type
-        return self
-    
     def start(self):
-        self.observer_thread = ObserverThread(self.thread_type)
+        self.observer_thread = ObserverThread(self.thread_type, self.sampling_period)
         match self.mapping_type:
             case MappingType.READ:
                 observer = ReadMappingObserver(self)
@@ -79,13 +44,10 @@ class Mapping(GrabberElement):
                 self.observer_thread.add_observer(observer)
             case MappingType.PUB:
                 observer = PublishMappingObserver(self)
-                self.observer_thread.add_observer(observer)                
-        self.observer_thread.start()        
-        
+                self.observer_thread.add_observer(observer)
+        self.observer_thread.start()
+
     def stop(self):
         """stops the mapping
         """
-        self.observer_thread.stop()                
-        
-        
-    
+        self.observer_thread.stop()

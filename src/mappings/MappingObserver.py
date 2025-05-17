@@ -1,5 +1,3 @@
-from abc import abstractmethod
-from PyDataGrabber.src.grabbers.GrabberElement import GrabberElement
 from PyDataGrabber.src.mappings.Observer import Observer
 from PyDataGrabber.src.mappings.Mapping import Mapping
 

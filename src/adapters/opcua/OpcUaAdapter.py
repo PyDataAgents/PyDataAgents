@@ -1,21 +1,15 @@
-from PyDataGrabber.src.adapters.Adapter import Adapter
+from opcua import Client
 from PyDataGrabber.src.adapters.AdapterException import AdapterException
 from PyDataGrabber.src.adapters.ReadAdapter import ReadAdapter
 from PyDataGrabber.src.adapters.WriteAdapter import WriteAdapter
-
-from opcua import Client
-
 from PyDataGrabber.src.buffers.Buffer import Buffer
 
 class OpcUaAdapter(ReadAdapter, WriteAdapter):
     
     def __init__(self, id):
         super().__init__(id)
-        self.opc_client = None
-        
-    def endpoint(self, endpoint=None):
-        self.endpoint = endpoint
-        return self
+        self.opc_client : Client = None
+        self.endpoint : str = None
     
     def connect(self) -> bool:
         self.opc_client = Client(self.endpoint)

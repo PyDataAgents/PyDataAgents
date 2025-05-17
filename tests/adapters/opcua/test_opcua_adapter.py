@@ -24,7 +24,7 @@ def test000():
     n = 1000
     i = 0
     while i < n:
-        opcua.readFromSource(bufDict, addressList)    
+        opcua.read_from_source(bufDict, addressList)    
         print(buf1.data())
         i = i + 1
         
@@ -38,7 +38,7 @@ def test010():
     buf1 = ListBuffer("T1", 1)
     bufDict = BufferUtils.to_dict(buf1)
     
-    opcua.endpoint("opc.tcp://jh:48010")
+    opcua.endpoint = "opc.tcp://jh:48010"
     
     address1 = "ns=4;s=AirConditioner_1.Temperature"
     addressList = list()

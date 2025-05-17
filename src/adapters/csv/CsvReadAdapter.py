@@ -19,29 +19,6 @@ class CsvReadAdapter(ReadAdapter):
         self.csv_reader = None
         self.headers = list()
         
-    def file_path(self, file_path : str):
-        self.file_path = file_path
-        return self
-    
-    def all_at_once(self, all_at_once : bool):
-        self.all_at_once = all_at_once
-        return self
-    
-    def delimiter(self, delimiter : str):
-        self.delimiter = delimiter
-        return self
-    
-    def auto_detect(self, auto_detect : bool):
-        self.auto_detect = auto_detect
-        return self
-    
-    def has_header(self, has_header : bool):
-        self.has_header = has_header
-        return self
-    
-    def force_numeric(self, force_numeric : bool):
-        self.force_numeric = force_numeric
-        
     def connect(self) -> bool:
         if self.file_path != None:
             if FileParser.exists_file(self.file_path):

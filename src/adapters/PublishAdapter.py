@@ -7,7 +7,7 @@ class PublishAdapter(Adapter):
     """
     
     @abstractmethod
-    def publish(buffers : dict[str, Buffer], addresses : list[str], sampling_period : int, n : int, persistent : bool):
+    def publish(self, buffers : dict[str, Buffer], addresses : list[str], sampling_period : int, n : int, persistent : bool):
         """publish samples from buffers to addresses with specified sampling_period and n samples at once
             <br>if persistent is specified False, then the samples will be removed from buffers
 
@@ -21,7 +21,7 @@ class PublishAdapter(Adapter):
         pass
     
     @abstractmethod
-    def unpublish():
+    def unpublish(self):
         """ resets the adapter to stop publishing
         """
         pass    

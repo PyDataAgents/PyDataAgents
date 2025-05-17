@@ -1,15 +1,8 @@
-from abc import abstractmethod
-import enum
 import json
-
+from abc import abstractmethod
+from PyDataGrabber.src.buffers.DataType import DataType
 from PyDataGrabber.src.grabbers.GrabberElement import GrabberElement
 
-class DataType(enum.Enum):
-    STRING = "STRING"
-    NUMERIC = "NUMERIC"
-    OBJECT = "OBJECT"
-    IMAGE = "IMAGE"
-    BYTE = "BYTE"
 
 class Buffer(GrabberElement):
     """
@@ -24,30 +17,10 @@ class Buffer(GrabberElement):
         self.data_type = data_type
         self.unit = unit
     
-    def capacity(self, capacity : int) -> int:
-        self.capacity = capacity
-        return self
-        
-    def data_type(self, data_type : DataType):
-        self.data_type = [data_type]
-        return self
-
-    def data_types(self, data_types : list):
-        self.data_type = data_types
-        return self
-
-    def unit(self, unit : str):
-        self.unit = [unit]
-        return self
-    
-    def units(self, units : list[str]):
-        self.unit = units
-        return self
-    
     @abstractmethod
-    def push(self, objects):
+    def push(self, elements):
         """
-        push new objetcs to buffer
+        push new elements to buffer
         """
         pass
         
@@ -83,18 +56,18 @@ class Buffer(GrabberElement):
         Returns:
             str: string represenation as json
         """
-        return self.json(n = 0, persistent=True)    
+        return self.json(n = 0, persistent=True)
 
     def config_options(self) -> dict:
         d = super().config_options()
         d["capacity"] = self.capacity
-        if self.data_type != None:
+        if self.data_type is not None:
             d["data_type"] = self.data_type
-        if self.unit != None:
+        if self.unit is not None:
             d["unit"] = self.unit
-        if self.initial_values != None:
+        if self.initial_values is not None:
             d["initial_values"] = self.initial_values
-        if self.description != None:
+        if self.description is not None:
             d["description"] = self.description
         return d
     

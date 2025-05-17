@@ -60,10 +60,7 @@ class CsvWriteAdapter(WriteAdapter):
                         self.csv_writer.writerow(d) 
                     else:
                         raise AdapterException("write_to_sink is not defined for n > 1")  
-                    
-                            
-                
-      
+
     def config_options(self) -> dict:
         d = super().config_options()
         d["folder"] = self.folder

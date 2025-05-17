@@ -12,10 +12,6 @@ class AdsAdapter(ReadAdapter, WriteAdapter):
         self.ads_client : pyads.Connection = None
         self.ams_net_id : str = None
         
-    def ams_net_id(self, ams_net_id):
-        self.ams_net_id = ams_net_id
-        return self
-    
     def connect(self) -> bool:
         self.ads_client = pyads.Connection(self.ams_net_id, pyads.PORT_SPS1)
         self.ads_client.open()

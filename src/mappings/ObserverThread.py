@@ -10,9 +10,10 @@ class ObserverThread(GrabberElement):
     SAFETY_DIFF_TIME_UNITS : int = 1
     SLEEP_WITH_HOLD_FACTOR : float = 0.9
      
-    def __init__(self, thread_type = ThreadType.MILLI_SECOND, id : str = None):
+    def __init__(self, id : str = None, thread_type = ThreadType.MILLI_SECOND, sampling_period : int = 100):
         super().__init__(id)
         self.thread_type : ThreadType = thread_type
+        self.sampling_period = sampling_period
         self.thread : threading.Thread = None
         self.observers : list[Observer] = list()
         self.is_running = False
