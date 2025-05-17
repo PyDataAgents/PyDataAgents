@@ -6,7 +6,7 @@ from PyDataGrabber.src.grabbers.Grabber import Grabber
 from PyDataGrabber.src.mappings.Mapping import Mapping, MappingType, ThreadType
 
 
-def test000():
+def test_000():
     grabber = Grabber("G1")
     
     buf = ListBuffer("T1")

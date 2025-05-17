@@ -1,13 +1,13 @@
-import enum
+
+from PyDataGrabber.src.grabbers.GrabberElement import GrabberElement
 from PyDataGrabber.src.adapters.Adapter import Adapter
 from PyDataGrabber.src.buffers.Buffer import Buffer
-from PyDataGrabber.src.grabbers.GrabberElement import GrabberElement
 from PyDataGrabber.src.mappings.MappingType import MappingType
+from PyDataGrabber.src.mappings.ThreadType import ThreadType
 from PyDataGrabber.src.mappings.ObserverThread import ObserverThread
 from PyDataGrabber.src.mappings.PublishMappingObserver import PublishMappingObserver
 from PyDataGrabber.src.mappings.ReadMappingObserver import ReadMappingObserver
 from PyDataGrabber.src.mappings.SubscribeMappingObserver import SubscribeMappingObserver
-from PyDataGrabber.src.mappings.ThreadType import ThreadType
 from PyDataGrabber.src.mappings.WriteMappingObserver import WriteMappingObserver
 
 
@@ -15,7 +15,7 @@ class Mapping(GrabberElement):
     
     def __init__(self, id):
         super().__init__(id)
-        self.buffers : dict[Buffer] = {}
+        self.buffers : dict[Buffer] = dict()
         self.adapter : Adapter = None
         self.addresses : list[str] = None
         self.thread_type : ThreadType = ThreadType.MILLI_SECOND
