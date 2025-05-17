@@ -1,10 +1,13 @@
 from abc import abstractmethod
 from PyDataGrabber.src.adapters.Adapter import Adapter
+from PyDataGrabber.src.buffers.Buffer import Buffer
 
 class SubscribeAdapter(Adapter):
+    """abstract class for Adapter Interface for subscribing from data sources
+    """
     
     @abstractmethod
-    def subscribe(buffers : dict, addresses : list, sampling_period : int):
+    def subscribe(buffers : dict[str, Buffer], addresses : list[str], sampling_period : int):
         pass
     
     @abstractmethod

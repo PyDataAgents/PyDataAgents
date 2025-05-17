@@ -1,9 +1,13 @@
 import threading
-import time
 import enum
 from PyDataGrabber.src.adapters.Adapter import Adapter
 from PyDataGrabber.src.buffers.Buffer import Buffer
 from PyDataGrabber.src.grabbers.GrabberElement import GrabberElement
+from PyDataGrabber.src.mappings.ObserverThread import ObserverThread
+from PyDataGrabber.src.mappings.PublishMappingObserver import PublishMappingObserver
+from PyDataGrabber.src.mappings.ReadMappingObserver import ReadMappingObserver
+from PyDataGrabber.src.mappings.SubscribeMappingObserver import SubscribeMappingObserver
+from PyDataGrabber.src.mappings.WriteMappingObserver import WriteMappingObserver
 
 class ThreadType(enum.Enum):
     MILLI_SECOND = "MILLI_SECOND"
@@ -20,24 +24,20 @@ class MappingType(enum.Enum):
     PUB = "PUB"
 
 class Mapping(GrabberElement):
-
-    SAFETY_DIFF_TIME_UNITS = 1
-    SLEEP_WITH_HOLD_FACTOR = 0.9
-
+    
     def __init__(self, id):
         super().__init__(id)
-        self.buffers = {}
-        self.adapter = None
-        self.addresses = list()
-        self.thread_type = ThreadType.MILLI_SECOND
-        self.sampling_period = 0
-        self.mapping_type = None
+        self.buffers : dict[Buffer] = {}
+        self.adapter : Adapter = None
+        self.addresses : list[str] = None
+        self.thread_type : ThreadType = ThreadType.MILLI_SECOND
+        self.sampling_period : int = 0
+        self.mapping_type : MappingType = None
         self.persistent = True
         self.isRunning = False
         self.hasError = False
         self.lastActiveTime = 0
-        self.thread = None
-        self.lock = threading.RLock()
+        self.observer_thread : ObserverThread = None
 
     def thread_type(self, thread_type = ThreadType.MILLI_SECOND):
         self.thread_type = thread_type
@@ -76,88 +76,24 @@ class Mapping(GrabberElement):
         return self
     
     def start(self):
-        if not self.isRunning:
-            match self.thread_type:
-                case ThreadType.MILLI_SECOND:                    
-                    self.thread = threading.Thread(target = self.runMillisecondThread)
-                
-                case ThreadType.MICRO_SECOND:
-                    self.thread = threading.Thread(target = self.runMicrosecondThread)
-                    
-                case ThreadType.ONLY_ONCE:
-                    self.thread = threading.Thread(target = self.runOnlyOnceThread)
-                    
-                case _:
-                    self.thread = threading.Thread(target = self.runMillisecondThread)
-                        
-            self.isRunning = True            
-            self.thread.start()
-        else:
-            Mapping.LOGGER.error("could not start mapping, because it is running already")
+        self.observer_thread = ObserverThread(self.thread_type)
+        match self.mapping_type:
+            case MappingType.READ:
+                observer = ReadMappingObserver(self)
+                self.observer_thread.add_observer(observer)
+            case MappingType.WRITE:
+                observer = WriteMappingObserver(self)
+                self.observer_thread.add_observer(observer)
+            case MappingType.SUB:
+                observer = SubscribeMappingObserver(self)
+                self.observer_thread.add_observer(observer)
+            case MappingType.PUB:
+                observer = PublishMappingObserver(self)
+                self.observer_thread.add_observer(observer)                
+        self.observer_thread.start()        
         
     def stop(self):
-        self.LOGGER.info("Stopping Mapping " + self.id)
-        self.isRunning = False
-        match self.mapping_type:
-            case MappingType.SUB:
-                self.adapter.unsubscribe()
-                
-            case MappingType.PUB:
-                self.adapter.unpublish()                
+        self.observer_thread.stop()                
         
         
-    def runMillisecondThread(self):
-        last_time = 0
-        current_time = 0
-        diff = 0
-        last_time = round(time.time() * 1000)
-        while self.isRunning:
-            current_time = round(time.time() * 1000)
-            if current_time - last_time > self.sampling_period - Mapping.SAFETY_DIFF_TIME_UNITS:
-                match self.mapping_type:
-                    case MappingType.READ:
-                        self.adapter.readFromSource(self.buffers, self.addresses, self.sampling_period)
-                            
-                    case MappingType.WRITE:
-                        self.adapter.writeToSink(self.buffers, self.addresses, self.sampling_period, self.persistent)
-                last_time = round(time.time() * 1000)
-            else:
-                # do nothing and sleep a little
-                diff = self.sampling_period - Mapping.SAFETY_DIFF_TIME_UNITS - (current_time - last_time)
-                time.sleep(diff / 1000.0 * Mapping.SLEEP_WITH_HOLD_FACTOR)
-        
-        Mapping.LOGGER.info("Mapping " + self.id + " has stopped")   
-        
-    
-    def runMicrosecondThread(self):
-        last_time = 0
-        current_time = 0
-        diff = 0
-        last_time = round(time.time() * 1000000.0)
-        while self.isRunning:
-            current_time = round(time.time() * 1000000.0)
-            if current_time - last_time > self.sampling_period - Mapping.SAFETY_DIFF_TIME_UNITS:
-                match self.mapping_type:
-                    case MappingType.READ:
-                        self.adapter.readFromSource(self.buffers, self.addresses, self.sampling_period)
-                            
-                    case MappingType.WRITE:
-                        self.adapter.writeToSink(self.buffers, self.addresses, self.sampling_period, self.persistent)
-                last_time = round(time.time() * 1000000.0)
-            else:
-                # do nothing and sleep a little
-                diff = self.sampling_period - Mapping.SAFETY_DIFF_TIME_UNITS - (current_time - last_time)
-                time.sleep(diff / 1000000.0 * Mapping.SLEEP_WITH_HOLD_FACTOR)
-        
-        Mapping.LOGGER.info("Mapping " + self.id + " has stopped")
-        pass
-    
-    def runOnlyOnceThread(self):
-        self.isRunning = True
-        match self.mapping_type:
-            case MappingType.SUB:
-                self.adapter.subscribe(self.buffers, self.addresses, self.sampling_period)
-                
-            case MappingType.PUB:
-                self.adapter.publish(self.buffers, self.addresses, self.sampling_period, self.persistent)
     

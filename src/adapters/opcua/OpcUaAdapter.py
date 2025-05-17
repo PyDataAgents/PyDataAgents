@@ -5,6 +5,8 @@ from PyDataGrabber.src.adapters.WriteAdapter import WriteAdapter
 
 from opcua import Client
 
+from PyDataGrabber.src.buffers.Buffer import Buffer
+
 class OpcUaAdapter(ReadAdapter, WriteAdapter):
     
     def __init__(self, id):
@@ -27,7 +29,7 @@ class OpcUaAdapter(ReadAdapter, WriteAdapter):
         self.opc_client = None
         return True
     
-    def readFromSource(self, buffers, addresses):
+    def read_from_source(self, buffers : dict[str, Buffer], addresses : list[str]):
         if len(buffers) != len(addresses):
             raise AdapterException("size of buffers and addresses must match")
         b = 0
@@ -36,8 +38,14 @@ class OpcUaAdapter(ReadAdapter, WriteAdapter):
             val = node.get_value()
             buffers[key].push(val)
         
-    def writeToSink(self, buffers, addresses, persistent):
-        pass
+    def write_to_sink(self, buffers : dict[str, Buffer], addresses : list[str], persistent : bool):
+        if len(buffers) != len(addresses):
+            raise AdapterException("size of buffers and addresses must match")
+        b = 0
+        for key in buffers:
+            node = self.opc_client.get_node(addresses[b])
+            val = buffers[key].data(n = 1, persistent=persistent)
+            self.opc_client.set_values(node, val)
     
     def config_options(self) -> dict:
         d = super().config_options()
