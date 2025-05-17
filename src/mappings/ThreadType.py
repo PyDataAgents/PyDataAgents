@@ -1,0 +1,11 @@
+import enum
+
+
+class ThreadType(enum.Enum):
+    MILLI_SECOND = "MILLI_SECOND"
+    MICRO_SECOND = "MICRO_SECOND"
+    NANO_SECOND = "NANO_SECOND"
+    INSTANT = "INSTANT"
+    SECOND = "SECOND"
+    ONLY_ONCE = "ONLY_ONCE"
+    TRIGGERED = "TRIGGERED"

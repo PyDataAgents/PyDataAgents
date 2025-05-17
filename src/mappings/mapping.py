@@ -2,26 +2,14 @@ import enum
 from PyDataGrabber.src.adapters.Adapter import Adapter
 from PyDataGrabber.src.buffers.Buffer import Buffer
 from PyDataGrabber.src.grabbers.GrabberElement import GrabberElement
+from PyDataGrabber.src.mappings.MappingType import MappingType
 from PyDataGrabber.src.mappings.ObserverThread import ObserverThread
 from PyDataGrabber.src.mappings.PublishMappingObserver import PublishMappingObserver
 from PyDataGrabber.src.mappings.ReadMappingObserver import ReadMappingObserver
 from PyDataGrabber.src.mappings.SubscribeMappingObserver import SubscribeMappingObserver
+from PyDataGrabber.src.mappings.ThreadType import ThreadType
 from PyDataGrabber.src.mappings.WriteMappingObserver import WriteMappingObserver
 
-class ThreadType(enum.Enum):
-    MILLI_SECOND = "MILLI_SECOND"
-    MICRO_SECOND = "MICRO_SECOND"
-    NANO_SECOND = "NANO_SECOND"
-    INSTANT = "INSTANT"
-    SECOND = "SECOND"
-    ONLY_ONCE = "ONLY_ONCE"
-    TRIGGERED = "TRIGGERED"
-
-class MappingType(enum.Enum):
-    READ = "READ"
-    WRITE = "WRITE"
-    SUB = "SUB"
-    PUB = "PUB"
 
 class Mapping(GrabberElement):
     
