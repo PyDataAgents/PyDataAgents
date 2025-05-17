@@ -1,4 +1,4 @@
-from abc import ABC, abstractmethod
+from abc import ABC
 import uuid
 from loguru import logger
 
@@ -19,6 +19,16 @@ class GrabberElement(ABC):
         else:
             self.id = id        
     
+    def name(self) -> str:
+        s = self.__class__.__name__ + "[" + self.id + "]"
+        return s
+            
+    def config_options(self) -> dict:
+        d = dict()
+        d["type"] = self.type
+        d["id"] = self.id
+        return d
+    
     @staticmethod
     def unique_id(obj):
         """
@@ -28,9 +38,3 @@ class GrabberElement(ABC):
             str: A unique identifier for the grabber element.
         """
         return f"{obj.__class__.__name__} [{uuid.uuid4()}]"
-        
-    def config_options(self) -> dict:
-        d = dict()
-        d["type"] = self.type
-        d["id"] = self.id
-        return d

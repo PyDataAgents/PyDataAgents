@@ -85,7 +85,7 @@ class CsvReadAdapter(ReadAdapter):
         d["has_header"] = self.has_header
         return d
     
-    def read_from_source(self, buffers : dict[str, Buffer], addresses : list[str]):
+    def read_from_source(self, buffers : dict[str, Buffer], addresses : list[str], n : int = 1):
         if addresses != None:
             if len(buffers) != len(addresses):
                 raise AdapterException("buffers and addresses must be of same size")

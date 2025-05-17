@@ -1,4 +1,3 @@
-import threading
 import enum
 from PyDataGrabber.src.adapters.Adapter import Adapter
 from PyDataGrabber.src.buffers.Buffer import Buffer
@@ -13,6 +12,7 @@ class ThreadType(enum.Enum):
     MILLI_SECOND = "MILLI_SECOND"
     MICRO_SECOND = "MICRO_SECOND"
     NANO_SECOND = "NANO_SECOND"
+    INSTANT = "INSTANT"
     SECOND = "SECOND"
     ONLY_ONCE = "ONLY_ONCE"
     TRIGGERED = "TRIGGERED"
@@ -32,11 +32,9 @@ class Mapping(GrabberElement):
         self.addresses : list[str] = None
         self.thread_type : ThreadType = ThreadType.MILLI_SECOND
         self.sampling_period : int = 0
+        self.n : int = 1
         self.mapping_type : MappingType = None
         self.persistent = True
-        self.isRunning = False
-        self.hasError = False
-        self.lastActiveTime = 0
         self.observer_thread : ObserverThread = None
 
     def thread_type(self, thread_type = ThreadType.MILLI_SECOND):
@@ -67,6 +65,10 @@ class Mapping(GrabberElement):
         self.sampling_period = sampling_period
         return self 
     
+    def n(self, n : int):
+        self.n = n
+        return self
+    
     def persistent(self, persistent : bool = True):
         self.persistent = persistent
         return self
@@ -93,6 +95,8 @@ class Mapping(GrabberElement):
         self.observer_thread.start()        
         
     def stop(self):
+        """stops the mapping
+        """
         self.observer_thread.stop()                
         
         

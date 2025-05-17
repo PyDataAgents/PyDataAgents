@@ -8,7 +8,7 @@ class WriteMappingObserver(MappingObserver):
         super().__init__(mapping, id)
 
     def observe(self):
-        self.mapping.adapter.write_to_sink(self.mapping.buffers, self.mapping.addresses, self.mapping.persistent)
+        self.mapping.adapter.write_to_sink(self.mapping.buffers, self.mapping.addresses, self.mapping.n, self.mapping.persistent)
     
     def unobserve(self):
         pass

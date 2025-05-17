@@ -21,7 +21,7 @@ class CsvWriteAdapter(WriteAdapter):
         self.decimal_precision : int = 3
         self.csv_file = None
         self.csv_writer = None
-        self.row : int = 0
+        self.rows : int = 0
         
     def connect(self) -> bool:
         if FileParser.exists_folder(self.folder):
@@ -39,7 +39,7 @@ class CsvWriteAdapter(WriteAdapter):
         self.csv_file = None
         return True
     
-    def write_to_sink(self, buffers : dict[Buffer], addresses : list[str], persistent : bool):
+    def write_to_sink(self, buffers : dict[Buffer], addresses : list[str], n : int = 1, persistent : bool = False):
         if len(buffers) == 1:
             if isinstance(self, DictBuffer):
                 pass
@@ -49,7 +49,20 @@ class CsvWriteAdapter(WriteAdapter):
             if addresses != None:
                 pass
             else:
-                pass
+                if self.rows == 0:
+                    headers = buffers.keys()
+                    self.csv_writer.writerow(headers)
+                else:
+                    if n == 1:
+                        d = list()
+                        for key in buffers.keys():                        
+                            d.append(buffers[key].data(n = n, persistent = persistent))
+                        self.csv_writer.writerow(d) 
+                    else:
+                        raise AdapterException("write_to_sink is not defined for n > 1")  
+                    
+                            
+                
       
     def config_options(self) -> dict:
         d = super().config_options()

@@ -7,5 +7,12 @@ class ReadAdapter(Adapter):
     """
     
     @abstractmethod
-    def read_from_source(self, buffers : dict[str, Buffer], addresses : list[str]):
+    def read_from_source(self, buffers : dict[str, Buffer], addresses : list[str], n : int):
+        """ reads data from source into buffers for specified addresses and n samples at once
+
+        Args:
+            buffers (dict[str, Buffer]): _description_
+            addresses (list[str]): _description_
+            n (int): _description_
+        """
         pass    

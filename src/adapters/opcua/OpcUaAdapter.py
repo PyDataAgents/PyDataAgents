@@ -29,22 +29,25 @@ class OpcUaAdapter(ReadAdapter, WriteAdapter):
         self.opc_client = None
         return True
     
-    def read_from_source(self, buffers : dict[str, Buffer], addresses : list[str]):
+    def read_from_source(self, buffers : dict[str, Buffer], addresses : list[str], n : int = 1):
         if len(buffers) != len(addresses):
             raise AdapterException("size of buffers and addresses must match")
         b = 0
-        for key in buffers:
-            node = self.opc_client.get_node(addresses[b])
-            val = node.get_value()
-            buffers[key].push(val)
+        if n == 1:
+            for key in buffers:
+                node = self.opc_client.get_node(addresses[b])
+                val = node.get_value()
+                buffers[key].push(val)
+        else:
+            raise AdapterException("read_from_source is not implemented for n > 1")
         
-    def write_to_sink(self, buffers : dict[str, Buffer], addresses : list[str], persistent : bool):
+    def write_to_sink(self, buffers : dict[str, Buffer], addresses : list[str], n : int = 1, persistent : bool = False):
         if len(buffers) != len(addresses):
             raise AdapterException("size of buffers and addresses must match")
         b = 0
         for key in buffers:
             node = self.opc_client.get_node(addresses[b])
-            val = buffers[key].data(n = 1, persistent=persistent)
+            val = buffers[key].data(n = n, persistent=persistent)
             self.opc_client.set_values(node, val)
     
     def config_options(self) -> dict:

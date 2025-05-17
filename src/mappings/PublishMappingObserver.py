@@ -8,7 +8,7 @@ class PublishMappingObserver(MappingObserver):
         super().__init__(mapping, id)
 
     def observe(self):
-        self.mapping.adapter.publish(self.mapping.buffers, self.mapping.addresses, self.mapping.sampling_period, self.mapping.persistent)
+        self.mapping.adapter.publish(self.mapping.buffers, self.mapping.addresses, self.mapping.sampling_period, self.mapping.n, self.mapping.persistent)
     
     def unobserve(self):
         self.mapping.adapter.unpublish()

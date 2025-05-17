@@ -8,7 +8,7 @@ class ReadMappingObserver(MappingObserver):
         super().__init__(mapping, id)
 
     def observe(self):
-        self.mapping.adapter.read_from_source(self.mapping.buffers, self.mapping.addresses)
+        self.mapping.adapter.read_from_source(self.mapping.buffers, self.mapping.addresses, self.mapping.n)
     
     def unobserve(self):
         pass

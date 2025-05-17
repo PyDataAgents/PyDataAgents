@@ -27,7 +27,7 @@ class AdsAdapter(ReadAdapter, WriteAdapter):
         self.ads_client = None
         return True
     
-    def read_from_source(self, buffers : dict[str, Buffer], addresses : list[str]):
+    def read_from_source(self, buffers : dict[str, Buffer], addresses : list[str], n : int = 1):
         if len(buffers) != len(addresses):
             raise AdapterException("size of buffers and addresses must match")
         b = 0
@@ -35,12 +35,12 @@ class AdsAdapter(ReadAdapter, WriteAdapter):
             val = self.ads_client.read_by_name(addresses[b])
             buffers[key].push(val)
         
-    def writeToSink(self, buffers : dict[str, Buffer], addresses : list[str], persistent : bool):
+    def writeToSink(self, buffers : dict[str, Buffer], addresses : list[str], persistent : bool, n : int = 1):
         if len(buffers) != len(addresses):
             raise AdapterException("size of buffers and addresses must match")
         b = 0
         for key in buffers:
-            val = buffers[key].data(1, persistent) 
+            val = buffers[key].data(n, persistent) 
             if len(val) > 1:
                 # TODO
                 raise AdapterException("writing more than one value is not supported yet")
