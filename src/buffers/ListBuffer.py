@@ -1,11 +1,12 @@
 import threading
-from PyDataGrabber.src.buffers.Buffer import Buffer, DataType
+from PyDataGrabber.src.buffers.Buffer import Buffer
+from PyDataGrabber.src.buffers.DataType import DataType
 
 class ListBuffer(Buffer):
     """buffer that stores its values in a capacity limited list
     """
 
-    def __init__(self, id : str = None, capacity : int = 1, data_type : list[DataType] = None, unit : list[str] = None, initial_values : list = None, description : str = None):
+    def __init__(self, id : str = None, capacity : int = 1, data_type : DataType = None, unit : str = None, initial_values : list = None, description : str = None):
         super().__init__(id = id, capacity = capacity, data_type=data_type, initial_values=initial_values, description=description)        
         if self.initial_values is not None:
             self.buffer = self.initial_values

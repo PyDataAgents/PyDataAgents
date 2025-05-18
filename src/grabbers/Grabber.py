@@ -1,3 +1,4 @@
+from __future__ import annotations
 import time
 from PyDataGrabber.src.adapters.Adapter import Adapter
 from PyDataGrabber.src.buffers.Buffer import Buffer

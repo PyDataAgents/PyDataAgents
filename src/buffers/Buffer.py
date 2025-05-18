@@ -1,6 +1,5 @@
 import json
 from abc import abstractmethod
-from PyDataGrabber.src.buffers.DataType import DataType
 from PyDataGrabber.src.grabbers.GrabberElement import GrabberElement
 
 
@@ -9,7 +8,7 @@ class Buffer(GrabberElement):
     Abstract base class for buffers.
     """
     
-    def __init__(self, id : str = None, capacity : int = 1, data_type : list[DataType] = None, unit : list[str] = None, initial_values : any = None, description : str = None):
+    def __init__(self, id : str = None, capacity : int = 1, data_type : any = None, unit : any = None, initial_values : any = None, description : str = None):
         super().__init__(id)
         self.capacity = capacity
         self.initial_values = initial_values
@@ -48,7 +47,7 @@ class Buffer(GrabberElement):
         return d
     
     def json(self, n=None, persistent=True):
-        return json.dumps(self.data_with_meta(n, persistent))
+        return json.dumps(self.data_with_meta(n, persistent), ensure_ascii=False)
 
     def __str__(self):
         """string representation

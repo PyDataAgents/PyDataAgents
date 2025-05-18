@@ -1,5 +1,7 @@
 import threading
-from PyDataGrabber.src.buffers.Buffer import Buffer, DataType
+from PyDataGrabber.src.buffers.Buffer import Buffer
+from PyDataGrabber.src.buffers.DataType import DataType
+
 
 class DictBuffer(Buffer):
     """buffer that stores its values in a dictionary in a table like fashion, where every key contains a list of data

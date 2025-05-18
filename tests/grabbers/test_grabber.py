@@ -1,6 +1,6 @@
 import time
 from PyDataGrabber.src.adapters.opcua.OpcUaAdapter import OpcUaAdapter
-from PyDataGrabber.src.buffers.Buffer import DataType
+from PyDataGrabber.src.buffers.DataType import DataType
 from PyDataGrabber.src.buffers.ListBuffer import ListBuffer
 from PyDataGrabber.src.grabbers.Grabber import Grabber
 from PyDataGrabber.src.mappings.Mapping import Mapping, MappingType, ThreadType
@@ -14,7 +14,7 @@ def test_000():
     buf = ListBuffer("T1")
     buf.capacity = 1
     buf.data_type = DataType.NUMERIC
-    buf.unit = list("°C")
+    buf.unit = "°C"
     
     grabber.add_buffer(buf)
     
@@ -36,7 +36,13 @@ def test_000():
     
     grabber.start()
     
-    time.sleep(10)
+    time.sleep(2)
+    
+    i = 0
+    while i < 10:
+        print(grabber.get_buffer("T1").json(n = 1, persistent = False))
+        time.sleep(1)
+        i = i + 1
     
     grabber.stop()
     

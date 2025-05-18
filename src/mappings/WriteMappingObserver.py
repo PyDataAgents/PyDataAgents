@@ -1,6 +1,5 @@
 from PyDataGrabber.src.mappings.MappingObserver import MappingObserver
 
-
 class WriteMappingObserver(MappingObserver):
 
     def observe(self):
