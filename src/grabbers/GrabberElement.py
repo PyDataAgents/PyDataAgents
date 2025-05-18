@@ -14,10 +14,10 @@ class GrabberElement(ABC):
         Initialize the grabber element and assign a unique ID.
         """
         self.type = self.__module__
-        if id == None:
-            self.id = GrabberElement.unique_id(self)
+        if id is not None:            
+            self.id = id 
         else:
-            self.id = id        
+            self.id = GrabberElement.unique_id()       
     
     def name(self) -> str:
         s = self.__class__.__name__ + "[" + self.id + "]"
@@ -29,12 +29,12 @@ class GrabberElement(ABC):
         d["id"] = self.id
         return d
     
-    @staticmethod
-    def unique_id(obj):
+    @classmethod
+    def unique_id(cls):
         """
-        Generate a unique ID for the grabber element.
+        Generate a unique ID for the grabber element class
         
         Returns:
-            str: A unique identifier for the grabber element.
+            str: A unique identifier for the grabber element class
         """
-        return f"{obj.__class__.__name__} [{uuid.uuid4()}]"
+        return f"{cls.__name__} [{uuid.uuid4()}]"

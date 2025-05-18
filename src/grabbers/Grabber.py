@@ -3,6 +3,7 @@ from PyDataGrabber.src.adapters.Adapter import Adapter
 from PyDataGrabber.src.buffers.Buffer import Buffer
 from PyDataGrabber.src.grabbers.GrabberElement import GrabberElement
 from PyDataGrabber.src.mappings.Mapping import Mapping
+from PyDataGrabber.src.mappings.MappingThread import MappingThread
 from PyDataGrabber.src.services.Service import Service
 
 
@@ -12,7 +13,7 @@ class Grabber(GrabberElement):
         super().__init__(id)
         self.buffer_store : dict[Buffer] = dict()
         self.adapter_store : dict[Adapter] = dict()
-        self.mapping_store : dict[Mapping] = dict()
+        self.mapping_store : dict[MappingThread] = dict()
         self.service_store : dict[Service] = dict()
         self.isRunning = False
     
@@ -23,7 +24,8 @@ class Grabber(GrabberElement):
         self.adapter_store[adapter.id] = adapter
         
     def add_mapping(self, mapping : Mapping):
-        self.mapping_store[mapping.id] = mapping
+        mapping_thread = MappingThread(mapping)
+        self.mapping_store[mapping.id] = mapping_thread
         
     def add_service(self, service : Service):
         self.service_store[service.id] = service
@@ -40,16 +42,16 @@ class Grabber(GrabberElement):
         self.start_services()       
     
     def connect_adapters(self):
-        for adapter in self.adapter_store:
-            if adapter.connect() == False:
+        for adapter in self.adapter_store.values():
+            if adapter.connect() is False:
                 Grabber.LOGGER.error(adapter.name() + " could not be connected")                
     
     def start_mappings(self):
-        for mapping in self.mapping_store:
+        for mapping in self.mapping_store.values():
             mapping.start()
             
     def start_services(self):
-        for service in self.service_store:
+        for service in self.service_store.values():
             service.start()
     
     def stop(self):
@@ -59,16 +61,16 @@ class Grabber(GrabberElement):
         self.disconnect_adapters()
         
     def disconnect_adapters(self):
-        for adapter in self.adapter_store:
-            if adapter.disconnect() == False:
+        for adapter in self.adapter_store.values():
+            if adapter.disconnect() is False:
                 Grabber.LOGGER.error(adapter.name() + " could not be disconnected")
     
     def stop_mappings(self):
-        for mapping in self.mapping_store:
+        for mapping in self.mapping_store.values():
             mapping.stop()
     
     def stop_services(self):
-        for service in self.service_store:
+        for service in self.service_store.values():
             service.stop()
             
     def get_adapter(self, id : str) -> Adapter:

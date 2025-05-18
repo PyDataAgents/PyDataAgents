@@ -1,8 +1,8 @@
 import threading
 import time
 from PyDataGrabber.src.grabbers.GrabberElement import GrabberElement
-from PyDataGrabber.src.mappings.Mapping import ThreadType
 from PyDataGrabber.src.mappings.Observer import Observer
+from PyDataGrabber.src.mappings.ThreadType import ThreadType
 
 
 class ObserverThread(GrabberElement):
@@ -10,35 +10,36 @@ class ObserverThread(GrabberElement):
     SAFETY_DIFF_TIME_UNITS : int = 1
     SLEEP_WITH_HOLD_FACTOR : float = 0.9
      
-    def __init__(self, id : str = None, thread_type = ThreadType.MILLI_SECOND, sampling_period : int = 100):
+    def __init__(self, id : str = None, thread_type : ThreadType = ThreadType.MILLI_SECOND, sampling_period : int = 100):
         super().__init__(id)
-        self.thread_type : ThreadType = thread_type
-        self.sampling_period = sampling_period
         self.thread : threading.Thread = None
+        self.thread_type = thread_type
+        self.sampling_period = sampling_period
         self.observers : list[Observer] = list()
         self.is_running = False
         
     def add_observer(self, observer : Observer):
         self.observers.append(observer)
         
-    def start(self):
+    def start(self):        
         if len(self.observers) > 0:
             if not self.is_running:
+                name = "Thread " + self.id
                 match self.thread_type:
                     case ThreadType.MILLI_SECOND:                    
-                        self.thread = threading.Thread(target = self.runMillisecondThread, name="Thread " + id)
+                        self.thread = threading.Thread(target = self.runMillisecondThread, name=name)
                     
                     case ThreadType.MICRO_SECOND:
-                        self.thread = threading.Thread(target = self.runMicrosecondThread, name="Thread " + id)
+                        self.thread = threading.Thread(target = self.runMicrosecondThread, name=name)
                         
                     case ThreadType.ONLY_ONCE:
-                        self.thread = threading.Thread(target = self.runOnlyOnceThread, name="Thread " + id)
+                        self.thread = threading.Thread(target = self.runOnlyOnceThread, name=name)
                     
                     case ThreadType.INSTANT:
-                        self.thread = threading.Thread(target = self.runInstantThread, name="Thread " + id)
+                        self.thread = threading.Thread(target = self.runInstantThread, name=name)
                         
                     case _:
-                        self.thread = threading.Thread(target = self.runMillisecondThread, name="Thread " + id)
+                        self.thread = threading.Thread(target = self.runMillisecondThread, name=name)
                             
                 self.is_running = True            
                 self.thread.start()
