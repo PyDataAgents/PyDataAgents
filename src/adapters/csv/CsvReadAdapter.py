@@ -1,20 +1,23 @@
 import csv
+from dataclasses import dataclass, field
 from PyDataGrabber.src.adapters.AdapterException import AdapterException
 from PyDataGrabber.src.adapters.ReadAdapter import ReadAdapter
 from PyDataGrabber.src.buffers.Buffer import Buffer
 from PyDataGrabber.src.utils.FileParser import FileParser
 from PyDataGrabber.src.buffers.DictBuffer import DictBuffer
 
+@dataclass
 class CsvReadAdapter(ReadAdapter):
     
-    def __init__(self, id):
-        super().__init__(id)
-        self.file_path = None
-        self.all_at_once = False
-        self.delimiter = ";"
-        self.has_header = True
-        self.auto_detect = False
-        self.force_numeric = True
+    file_path : str = field(default=None, metadata={"description": "path to the csv file to read"})
+    all_at_once : bool = field(default=True, metadata={"description": "read all data at once"})
+    delimiter : str = field(default=";", metadata={"description": "delimiter to use to separate columns"})
+    has_header : bool = field(default=True, metadata={"description": "specifies whether a header is present in data"})
+    auto_detect : bool = field(default=False, metadata={"description": "specifies whether to use the csv sniffing option"})
+    force_numeric : bool = field(default=True, metadata={"description": "forces numeric parsing of data"})
+    
+    def __init__(self):
+        super().__init__()
         self.csv_file = None
         self.csv_reader = None
         self.headers = list()
@@ -52,16 +55,7 @@ class CsvReadAdapter(ReadAdapter):
         self.csv_reader = None
         self.csv_file = None
         return True
-        
-    def config_options(self) -> dict:
-        d = super().config_options()
-        d["file_path"] = self.file_path
-        d["all_at_once"] = self.all_at_once
-        d["delimiter"] = self.delimiter
-        d["force_numeric"] = self.force_numeric
-        d["has_header"] = self.has_header
-        return d
-    
+            
     def read_from_source(self, buffers : dict[str, Buffer], addresses : list[str], n : int = 1):
         if addresses != None:
             if len(buffers) != len(addresses):

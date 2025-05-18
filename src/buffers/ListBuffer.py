@@ -1,17 +1,16 @@
 import threading
 from PyDataGrabber.src.buffers.Buffer import Buffer
-from PyDataGrabber.src.buffers.DataType import DataType
 
 class ListBuffer(Buffer):
     """buffer that stores its values in a capacity limited list
     """
 
-    def __init__(self, id : str = None, capacity : int = 1, data_type : DataType = None, unit : str = None, initial_values : list = None, description : str = None):
-        super().__init__(id = id, capacity = capacity, data_type=data_type, initial_values=initial_values, description=description)        
+    def __init__(self):
+        super().__init__()        
         if self.initial_values is not None:
-            self.buffer = self.initial_values
+            self.elements = self.initial_values
         else:
-            self.buffer = list()
+            self.elements = list()
         self.lock = threading.RLock()
 
     def push(self, elements : list):
@@ -21,13 +20,13 @@ class ListBuffer(Buffer):
                 if too_many > 0:
                     rest = len(elements) - too_many
                     if rest > 0:
-                        self.buffer.extend(elements[0:rest])
+                        self.elements.extend(elements[0:rest])
                     i = 0
                     while i < too_many:
                         self.__push1(elements[rest + i])
                         i = i + 1
                 else:
-                    self.buffer.extend(elements)
+                    self.elements.extend(elements)
             else:
                 self.__push1(elements)
 
@@ -37,18 +36,18 @@ class ListBuffer(Buffer):
                 if n > self.size():
                     ListBuffer.LOGGER.warning("buffer only contains " + self.size() + " elements")
                     n = self.size()
-                d = self.buffer[0:n]
+                d = self.elements[0:n]
                 if not persistent:
-                    del self.buffer[0:n]
+                    del self.elements[0:n]
                 return d
             else:
-                d = self.buffer
+                d = self.elements
                 if not persistent:
-                    self.buffer.clear()
+                    self.elements.clear()
                 return d
     
     def size(self) -> int:
-        return len(self.buffer)
+        return len(self.elements)
         
     def __push1(self, element : any):
         """private function for inserting and removing an object if necessary
@@ -58,6 +57,6 @@ class ListBuffer(Buffer):
         """
         with self.lock:
             if self.size() == self.capacity:
-                self.buffer.pop(0)
+                self.elements.pop(0)
             
-            self.buffer.append(element)
+            self.elements.append(element)

@@ -10,10 +10,8 @@ class SubscribeAdapter(Adapter):
     def subscribe(self, buffers : dict[str, Buffer], addresses : list[str], sampling_period : int, n : int):
         """subscribes to data from source into specified buffers and addresses, with specified sampling_period and n samples at once
         """
-        pass
     
     @abstractmethod
     def unsubscribe(self):
         """resets the subscription
-        """
-        pass  
+        """  

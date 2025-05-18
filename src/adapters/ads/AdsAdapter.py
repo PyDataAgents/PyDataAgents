@@ -1,3 +1,4 @@
+from dataclasses import dataclass, field
 import pyads
 from PyDataGrabber.src.adapters.AdapterException import AdapterException
 from PyDataGrabber.src.adapters.ReadAdapter import ReadAdapter
@@ -5,12 +6,14 @@ from PyDataGrabber.src.adapters.WriteAdapter import WriteAdapter
 from PyDataGrabber.src.buffers.Buffer import Buffer
 
 
+@dataclass
 class AdsAdapter(ReadAdapter, WriteAdapter):
     
-    def __init__(self, id):
-        super().__init__(id)
+    ams_net_id : str = field(default=None, metadata = {"description": "AMS Net Id to connect to for ADS Connection"})
+    
+    def __init__(self):
+        super().__init__()
         self.ads_client : pyads.Connection = None
-        self.ams_net_id : str = None
         
     def connect(self) -> bool:
         self.ads_client = pyads.Connection(self.ams_net_id, pyads.PORT_SPS1)
@@ -42,8 +45,3 @@ class AdsAdapter(ReadAdapter, WriteAdapter):
                 raise AdapterException("writing more than one value is not supported yet")
             else:
                 self.ads_client.write_by_name(addresses[b], val[0])
-    
-    def config_options(self) -> dict:
-        d = super().config_options()
-        d["ams_net_id"] = self.ams_net_id
-        return d

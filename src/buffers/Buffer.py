@@ -1,27 +1,31 @@
+from dataclasses import dataclass, field
 import json
 from abc import abstractmethod
+from PyDataGrabber.src.buffers.DataType import DataType
 from PyDataGrabber.src.grabbers.GrabberElement import GrabberElement
 
-
+@dataclass
 class Buffer(GrabberElement):
     """
     Abstract base class for buffers.
     """
     
-    def __init__(self, id : str = None, capacity : int = 1, data_type : any = None, unit : any = None, initial_values : any = None, description : str = None):
-        super().__init__(id)
-        self.capacity = capacity
-        self.initial_values = initial_values
-        self.description = description
-        self.data_type = data_type
-        self.unit = unit
+    capacity : int = field(default=1, metadata={"description": "number of elements that can be stored in buffer before being discarded in FiFo fashion"})
+    data_type : any = field(default=DataType.NUMERIC, metadata={"description": "datatype to expect from buffer elements, can be DataType enum or list of enums"})
+    initial_values : any = field(default=None, metadata={"description": "initial values in buffer"})
+    unit : any = field(default=1, metadata={"description": "unit of element values in this buffer, can be string or list of strings"})
+    description : str = field(default=1, metadata={"description": "buffer description"})
+    
+    
+    def __init__(self):
+        super().__init__()        
+        self.elements = any
     
     @abstractmethod
     def push(self, elements):
         """
         push new elements to buffer
         """
-        pass
         
     @abstractmethod
     def data(self, n=0, persistent=True) -> any:
@@ -38,7 +42,6 @@ class Buffer(GrabberElement):
         Returns:
             int: number of samples
         """
-        pass
     
     def data_with_meta(self, n : int = 0, persistent : bool = True) -> dict:
         d = {}
@@ -55,20 +58,6 @@ class Buffer(GrabberElement):
         Returns:
             str: string represenation as json
         """
-        return self.json(n = 0, persistent=True)
-
-    def config_options(self) -> dict:
-        d = super().config_options()
-        d["capacity"] = self.capacity
-        if self.data_type is not None:
-            d["data_type"] = self.data_type
-        if self.unit is not None:
-            d["unit"] = self.unit
-        if self.initial_values is not None:
-            d["initial_values"] = self.initial_values
-        if self.description is not None:
-            d["description"] = self.description
-        return d
-    
+        return self.json(n = 0, persistent=True)    
         
         

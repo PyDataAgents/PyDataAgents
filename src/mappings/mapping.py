@@ -1,24 +1,28 @@
+from dataclasses import dataclass, field
 from PyDataGrabber.src.grabbers.GrabberElement import GrabberElement
 from PyDataGrabber.src.adapters.Adapter import Adapter
 from PyDataGrabber.src.buffers.Buffer import Buffer
 from PyDataGrabber.src.mappings.MappingType import MappingType
 from PyDataGrabber.src.mappings.ThreadType import ThreadType
 
-
+@dataclass
 class Mapping(GrabberElement):
     """_summary_
 
     Args:
         GrabberElement (_type_): _description_
     """
-
-    def __init__(self, id : str = None):
-        super().__init__(id)
+    
+    buffer_ids : list[str] = field(default=None, metadata={"description": "list of buffer ids to map from"})
+    adapter_id : str = field(default=None, metadata={"description": "id of the Adapter used for this Mapping"})
+    addresses : list[str] = field(default=None, metadata={"description": "list of addresses to read/subscribe from or write/publish to"})
+    thread_type : ThreadType = field(default=ThreadType.MILLI_SECOND, metadata={"description": "type of thread, e.g. MILLI_SECONDS, MICRO_SECONDS, INSTANT, ONLY_ONCE, ..."})
+    mapping_type : MappingType = field(default=None, metadata={"description": "type of mapping, e.g. READ, WRITE, SUB or PUB"})
+    n : int = field(default=1, metadata={"description": "number of samples to insert or remove from buffers"})
+    sampling_period : int = field(default=100, metadata={"description": "sampling period to apply in this Mapping"})
+    persistent : bool = field(default=True, metadata={"description": "specifies whether to remove or keep the values of the buffers when writing or publishing to a data sink"})
+    
+    def __init__(self):
+        super().__init__()
         self.buffers : dict[Buffer] = dict()
         self.adapter : Adapter = None
-        self.addresses : list[str] = None
-        self.thread_type : ThreadType = ThreadType.MILLI_SECOND
-        self.sampling_period : int = 0
-        self.n : int = 1
-        self.mapping_type : MappingType = None
-        self.persistent = True

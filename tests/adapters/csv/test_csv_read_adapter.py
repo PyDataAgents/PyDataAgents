@@ -29,7 +29,8 @@ def test002():
     
 
 def test010():
-    csv_adapter = CsvReadAdapter("CSV1")
+    csv_adapter = CsvReadAdapter()
+    csv_adapter.id = "CSV1"
     csv_adapter.all_at_once = True
     print(csv_adapter.config_options())
     

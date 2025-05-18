@@ -4,8 +4,8 @@ from PyDataGrabber.src.grabbers.GrabberElement import GrabberElement
 
 class Observer(GrabberElement):
     
-    def __init__(self, id : str = None):
-        super().__init__(id)
+    def __init__(self):
+        super().__init__()
         
     @abstractmethod
     def observe(self):

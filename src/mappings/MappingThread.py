@@ -11,12 +11,12 @@ from PyDataGrabber.src.mappings.WriteMappingObserver import WriteMappingObserver
 class MappingThread(GrabberElement):
     
     def __init__(self, mapping : Mapping):
-        super().__init__(MappingThread.unique_id())
+        super().__init__()
         self.mapping = mapping
         self.observer_thread : ObserverThread = None
     
     def start(self):
-        self.observer_thread = ObserverThread(ObserverThread.unique_id(), self.mapping.thread_type, self.mapping.sampling_period)
+        self.observer_thread = ObserverThread(self.observer_thread.unique_id(), self.mapping.thread_type, self.mapping.sampling_period)
         match self.mapping.mapping_type:
             case MappingType.READ:
                 observer = ReadMappingObserver(self.mapping)

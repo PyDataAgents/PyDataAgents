@@ -1,7 +1,7 @@
 import enum
 
 
-class ThreadType(enum.Enum):
+class ThreadType(str, enum.Enum):
     MILLI_SECOND = "MILLI_SECOND"
     MICRO_SECOND = "MICRO_SECOND"
     NANO_SECOND = "NANO_SECOND"

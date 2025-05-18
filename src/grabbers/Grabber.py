@@ -1,4 +1,5 @@
 from __future__ import annotations
+from dataclasses import dataclass
 import time
 from PyDataGrabber.src.adapters.Adapter import Adapter
 from PyDataGrabber.src.buffers.Buffer import Buffer
@@ -7,16 +8,16 @@ from PyDataGrabber.src.mappings.Mapping import Mapping
 from PyDataGrabber.src.mappings.MappingThread import MappingThread
 from PyDataGrabber.src.services.Service import Service
 
-
+@dataclass
 class Grabber(GrabberElement):
     
-    def __init__(self, id : str = None):
-        super().__init__(id)
+    def __init__(self):
+        super().__init__()
         self.buffer_store : dict[Buffer] = dict()
         self.adapter_store : dict[Adapter] = dict()
         self.mapping_store : dict[MappingThread] = dict()
         self.service_store : dict[Service] = dict()
-        self.isRunning = False
+        self.is_running = False
     
     def add_buffer(self, buffer : Buffer):
         self.buffer_store[buffer.id] = buffer
@@ -33,11 +34,11 @@ class Grabber(GrabberElement):
         
     def start_blocking(self):        
         self.start()
-        while self.isRunning:
+        while self.is_running:
             time.sleep(3)            
     
     def start(self):
-        self.isRunning = True
+        self.is_running = True
         self.connect_adapters()
         self.start_mappings()
         self.start_services()       
@@ -56,7 +57,7 @@ class Grabber(GrabberElement):
             service.start()
     
     def stop(self):
-        self.isRunning = False
+        self.is_running = False
         self.stop_services()
         self.stop_mappings()
         self.disconnect_adapters()

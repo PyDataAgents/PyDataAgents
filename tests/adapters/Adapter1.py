@@ -7,9 +7,9 @@ class Adapter1(Adapter):
         Adapter (_type_): _description_
     """
     
-    def __init__(self, id=None):
+    def __init__(self):
         """_summary_"""
-        super().__init__(id)        
+        super().__init__()        
         
     def connect(self):
         """

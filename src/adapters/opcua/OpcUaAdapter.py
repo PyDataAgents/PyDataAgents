@@ -1,15 +1,18 @@
+from dataclasses import dataclass, field
 from opcua import Client
 from PyDataGrabber.src.adapters.AdapterException import AdapterException
 from PyDataGrabber.src.adapters.ReadAdapter import ReadAdapter
 from PyDataGrabber.src.adapters.WriteAdapter import WriteAdapter
 from PyDataGrabber.src.buffers.Buffer import Buffer
 
+@dataclass
 class OpcUaAdapter(ReadAdapter, WriteAdapter):
     
-    def __init__(self, id):
-        super().__init__(id)
+    endpoint : str = field(default=None, metadata={"description" : "endpoint of the opc ua server, e.g. opc.tcp://localhost:48010"})
+    
+    def __init__(self):
+        super().__init__()
         self.opc_client : Client = None
-        self.endpoint : str = None
     
     def connect(self) -> bool:
         self.opc_client = Client(self.endpoint)
@@ -43,9 +46,4 @@ class OpcUaAdapter(ReadAdapter, WriteAdapter):
             node = self.opc_client.get_node(addresses[b])
             val = buffers[key].data(n = n, persistent=persistent)
             self.opc_client.set_values(node, val)
-    
-    def config_options(self) -> dict:
-        d = super().config_options()
-        d["endpoint"] = self.endpoint
-        return d
     

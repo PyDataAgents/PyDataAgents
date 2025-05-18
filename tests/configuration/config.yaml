@@ -1,0 +1,6 @@
+grabber:
+  adapters:
+    -
+      type: PyDataGrabber.src.adapters.opcua.OpcUaAdapter
+      id: OPC1
+      endpoint: opc.tcp://jh:48010

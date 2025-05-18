@@ -1,7 +1,7 @@
 import enum
 
 
-class MappingType(enum.Enum):
+class MappingType(str, enum.Enum):
     READ = "READ"
     WRITE = "WRITE"
     SUB = "SUB"

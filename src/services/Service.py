@@ -7,9 +7,11 @@ if TYPE_CHECKING:
     from PyDataGrabber.src.grabbers.Grabber import Grabber
 
 class Service(GrabberElement):
+    """abstract base class for Grabber Services
+    """
     
-    def __init__(self, id):
-        super().__init__(id)
+    def __init__(self):
+        super().__init__()
         self.is_running : bool = False
         self.grabber : Grabber = None
         
