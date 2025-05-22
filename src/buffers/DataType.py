@@ -7,5 +7,4 @@ class DataType(str, enum.Enum):
     NUMERIC = "NUMERIC"
     OBJECT = "OBJECT"
     IMAGE = "IMAGE"
-    BYTE = "BYTE"
-    
+    BYTE = "BYTE"    

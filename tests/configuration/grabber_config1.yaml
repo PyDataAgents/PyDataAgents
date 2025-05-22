@@ -1,0 +1,28 @@
+grabber:
+  type: PyDataGrabber.src.grabbers.Grabber
+  id: G1
+adapters:
+- type: PyDataGrabber.src.adapters.opcua.OpcUaAdapter
+  id: A1
+  endpoint: opc.tcp://localhost:4840/freeopcua/server/
+buffers:
+- type: PyDataGrabber.src.buffers.ListBuffer
+  id: B1
+  capacity: 1000
+  data_type: NUMERIC
+  initial_values: null
+  unit: 1
+  description: Test buffer
+mappings:
+- type: PyDataGrabber.src.mappings.Mapping
+  id: M1
+  buffer_ids:
+  - B1
+  adapter_id: A1
+  addresses: null
+  thread_type: MILLI_SECOND
+  mapping_type: null
+  n: 1
+  sampling_period: 100
+  persistent: true
+services: []
