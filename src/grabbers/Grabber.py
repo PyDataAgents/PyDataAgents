@@ -49,8 +49,8 @@ class Grabber(GrabberElement):
                 Grabber.LOGGER.error(adapter.name() + " could not be connected")                
     
     def start_mappings(self):
-        for mapping in self.mapping_store.values():
-            mapping.start()
+        for mapping_thread in self.mapping_store.values():
+            mapping_thread.start(self)
             
     def start_services(self):
         for service in self.service_store.values():

@@ -14,13 +14,15 @@ class GrabberElement(ABC):
     
     LOGGER = logger
     
-    def __init__(self):
+    def __init__(self, id : str = None):
         """
         Initialize the grabber element and assign a unique ID.
         """
         self.type = self.__module__
         if id is None:            
-            self.id = self.unique_id()       
+            self.id = self.unique_id()
+        else:
+            self.id = id       
         
     def name(self) -> str:
         s = self.__class__.__name__ + "[" + self.id + "]"
