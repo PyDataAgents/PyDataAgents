@@ -1,12 +1,17 @@
+from dataclasses import dataclass, field
 from fastapi import FastAPI
 from PyDataGrabber.src.grabbers.Grabber import Grabber
 from PyDataGrabber.src.services.Service import Service
-from PyDataGrabber.src.services.rest.GrabberRestAPI import get_grabber_api_router
+from PyDataGrabber.src.services.rest.GrabberRESTAPI import get_grabber_api_router
 
 
+@dataclass
 class RestService(Service):
     """Service for creating a REST API for DataGrabber using FastAPI
     """
+    
+    port : int = field(default=8000, metadata={"description": "port of the REST API endpoint"})
+    
     
     def __init__(self):
         super().__init__()

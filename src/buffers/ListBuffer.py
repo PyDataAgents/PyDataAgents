@@ -15,6 +15,8 @@ class ListBuffer(Buffer):
 
     def push(self, elements : list):
         with self.lock:
+            if isinstance(elements, str):
+                self.__push1(elements)
             if hasattr(elements, "__len__"):
                 too_many =  len(elements) + self.size() - self.capacity
                 if too_many > 0:
@@ -32,20 +34,24 @@ class ListBuffer(Buffer):
 
     def data(self, n : int = 0, persistent : bool = True) -> list:
         with self.lock:
-            if n > 0:
-                if n > self.size():
-                    ListBuffer.LOGGER.warning("buffer only contains " + self.size() + " elements")
-                    n = self.size()
-                d = self.elements[0:n]
-                if not persistent:
-                    del self.elements[0:n]
-                return d
+            if self.size() > 0:
+                if n > 0:
+                    if n > self.size():
+                        ListBuffer.LOGGER.warning("buffer only contains " + str(self.size()) + " elements")
+                        n = self.size()
+                    d = self.elements[0:n]
+                    if not persistent:
+                        del self.elements[0:n]
+                    return d
+                else:
+                    d = self.elements
+                    if not persistent:
+                        self.elements.clear()
+                    return d
             else:
-                d = self.elements
-                if not persistent:
-                    self.elements.clear()
-                return d
-    
+                ListBuffer.LOGGER.warning("buffer is empty")
+                return []
+                    
     def size(self) -> int:
         return len(self.elements)
         

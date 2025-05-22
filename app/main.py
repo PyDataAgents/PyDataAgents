@@ -4,9 +4,11 @@ import uvicorn
 from PyDataGrabber.src.grabbers.Grabber import Grabber
 from PyDataGrabber.src.services.rest.RestService import RestService
 
-grabber = Grabber("G1")
+grabber = Grabber()
+grabber.id = "G1"
 
-service = RestService("S1")
+service = RestService()
+service.id = "S1"
 service.set_grabber(grabber)
 
 app = service.app

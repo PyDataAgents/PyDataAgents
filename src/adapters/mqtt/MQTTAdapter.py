@@ -4,6 +4,9 @@ from PyDataGrabber.src.adapters.AdapterException import AdapterException
 from PyDataGrabber.src.adapters.SubscribeAdapter import SubscribeAdapter
 from PyDataGrabber.src.adapters.WriteAdapter import WriteAdapter
 from PyDataGrabber.src.buffers.Buffer import Buffer
+from PyDataGrabber.src.utils.StringParser import StringParser
+
+ROOT_TOPIC = "#"
 
 @dataclass
 class MQTTAdapter(SubscribeAdapter, WriteAdapter):
@@ -11,8 +14,12 @@ class MQTTAdapter(SubscribeAdapter, WriteAdapter):
     endpoint : str = field(default=None, metadata={"description": "endpoint of the MQTT broker, e.g. test.mosquitto.org (public test broker)"})
     port : int = field(default=1883, metadata={"description": "port of the mqtt broker"})
     keep_alive : int = field(default=60, metadata={"description": "keep alive interval with broker"})
+    force_numeric : bool = field(default=False, metadata={"description": "specifies if the payload from mqtt topics should be parsed as numeric value, rather than string"})
+    retain : bool = field(default=False, metadata={"description": "specifies whether messages should be retained on publishing"})
+    qos : int = field(default=0, metadata={"description": "quality of service parameter of mqtt publish"})
     
     def __init__(self):
+        super().__init__()
         self.client : mqtt.Client = None
     
     def connect(self) -> bool:
@@ -33,15 +40,32 @@ class MQTTAdapter(SubscribeAdapter, WriteAdapter):
             sampling_period (int, optional): _description_. Defaults to 0.
             n (int, optional): _description_. Defaults to 1.
         """
+        if n > 1:
+            raise AdapterException("n > 1 is not implemented yet")
+        topic_to_buffer = dict()        
+        for address in addresses:
+            d = StringParser.string_to_dict(address)
+            if "topic" not in d or "id" not in d:
+                raise AdapterException("mqtt address must contain topic=<MQTT_TOPIC> and id=<BUFFER_ID>")
+            topic = d["topic"]
+            id = d["id"]
+            topic_to_buffer[topic] = id
+            self.client.subscribe(topic)
+            
         # define a message callback inline
         def on_message(client, userdata, message):
             print(f"Received: {message.payload.decode()} on topic {message.topic}")
-            
-        for address in addresses:
-            self.client.subscribe(address)
+            if message.topic in topic_to_buffer:
+                if self.force_numeric:
+                    buffers[topic_to_buffer[message.topic]].push(float(message.payload.decode()))
+                else:
+                    buffers[topic_to_buffer[message.topic]].push(message.payload.decode())
+               
         self.client.on_message = on_message
-        self.client.loop_forever()
+        self.client.loop_start()
         
+    def unsubscribe(self):
+        self.client.unsubscribe(ROOT_TOPIC)
     
     def write_to_sink(self, buffers : dict[str, Buffer], addresses : list[str], n : int = 1, persistent : bool = True):
         """publish buffer values to mqtt topcis by writing single publish messages
@@ -61,5 +85,5 @@ class MQTTAdapter(SubscribeAdapter, WriteAdapter):
         for buffer in buffers.values():
             address = addresses[a]
             val = buffer.data(n = n, persistent = persistent)
-            self.client.publish(address, val)
+            self.client.publish(address, val, retain = self.retain, qos = self.qos)
             a = a + 1
