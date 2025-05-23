@@ -1,5 +1,8 @@
 import json
+from PyDataGrabber.src.buffers.Buffer import Buffer
 from PyDataGrabber.src.grabbers.Grabber import Grabber
+from PyDataGrabber.src.grabbers.GrabberException import GrabberException
+from PyDataGrabber.src.utils.ClassParser import ClassParser
 
 
 class GrabberConfig:
@@ -29,6 +32,37 @@ class GrabberConfig:
             # create service configs
             for service in grabber.service_store.values():
                 self.service_configs.append(service.config_options())
+    
+    def create(self) -> Grabber:
+        """
+        Create a Grabber instance from the configuration.
+        """
+        if len(self.grabber_config) > 0:
+            grabber : Grabber = ClassParser.create_instance(self.grabber_config["type"])            
+            ClassParser.set_properties(grabber, self.grabber_config)
+            if len(self.buffer_configs) > 0:
+                for buffer_config in self.buffer_configs:
+                    buffer : Buffer = ClassParser.create_instance(buffer_config["type"])
+                    ClassParser.set_properties(buffer, buffer_config)
+                    grabber.add_buffer(buffer)
+            if len(self.adapter_configs) > 0:
+                for adapter_config in self.adapter_configs:
+                    adapter = ClassParser.create_instance(adapter_config["type"])
+                    ClassParser.set_properties(adapter, adapter_config)
+                    grabber.add_adapter(adapter)
+            if len(self.mapping_configs) > 0:
+                for mapping_config in self.mapping_configs:
+                    mapping = ClassParser.create_instance(mapping_config["type"])
+                    ClassParser.set_properties(mapping, mapping_config)
+                    grabber.add_mapping(mapping)
+            if len(self.service_configs) > 0:
+                for service_config in self.service_configs:
+                    service = ClassParser.create_instance(service_config["type"])
+                    ClassParser.set_properties(service, service_config)
+                    grabber.add_service(service)
+            return grabber
+        else:
+            raise GrabberException("Grabber configuration is not set.")
      
     def json(self) -> str:
         """

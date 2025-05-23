@@ -94,5 +94,8 @@ def test042():
     yc = YAMLConfig(os.path.dirname(__file__) + "\\grabber_config1.yaml")
     gc = yc.load()
     print(gc)
+    g = gc.create()
+    gc2 = GrabberConfig(g)
+    print(gc2)
     
     

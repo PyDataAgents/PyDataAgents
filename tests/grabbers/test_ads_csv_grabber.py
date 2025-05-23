@@ -62,3 +62,5 @@ def test_000():
 
 def test_001():
     yc = YAMLConfig(os.path.dirname(__file__) + "\\ads_csv.yaml")
+    gc = yc.load()
+    print(gc)
