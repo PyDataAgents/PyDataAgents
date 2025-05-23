@@ -17,4 +17,3 @@ class WriteAdapter(Adapter):
             n (int): _description_
             persistent (bool): _description_
         """
-        pass

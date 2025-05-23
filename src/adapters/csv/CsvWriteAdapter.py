@@ -102,7 +102,10 @@ class CsvWriteAdapter(WriteAdapter):
                     
     def _new_file_name(self) -> str:
         ts = TimeParser.utc_ms()
-        file_path = self.folder.rstrip(os.path.sep) + os.path.sep + ts + "_" + self.file_post_fix + "." + self.file_extension.lstrip(".")
+        if self.file_post_fix is None:
+            file_path = self.folder.rstrip(os.path.sep) + os.path.sep + ts + "." + self.file_extension.lstrip(".")
+        else:
+            file_path = self.folder.rstrip(os.path.sep) + os.path.sep + ts + "_" + self.file_post_fix + "." + self.file_extension.lstrip(".")
         return file_path
             
         

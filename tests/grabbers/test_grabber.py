@@ -3,27 +3,33 @@ from PyDataGrabber.src.adapters.opcua.OpcUaAdapter import OpcUaAdapter
 from PyDataGrabber.src.buffers.DataType import DataType
 from PyDataGrabber.src.buffers.ListBuffer import ListBuffer
 from PyDataGrabber.src.grabbers.Grabber import Grabber
-from PyDataGrabber.src.mappings.Mapping import Mapping, MappingType, ThreadType
+from PyDataGrabber.src.mappings.Mapping import Mapping
+from PyDataGrabber.src.mappings.MappingType import MappingType
+from PyDataGrabber.src.mappings.ThreadType import ThreadType
 from PyDataGrabber.src.utils.AdapterUtils import AdapterUtils
 from PyDataGrabber.src.utils.BufferUtils import BufferUtils
 
 
 def test_000():
-    grabber = Grabber("G1")
+    grabber = Grabber()
+    grabber.id = "G1"
     
-    buf = ListBuffer("T1")
+    buf = ListBuffer()
+    buf.id = "T1"
     buf.capacity = 1
     buf.data_type = DataType.NUMERIC
     buf.unit = "°C"
     
     grabber.add_buffer(buf)
     
-    opcua = OpcUaAdapter("OPC1")
+    opcua = OpcUaAdapter()
+    opcua.id = "A1"
     opcua.endpoint = "opc.tcp://jh:48010"
     
     grabber.add_adapter(opcua)
     
-    mapping = Mapping("M1")
+    mapping = Mapping()
+    mapping.id = "M1"
     mapping.buffers = BufferUtils.to_dict(buf)
     mapping.addresses = AdapterUtils.address_to_list("ns=4;s=AirConditioner_1.Temperature")
     mapping.adapter = opcua

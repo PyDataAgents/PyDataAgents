@@ -14,5 +14,4 @@ class ReadAdapter(Adapter):
             buffers (dict[str, Buffer]): _description_
             addresses (list[str]): _description_
             n (int): _description_
-        """
-        pass    
+        """    
