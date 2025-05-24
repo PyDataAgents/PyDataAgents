@@ -5,8 +5,8 @@ from PyDataGrabber.src.adapters.AdapterException import AdapterException
 from PyDataGrabber.src.adapters.WriteAdapter import WriteAdapter
 from PyDataGrabber.src.buffers.Buffer import Buffer
 from PyDataGrabber.src.buffers.DictBuffer import DictBuffer
-from PyDataGrabber.src.utils.FileParser import FileParser
-from PyDataGrabber.src.utils.TimeParser import TimeParser
+from PyDataGrabber.src.utils.FileUtils import FileUtils
+from PyDataGrabber.src.utils.TimeUtils import TimeUtils
 
 @dataclass
 class CsvWriteAdapter(WriteAdapter):
@@ -26,7 +26,7 @@ class CsvWriteAdapter(WriteAdapter):
         self.rows : int = 0
         
     def connect(self) -> bool:
-        if FileParser.exists_folder(self.folder):
+        if FileUtils.exists_folder(self.folder):
             self.csv_file = open(self._new_file_name(), "w")
             self.csv_writer = csv.writer(self.csv_file, delimiter=self.delimiter, lineterminator="\n")
             return True
@@ -55,7 +55,7 @@ class CsvWriteAdapter(WriteAdapter):
                 else:
                     if n == 1:
                         d = dict()
-                        d["TIMESTAMP [ms]"] = TimeParser.utc_ms()
+                        d["TIMESTAMP [ms]"] = TimeUtils.utc_ms()
                         d.update(buffer.data(n = n, persistent = persistent))
                         self.csv_writer.writerow(d)
                         self.rows = self.rows + 1
@@ -86,7 +86,7 @@ class CsvWriteAdapter(WriteAdapter):
                     if n == 1:
                         d = list()
                         if self.with_timestamp:
-                            d.append(TimeParser.utc_ms())
+                            d.append(TimeUtils.utc_ms())
                         for key in buffers.keys():                        
                             d.append(buffers[key].data(n = n, persistent = persistent))
                         self.csv_writer.writerow(d)
@@ -101,7 +101,7 @@ class CsvWriteAdapter(WriteAdapter):
                         raise AdapterException("write_to_sink is not defined for n > 1") 
                     
     def _new_file_name(self) -> str:
-        ts = TimeParser.utc_ms()
+        ts = TimeUtils.utc_ms()
         if self.file_post_fix is None:
             file_path = self.folder.rstrip(os.path.sep) + os.path.sep + ts + "." + self.file_extension.lstrip(".")
         else:

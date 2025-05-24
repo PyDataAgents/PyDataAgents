@@ -1,7 +1,7 @@
 import time
 
 
-class TimeParser:
+class TimeUtils:
     
     @staticmethod
     def utc_ms():

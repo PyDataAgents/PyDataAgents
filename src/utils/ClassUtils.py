@@ -1,7 +1,7 @@
 import importlib
 
 
-class ClassParser:
+class ClassUtils:
     
     @staticmethod
     def create_class(fully_qualified_class_name):
@@ -18,7 +18,7 @@ class ClassParser:
         """
         Create an instance of a class from the class name.
         """
-        Clazz = ClassParser.create_class(fully_qualified_class_name)
+        Clazz = ClassUtils.create_class(fully_qualified_class_name)
         return Clazz()
     
     @staticmethod
@@ -37,4 +37,4 @@ class ClassParser:
         Set multiple properties of an object.
         """
         for property_name, value in properties.items():
-            ClassParser.set_property(obj, property_name, value)
+            ClassUtils.set_property(obj, property_name, value)

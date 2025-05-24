@@ -4,7 +4,7 @@ from PyDataGrabber.src.adapters.AdapterException import AdapterException
 from PyDataGrabber.src.adapters.SubscribeAdapter import SubscribeAdapter
 from PyDataGrabber.src.adapters.WriteAdapter import WriteAdapter
 from PyDataGrabber.src.buffers.Buffer import Buffer
-from PyDataGrabber.src.utils.StringParser import StringParser
+from PyDataGrabber.src.utils.StringUtils import StringUtils
 
 ROOT_TOPIC = "#"
 
@@ -44,7 +44,7 @@ class MQTTAdapter(SubscribeAdapter, WriteAdapter):
             raise AdapterException("n > 1 is not implemented yet")
         topic_to_buffer = dict()        
         for address in addresses:
-            d = StringParser.string_to_dict(address)
+            d = StringUtils.string_to_dict(address)
             if "topic" not in d or "id" not in d:
                 raise AdapterException("mqtt address must contain topic=<MQTT_TOPIC> and id=<BUFFER_ID>")
             topic = d["topic"]

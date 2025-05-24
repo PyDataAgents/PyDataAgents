@@ -1,6 +1,6 @@
 import os
 
-class FileParser:
+class FileUtils:
     
     @staticmethod
     def exists_file(file_path : str) -> bool:

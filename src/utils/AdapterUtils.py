@@ -1,4 +1,4 @@
-from PyDataGrabber.src.utils.StringParser import StringParser
+from PyDataGrabber.src.utils.StringUtils import StringUtils
 
 
 class AdapterUtils:
@@ -11,5 +11,5 @@ class AdapterUtils:
 
     @staticmethod
     def address_to_dict(address : str) -> dict[str, str]:
-        d = StringParser.string_to_dict(address)
+        d = StringUtils.string_to_dict(address)
         return d

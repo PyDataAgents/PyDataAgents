@@ -1,4 +1,4 @@
-class StringParser:
+class StringUtils:
     
     @staticmethod
     def string_to_dict(s : str, delimiter : str = ";", assign_str : str = "="):    

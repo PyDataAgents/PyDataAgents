@@ -3,7 +3,7 @@ from dataclasses import dataclass, field
 from PyDataGrabber.src.adapters.AdapterException import AdapterException
 from PyDataGrabber.src.adapters.ReadAdapter import ReadAdapter
 from PyDataGrabber.src.buffers.Buffer import Buffer
-from PyDataGrabber.src.utils.FileParser import FileParser
+from PyDataGrabber.src.utils.FileUtils import FileUtils
 from PyDataGrabber.src.buffers.DictBuffer import DictBuffer
 
 @dataclass
@@ -24,7 +24,7 @@ class CsvReadAdapter(ReadAdapter):
         
     def connect(self) -> bool:
         if self.file_path != None:
-            if FileParser.exists_file(self.file_path):
+            if FileUtils.exists_file(self.file_path):
                 self.csv_file =  open(self.file_path, 'r')
                 if self.auto_detect:
                     csv_sample = self.csv_file.read(1024)

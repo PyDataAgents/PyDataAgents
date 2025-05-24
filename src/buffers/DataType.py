@@ -4,7 +4,9 @@ import enum
 class DataType(str, enum.Enum):
     
     STRING = "STRING"
-    NUMERIC = "NUMERIC"
+    FLOAT = "FLOAT"
+    INT = "INT"
     OBJECT = "OBJECT"
     IMAGE = "IMAGE"
-    BYTE = "BYTE"    
+    BYTE = "BYTE"
+    BOOL = "BOOL"    
