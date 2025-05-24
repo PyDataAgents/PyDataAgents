@@ -10,13 +10,18 @@ from PyDataGrabber.src.buffers.Buffer import Buffer
 class AdsAdapter(ReadAdapter, WriteAdapter):
     
     ams_net_id : str = field(default=None, metadata = {"description": "AMS Net Id to connect to for ADS Connection"})
+    twincat : int = field(default=3, metadata = {"description": "Twincat version to use, e.g. 2 or 3 for TwinCAT 2/3"})
     
     def __init__(self):
         super().__init__()
         self.ads_client : pyads.Connection = None
         
     def connect(self) -> bool:
-        self.ads_client = pyads.Connection(self.ams_net_id, pyads.PORT_SPS1)
+        match self.twincat:
+            case 2:
+                self.ads_client = pyads.Connection(self.ams_net_id, pyads.PORT_TC2PLC1)
+            case 3:
+                self.ads_client = pyads.Connection(self.ams_net_id, pyads.PORT_TC3PLC1)
         self.ads_client.open()
         print(self.ads_client.read_state())
         return True
