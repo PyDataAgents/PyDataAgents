@@ -1,11 +1,11 @@
 import os
-from PyDataGrabber.src.adapters.ads.AdsAdapter import AdsAdapter
-from PyDataGrabber.src.adapters.csv.CsvWriteAdapter import CsvWriteAdapter
-from PyDataGrabber.src.buffers.ListBuffer import ListBuffer
-from PyDataGrabber.src.configuration.GrabberConfig import GrabberConfig
-from PyDataGrabber.src.configuration.YAMLConfig import YAMLConfig
-from PyDataGrabber.src.grabbers.Grabber import Grabber
-from PyDataGrabber.src.mappings.Mapping import Mapping
+from PyDataGrabber.adapters.ads.AdsAdapter import AdsAdapter
+from PyDataGrabber.adapters.csv.CsvWriteAdapter import CsvWriteAdapter
+from PyDataGrabber.buffers.ListBuffer import ListBuffer
+from PyDataGrabber.grabbers.GrabberConfig import GrabberConfig
+from PyDataGrabber.grabbers.YAMLConfig import YAMLConfig
+from PyDataGrabber.grabbers.Grabber import Grabber
+from PyDataGrabber.mappings.Mapping import Mapping
 
 
 def test_000():

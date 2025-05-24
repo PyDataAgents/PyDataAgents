@@ -1,13 +1,13 @@
 import time
-from PyDataGrabber.src.adapters.opcua.OpcUaAdapter import OpcUaAdapter
-from PyDataGrabber.src.buffers.DataType import DataType
-from PyDataGrabber.src.buffers.ListBuffer import ListBuffer
-from PyDataGrabber.src.grabbers.Grabber import Grabber
-from PyDataGrabber.src.mappings.Mapping import Mapping
-from PyDataGrabber.src.mappings.MappingType import MappingType
-from PyDataGrabber.src.mappings.ThreadType import ThreadType
-from PyDataGrabber.src.utils.AdapterUtils import AdapterUtils
-from PyDataGrabber.src.utils.BufferUtils import BufferUtils
+from PyDataGrabber.adapters.opcua.OpcUaAdapter import OpcUaAdapter
+from PyDataGrabber.buffers.DataType import DataType
+from PyDataGrabber.buffers.ListBuffer import ListBuffer
+from PyDataGrabber.grabbers.Grabber import Grabber
+from PyDataGrabber.mappings.Mapping import Mapping
+from PyDataGrabber.mappings.MappingType import MappingType
+from PyDataGrabber.mappings.ThreadType import ThreadType
+from PyDataGrabber.utils.AdapterUtils import AdapterUtils
+from PyDataGrabber.utils.BufferUtils import BufferUtils
 
 
 def test_000():
@@ -17,7 +17,7 @@ def test_000():
     buf = ListBuffer()
     buf.id = "T1"
     buf.capacity = 1
-    buf.data_type = DataType.NUMERIC
+    buf.data_type = DataType.FLOAT
     buf.unit = "°C"
     
     grabber.add_buffer(buf)
