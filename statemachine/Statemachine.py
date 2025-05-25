@@ -15,17 +15,17 @@ class Statemachine(GrabberElement):
     def __init__(self, start_action : Action): 
         self.actions : dict[str, Action] = dict()
         self.transitions : dict[str, Transition] = dict()
-        self.start_action = start_action
+        self.start_action : Action = start_action
         self.is_running = False
         
     def assemble(self, node : Node):
         if isinstance(node, Transition):
-            if not node.id in self.transitions:
+            if not node.id in self.transitions.values():
                 self.transitions[node.id] = node
                 for node2 in node.children:
                     self.assemble(node2)
         elif isinstance(node, Action):
-            if not node in self.actions:
+            if not node in self.actions.values():
                 self.actions[node.id] = node
                 for node2 in node.children:
                     self.assemble(node2)
@@ -36,6 +36,7 @@ class Statemachine(GrabberElement):
     def start(self):
         self.assemble(self.start_action)
         self.start_action.activate()
+        self.is_running = True
         while (self.is_running and (self.has_active_actions() or self.has_active_transitions())):
             # execute active actions
             for action in self.actions.values():
@@ -64,6 +65,7 @@ class Statemachine(GrabberElement):
                     
                     # deactivate the transition itself
                     transition.state = State.INACTIVE
+        self.is_running = False
     
     def stop(self):
         self.is_running = False

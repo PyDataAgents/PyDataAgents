@@ -1,4 +1,4 @@
-from PyDataGrabber.src.utils.StringUtils import StringUtils
+from PyDataGrabber.utils.StringUtils import StringUtils
 
 
 class AdapterUtils:

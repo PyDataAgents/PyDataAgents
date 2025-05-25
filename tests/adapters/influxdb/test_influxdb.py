@@ -1,11 +1,11 @@
 import configparser
 import time
 
-from PyDataGrabber.src.adapters.influxdb.InfluxDbAdapter import InfluxDbAdapter
-from PyDataGrabber.src.buffers.SignalBuffer import SignalBuffer
-from PyDataGrabber.src.buffers.signals.Sine import Sine
-from PyDataGrabber.src.utils.AdapterUtils import AdapterUtils
-from PyDataGrabber.src.utils.BufferUtils import BufferUtils
+from PyDataGrabber.adapters.influxdb.InfluxDbAdapter import InfluxDbAdapter
+from PyDataGrabber.buffers.SignalBuffer import SignalBuffer
+from PyDataGrabber.buffers.signals.Sine import Sine
+from PyDataGrabber.utils.AdapterUtils import AdapterUtils
+from PyDataGrabber.utils.BufferUtils import BufferUtils
     
 def test_000():
     

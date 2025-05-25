@@ -1,5 +1,8 @@
 import importlib
 
+from PyDataGrabber.grabbers.GrabberElement import GrabberElement
+from PyDataGrabber.grabbers.GrabberException import GrabberException
+
 
 class ClassUtils:
     
@@ -27,9 +30,23 @@ class ClassUtils:
         Set a property of an object.
         """
         if hasattr(obj, property_name):
-            setattr(obj, property_name, value)
+            attr = getattr(obj, property_name)
+            if attr is not None and isinstance(attr, GrabberElement):
+                if isinstance(value, dict):
+                    # If the value is a dictionary, set properties of the GrabberElement
+                    if "type" in value:
+                        # If the dictionary contains a type, create an instance of that type
+                        sub_obj = ClassUtils.create_instance(value["type"])
+                        ClassUtils.set_properties(sub_obj, value)
+                        setattr(obj, property_name, sub_obj)
+                    else:
+                        raise GrabberException(f"Expected a dictionary with 'type' for property '{property_name}' of {obj}, but got {value}.")
+                else:
+                    raise GrabberException(f"Expected a dictionary for property '{property_name}' of {obj}, but got {type(value).__name__}.")
+            else:
+                setattr(obj, property_name, value)
         else:
-            raise AttributeError(f"Object {obj} has no attribute {property_name}")
+            raise GrabberException(f"Object {obj} has no attribute {property_name}")
         
     @staticmethod
     def set_properties(obj, properties : dict):
