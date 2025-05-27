@@ -14,7 +14,7 @@ class Buffer(GrabberElement):
     data_type : str = field(default=DataType.FLOAT.value, metadata={"description": "datatype to expect from buffer elements, can be DataType enum or list of enums"})
     initial_values : any = field(default=None, metadata={"description": "initial values in buffer"})
     unit : any = field(default=1, metadata={"description": "unit of element values in this buffer, can be string or list of strings"})
-    description : str = field(default=1, metadata={"description": "buffer description"})
+    description : str = field(default=None, metadata={"description": "buffer description"})
     
     
     def __init__(self):

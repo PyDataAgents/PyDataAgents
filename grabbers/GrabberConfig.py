@@ -63,8 +63,8 @@ class GrabberConfig:
             return grabber
         else:
             raise GrabberException("Grabber configuration is not set.")
-     
-    def json(self) -> str:
+    
+    def to_dict(self) -> dict:
         """
         Convert the configuration to a JSON string.
         """
@@ -73,9 +73,14 @@ class GrabberConfig:
         d["adapters"] = self.adapter_configs
         d["buffers"] = self.buffer_configs
         d["mappings"] = self.mapping_configs
-        d["services"] = self.service_configs        
-        return json.dumps(d, indent=4)
+        d["services"] = self.service_configs    
+        return d
+     
+    def to_json(self) -> str:
+        """
+        Convert the configuration to a JSON string.
+        """                
+        return json.dumps(self.to_dict(), indent=4)
                
     def __str__(self) -> str:
-        return self.json()
-    
+        return self.to_json()

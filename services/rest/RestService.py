@@ -1,8 +1,9 @@
 from dataclasses import dataclass, field
 from fastapi import APIRouter, FastAPI
-from PyDataGrabber.src.grabbers.Grabber import Grabber
-from PyDataGrabber.src.services.Service import Service
-from PyDataGrabber.src.services.rest.GrabberRESTAPI import GrabberRESTAPI
+from PyDataGrabber.grabbers.Grabber import Grabber
+from PyDataGrabber.services.Service import Service
+from PyDataGrabber.services.rest.BufferRESTAPI import BufferRESTAPI
+from PyDataGrabber.services.rest.GrabberRESTAPI import GrabberRESTAPI
 
 
 @dataclass
@@ -14,11 +15,12 @@ class RestService(Service):
         
     def __init__(self):
         super().__init__()
-        self.app = FastAPI()
+        self.app = FastAPI(title="DataGrabber", docs_url="/docs")
         
     def set_grabber(self, grabber : Grabber):
         self.grabber = grabber
         self.app.include_router(GrabberRESTAPI.get_api_router(self.grabber))
+        self.app.include_router(BufferRESTAPI.get_api_router(self.grabber))
     
     def add_router(self, router : APIRouter):
         self.app.include_router(router)

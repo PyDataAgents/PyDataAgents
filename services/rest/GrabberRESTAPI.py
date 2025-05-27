@@ -1,25 +1,26 @@
 from fastapi import APIRouter
-from PyDataGrabber.src.grabbers.Grabber import Grabber
+from PyDataGrabber.grabbers.Grabber import Grabber
+from PyDataGrabber.grabbers.GrabberConfig import GrabberConfig
 
-ROOT_URL : str = "/grabber/api/v1"
+ROOT_URL : str = "/api/v1/grabber"
 
 class GrabberRESTAPI:
     """
     REST API for DataGrabber using FastAPI.
     Provides endpoints to interact with the Grabber instance.
     """
-   
+
     @staticmethod
     def get_api_router(grabber : Grabber) -> APIRouter:
         
-        router = APIRouter()
+        router = APIRouter(prefix=ROOT_URL, tags=["Grabber"])
         
-        @router.get(ROOT_URL + "/hello")
-        def hello():
-            return {"message": "Welcome to FastAPI for DataGrabber"}
+        @router.get("/")
+        def online():
+            return True
         
-        @router.get(ROOT_URL)
-        def get_grabber():
-            return {"Grabber ID": grabber.id}
-        
+        @router.get("/config")
+        def config():
+            return GrabberConfig(grabber).to_dict()
+                
         return router

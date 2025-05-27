@@ -32,7 +32,7 @@ class GrabberElement(ABC):
     def cname(cls) -> str:
         s = cls.__name__
         return s
-            
+
     def config_options(self, with_descriptions = False) -> dict:
         result = {}
         for f in fields(self):
@@ -43,9 +43,28 @@ class GrabberElement(ABC):
                     "description": f.metadata.get("description", "")
                 }
             else:
-                result[f.name] = value
+                if isinstance(value, GrabberElement):
+                    result[f.name] = value.config_options(with_descriptions)
+                elif isinstance(value, list):
+                    li = list()
+                    for item in value:
+                        if isinstance(item, GrabberElement):
+                            li.append(item.config_options())
+                        else:
+                            li.append(item)
+                    result[f.name] = li
+                elif isinstance(value, dict):
+                    d = dict()
+                    for k, v in value.items():
+                        if isinstance(v, GrabberElement):
+                            d[k] = v.config_options()
+                        else:
+                            d[k] = v
+                    result[f.name] = d
+                else:
+                    result[f.name] = value
         return result
-    
+
     def unique_id(self):
         """
         Generate a unique ID for the grabber element class

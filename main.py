@@ -1,8 +1,8 @@
 import multiprocessing
 
 import uvicorn
-from PyDataGrabber.src.grabbers.Grabber import Grabber
-from PyDataGrabber.src.services.rest.RestService import RestService
+from PyDataGrabber.grabbers.Grabber import Grabber
+from PyDataGrabber.services.rest.RestService import RestService
 
 grabber = Grabber()
 grabber.id = "G1"

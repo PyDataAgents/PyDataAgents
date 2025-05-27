@@ -12,12 +12,13 @@ from PyDataGrabber.statemachine.StatemachineObserver import StatemachineObserver
 class StatemachineService(Service):
     
     start_node_id : str = field(default=None, metadata={"description": "ID of the start node in the statemachine service"})
-    nodes : dict[str, Node] = field(default=dict[str, Node](), metadata={"description": "dictionary of nodes in the statemachine service"})
+    nodes : dict[str, Node] = field(default_factory=dict[str, Node](), metadata={"description": "dictionary of nodes in the statemachine service"})
     
     def __init__(self):
         super().__init__()
         self.statemachine : Statemachine = None
         self.observer_thread : ObserverThread = None
+        self.nodes = dict[str, Node]()
 
     def start(self):
         if self.start_node_id is None:
@@ -35,6 +36,9 @@ class StatemachineService(Service):
 
     def stop(self):
         self.statemachine.stop()
+    
+    def add_node(self, node : Node):
+        self.nodes[node.id] = node
         
     def connect_nodes(self):
         """
