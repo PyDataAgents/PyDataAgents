@@ -5,7 +5,7 @@ from PyDataGrabber.statemachine.Transition import Transition
 
 
 @dataclass
-class CompareBufferTransition(BufferNode, Transition):
+class BufferInRangeTransition(BufferNode, Transition):
     """
     A transition that compares the current buffer with a target value.
     If the buffer matches the target, the transition is successful.

@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-import threading
+from apscheduler.schedulers.background import BackgroundScheduler
 from PyDataGrabber.buffers.BufferException import BufferException
 from PyDataGrabber.buffers.TimedBuffer import TimedBuffer
 from PyDataGrabber.buffers.signals.Signal import Signal
@@ -19,8 +19,10 @@ class SignalBuffer(TimedBuffer):
         self.signal = signal
         self.capacity = capacity
         self.sampling_period = sampling_period
-        self.signal_task() 
-        
+        self.scheduler = BackgroundScheduler()
+        self.scheduler.add_job(self.signal_task, 'interval', seconds=self.sampling_period / 1000.0)
+        self.scheduler.start()
+
     def signal_task(self):
         """
         A task that samples the signal at regular intervals.
@@ -28,11 +30,6 @@ class SignalBuffer(TimedBuffer):
         """
         if self.signal is not None:
             t, v = self.signal.value()
-            self.push_timestamps(v, t)            
-            threading.Timer(self.sampling_period / 1000.0, self.signal_task).start()            
+            self.push_timestamps(v, t)                        
         else:
             raise BufferException("No signal set for sampling.")
-    
-        
-    
-

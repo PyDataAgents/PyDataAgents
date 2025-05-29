@@ -1,9 +1,26 @@
+from typing import Any, Dict, List, Union
 from fastapi import APIRouter, Path, Query
-from PyDataGrabber.buffers.Buffer import Buffer
+from pydantic import BaseModel, Field
+from PyDataGrabber.buffers import Buffer
+from PyDataGrabber.buffers.DataType import DataType
+from PyDataGrabber.buffers.ListBuffer import ListBuffer
 from PyDataGrabber.grabbers.Grabber import Grabber
+from PyDataGrabber.utils.ClassUtils import ClassUtils
 
 ROOT_URL : str = "/api/v1/buffers"
+ 
+class BufferDefinition(BaseModel):
+    type : str = Field(default=ListBuffer.__module__, title="type of the buffer to create")
+    id : str = Field(default=ListBuffer().unique_id(), title="unique identifer throughout Grabber application")
+    capacity : int = Field(default=1, title="number of elements that can be stored in buffer before being discarded in FiFo fashion")
+    data_type : str = Field(default=DataType.FLOAT.value, title="datatype to expect from buffer elements, can be DataType enum or list of enums")
+    initial_values : Any = Field(default=None, title="initial values in buffer")
+    unit : Any = Field(default=None, title="unit of element values in this buffer, can be string or list of strings")
+    description : str = Field(default=None, title="buffer description")
 
+class BufferData(BaseModel):
+    data: Union[Any, List[Any], Dict[str, Any]]
+        
 class BufferRESTAPI:
     """
     REST API for Buffers using FastAPI.
@@ -63,9 +80,24 @@ class BufferRESTAPI:
             return buffer.data(n, persistent)
         
         @router.post("/")
-        def add_buffer(d : dict) -> str:
-            
-            return d["id"]
+        def add_buffer(buffer_def : BufferDefinition) -> str:
+            buffer : Buffer = ClassUtils.create_instance(buffer_def.type)
+            buffer.type = buffer_def.type
+            buffer.id = buffer_def.id
+            buffer.capacity = buffer_def.capacity
+            buffer.data_type = buffer_def.data_type
+            buffer.initial_values = buffer_def.initial_values
+            buffer.unit = buffer_def.unit
+            buffer.description = buffer_def.description
+            grabber.add_buffer(buffer)
+            return buffer_def.id
         
+        @router.put("/{id}")
+        def add_data(id : str = Path(description="unique ID of the buffer"), data : BufferData = None)-> bool:
+            if id not in grabber.buffer_store:
+                return {"error" : "Buffer with " + id + " not found"}
+            grabber.buffer_store[id].push(data.data)
+            return True
                
         return router
+   

@@ -1,8 +1,8 @@
 from dataclasses import dataclass, field
-from PyDataGrabber.src.adapters.WriteAdapter import WriteAdapter
-from PyDataGrabber.src.statemachine.Action import Action
-from PyDataGrabber.src.statemachine.AdapterNode import AdapterNode
-from PyDataGrabber.src.statemachine.StatemachineException import StatemachineException
+from PyDataGrabber.adapters.WriteAdapter import WriteAdapter
+from PyDataGrabber.statemachine.Action import Action
+from PyDataGrabber.statemachine.AdapterNode import AdapterNode
+from PyDataGrabber.statemachine.StatemachineException import StatemachineException
 
 @dataclass
 class AdapterWriteAction(AdapterNode, Action):
