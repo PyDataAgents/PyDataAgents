@@ -1,0 +1,14 @@
+{
+    "data": {
+            "timestamps": [1637913792323, 167832304234, 1679239423423, ...],
+            "feature1": [1.0, 1.2, 2.0, 2.3, ...],
+            "feature2": [0.1, 0.9, 0.3, 0.7, ...]
+    },
+    "meta": {
+        "type": "<BUFFER_TYPE>",
+        "id": "D1",
+        "data_type": ["INT", "FLOAT", "FLOAT"],
+        "unit": ["ms", "A", "mm"],
+        "description": "dictionary buffer with multiple features and timestamps (m x n)"
+    }
+}

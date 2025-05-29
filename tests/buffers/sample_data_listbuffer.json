@@ -1,0 +1,11 @@
+{
+    "data": [1.0, 1.2, 2.0, 2.3, ...],
+    "meta": {
+        "type": "<BUFFER_TYPE>",
+        "id": "B1",
+        "data_type": "FLOAT",
+        "unit": "A",
+        "description": "simple list buffer with an list based (1 x n) data storage",
+        "initial_values": []
+    }
+}
