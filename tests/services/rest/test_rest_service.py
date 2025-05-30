@@ -1,6 +1,4 @@
-import multiprocessing
-
-import uvicorn
+import time
 from PyDataGrabber.buffers.DataType import DataType
 from PyDataGrabber.buffers.SignalBuffer import SignalBuffer
 from PyDataGrabber.buffers.signals.Sine import Sine
@@ -12,7 +10,8 @@ def test_000():
     grabber.id = "G1"
     
     s = Sine()
-    b = SignalBuffer(s)
+    b = SignalBuffer()
+    b.signal = s
     b.capacity = 100
     b.id = "S1"
     b.sampling_period = 100 # ms
@@ -23,9 +22,32 @@ def test_000():
 
     service = RestService()
     service.id = "S1"
-    service.set_grabber(grabber)
+    
+    grabber.add_service(service)
 
-    app = service.app
+    grabber.start_blocking()
+    
+def test_010():
+    grabber = Grabber()
+    grabber.id = "G1"
+    
+    s = Sine()
+    b = SignalBuffer()
+    b.signal = s
+    b.capacity = 100
+    b.id = "S1"
+    b.sampling_period = 100 # ms
+    b.unit = "V"
+    b.data_type = DataType.FLOAT.value
 
-    multiprocessing.freeze_support()  # For Windows support
-    uvicorn.run(app, host="0.0.0.0", port=8001, reload=False, workers=1)
+    grabber.add_buffer(b)
+
+    service = RestService()
+    service.id = "S1"
+    service.install(grabber)
+    
+    service.start()
+    
+    time.sleep(5)
+    
+    service.stop()

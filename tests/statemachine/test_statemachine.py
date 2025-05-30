@@ -1,5 +1,5 @@
 from PyDataGrabber.statemachine.JoinTransition import JoinTransition
-from PyDataGrabber.statemachine.Statemachine import Statemachine
+from PyDataGrabber.statemachine.StatemachineService import StatemachineService
 from PyDataGrabber.statemachine.actions.SleepAction import SleepAction
 from PyDataGrabber.statemachine.actions.StartAction import StartAction
 from PyDataGrabber.statemachine.actions.StopAction import StopAction
@@ -22,7 +22,8 @@ def test_000():
     n2.add_child(n3)
     n3.add_child(n4)
     
-    sm = Statemachine(n1)
+    sm = StatemachineService()
+    sm.start_action = n1
     
     sm.start()
     
@@ -47,7 +48,8 @@ def test_010():
     n5.add_child(n6)
     n6.add_child(n7)
     
-    sm = Statemachine(n1)
+    sm = StatemachineService()
+    sm.start_action = n1
     
     sm.start()
     
@@ -73,7 +75,8 @@ def test_020():
     n6.add_child(n7)
     n7.add_child(n2)
     
-    sm = Statemachine(n1)
+    sm = StatemachineService()
+    sm.start_action = n1
     
     sm.start()
     
@@ -96,7 +99,8 @@ def test_021():
     n4.add_child(n6)
     n6.add_child(n2)
     
-    sm = Statemachine(n1)
+    sm = StatemachineService()
+    sm.start_action = n1
     
     sm.start()
     
@@ -119,7 +123,8 @@ def test_030():
     n4.add_child(n5)
     n5.add_child(n6)
     
-    sm = Statemachine(n1)
+    sm = StatemachineService()
+    sm.start_action = n1
     
     sm.start()
     
@@ -145,7 +150,8 @@ def test_040():
     n5.add_child(n6)
     n6.add_child(n7)
     
-    sm = Statemachine(n1)
+    sm = StatemachineService()
+    sm.start_action = n1
     sm.start()
     
 def test_050():
@@ -172,5 +178,6 @@ def test_050():
     n6.add_child(n7)
     n7.add_child(n8)
     
-    sm = Statemachine(n1)
+    sm = StatemachineService()
+    sm.start_action = n1
     sm.start()

@@ -12,6 +12,10 @@ class Service(GrabberElement):
         self.is_running : bool = False
         self.grabber : Grabber = None
     
+    def install(self, grabber : Grabber = None):
+        super().install(grabber)
+        self.grabber = grabber
+        
     @abstractmethod
     def start(self):
         pass
@@ -20,7 +24,5 @@ class Service(GrabberElement):
     def stop(self):
         pass
     
-    def set_grabber(self, grabber : Grabber):
-        self.grabber = grabber
     
     

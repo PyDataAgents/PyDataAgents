@@ -1,3 +1,4 @@
+from __future__ import annotations
 from dataclasses import dataclass, field
 from PyDataGrabber.grabbers.Grabber import Grabber
 from PyDataGrabber.mappings.ObserverThread import ObserverThread
@@ -6,25 +7,50 @@ from PyDataGrabber.services.Service import Service
 from PyDataGrabber.services.ServiceException import ServiceException
 from PyDataGrabber.statemachine.Action import Action
 from PyDataGrabber.statemachine.Node import Node
-from PyDataGrabber.statemachine.Statemachine import Statemachine
+from PyDataGrabber.statemachine.State import State
+from PyDataGrabber.statemachine.StatemachineException import StatemachineException
 from PyDataGrabber.statemachine.StatemachineObserver import StatemachineObserver
+from PyDataGrabber.statemachine.Transition import Transition
+
 
 @dataclass
 class StatemachineService(Service):
     
+    retry_error_nodes : bool = field(default=False, metadata={"description" : "Statemachine object containing actions and transitions to go through to represent a state machine program flow"})    
     start_node_id : str = field(default=None, metadata={"description": "ID of the start node in the statemachine service"})
     nodes : dict[str, Node] = field(default_factory=dict[str, Node](), metadata={"description": "dictionary of nodes in the statemachine service"})
+    thread_type : str = field(default=ThreadType.INSTANT.value, metadata={"description": ""})
     
     def __init__(self):
         super().__init__()
-        self.statemachine : Statemachine = None
         self.observer_thread : ObserverThread = None
-        self.nodes = dict[str, Node]()
+        self.actions : dict[str, Action] = dict()
+        self.transitions : dict[str, Transition] = dict()
+        self.start_action : Action = None
+        self.is_running = False
 
     def install(self, grabber : Grabber = None):
         super().install(grabber)
-        self.connect_nodes()        
+        for node in self.nodes.values():
+            node.install(grabber)
+        self.connect_nodes()
+        self.assemble(self.start_action)
     
+    def assemble(self, node : Node):
+        if isinstance(node, Transition):
+            if not node.id in self.transitions.values():
+                self.transitions[node.id] = node
+                for node2 in node.children:
+                    self.assemble(node2)
+        elif isinstance(node, Action):
+            if not node in self.actions.values():
+                self.actions[node.id] = node
+                for node2 in node.children:
+                    self.assemble(node2)
+            else:
+                if len(self.transitions) == 0:
+                    raise StatemachineException("this " + self.name() + " network causes a " + RecursionError.__name__ + "! Make sure to break your loop Statemachine Network with a " + Transition.cname() + " or change the network layout.")
+        
     def start(self):
         if self.start_node_id is None:
             raise ServiceException("Start node ID must be set before starting the statemachine service.")
@@ -32,14 +58,13 @@ class StatemachineService(Service):
             raise ServiceException(f"Start node with ID {self.start_node_id} not found in the statemachine service.")
         if not isinstance(self.nodes[self.start_node_id], Action):
             raise ServiceException(f"Node with ID {self.start_node_id} is not a valid Action Node instance.")
-        self.statemachine = Statemachine(self.nodes[self.start_node_id])
         self.observer_thread = ObserverThread(self.observer_thread.unique_id(), ThreadType.ONLY_ONCE, 0)
-        observer = StatemachineObserver(self.statemachine)
+        observer = StatemachineObserver(self)
         self.observer_thread.add_observer(observer)
         self.observer_thread.start()
 
     def stop(self):
-        self.statemachine.stop()
+        self.is_running = False
     
     def add_node(self, node : Node):
         self.nodes[node.id] = node
@@ -56,3 +81,28 @@ class StatemachineService(Service):
                         node.add_child(self.nodes[child_id])
                     else:
                         raise ServiceException(f"Child node with ID {child_id} not found for node {node.id}.")
+                    
+    def has_active_actions(self) -> bool:
+        for action in self.actions.values():
+            if action.state == State.ACTIVE:
+                return True
+        return False
+    
+    def has_active_transitions(self) -> bool:
+        for transition in self.transitions.values():
+            if transition.state == State.ACTIVE:
+                return True
+        return False
+    
+    def node_by_id(self, id) -> Node:
+        if id in self.actions:
+            return self.actions[id]
+        if id in self.transitions:
+            return self.transitions[id]
+        return None
+        
+    def activate(self, action : Action):
+        action.activate()
+    
+    def deactivate(self, action: Action):
+        action.deactivate()     

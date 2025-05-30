@@ -1,6 +1,3 @@
-import multiprocessing
-
-import uvicorn
 from PyDataGrabber.grabbers.Grabber import Grabber
 from PyDataGrabber.services.rest.RestService import RestService
 
@@ -9,10 +6,8 @@ grabber.id = "G1"
 
 service = RestService()
 service.id = "S1"
-service.set_grabber(grabber)
+service.port = 8001
 
-app = service.app
+grabber.add_service(service)
 
-if __name__ == '__main__':
-    multiprocessing.freeze_support()  # For Windows support
-    uvicorn.run(app, host="0.0.0.0", port=8001, reload=False, workers=1)
+grabber.start_blocking()

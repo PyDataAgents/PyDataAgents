@@ -2,7 +2,6 @@ import os
 from PyDataGrabber.grabbers.Grabber import Grabber
 from PyDataGrabber.grabbers.GrabberConfig import GrabberConfig
 from PyDataGrabber.grabbers.YAMLConfig import YAMLConfig
-from PyDataGrabber.statemachine.Statemachine import Statemachine
 from PyDataGrabber.statemachine.StatemachineService import StatemachineService
 from PyDataGrabber.statemachine.actions.StartAction import StartAction
 
@@ -13,9 +12,8 @@ def test_000():
     
     n1 = StartAction()
     
-    sm = Statemachine(n1)
-    
     sms = StatemachineService()
+    sms.start_action = n1
     
     sms.add_node(n1)
     
