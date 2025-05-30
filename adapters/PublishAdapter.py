@@ -18,11 +18,9 @@ class PublishAdapter(Adapter):
             n (int): _description_
             persistent (bool): _description_
         """
-        pass
     
     @abstractmethod
     def unpublish(self):
         """ resets the adapter to stop publishing
-        """
-        pass    
+        """  
     

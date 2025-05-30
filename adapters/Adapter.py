@@ -1,5 +1,5 @@
+from __future__ import annotations
 from abc import abstractmethod
-
 from PyDataGrabber.grabbers.GrabberElement import GrabberElement
 
 class Adapter(GrabberElement):
@@ -16,7 +16,7 @@ class Adapter(GrabberElement):
     @abstractmethod
     def disconnect(self) -> bool:
         """
-        disconnect from the data source/sink.
+        disconnect from the data source/sink.    
         """
     
     

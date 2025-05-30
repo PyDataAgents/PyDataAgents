@@ -1,6 +1,7 @@
 from abc import abstractmethod
 from dataclasses import dataclass, field
 from PyDataGrabber.buffers.DataType import DataType
+from PyDataGrabber.grabbers.Grabber import Grabber
 from PyDataGrabber.grabbers.GrabberElement import GrabberElement
 
 @dataclass
@@ -13,6 +14,12 @@ class ObjectTransformation(GrabberElement):
     
     def __init__(self):
         super().__init__()
+        
+    def install(self, grabber : Grabber = None):
+        pass
+    
+    def deinstall(self, grabber : Grabber = None):
+        pass
        
     @abstractmethod 
     def apply(self, element: any) -> any:

@@ -1,8 +1,13 @@
+from __future__ import annotations
+from typing import TYPE_CHECKING
 from abc import ABC
 from dataclasses import dataclass, field, fields
 import uuid
 from loguru import logger
 
+if TYPE_CHECKING:
+    from PyDataGrabber.grabbers.Grabber import Grabber
+    
 @dataclass
 class GrabberElement(ABC):
     """
@@ -73,3 +78,14 @@ class GrabberElement(ABC):
             str: A unique identifier for the grabber element class
         """
         return f"{self.__class__.__name__} [{uuid.uuid4()}]"
+    
+    def install(self, grabber : Grabber = None):
+        """initializes the element with respect to startup functionality or initial internal object creation,
+           if grabber is not None, it can be used to reference or create other grabber elements
+        """
+        return
+        
+    def deinstall(self, grabber : Grabber = None):
+        """resets the element, this method can be used to stop internal element logic or reset objects that were initialized on creation
+        """
+        return

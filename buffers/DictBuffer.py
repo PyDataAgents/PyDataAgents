@@ -1,22 +1,26 @@
+from __future__ import annotations
 import threading
 from PyDataGrabber.buffers.Buffer import Buffer
-from PyDataGrabber.grabbers.Usage import Usage
+from PyDataGrabber.grabbers import Grabber
 
-@Usage("This Buffer stores data in a dictionary, where every key contains a list of data samples")
 class DictBuffer(Buffer):
     """buffer that stores its values in a dictionary in a table like fashion, where every key contains a list of data
-
-    Args:
-        Buffer (_type_): _description_
     """    
     
     def __init__(self):
         super().__init__()
         self.elements : dict[list] = dict()
-        if self.initial_values is not None:
-            self.elements = self.initial_values
         self.lock = threading.RLock()
 
+    def install(self, grabber : Grabber = None):
+        super().install(grabber)
+        if self.initial_values is not None:
+            self.elements = self.initial_values
+        
+    def deinstall(self, grabber : Grabber = None):
+        super().deinstall(grabber)
+        self.elements = {}        
+    
     def push(self, elements : dict):
         with self.lock:
             for k in elements:

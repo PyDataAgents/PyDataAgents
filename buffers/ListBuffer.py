@@ -1,5 +1,7 @@
+from __future__ import annotations
 import threading
 from PyDataGrabber.buffers.Buffer import Buffer
+from PyDataGrabber.grabbers.Grabber import Grabber
 
 class ListBuffer(Buffer):
     """buffer that stores its values in a capacity limited list
@@ -7,12 +9,18 @@ class ListBuffer(Buffer):
 
     def __init__(self):
         super().__init__()        
-        if self.initial_values is not None:
-            self.elements = self.initial_values
-        else:
-            self.elements = list()
+        self.elements = list()
         self.lock = threading.RLock()
 
+    def install(self, grabber : Grabber = None):
+        super().install(grabber)
+        if self.initial_values is not None:
+            self.elements = self.initial_values
+            
+    def deinstall(self, grabber : Grabber = None):
+        super().deinstall(grabber)
+        self.elements = []
+           
     def push(self, elements : list):
         with self.lock:
             if isinstance(elements, str):

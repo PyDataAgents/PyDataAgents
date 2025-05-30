@@ -15,7 +15,7 @@ class AdsAdapter(ReadAdapter, WriteAdapter):
     def __init__(self):
         super().__init__()
         self.ads_client : pyads.Connection = None
-        
+    
     def connect(self) -> bool:
         match self.twincat:
             case 2:

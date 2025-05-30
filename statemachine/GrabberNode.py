@@ -1,11 +1,9 @@
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from PyDataGrabber.grabbers.Grabber import Grabber
 from PyDataGrabber.statemachine.Node import Node
 
 @dataclass
 class GrabberNode(Node):
-    
-    grabber_id : str = field(default=None, metadata={"description": "ID of the grabber"})
     
     def __init__(self):
         super().__init__()

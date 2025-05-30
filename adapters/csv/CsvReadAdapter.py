@@ -3,6 +3,7 @@ from dataclasses import dataclass, field
 from PyDataGrabber.adapters.AdapterException import AdapterException
 from PyDataGrabber.adapters.ReadAdapter import ReadAdapter
 from PyDataGrabber.buffers.Buffer import Buffer
+from PyDataGrabber.grabbers.Grabber import Grabber
 from PyDataGrabber.utils.FileUtils import FileUtils
 from PyDataGrabber.buffers.DictBuffer import DictBuffer
 

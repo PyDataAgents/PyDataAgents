@@ -1,4 +1,5 @@
 from dataclasses import dataclass, field
+from PyDataGrabber.grabbers.Grabber import Grabber
 from PyDataGrabber.mappings.ObserverThread import ObserverThread
 from PyDataGrabber.mappings.ThreadType import ThreadType
 from PyDataGrabber.services.Service import Service
@@ -20,6 +21,10 @@ class StatemachineService(Service):
         self.observer_thread : ObserverThread = None
         self.nodes = dict[str, Node]()
 
+    def install(self, grabber : Grabber = None):
+        super().install(grabber)
+        self.connect_nodes()        
+    
     def start(self):
         if self.start_node_id is None:
             raise ServiceException("Start node ID must be set before starting the statemachine service.")
@@ -27,7 +32,6 @@ class StatemachineService(Service):
             raise ServiceException(f"Start node with ID {self.start_node_id} not found in the statemachine service.")
         if not isinstance(self.nodes[self.start_node_id], Action):
             raise ServiceException(f"Node with ID {self.start_node_id} is not a valid Action Node instance.")
-        self.connect_nodes()
         self.statemachine = Statemachine(self.nodes[self.start_node_id])
         self.observer_thread = ObserverThread(self.observer_thread.unique_id(), ThreadType.ONLY_ONCE, 0)
         observer = StatemachineObserver(self.statemachine)

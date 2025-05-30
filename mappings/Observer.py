@@ -6,7 +6,7 @@ class Observer(GrabberElement):
     
     def __init__(self):
         super().__init__()
-        
+                
     @abstractmethod
     def observe(self):
         pass

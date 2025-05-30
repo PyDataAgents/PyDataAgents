@@ -1,9 +1,10 @@
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 from typing import Tuple
 
+from PyDataGrabber.grabbers.GrabberElement import GrabberElement
 from PyDataGrabber.utils.TimeUtils import TimeUtils
 
-class Signal(ABC):
+class Signal(GrabberElement):
     """
     Abstract base class for signals.
     """

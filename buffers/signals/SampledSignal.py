@@ -1,23 +1,25 @@
-from abc import ABC, abstractmethod
+from abc import abstractmethod
+from dataclasses import dataclass, field
 from typing import Tuple
 
+from PyDataGrabber.grabbers.GrabberElement import GrabberElement
 
-class SampledSignal(ABC):
+@dataclass
+class SampledSignal(GrabberElement):
     """
     A class representing a sampled signal for continuously sampled data
     """
-
-    def __init__(self, sample_rate : float):
+    sample_rate : float = field(default=1.0, metadata={"description": "sample rate of the signal in Hz"})
+        
+    def __init__(self):
         """
-        Initializes the SampledSignal with sample rate
         """
-        self.sample_rate = sample_rate
-        self.sample_count : int = -1
+        self.sample_count : int = 0
 
     @abstractmethod
     def sample(self) -> Tuple[float, float]:
-        self.sample_count += 1
         t = self.sample_count * 1.0 / self.sample_rate
+        self.sample_count += 1
         return t, t
     
     def samples(self, n : int = 1) -> Tuple[list[float], list[float]]:
@@ -35,4 +37,4 @@ class SampledSignal(ABC):
         """
         Resets the signal's start time and sample count.
         """
-        self.sample_count = -1
+        self.sample_count = 0

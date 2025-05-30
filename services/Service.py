@@ -1,10 +1,7 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING
 from abc import abstractmethod
+from PyDataGrabber.grabbers.Grabber import Grabber
 from PyDataGrabber.grabbers.GrabberElement import GrabberElement
-
-if TYPE_CHECKING:
-    from PyDataGrabber.grabbers.Grabber import Grabber
 
 class Service(GrabberElement):
     """abstract base class for Grabber Services
@@ -14,7 +11,7 @@ class Service(GrabberElement):
         super().__init__()
         self.is_running : bool = False
         self.grabber : Grabber = None
-        
+    
     @abstractmethod
     def start(self):
         pass

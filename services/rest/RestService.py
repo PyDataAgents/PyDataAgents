@@ -17,11 +17,16 @@ class RestService(Service):
         super().__init__()
         self.app = FastAPI(title="DataGrabber", docs_url="/docs")
         
-    def set_grabber(self, grabber : Grabber):
+    def install(self, grabber : Grabber = None):
+        super().install(grabber)
         self.grabber = grabber
         self.app.include_router(GrabberRESTAPI.get_api_router(self.grabber))
         self.app.include_router(BufferRESTAPI.get_api_router(self.grabber))
-    
+        
+    def deinstall(self, grabber : Grabber = None):
+        super().deinstall(grabber)
+        self.app = None
+        
     def add_router(self, router : APIRouter):
         self.app.include_router(router)
     

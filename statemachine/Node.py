@@ -14,7 +14,7 @@ class Node(GrabberElement):
         self.children : list[Node] = list()
         self.state : State = State.INACTIVE
         self.child_ids = list[str]()
-        
+      
     def add_child(self, node : Node):
         self.children.append(node)
         node.parents.append(self)       

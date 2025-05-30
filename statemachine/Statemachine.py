@@ -12,12 +12,13 @@ class Statemachine(GrabberElement):
     
     retry_error_nodes : bool = field(default=False, metadata={"description" : "Statemachine object containing actions and transitions to go through to represent a state machine program flow"})
     
-    def __init__(self, start_action : Action): 
+    def __init__(self, start_action : Action):
+        super().__init__() 
         self.actions : dict[str, Action] = dict()
         self.transitions : dict[str, Transition] = dict()
         self.start_action : Action = start_action
         self.is_running = False
-        
+            
     def assemble(self, node : Node):
         if isinstance(node, Transition):
             if not node.id in self.transitions.values():

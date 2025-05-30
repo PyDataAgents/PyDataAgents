@@ -1,8 +1,9 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from apscheduler.schedulers.background import BackgroundScheduler
 from PyDataGrabber.buffers.BufferException import BufferException
 from PyDataGrabber.buffers.TimedBuffer import TimedBuffer
 from PyDataGrabber.buffers.signals.Signal import Signal
+from PyDataGrabber.grabbers.Grabber import Grabber
 
 @dataclass
 class SignalBuffer(TimedBuffer):
@@ -13,16 +14,24 @@ class SignalBuffer(TimedBuffer):
         start_time (int): The start time of the signal in milliseconds.
         elapsed_time (float): The elapsed time since the start in seconds.
     """
+    
+    signal : Signal = field(default=None, metadata={"description": "a signal object to simulate data"})
+    sampling_period : int = field(default=100, metadata={"description": "interval in milliseconds for update"})
 
-    def __init__(self, signal : Signal = None, capacity: int = 1, sampling_period : int = 100):
+    def __init__(self):
         super().__init__()
-        self.signal = signal
-        self.capacity = capacity
-        self.sampling_period = sampling_period
+        self.scheduler : BackgroundScheduler = None        
+
+    def install(self, grabber : Grabber = None):
+        super().install(grabber)
         self.scheduler = BackgroundScheduler()
         self.scheduler.add_job(self.signal_task, 'interval', seconds=self.sampling_period / 1000.0)
         self.scheduler.start()
-
+            
+    def deinstall(self, grabber : Grabber = None):
+        super().deinstall(grabber)
+        self.scheduler.shutdown()    
+    
     def signal_task(self):
         """
         A task that samples the signal at regular intervals.

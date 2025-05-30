@@ -1,11 +1,17 @@
+from dataclasses import dataclass, field
 from PyDataGrabber.buffers.signals.Signal import Signal
 from PyDataGrabber.utils.MathUtils import MathUtils
 
-
+@dataclass
 class Sine(Signal):
     """
     A class to represent a sine wave signal.
     """
+    
+    f : float = field(default=1.0, metadata={"description": "frequency of sine wave in Hz"})
+    a : float = field(default=1.0, metadata={"description": "amplitude of sine wave"})
+    p : float = field(default=0.0, metadata={"description": "phase angle of sine wave in °"})
+    n : float = field(default=0.0, metadata={"description": "noise level of sine wave in respect to ampltidue [0..1]"})
 
     def __init__(self):
         """
@@ -16,10 +22,6 @@ class Sine(Signal):
         :param phase: Phase shift of the sine wave in radians.
         """
         super().__init__()
-        self.f = 1.0
-        self.a = 1.0
-        self.p = 0.0
-        self.n = 0.0
         
     def value(self, t: int = None) -> tuple[int, float]:
         """

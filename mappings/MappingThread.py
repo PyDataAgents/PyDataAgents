@@ -18,7 +18,7 @@ class MappingThread(GrabberElement):
         super().__init__()
         self.mapping : Mapping = mapping
         self.observer_thread : ObserverThread = None
-    
+        
     def start(self, grabber : Grabber):
         self.observer_thread = ObserverThread(self.observer_thread.unique_id(), self.mapping.thread_type, self.mapping.sampling_period)
         # assemble adapters and buffers from Grabber
