@@ -24,6 +24,7 @@ class StatemachineService(Service):
     def __init__(self):
         super().__init__()
         self.observer_thread : ObserverThread = None
+        self.nodes : dict[str, Node] = dict()
         self.actions : dict[str, Action] = dict()
         self.transitions : dict[str, Transition] = dict()
         self.start_action : Action = None
@@ -31,10 +32,17 @@ class StatemachineService(Service):
 
     def install(self, grabber : Grabber = None):
         super().install(grabber)
+        if self.start_action is None:
+            if self.start_node_id is None:
+                raise StatemachineException("No start action can be found!")
+            else:
+                if self.start_node_id in self.nodes:
+                    self.start_action = self.nodes[self.start_node_id]
+                else:
+                    raise StatemachineException("the specified start node id cannot be found among nodes")            
         for node in self.nodes.values():
             node.install(grabber)
         self.connect_nodes()
-        self.assemble(self.start_action)
     
     def assemble(self, node : Node):
         if isinstance(node, Transition):
@@ -52,13 +60,12 @@ class StatemachineService(Service):
                     raise StatemachineException("this " + self.name() + " network causes a " + RecursionError.__name__ + "! Make sure to break your loop Statemachine Network with a " + Transition.cname() + " or change the network layout.")
         
     def start(self):
-        if self.start_node_id is None:
+        if self.start_action is None:
             raise ServiceException("Start node ID must be set before starting the statemachine service.")
-        if self.start_node_id not in self.nodes:
-            raise ServiceException(f"Start node with ID {self.start_node_id} not found in the statemachine service.")
-        if not isinstance(self.nodes[self.start_node_id], Action):
-            raise ServiceException(f"Node with ID {self.start_node_id} is not a valid Action Node instance.")
-        self.observer_thread = ObserverThread(self.observer_thread.unique_id(), ThreadType.ONLY_ONCE, 0)
+        if not isinstance(self.nodes[self.start_action.id], Action):
+            raise ServiceException(f"Node with ID {self.start_node_id} is not a valid Action Node instance.")        
+        self.assemble(self.start_action)
+        self.observer_thread = ObserverThread(ObserverThread.unique_id(), ThreadType.ONLY_ONCE, 0)
         observer = StatemachineObserver(self)
         self.observer_thread.add_observer(observer)
         self.observer_thread.start()

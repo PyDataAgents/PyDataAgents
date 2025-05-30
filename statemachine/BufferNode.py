@@ -23,10 +23,11 @@ class BufferNode(Node):
             StatemachineException: throws an `Exception` if no `buffer` with the specified `buffer_id` can be found in `grabber`
         """
         super().install(grabber)
-        if self.buffer_id in grabber.buffer_store:
-            self.buffer = grabber.buffer_store[self.buffer_id]
-        else:
-            raise StatemachineException("No " + Buffer.cname() + " with id=" + self.buffer_id + " exists in " + Grabber.cname())
+        if self.buffer is None:
+            if self.buffer_id in grabber.buffer_store:
+                self.buffer = grabber.buffer_store[self.buffer_id]
+            else:
+                raise StatemachineException("No " + Buffer.cname() + " with id=" + self.buffer_id + " exists in " + Grabber.cname())
         
     def deinstall(self, grabber : Grabber = None):
         super().deinstall(grabber)

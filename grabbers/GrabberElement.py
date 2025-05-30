@@ -70,14 +70,15 @@ class GrabberElement(ABC):
                     result[f.name] = value
         return result
 
-    def unique_id(self):
+    @classmethod
+    def unique_id(cls):
         """
         Generate a unique ID for the grabber element class
         
         Returns:
             str: A unique identifier for the grabber element class
         """
-        return f"{self.__class__.__name__} [{uuid.uuid4()}]"
+        return f"{cls.__name__} [{uuid.uuid4()}]"
     
     def install(self, grabber : Grabber = None):
         """initializes the element with respect to startup functionality or initial internal object creation,

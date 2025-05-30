@@ -1,6 +1,9 @@
 from dataclasses import dataclass, field
 
+from PyDataGrabber.grabbers.Grabber import Grabber
+from PyDataGrabber.services.Service import Service
 from PyDataGrabber.statemachine.Node import Node
+from PyDataGrabber.statemachine.StatemachineException import StatemachineException
 
 @dataclass
 class ServiceNode(Node):
@@ -20,3 +23,15 @@ class ServiceNode(Node):
         """
         super().__init__()
         self.service = None
+        
+    def install(self, grabber : Grabber = None):
+        super().install()
+        if self.service is None:
+            if self.service_id in grabber.mapping_store:
+                self.service = grabber.service_store[self.service_id]
+            else:
+                raise StatemachineException("No " + Service.cname() + " with id=" + self.service_id + " was found")
+            
+    def deinstall(self, grabber : Grabber = None):
+        super().deinstall()
+        self.service : Service = None

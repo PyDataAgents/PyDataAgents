@@ -20,7 +20,6 @@ class StatemachineObserver(Observer):
         self.statemachine = statemachine
 
     def observe(self):
-        self.statemachine.assemble(self.statemachine.start_action)
         self.statemachine.start_action.activate()
         self.statemachine.is_running = True
         while (self.statemachine.is_running and (self.statemachine.has_active_actions() or self.statemachine.has_active_transitions())):

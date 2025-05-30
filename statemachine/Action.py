@@ -19,5 +19,6 @@ class Action(Node):
     
     @abstractmethod
     def execute(self):
-        pass
-        
+        """
+        method for execution of the `Action`
+        """
