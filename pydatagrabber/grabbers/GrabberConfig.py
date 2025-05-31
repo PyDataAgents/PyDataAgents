@@ -1,8 +1,8 @@
 import json
-from PyDataGrabber.pydatagrabber.buffers.Buffer import Buffer
-from PyDataGrabber.pydatagrabber.grabbers.Grabber import Grabber
-from PyDataGrabber.pydatagrabber.grabbers.GrabberException import GrabberException
-from PyDataGrabber.pydatagrabber.utils.ClassUtils import ClassUtils
+from ..buffers.Buffer import Buffer
+from .Grabber import Grabber
+from .GrabberException import GrabberException
+from ..utils.ClassUtils import ClassUtils
 
 
 class GrabberConfig:

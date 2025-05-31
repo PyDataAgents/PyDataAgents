@@ -1,5 +1,5 @@
 from abc import abstractmethod
-from PyDataGrabber.pydatagrabber.grabbers.GrabberElement import GrabberElement
+from ..grabbers.GrabberElement import GrabberElement
 
 
 class Observer(GrabberElement):

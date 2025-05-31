@@ -2,8 +2,8 @@ from dataclasses import dataclass, field
 import time
 import sounddevice as sd
 import numpy as np
-from PyDataGrabber.pydatagrabber.adapters.SubscribeAdapter import SubscribeAdapter
-from PyDataGrabber.pydatagrabber.buffers.Buffer import Buffer
+from ...adapters.SubscribeAdapter import SubscribeAdapter
+from ...buffers.Buffer import Buffer
 
 @dataclass
 class AudioAdapter(SubscribeAdapter):

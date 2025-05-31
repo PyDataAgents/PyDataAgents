@@ -1,5 +1,5 @@
 import time
-from PyDataGrabber.pydatagrabber.buffers.ListBuffer import ListBuffer
+from .ListBuffer import ListBuffer
 
 
 class TimedBuffer(ListBuffer):

@@ -3,14 +3,14 @@ from typing import TYPE_CHECKING
 from dataclasses import dataclass
 import time
 from loguru import logger
-from PyDataGrabber.pydatagrabber.grabbers.GrabberElement import GrabberElement
-from PyDataGrabber.pydatagrabber.mappings.MappingThread import MappingThread
+from .GrabberElement import GrabberElement
+from ..mappings.MappingThread import MappingThread
 
 if TYPE_CHECKING:
-    from PyDataGrabber.pydatagrabber.adapters.Adapter import Adapter
-    from PyDataGrabber.pydatagrabber.buffers.Buffer import Buffer
-    from PyDataGrabber.pydatagrabber.mappings.Mapping import Mapping
-    from PyDataGrabber.pydatagrabber.services.Service import Service
+    from ..adapters.Adapter import Adapter
+    from ..buffers.Buffer import Buffer
+    from ..mappings.Mapping import Mapping
+    from ..services.Service import Service
 
 @dataclass
 class Grabber(GrabberElement):

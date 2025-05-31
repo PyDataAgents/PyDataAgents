@@ -1,4 +1,4 @@
-from PyDataGrabber.pydatagrabber.buffers.TimedBuffer import TimedBuffer
+from .TimedBuffer import TimedBuffer
 
 
 class SampledBuffer(TimedBuffer):

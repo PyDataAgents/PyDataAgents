@@ -2,7 +2,7 @@ from abc import abstractmethod
 from dataclasses import dataclass, field
 from typing import Tuple
 
-from PyDataGrabber.pydatagrabber.grabbers.GrabberElement import GrabberElement
+from ...grabbers.GrabberElement import GrabberElement
 
 @dataclass
 class SampledSignal(GrabberElement):

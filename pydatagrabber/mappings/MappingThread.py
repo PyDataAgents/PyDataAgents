@@ -1,16 +1,16 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
-from PyDataGrabber.pydatagrabber.grabbers.GrabberElement import GrabberElement
-from PyDataGrabber.pydatagrabber.mappings.Mapping import Mapping
-from PyDataGrabber.pydatagrabber.mappings.MappingType import MappingType
-from PyDataGrabber.pydatagrabber.mappings.ObserverThread import ObserverThread
-from PyDataGrabber.pydatagrabber.mappings.PublishMappingObserver import PublishMappingObserver
-from PyDataGrabber.pydatagrabber.mappings.ReadMappingObserver import ReadMappingObserver
-from PyDataGrabber.pydatagrabber.mappings.SubscribeMappingObserver import SubscribeMappingObserver
-from PyDataGrabber.pydatagrabber.mappings.WriteMappingObserver import WriteMappingObserver
+from ..grabbers.GrabberElement import GrabberElement
+from .Mapping import Mapping
+from .MappingType import MappingType
+from .ObserverThread import ObserverThread
+from .PublishMappingObserver import PublishMappingObserver
+from .ReadMappingObserver import ReadMappingObserver
+from .SubscribeMappingObserver import SubscribeMappingObserver
+from .WriteMappingObserver import WriteMappingObserver
 
 if TYPE_CHECKING:
-    from PyDataGrabber.pydatagrabber.grabbers.Grabber import Grabber
+    from pydatagrabber.grabbers.Grabber import Grabber
 
 class MappingThread(GrabberElement):
     

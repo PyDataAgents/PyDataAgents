@@ -1,4 +1,4 @@
-from PyDataGrabber.pydatagrabber.mappings.MappingObserver import MappingObserver
+from .MappingObserver import MappingObserver
 
 class WriteMappingObserver(MappingObserver):
 

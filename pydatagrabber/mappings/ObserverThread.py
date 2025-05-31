@@ -1,8 +1,8 @@
 import threading
 import time
-from PyDataGrabber.pydatagrabber.grabbers.GrabberElement import GrabberElement
-from PyDataGrabber.pydatagrabber.mappings.Observer import Observer
-from PyDataGrabber.pydatagrabber.mappings.ThreadType import ThreadType
+from ..grabbers.GrabberElement import GrabberElement
+from .Observer import Observer
+from .ThreadType import ThreadType
 
 
 class ObserverThread(GrabberElement):

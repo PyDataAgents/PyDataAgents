@@ -1,8 +1,8 @@
 from abc import abstractmethod
 from dataclasses import dataclass, field
-from PyDataGrabber.pydatagrabber.buffers.DataType import DataType
-from PyDataGrabber.pydatagrabber.grabbers.Grabber import Grabber
-from PyDataGrabber.pydatagrabber.grabbers.GrabberElement import GrabberElement
+from .DataType import DataType
+from ..grabbers.Grabber import Grabber
+from ..grabbers.GrabberElement import GrabberElement
 
 @dataclass
 class ObjectTransformation(GrabberElement):

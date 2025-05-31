@@ -1,7 +1,7 @@
 from __future__ import annotations
 import threading
-from PyDataGrabber.pydatagrabber.buffers.Buffer import Buffer
-from PyDataGrabber.pydatagrabber.grabbers import Grabber
+from .Buffer import Buffer
+from ..grabbers import Grabber
 
 class DictBuffer(Buffer):
     """buffer that stores its values in a dictionary in a table like fashion, where every key contains a list of data

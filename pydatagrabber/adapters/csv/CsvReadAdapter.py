@@ -1,11 +1,10 @@
 import csv
 from dataclasses import dataclass, field
-from PyDataGrabber.pydatagrabber.adapters.AdapterException import AdapterException
-from PyDataGrabber.pydatagrabber.adapters.ReadAdapter import ReadAdapter
-from PyDataGrabber.pydatagrabber.buffers.Buffer import Buffer
-from PyDataGrabber.pydatagrabber.grabbers.Grabber import Grabber
-from PyDataGrabber.pydatagrabber.utils.FileUtils import FileUtils
-from PyDataGrabber.pydatagrabber.buffers.DictBuffer import DictBuffer
+from ...adapters.AdapterException import AdapterException
+from ...adapters.ReadAdapter import ReadAdapter
+from ...buffers.Buffer import Buffer
+from ...utils.FileUtils import FileUtils
+from ...buffers.DictBuffer import DictBuffer
 
 @dataclass
 class CsvReadAdapter(ReadAdapter):

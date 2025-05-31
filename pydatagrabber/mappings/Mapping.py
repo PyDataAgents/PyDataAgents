@@ -1,8 +1,8 @@
 from dataclasses import dataclass, field
-from PyDataGrabber.pydatagrabber.grabbers.GrabberElement import GrabberElement
-from PyDataGrabber.pydatagrabber.adapters.Adapter import Adapter
-from PyDataGrabber.pydatagrabber.buffers.Buffer import Buffer
-from PyDataGrabber.pydatagrabber.mappings.ThreadType import ThreadType
+from ..grabbers.GrabberElement import GrabberElement
+from ..adapters.Adapter import Adapter
+from ..buffers.Buffer import Buffer
+from .ThreadType import ThreadType
 
 @dataclass
 class Mapping(GrabberElement):

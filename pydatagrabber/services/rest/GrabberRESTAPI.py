@@ -1,6 +1,6 @@
 from fastapi import APIRouter
-from PyDataGrabber.pydatagrabber.grabbers.Grabber import Grabber
-from PyDataGrabber.pydatagrabber.grabbers.GrabberConfig import GrabberConfig
+from ...grabbers.Grabber import Grabber
+from ...grabbers.GrabberConfig import GrabberConfig
 
 ROOT_URL : str = "/api/v1/grabber"
 

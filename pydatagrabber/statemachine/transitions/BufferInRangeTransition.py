@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
-from PyDataGrabber.pydatagrabber.buffers.Comparator import Comparator
-from PyDataGrabber.pydatagrabber.statemachine.BufferNode import BufferNode
-from PyDataGrabber.pydatagrabber.statemachine.Transition import Transition
+from ...buffers.Comparator import Comparator
+from ..BufferNode import BufferNode
+from ..Transition import Transition
 
 
 @dataclass

@@ -1,9 +1,9 @@
 from dataclasses import dataclass, field
 
-from PyDataGrabber.pydatagrabber.grabbers.Grabber import Grabber
-from PyDataGrabber.pydatagrabber.services.Service import Service
-from PyDataGrabber.pydatagrabber.statemachine.Node import Node
-from PyDataGrabber.pydatagrabber.statemachine.StatemachineException import StatemachineException
+from ..grabbers.Grabber import Grabber
+from ..services.Service import Service
+from .Node import Node
+from .StatemachineException import StatemachineException
 
 @dataclass
 class ServiceNode(Node):

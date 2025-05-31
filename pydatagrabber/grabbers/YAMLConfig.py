@@ -1,6 +1,6 @@
 import yaml
-from PyDataGrabber.pydatagrabber.grabbers.FileConfig import FileConfig
-from PyDataGrabber.pydatagrabber.grabbers.GrabberConfig import GrabberConfig
+from .FileConfig import FileConfig
+from .GrabberConfig import GrabberConfig
 
 
 class YAMLConfig(FileConfig):

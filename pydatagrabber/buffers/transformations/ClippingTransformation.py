@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from PyDataGrabber.pydatagrabber.buffers.ObjectTransformation import ObjectTransformation
+from ..ObjectTransformation import ObjectTransformation
 
 
 @dataclass

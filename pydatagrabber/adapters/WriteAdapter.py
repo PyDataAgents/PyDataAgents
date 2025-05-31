@@ -1,6 +1,6 @@
 from abc import abstractmethod
-from PyDataGrabber.pydatagrabber.adapters.Adapter import Adapter
-from PyDataGrabber.pydatagrabber.buffers.Buffer import Buffer
+from .Adapter import Adapter
+from ..buffers.Buffer import Buffer
 
 class WriteAdapter(Adapter):
     """abstract class for Adapter Interface for writing to data sinks

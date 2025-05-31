@@ -1,9 +1,9 @@
 from dataclasses import dataclass, field
 from opcua import Client
-from PyDataGrabber.pydatagrabber.adapters.AdapterException import AdapterException
-from PyDataGrabber.pydatagrabber.adapters.ReadAdapter import ReadAdapter
-from PyDataGrabber.pydatagrabber.adapters.WriteAdapter import WriteAdapter
-from PyDataGrabber.pydatagrabber.buffers.Buffer import Buffer
+from ...adapters.AdapterException import AdapterException
+from ...adapters.ReadAdapter import ReadAdapter
+from ...adapters.WriteAdapter import WriteAdapter
+from ...buffers.Buffer import Buffer
 
 @dataclass
 class OpcUaAdapter(ReadAdapter, WriteAdapter):

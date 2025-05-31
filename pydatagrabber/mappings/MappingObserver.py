@@ -1,11 +1,11 @@
-from PyDataGrabber.pydatagrabber.adapters.PublishAdapter import PublishAdapter
-from PyDataGrabber.pydatagrabber.adapters.ReadAdapter import ReadAdapter
-from PyDataGrabber.pydatagrabber.adapters.SubscribeAdapter import SubscribeAdapter
-from PyDataGrabber.pydatagrabber.adapters.WriteAdapter import WriteAdapter
-from PyDataGrabber.pydatagrabber.mappings.MappingException import MappingException
-from PyDataGrabber.pydatagrabber.mappings.MappingType import MappingType
-from PyDataGrabber.pydatagrabber.mappings.Observer import Observer
-from PyDataGrabber.pydatagrabber.mappings.Mapping import Mapping
+from ..adapters.PublishAdapter import PublishAdapter
+from ..adapters.ReadAdapter import ReadAdapter
+from ..adapters.SubscribeAdapter import SubscribeAdapter
+from ..adapters.WriteAdapter import WriteAdapter
+from .MappingException import MappingException
+from .MappingType import MappingType
+from .Observer import Observer
+from .Mapping import Mapping
 
 class MappingObserver(Observer):
     """abstract base class for mapping observers

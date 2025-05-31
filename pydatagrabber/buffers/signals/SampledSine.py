@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
-from PyDataGrabber.pydatagrabber.buffers.signals.SampledSignal import SampledSignal
-from PyDataGrabber.pydatagrabber.utils.MathUtils import MathUtils
+from ...buffers.signals.SampledSignal import SampledSignal
+from ...utils.MathUtils import MathUtils
 
 @dataclass
 class SampledSine(SampledSignal):

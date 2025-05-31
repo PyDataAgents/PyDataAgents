@@ -1,10 +1,10 @@
 from dataclasses import dataclass, field
-from PyDataGrabber.pydatagrabber.grabbers.Grabber import Grabber
-from PyDataGrabber.pydatagrabber.grabbers.GrabberElement import GrabberElement
-from PyDataGrabber.pydatagrabber.statemachine.BufferNode import BufferNode
-from PyDataGrabber.pydatagrabber.statemachine.GrabberNode import GrabberNode
-from PyDataGrabber.pydatagrabber.statemachine.StatemachineException import StatemachineException
-from PyDataGrabber.pydatagrabber.utils.ClassUtils import ClassUtils
+from ...grabbers.Grabber import Grabber
+from ...grabbers.GrabberElement import GrabberElement
+from ..BufferNode import BufferNode
+from ..GrabberNode import GrabberNode
+from ..StatemachineException import StatemachineException
+from ...utils.ClassUtils import ClassUtils
 
 @dataclass
 class ConfigureElementAction(GrabberNode, BufferNode):

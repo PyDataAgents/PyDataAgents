@@ -1,11 +1,11 @@
 from typing import Any, Dict, List, Union
 from fastapi import APIRouter, Path, Query
 from pydantic import BaseModel, Field
-from PyDataGrabber.pydatagrabber.buffers import Buffer
-from PyDataGrabber.pydatagrabber.buffers.DataType import DataType
-from PyDataGrabber.pydatagrabber.buffers.ListBuffer import ListBuffer
-from PyDataGrabber.pydatagrabber.grabbers.Grabber import Grabber
-from PyDataGrabber.pydatagrabber.utils.ClassUtils import ClassUtils
+from ...buffers.Buffer import Buffer
+from ...buffers.DataType import DataType
+from ...buffers.ListBuffer import ListBuffer
+from ...grabbers.Grabber import Grabber
+from ...utils.ClassUtils import ClassUtils
 
 ROOT_URL : str = "/api/v1/buffers"
  

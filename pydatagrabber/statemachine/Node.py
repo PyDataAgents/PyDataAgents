@@ -1,7 +1,7 @@
 from __future__ import annotations
 from dataclasses import dataclass, field
-from PyDataGrabber.pydatagrabber.grabbers.GrabberElement import GrabberElement
-from PyDataGrabber.pydatagrabber.statemachine.State import State
+from ..grabbers.GrabberElement import GrabberElement
+from .State import State
 
 @dataclass
 class Node(GrabberElement):

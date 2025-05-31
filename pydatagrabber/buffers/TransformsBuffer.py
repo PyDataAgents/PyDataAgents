@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
-from PyDataGrabber.pydatagrabber.buffers.ListBuffer import ListBuffer
-from PyDataGrabber.pydatagrabber.buffers.ObjectTransformation import ObjectTransformation
+from .ListBuffer import ListBuffer
+from .ObjectTransformation import ObjectTransformation
 
 @dataclass
 class TransformsBuffer(ListBuffer):

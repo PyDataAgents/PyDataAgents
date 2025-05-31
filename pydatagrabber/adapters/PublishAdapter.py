@@ -1,6 +1,6 @@
 from abc import abstractmethod
-from PyDataGrabber.pydatagrabber.adapters.Adapter import Adapter
-from PyDataGrabber.pydatagrabber.buffers.Buffer import Buffer
+from .Adapter import Adapter
+from ..buffers.Buffer import Buffer
 
 class PublishAdapter(Adapter):
     """abstract class for Adapter Interface for publishing to data sinks

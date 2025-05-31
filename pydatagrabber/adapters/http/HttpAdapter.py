@@ -2,11 +2,11 @@ from dataclasses import dataclass, field
 import json
 import jsonpath_ng
 import urllib3
-from PyDataGrabber.pydatagrabber.adapters.AdapterException import AdapterException
-from PyDataGrabber.pydatagrabber.adapters.ReadAdapter import ReadAdapter
-from PyDataGrabber.pydatagrabber.adapters.WriteAdapter import WriteAdapter
-from PyDataGrabber.pydatagrabber.buffers.Buffer import Buffer
-from PyDataGrabber.pydatagrabber.utils.AdapterUtils import AdapterUtils
+from ...adapters.AdapterException import AdapterException
+from ...adapters.ReadAdapter import ReadAdapter
+from ...adapters.WriteAdapter import WriteAdapter
+from ...buffers.Buffer import Buffer
+from ...utils.AdapterUtils import AdapterUtils
 
 @dataclass
 class HttpAdapter(ReadAdapter, WriteAdapter):

@@ -1,6 +1,6 @@
 import time
 
-from PyDataGrabber.pydatagrabber.statemachine.Action import Action
+from ..Action import Action
 
 class SleepAction(Action):
     """

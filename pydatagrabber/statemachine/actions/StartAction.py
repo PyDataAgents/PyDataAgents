@@ -1,5 +1,5 @@
-from PyDataGrabber.pydatagrabber.statemachine.Action import Action
-from PyDataGrabber.pydatagrabber.statemachine.State import State
+from ..Action import Action
+from ..State import State
 
 
 class StartAction(Action):

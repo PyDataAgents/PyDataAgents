@@ -1,16 +1,16 @@
 from __future__ import annotations
 from dataclasses import dataclass, field
-from PyDataGrabber.pydatagrabber.grabbers.Grabber import Grabber
-from PyDataGrabber.pydatagrabber.mappings.ObserverThread import ObserverThread
-from PyDataGrabber.pydatagrabber.mappings.ThreadType import ThreadType
-from PyDataGrabber.pydatagrabber.services.Service import Service
-from PyDataGrabber.pydatagrabber.services.ServiceException import ServiceException
-from PyDataGrabber.pydatagrabber.statemachine.Action import Action
-from PyDataGrabber.pydatagrabber.statemachine.Node import Node
-from PyDataGrabber.pydatagrabber.statemachine.State import State
-from PyDataGrabber.pydatagrabber.statemachine.StatemachineException import StatemachineException
-from PyDataGrabber.pydatagrabber.statemachine.StatemachineObserver import StatemachineObserver
-from PyDataGrabber.pydatagrabber.statemachine.Transition import Transition
+from ..grabbers.Grabber import Grabber
+from ..mappings.ObserverThread import ObserverThread
+from ..mappings.ThreadType import ThreadType
+from ..services.Service import Service
+from ..services.ServiceException import ServiceException
+from .Action import Action
+from .Node import Node
+from .State import State
+from .StatemachineException import StatemachineException
+from .StatemachineObserver import StatemachineObserver
+from .Transition import Transition
 
 
 @dataclass

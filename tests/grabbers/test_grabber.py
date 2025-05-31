@@ -1,13 +1,13 @@
 import time
-from PyDataGrabber.pydatagrabber.adapters.opcua.OpcUaAdapter import OpcUaAdapter
-from PyDataGrabber.pydatagrabber.buffers.DataType import DataType
-from PyDataGrabber.pydatagrabber.buffers.ListBuffer import ListBuffer
-from PyDataGrabber.pydatagrabber.grabbers.Grabber import Grabber
-from PyDataGrabber.pydatagrabber.mappings.Mapping import Mapping
-from PyDataGrabber.pydatagrabber.mappings.MappingType import MappingType
-from PyDataGrabber.pydatagrabber.mappings.ThreadType import ThreadType
-from PyDataGrabber.pydatagrabber.utils.AdapterUtils import AdapterUtils
-from PyDataGrabber.pydatagrabber.utils.BufferUtils import BufferUtils
+from ...pydatagrabber.adapters.opcua.OpcUaAdapter import OpcUaAdapter
+from ...pydatagrabber.buffers.DataType import DataType
+from ...pydatagrabber.buffers.ListBuffer import ListBuffer
+from ...pydatagrabber.grabbers.Grabber import Grabber
+from ...pydatagrabber.mappings.Mapping import Mapping
+from ...pydatagrabber.mappings.MappingType import MappingType
+from ...pydatagrabber.mappings.ThreadType import ThreadType
+from ...pydatagrabber.utils.AdapterUtils import AdapterUtils
+from ...pydatagrabber.utils.BufferUtils import BufferUtils
 
 
 def test_000():

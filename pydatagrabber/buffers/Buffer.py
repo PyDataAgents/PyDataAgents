@@ -2,8 +2,8 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 import json
 from abc import abstractmethod
-from PyDataGrabber.pydatagrabber.buffers.DataType import DataType
-from PyDataGrabber.pydatagrabber.grabbers.GrabberElement import GrabberElement
+from .DataType import DataType
+from ..grabbers.GrabberElement import GrabberElement
 
 @dataclass
 class Buffer(GrabberElement):

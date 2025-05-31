@@ -1,12 +1,12 @@
 import csv
 from dataclasses import dataclass, field
 import os
-from PyDataGrabber.adapters.AdapterException import AdapterException
-from PyDataGrabber.adapters.WriteAdapter import WriteAdapter
-from PyDataGrabber.buffers.Buffer import Buffer
-from PyDataGrabber.buffers.DictBuffer import DictBuffer
-from PyDataGrabber.utils.FileUtils import FileUtils
-from PyDataGrabber.utils.TimeUtils import TimeUtils
+from ...adapters.AdapterException import AdapterException
+from ...adapters.WriteAdapter import WriteAdapter
+from ...buffers.Buffer import Buffer
+from ...buffers.DictBuffer import DictBuffer
+from ...utils.FileUtils import FileUtils
+from ...utils.TimeUtils import TimeUtils
 
 @dataclass
 class CsvWriteAdapter(WriteAdapter):

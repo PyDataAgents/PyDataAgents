@@ -1,7 +1,7 @@
 from __future__ import annotations
 import threading
-from PyDataGrabber.pydatagrabber.buffers.Buffer import Buffer
-from PyDataGrabber.pydatagrabber.grabbers.Grabber import Grabber
+from .Buffer import Buffer
+from ..grabbers.Grabber import Grabber
 
 class ListBuffer(Buffer):
     """buffer that stores its values in a capacity limited list

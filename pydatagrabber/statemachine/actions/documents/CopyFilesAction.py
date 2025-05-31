@@ -1,9 +1,9 @@
 from dataclasses import dataclass, field
-from PyDataGrabber.pydatagrabber.buffers.ListBuffer import ListBuffer
-from PyDataGrabber.pydatagrabber.statemachine.Action import Action
-from PyDataGrabber.pydatagrabber.statemachine.BufferNode import BufferNode
-from PyDataGrabber.pydatagrabber.statemachine.StatemachineException import StatemachineException
-from PyDataGrabber.pydatagrabber.utils.FileUtils import FileUtils
+from ....buffers.ListBuffer import ListBuffer
+from ...Action import Action
+from ...BufferNode import BufferNode
+from ...StatemachineException import StatemachineException
+from ....utils.FileUtils import FileUtils
 
 @dataclass
 class CopyFilesAction(BufferNode, Action):

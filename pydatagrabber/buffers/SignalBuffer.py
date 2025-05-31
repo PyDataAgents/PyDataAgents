@@ -1,9 +1,9 @@
 from dataclasses import dataclass, field
 from apscheduler.schedulers.background import BackgroundScheduler
-from PyDataGrabber.pydatagrabber.buffers.BufferException import BufferException
-from PyDataGrabber.pydatagrabber.buffers.TimedBuffer import TimedBuffer
-from PyDataGrabber.pydatagrabber.buffers.signals.Signal import Signal
-from PyDataGrabber.pydatagrabber.grabbers.Grabber import Grabber
+from .BufferException import BufferException
+from .TimedBuffer import TimedBuffer
+from .signals.Signal import Signal
+from ..grabbers.Grabber import Grabber
 
 @dataclass
 class SignalBuffer(TimedBuffer):

@@ -1,7 +1,7 @@
 import importlib
 
-from PyDataGrabber.pydatagrabber.grabbers.GrabberElement import GrabberElement
-from PyDataGrabber.pydatagrabber.grabbers.GrabberException import GrabberException
+from ..grabbers.GrabberElement import GrabberElement
+from ..grabbers.GrabberException import GrabberException
 
 
 class ClassUtils:

@@ -1,7 +1,7 @@
 from __future__ import annotations
 from abc import abstractmethod
-from PyDataGrabber.pydatagrabber.grabbers.Grabber import Grabber
-from PyDataGrabber.pydatagrabber.grabbers.GrabberElement import GrabberElement
+from ..grabbers.Grabber import Grabber
+from ..grabbers.GrabberElement import GrabberElement
 
 class Service(GrabberElement):
     """abstract base class for Grabber Services

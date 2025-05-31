@@ -1,4 +1,4 @@
-from PyDataGrabber.pydatagrabber.buffers.Buffer import Buffer
+from ..buffers.Buffer import Buffer
 
 class BufferUtils:
         

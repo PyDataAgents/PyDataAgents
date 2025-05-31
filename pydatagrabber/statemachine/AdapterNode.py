@@ -1,8 +1,8 @@
 from dataclasses import dataclass, field
-from PyDataGrabber.pydatagrabber.adapters.Adapter import Adapter
-from PyDataGrabber.pydatagrabber.grabbers.Grabber import Grabber
-from PyDataGrabber.pydatagrabber.statemachine.BufferNode import BufferNode
-from PyDataGrabber.pydatagrabber.statemachine.StatemachineException import StatemachineException
+from ..adapters.Adapter import Adapter
+from ..grabbers.Grabber import Grabber
+from .BufferNode import BufferNode
+from .StatemachineException import StatemachineException
 
 @dataclass
 class AdapterNode(BufferNode):

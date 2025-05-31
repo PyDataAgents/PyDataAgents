@@ -1,9 +1,9 @@
 from dataclasses import dataclass, field
 
-from PyDataGrabber.pydatagrabber.grabbers.Grabber import Grabber
-from PyDataGrabber.pydatagrabber.mappings.MappingThread import MappingThread
-from PyDataGrabber.pydatagrabber.statemachine.Node import Node
-from PyDataGrabber.pydatagrabber.statemachine.StatemachineException import StatemachineException
+from ..grabbers.Grabber import Grabber
+from ..mappings.MappingThread import MappingThread
+from .Node import Node
+from .StatemachineException import StatemachineException
 
 @dataclass
 class MappingNode(Node):

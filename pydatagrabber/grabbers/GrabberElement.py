@@ -6,7 +6,7 @@ import uuid
 from loguru import logger
 
 if TYPE_CHECKING:
-    from PyDataGrabber.pydatagrabber.grabbers.Grabber import Grabber
+    from pydatagrabber.grabbers.Grabber import Grabber
     
 @dataclass
 class GrabberElement(ABC):

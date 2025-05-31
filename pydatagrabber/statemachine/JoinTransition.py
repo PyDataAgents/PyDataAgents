@@ -1,4 +1,4 @@
-from PyDataGrabber.pydatagrabber.statemachine.Transition import Transition
+from .Transition import Transition
 
 
 class JoinTransition(Transition):

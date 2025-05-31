@@ -1,12 +1,12 @@
 from dataclasses import dataclass, field
 import snap7
 from snap7.type import Areas
-from PyDataGrabber.pydatagrabber.adapters.AdapterException import AdapterException
-from PyDataGrabber.pydatagrabber.adapters.ReadAdapter import ReadAdapter
-from PyDataGrabber.pydatagrabber.adapters.WriteAdapter import WriteAdapter
-from PyDataGrabber.pydatagrabber.buffers.Buffer import Buffer
-from PyDataGrabber.pydatagrabber.buffers.DataType import DataType
-from PyDataGrabber.pydatagrabber.utils.AdapterUtils import AdapterUtils
+from ...adapters.AdapterException import AdapterException
+from ...adapters.ReadAdapter import ReadAdapter
+from ...adapters.WriteAdapter import WriteAdapter
+from ...buffers.Buffer import Buffer
+from ...buffers.DataType import DataType
+from ...utils.AdapterUtils import AdapterUtils
 
 @dataclass
 class S7Adapter(ReadAdapter, WriteAdapter):

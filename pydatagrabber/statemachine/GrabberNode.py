@@ -1,6 +1,6 @@
 from dataclasses import dataclass
-from PyDataGrabber.pydatagrabber.grabbers.Grabber import Grabber
-from PyDataGrabber.pydatagrabber.statemachine.Node import Node
+from ..grabbers.Grabber import Grabber
+from .Node import Node
 
 @dataclass
 class GrabberNode(Node):

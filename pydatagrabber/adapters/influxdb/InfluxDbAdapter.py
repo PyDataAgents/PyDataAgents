@@ -2,14 +2,14 @@ import influxdb_client
 from influxdb_client.client.write_api import SYNCHRONOUS
 
 from dataclasses import dataclass, field
-from PyDataGrabber.pydatagrabber.adapters.AdapterException import AdapterException
-from PyDataGrabber.pydatagrabber.adapters.ReadAdapter import ReadAdapter
-from PyDataGrabber.pydatagrabber.adapters.WriteAdapter import WriteAdapter
-from PyDataGrabber.pydatagrabber.buffers.Buffer import Buffer
-from PyDataGrabber.pydatagrabber.buffers.DictBuffer import DictBuffer
-from PyDataGrabber.pydatagrabber.buffers.ListBuffer import ListBuffer
-from PyDataGrabber.pydatagrabber.buffers.TimedBuffer import TimedBuffer
-from PyDataGrabber.pydatagrabber.utils.AdapterUtils import AdapterUtils
+from ...adapters.AdapterException import AdapterException
+from ...adapters.ReadAdapter import ReadAdapter
+from ...adapters.WriteAdapter import WriteAdapter
+from ...buffers.Buffer import Buffer
+from ...buffers.DictBuffer import DictBuffer
+from ...buffers.ListBuffer import ListBuffer
+from ...buffers.TimedBuffer import TimedBuffer
+from ...utils.AdapterUtils import AdapterUtils
 
 @dataclass
 class InfluxDbAdapter(ReadAdapter, WriteAdapter):

@@ -1,13 +1,13 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
-from PyDataGrabber.pydatagrabber.mappings.Observer import Observer
-from PyDataGrabber.pydatagrabber.statemachine.Action import Action
-from PyDataGrabber.pydatagrabber.statemachine.JoinTransition import JoinTransition
-from PyDataGrabber.pydatagrabber.statemachine.State import State
-from PyDataGrabber.pydatagrabber.statemachine.Transition import Transition
+from ..mappings.Observer import Observer
+from .Action import Action
+from .JoinTransition import JoinTransition
+from .State import State
+from .Transition import Transition
 
 if TYPE_CHECKING:
-    from PyDataGrabber.pydatagrabber.statemachine.StatemachineService import StatemachineService
+    from .StatemachineService import StatemachineService
     
 class StatemachineObserver(Observer):
     """

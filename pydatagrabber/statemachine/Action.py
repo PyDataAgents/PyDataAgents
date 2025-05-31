@@ -1,6 +1,6 @@
 from abc import abstractmethod
-from PyDataGrabber.pydatagrabber.statemachine.Node import Node
-from PyDataGrabber.pydatagrabber.statemachine.State import State
+from .Node import Node
+from .State import State
 
 
 class Action(Node):

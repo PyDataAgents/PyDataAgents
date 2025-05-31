@@ -1,9 +1,9 @@
 from dataclasses import dataclass, field
-from PyDataGrabber.pydatagrabber.buffers.Buffer import Buffer
-from PyDataGrabber.pydatagrabber.statemachine.Action import Action
-from PyDataGrabber.pydatagrabber.statemachine.GrabberNode import GrabberNode
-from PyDataGrabber.pydatagrabber.statemachine.StatemachineException import StatemachineException
-from PyDataGrabber.pydatagrabber.utils.ClassUtils import ClassUtils
+from ....buffers.Buffer import Buffer
+from ...Action import Action
+from ...GrabberNode import GrabberNode
+from ...StatemachineException import StatemachineException
+from ....utils.ClassUtils import ClassUtils
 
 @dataclass
 class AddBufferAction(GrabberNode, Action):

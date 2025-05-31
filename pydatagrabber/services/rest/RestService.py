@@ -3,10 +3,10 @@ import multiprocessing
 import threading
 from fastapi import APIRouter, FastAPI
 import uvicorn
-from PyDataGrabber.pydatagrabber.grabbers.Grabber import Grabber
-from PyDataGrabber.pydatagrabber.services.Service import Service
-from PyDataGrabber.pydatagrabber.services.rest.BufferRESTAPI import BufferRESTAPI
-from PyDataGrabber.pydatagrabber.services.rest.GrabberRESTAPI import GrabberRESTAPI
+from ...grabbers.Grabber import Grabber
+from ..Service import Service
+from .BufferRESTAPI import BufferRESTAPI
+from .GrabberRESTAPI import GrabberRESTAPI
 
 
 @dataclass

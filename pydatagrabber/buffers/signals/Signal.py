@@ -1,8 +1,8 @@
 from abc import abstractmethod
 from typing import Tuple
 
-from PyDataGrabber.pydatagrabber.grabbers.GrabberElement import GrabberElement
-from PyDataGrabber.pydatagrabber.utils.TimeUtils import TimeUtils
+from ...grabbers.GrabberElement import GrabberElement
+from ...utils.TimeUtils import TimeUtils
 
 class Signal(GrabberElement):
     """

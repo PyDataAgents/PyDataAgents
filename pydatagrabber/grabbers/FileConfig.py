@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from PyDataGrabber.pydatagrabber.grabbers.GrabberConfig import GrabberConfig
+from .GrabberConfig import GrabberConfig
 
 
 class FileConfig(ABC):

@@ -1,6 +1,6 @@
 from abc import abstractmethod
 
-from PyDataGrabber.pydatagrabber.statemachine.Node import Node
+from .Node import Node
 
 
 class Transition(Node):
