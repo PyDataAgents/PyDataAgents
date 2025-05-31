@@ -1,0 +1,41 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "pydatagrabber"
+version = "0.1"
+description = 'An IIoT framwork for reading and writing from sources/sinks.'
+readme = "README.md"
+requires-python = ">=3.11"
+license = "MIT"
+keywords = []
+authors = [
+  { name = "FirstName LastName", email = "youremail@youremail.org" },
+]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+]
+dependencies = [
+    "loguru",
+    "opcua",
+    "pyads",
+    "fastapi[standard]",
+    "PyYAML",
+    "sounddevice",
+    "numpy",
+    "paho-mqtt",
+    "urllib3",
+    "jsonpath-ng",
+    "influxdb-client",
+    "python-snap7",
+    "APScheduler"
+]
+
+[project.urls]
+Documentation = "https://github.com/unknown/pyospackage#readme"
+Issues = "https://github.com/unknown/pyospackage/issues"
+Source = "https://github.com/unknown/pyospackage"
