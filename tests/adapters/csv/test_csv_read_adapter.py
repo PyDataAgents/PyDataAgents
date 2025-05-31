@@ -1,6 +1,6 @@
 import csv
 import os
-from PyDataGrabber.adapters.csv.CsvReadAdapter import CsvReadAdapter
+from PyDataGrabber.pydatagrabber.adapters.csv.CsvReadAdapter import CsvReadAdapter
 
 def test000():
     script_path = os.getcwd()

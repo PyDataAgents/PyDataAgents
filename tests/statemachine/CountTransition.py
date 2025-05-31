@@ -1,4 +1,4 @@
-from PyDataGrabber.statemachine.Transition import Transition
+from PyDataGrabber.pydatagrabber.statemachine.Transition import Transition
 from PyDataGrabber.tests.statemachine.CountAction import CountAction
 
 

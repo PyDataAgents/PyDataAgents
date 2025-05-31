@@ -2,8 +2,8 @@ import time
 import sounddevice as sd
 import numpy as np
 
-from PyDataGrabber.adapters.audio.AudioAdapter import AudioAdapter
-from PyDataGrabber.buffers.ListBuffer import ListBuffer
+from PyDataGrabber.pydatagrabber.adapters.audio.AudioAdapter import AudioAdapter
+from PyDataGrabber.pydatagrabber.buffers.ListBuffer import ListBuffer
 
 def test_000():
 

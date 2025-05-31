@@ -1,8 +1,8 @@
 import time
-from PyDataGrabber.adapters.mqtt.MQTTAdapter import MQTTAdapter
-from PyDataGrabber.buffers.ListBuffer import ListBuffer
-from PyDataGrabber.utils.AdapterUtils import AdapterUtils
-from PyDataGrabber.utils.BufferUtils import BufferUtils
+from PyDataGrabber.pydatagrabber.adapters.mqtt.MQTTAdapter import MQTTAdapter
+from PyDataGrabber.pydatagrabber.buffers.ListBuffer import ListBuffer
+from PyDataGrabber.pydatagrabber.utils.AdapterUtils import AdapterUtils
+from PyDataGrabber.pydatagrabber.utils.BufferUtils import BufferUtils
 
 
 def test_000():

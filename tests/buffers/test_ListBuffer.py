@@ -1,4 +1,4 @@
-from PyDataGrabber.buffers.ListBuffer import ListBuffer
+from PyDataGrabber.pydatagrabber.buffers.ListBuffer import ListBuffer
 
 def test_000():
     buf1 = ListBuffer()

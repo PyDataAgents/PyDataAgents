@@ -1,9 +1,9 @@
 import time
-from PyDataGrabber.buffers.DataType import DataType
-from PyDataGrabber.buffers.SignalBuffer import SignalBuffer
-from PyDataGrabber.buffers.signals.Sine import Sine
-from PyDataGrabber.grabbers.Grabber import Grabber
-from PyDataGrabber.services.rest.RestService import RestService
+from PyDataGrabber.pydatagrabber.buffers.DataType import DataType
+from PyDataGrabber.pydatagrabber.buffers.SignalBuffer import SignalBuffer
+from PyDataGrabber.pydatagrabber.buffers.signals.Sine import Sine
+from PyDataGrabber.pydatagrabber.grabbers.Grabber import Grabber
+from PyDataGrabber.pydatagrabber.services.rest.RestService import RestService
 
 def test_000():
     grabber = Grabber()

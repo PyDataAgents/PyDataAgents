@@ -1,11 +1,11 @@
 import configparser
 import time
 
-from PyDataGrabber.adapters.influxdb.InfluxDbAdapter import InfluxDbAdapter
-from PyDataGrabber.buffers.SignalBuffer import SignalBuffer
-from PyDataGrabber.buffers.signals.Sine import Sine
-from PyDataGrabber.utils.AdapterUtils import AdapterUtils
-from PyDataGrabber.utils.BufferUtils import BufferUtils
+from PyDataGrabber.pydatagrabber.adapters.influxdb.InfluxDbAdapter import InfluxDbAdapter
+from PyDataGrabber.pydatagrabber.buffers.SignalBuffer import SignalBuffer
+from PyDataGrabber.pydatagrabber.buffers.signals.Sine import Sine
+from PyDataGrabber.pydatagrabber.utils.AdapterUtils import AdapterUtils
+from PyDataGrabber.pydatagrabber.utils.BufferUtils import BufferUtils
     
 def test_000():
     
@@ -30,7 +30,10 @@ def test_010():
     
     s = Sine()
     s.f = 0.01
-    sb = SignalBuffer(s, capacity=1, sampling_period=100)
+    sb = SignalBuffer()
+    sb.signal = s
+    sb.capacity=1
+    sb.sampling_period=100
     
     d = BufferUtils.to_dict(sb)
     address = "b=test2;m=m1;f=sine"

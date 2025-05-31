@@ -1,4 +1,4 @@
-from PyDataGrabber.statemachine.Action import Action
+from PyDataGrabber.pydatagrabber.statemachine.Action import Action
 
 
 class CountAction(Action):
