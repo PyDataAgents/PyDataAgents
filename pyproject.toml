@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "pydatagrabber"
 version = "0.0.1a4"
-description = 'An IIoT framework for reading and writing from sources/sinks.'
+description = "An IIoT framework for reading and writing from sources/sinks."
 readme = "README.md"
 requires-python = ">=3.11"
 license = "MIT"
