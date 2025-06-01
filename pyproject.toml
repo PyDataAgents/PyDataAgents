@@ -31,7 +31,9 @@ dependencies = [
     "jsonpath-ng",
     "influxdb-client",
     "python-snap7",
-    "APScheduler"
+    "APScheduler",
+    "smtplib",
+    "email"
 ]
 
 [tool.setuptools.packages.find]
