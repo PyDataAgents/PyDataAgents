@@ -24,4 +24,7 @@ a grabber can consists of one or more of the following [GrabberElements](pydatag
 
 ### Buffer
 
+### Mapping
+
 ### Service
+
