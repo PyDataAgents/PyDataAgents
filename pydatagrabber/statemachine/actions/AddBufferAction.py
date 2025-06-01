@@ -1,9 +1,9 @@
 from dataclasses import dataclass, field
-from ....buffers.Buffer import Buffer
-from ...Action import Action
-from ...GrabberNode import GrabberNode
-from ...StatemachineException import StatemachineException
-from ....utils.ClassUtils import ClassUtils
+from ...buffers.Buffer import Buffer
+from ..Action import Action
+from ..GrabberNode import GrabberNode
+from ..StatemachineException import StatemachineException
+from ...utils.ClassUtils import ClassUtils
 
 @dataclass
 class AddBufferAction(GrabberNode, Action):

@@ -1,8 +1,8 @@
 from dataclasses import dataclass, field
-from ....adapters.WriteAdapter import WriteAdapter
-from ...Action import Action
-from ...AdapterNode import AdapterNode
-from ...StatemachineException import StatemachineException
+from ...adapters.WriteAdapter import WriteAdapter
+from ..Action import Action
+from ..AdapterNode import AdapterNode
+from ..StatemachineException import StatemachineException
 
 @dataclass
 class AdapterWriteAction(AdapterNode, Action):

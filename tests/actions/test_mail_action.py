@@ -1,5 +1,5 @@
 import configparser
-from pydatagrabber.statemachine.actions.mail.MailAction import MailAction
+from pydatagrabber.statemachine.actions.MailAction import MailAction
 
 
 def test_000():

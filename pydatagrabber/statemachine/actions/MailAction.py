@@ -3,8 +3,8 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 import smtplib
 
-from ...StatemachineException import StatemachineException
-from ...Action import Action
+from ..StatemachineException import StatemachineException
+from ..Action import Action
 
 
 @dataclass

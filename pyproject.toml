@@ -33,7 +33,8 @@ dependencies = [
     "python-snap7",
     "APScheduler",
     "smtplib",
-    "email"
+    "email",
+    "websocket-client"
 ]
 
 [tool.setuptools.packages.find]
