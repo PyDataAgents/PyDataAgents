@@ -7,6 +7,7 @@ Examples:<br>
 - TCP/IP, UDP and SERIAL
 - MQTT
 - INFLUXDB
+![pydatagrabber_sources.png](docs/pydatagrabber_sources.png)
 ## architecture
 the core element of the framework is a [(data)grabber](pydatagrabber/grabbers/Grabber.py)
 a grabber can consists of one or more of the following [GrabberElements](pydatagrabber/grabbers/GrabberElement.py):
@@ -14,6 +15,7 @@ a grabber can consists of one or more of the following [GrabberElements](pydatag
 - buffers
 - mappings
 - services
+
 <br>each [GrabberElement](pydatagrabber/grabbers/GrabberElement.py) is dedicated for a special task within the datagrabber framework
 <br>these tasks are highlighted below
 ### Grabber
