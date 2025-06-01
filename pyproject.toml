@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pydatagrabber"
-version = "0.0.1a3"
+version = "0.0.1a4"
 description = 'An IIoT framework for reading and writing from sources/sinks.'
 readme = "README.md"
 requires-python = ">=3.11"
@@ -14,7 +14,7 @@ authors = [
   { name = "Jonas Hillenbrand", email = "hillenbrandjonas@hotmail.com" },
 ]
 classifiers = [
-  "Development Status :: 4 - Beta",
+  "Development Status :: 2 - Experimental",
   "Programming Language :: Python",
   "Programming Language :: Python :: 3.11"
 ]
