@@ -15,7 +15,7 @@ a grabber can consists of one or more of the following [GrabberElements](pydatag
 - buffers
 - mappings
 - services
-
+![pydatagrabber_framework.png](docs/pydatagrabber_framework.png)
 <br>each [GrabberElement](pydatagrabber/grabbers/GrabberElement.py) is dedicated for a special task within the datagrabber framework
 <br>these tasks are highlighted below
 ### Grabber
