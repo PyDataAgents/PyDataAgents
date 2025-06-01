@@ -1,4 +1,5 @@
 # PyDataGrabber
+![pydatagrabber_sources.png](docs/pydatagrabber_logo.png)
 is a IIoT python framework to generate autonomous Data Acquisition Agents for common industrial 
 protocols, data sources and sinks.<br>
 Examples:<br>
@@ -7,7 +8,7 @@ Examples:<br>
 - TCP/IP, UDP and SERIAL
 - MQTT
 - INFLUXDB
-![pydatagrabber_sources.png](docs/pydatagrabber_sources.png)
+![pydatagrabber_sources_and_sinks.png](docs/pydatagrabber_sources_and_sinks.png)
 ## architecture
 the core element of the framework is a [(data)grabber](pydatagrabber/grabbers/Grabber.py)
 a grabber can consists of one or more of the following [GrabberElements](pydatagrabber/grabbers/GrabberElement.py):
