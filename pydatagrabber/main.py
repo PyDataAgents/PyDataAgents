@@ -1,5 +1,5 @@
-from PyDataGrabber.pydatagrabber.grabbers.Grabber import Grabber
-from PyDataGrabber.pydatagrabber.services.rest.RestService import RestService
+from pydatagrabber.grabbers.Grabber import Grabber
+from pydatagrabber.services.rest.RestService import RestService
 
 grabber = Grabber()
 grabber.id = "G1"

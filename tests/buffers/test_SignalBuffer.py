@@ -1,6 +1,6 @@
 import time
-from PyDataGrabber.pydatagrabber.buffers.SignalBuffer import SignalBuffer
-from PyDataGrabber.pydatagrabber.buffers.signals.Sine import Sine
+from pydatagrabber.buffers.SignalBuffer import SignalBuffer
+from pydatagrabber.buffers.signals.Sine import Sine
 
 
 def test_000():

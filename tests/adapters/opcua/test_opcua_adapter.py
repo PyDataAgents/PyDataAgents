@@ -1,7 +1,7 @@
 import time
-from PyDataGrabber.pydatagrabber.adapters.opcua.OpcUaAdapter import OpcUaAdapter
-from PyDataGrabber.pydatagrabber.buffers.ListBuffer import ListBuffer
-from PyDataGrabber.pydatagrabber.utils.BufferUtils import BufferUtils
+from pydatagrabber.adapters.opcua.OpcUaAdapter import OpcUaAdapter
+from pydatagrabber.buffers.ListBuffer import ListBuffer
+from pydatagrabber.utils.BufferUtils import BufferUtils
 
 def test000():
     """

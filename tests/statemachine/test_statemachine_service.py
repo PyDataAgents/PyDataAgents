@@ -1,16 +1,16 @@
 import os
-from PyDataGrabber.pydatagrabber.grabbers.Grabber import Grabber
-from PyDataGrabber.pydatagrabber.grabbers.GrabberConfig import GrabberConfig
-from PyDataGrabber.pydatagrabber.grabbers.YAMLConfig import YAMLConfig
-from PyDataGrabber.pydatagrabber.statemachine.JoinTransition import JoinTransition
-from PyDataGrabber.pydatagrabber.statemachine.StatemachineService import StatemachineService
-from PyDataGrabber.pydatagrabber.statemachine.actions.SleepAction import SleepAction
-from PyDataGrabber.pydatagrabber.statemachine.actions.StartAction import StartAction
-from PyDataGrabber.pydatagrabber.statemachine.actions.StopAction import StopAction
-from PyDataGrabber.pydatagrabber.statemachine.transitions.TrueTransition import TrueTransition
-from PyDataGrabber.tests.statemachine.CountAction import CountAction
-from PyDataGrabber.tests.statemachine.CountTransition import CountTransition
-from PyDataGrabber.tests.statemachine.PrintAction import PrintAction
+from pydatagrabber.grabbers.Grabber import Grabber
+from pydatagrabber.grabbers.GrabberConfig import GrabberConfig
+from pydatagrabber.grabbers.YAMLConfig import YAMLConfig
+from pydatagrabber.statemachine.JoinTransition import JoinTransition
+from pydatagrabber.statemachine.StatemachineService import StatemachineService
+from pydatagrabber.statemachine.actions.SleepAction import SleepAction
+from pydatagrabber.statemachine.actions.StartAction import StartAction
+from pydatagrabber.statemachine.actions.StopAction import StopAction
+from pydatagrabber.statemachine.transitions.TrueTransition import TrueTransition
+from tests.statemachine.CountAction import CountAction
+from tests.statemachine.CountTransition import CountTransition
+from tests.statemachine.PrintAction import PrintAction
 
 
 def test_000():

@@ -1,5 +1,5 @@
-from PyDataGrabber.pydatagrabber.statemachine.Transition import Transition
-from PyDataGrabber.tests.statemachine.CountAction import CountAction
+from pydatagrabber.statemachine.Transition import Transition
+from tests.statemachine.CountAction import CountAction
 
 
 class CountTransition(Transition):

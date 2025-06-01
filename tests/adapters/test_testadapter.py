@@ -1,4 +1,4 @@
-from PyDataGrabber.tests.adapters.Adapter1 import Adapter1
+from tests.adapters.Adapter1 import Adapter1
 
 def test_000():
     adapter = Adapter1()

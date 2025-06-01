@@ -1,12 +1,12 @@
 grabber:
-  type: PyDataGrabber.src.grabbers.Grabber
+  type: pydatagrabber.grabbers.Grabber
   id: G1
 adapters:
-- type: PyDataGrabber.src.adapters.opcua.OpcUaAdapter
+- type: pydatagrabber.adapters.opcua.OpcUaAdapter
   id: A1
   endpoint: opc.tcp://localhost:4840/freeopcua/server/
 buffers:
-- type: PyDataGrabber.src.buffers.ListBuffer
+- type: pydatagrabber.buffers.ListBuffer
   id: B1
   capacity: 1000
   data_type: NUMERIC
@@ -14,7 +14,7 @@ buffers:
   unit: 1
   description: Test buffer
 mappings:
-- type: PyDataGrabber.src.mappings.Mapping
+- type: pydatagrabber.mappings.Mapping
   id: M1
   buffer_ids:
   - B1

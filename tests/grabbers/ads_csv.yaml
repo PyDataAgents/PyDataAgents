@@ -1,11 +1,11 @@
 grabber:
-  type: PyDataGrabber.src.grabbers.Grabber
+  type: pydatagrabber.grabbers.Grabber
   id: G1
 adapters:
-- type: PyDataGrabber.src.adapters.ads.AdsAdapter
+- type: pydatagrabber.adapters.ads.AdsAdapter
   id: A1
   ams_net_id: 191.1.1.1.1.1
-- type: PyDataGrabber.src.adapters.csv.CsvWriteAdapter
+- type: pydatagrabber.adapters.csv.CsvWriteAdapter
   id: A2
   folder: c:\code\PyDataGrabber_ws\PyDataGrabber\tests\grabbers
   file_post_fix: 125kN
@@ -15,7 +15,7 @@ adapters:
   delimiter: ;
   decimal_precision: 3
 buffers:
-- type: PyDataGrabber.src.buffers.ListBuffer
+- type: pydatagrabber.buffers.ListBuffer
   id: B1
   capacity: 1
   data_type: NUMERIC
@@ -23,7 +23,7 @@ buffers:
   unit: 1
   description: 1
 mappings:
-- type: PyDataGrabber.src.mappings.Mapping
+- type: pydatagrabber.mappings.Mapping
   id: M1
   buffer_ids:
   - B1
@@ -35,7 +35,7 @@ mappings:
   n: 1
   sampling_period: 10
   persistent: true
-- type: PyDataGrabber.src.mappings.Mapping
+- type: pydatagrabber.mappings.Mapping
   id: M2
   buffer_ids:
   - B1

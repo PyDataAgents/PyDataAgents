@@ -2,14 +2,14 @@ import importlib
 import os
 import yaml
 
-from ...pydatagrabber.adapters.opcua.OpcUaAdapter import OpcUaAdapter
-from ...pydatagrabber.buffers.ListBuffer import ListBuffer
-from ...pydatagrabber.grabbers.GrabberConfig import GrabberConfig
-from ...pydatagrabber.grabbers.YAMLConfig import YAMLConfig
-from ...pydatagrabber.grabbers.Grabber import Grabber
-from ...pydatagrabber.mappings.Mapping import Mapping
-from ...pydatagrabber.mappings.ThreadType import ThreadType
-from .ConfigObject import ConfigObject
+from pydatagrabber.adapters.opcua.OpcUaAdapter import OpcUaAdapter
+from pydatagrabber.buffers.ListBuffer import ListBuffer
+from pydatagrabber.grabbers.GrabberConfig import GrabberConfig
+from pydatagrabber.grabbers.YAMLConfig import YAMLConfig
+from pydatagrabber.grabbers.Grabber import Grabber
+from pydatagrabber.mappings.Mapping import Mapping
+from pydatagrabber.mappings.ThreadType import ThreadType
+from tests.grabbers.ConfigObject import ConfigObject
 
 
 def test_000():
@@ -18,13 +18,13 @@ def test_000():
     print(d)
     
 def test_010():
-    module = __import__("PyDataGrabber.src.adapters.opcua")
+    module = __import__("pydatagrabber.adapters.opcua")
     clazz = getattr(module, "OpcUaAdapter")
     instance = clazz()
     print(instance.id)
 
 def test_011():
-    Clazz = getattr(importlib.import_module("PyDataGrabber.src.adapters.opcua.OpcUaAdapter"), "OpcUaAdapter")
+    Clazz = getattr(importlib.import_module("pydatagrabber.adapters.opcua.OpcUaAdapter"), "OpcUaAdapter")
     instance = Clazz()
     print(instance.id)
     
