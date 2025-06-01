@@ -11,7 +11,7 @@ requires-python = ">=3.11"
 license = "MIT"
 keywords = ["IIoT", "Industrial Datalogging", "software robots", "data agents"]
 authors = [
-  { name = "Jonas Hillenbrand", email = "" },
+  { name = "Jonas Hillenbrand", email = "hillenbrandjonas@hotmail.com" },
 ]
 classifiers = [
   "Development Status :: 4 - Beta",
