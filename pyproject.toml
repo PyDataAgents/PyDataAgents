@@ -9,7 +9,7 @@ description = 'An IIoT framework for reading and writing from sources/sinks.'
 readme = "README.md"
 requires-python = ">=3.11"
 license = "MIT"
-keywords = [""IIoT", "Industrial Datalogging", "software robots", "data agents"]
+keywords = ["IIoT", "Industrial Datalogging", "software robots", "data agents"]
 authors = [
   { name = "Jonas Hillenbrand", email = "" },
 ]
