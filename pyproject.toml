@@ -1,6 +1,6 @@
 [build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
 
 [project]
 name = "pydatagrabber"
@@ -36,8 +36,6 @@ dependencies = [
 
 [tool.setuptools.packages.find]
 where = ["."]
-packages = ["pydatagrabber", "pydatagrabber.grabbers"]
-include = ["pydatagrabber*"]
 exclude = ["tests"]
 
 [project.urls]
