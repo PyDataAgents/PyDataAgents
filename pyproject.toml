@@ -5,19 +5,18 @@ build-backend = "hatchling.build"
 [project]
 name = "pydatagrabber"
 version = "0.0.1a3"
-description = 'An IIoT framwork for reading and writing from sources/sinks.'
+description = 'An IIoT framework for reading and writing from sources/sinks.'
 readme = "README.md"
 requires-python = ">=3.11"
 license = "MIT"
-keywords = []
+keywords = [""IIoT", "Industrial Datalogging", "software robots", "data agents"]
 authors = [
-  { name = "FirstName LastName", email = "youremail@youremail.org" },
+  { name = "Jonas Hillenbrand", email = "" },
 ]
 classifiers = [
   "Development Status :: 4 - Beta",
   "Programming Language :: Python",
-  "Programming Language :: Python :: 3.11",
-  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.11"
 ]
 dependencies = [
     "loguru",
@@ -37,10 +36,11 @@ dependencies = [
 
 [tool.setuptools.packages.find]
 where = ["."]
+packages = ["pydatagrabber", "pydatagrabber.grabbers"]
 include = ["pydatagrabber*"]
 exclude = ["tests"]
 
 [project.urls]
-Documentation = "https://github.com/unknown/pyospackage#readme"
-Issues = "https://github.com/unknown/pyospackage/issues"
-Source = "https://github.com/unknown/pyospackage"
+Documentation = "https://github.com/jhillenbrand/PyDataGrabber"
+Issues = "https://github.com/jhillenbrand/PyDataGrabber"
+Source = "https://github.com/jhillenbrand/PyDataGrabber"
