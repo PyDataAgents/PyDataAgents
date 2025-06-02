@@ -32,8 +32,6 @@ dependencies = [
     "influxdb-client",
     "python-snap7",
     "APScheduler",
-    "smtplib",
-    "email",
     "websocket-client"
 ]
 
