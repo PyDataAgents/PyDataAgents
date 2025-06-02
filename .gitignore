@@ -13,3 +13,5 @@ __pycache__
 *.ini
 
 *.egg-info
+
+*.code-workspace
