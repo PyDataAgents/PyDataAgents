@@ -5,7 +5,7 @@ from ..grabbers import Grabber
 
 class DictBuffer(Buffer):
     """buffer that stores its values in a dictionary in a table like fashion, where every key contains a list of data
-    """    
+    """
     
     def __init__(self):
         super().__init__()
