@@ -59,6 +59,14 @@ class ListBuffer(Buffer):
             else:
                 ListBuffer.LOGGER.warning("buffer is empty")
                 return []
+            
+    def data_with_meta(self, n = 0, persistent = True) -> dict:        
+        data = {}
+        data["values"] = self.data(n, persistent)
+        d = {}
+        d["data"] = data
+        d["meta"] = self.config_options()
+        return d
                     
     def size(self) -> int:
         return len(self.elements)
