@@ -5,7 +5,7 @@ import xml.etree.ElementTree as ET
 
 def test_000():
     session = requests.Session()
-    session.auth = HttpNtlmAuth("domain\user", "password")
+    session.auth = HttpNtlmAuth("user", "password")
     
     resp = session.get("http:/url")
     
