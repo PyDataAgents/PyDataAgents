@@ -32,7 +32,9 @@ dependencies = [
     "influxdb-client",
     "python-snap7",
     "APScheduler",
-    "websocket-client"
+    "websocket-client",
+    "selenium",
+    "requests_ntlm"
 ]
 
 [tool.setuptools.packages.find]
