@@ -82,7 +82,8 @@ class Grabber(GrabberElement):
     
     def start_mappings(self):
         for mapping_thread in self.mapping_store.values():
-            mapping_thread.start(self)
+            if mapping_thread.mapping.auto_start:
+                mapping_thread.start(self)
             
     def start_services(self):
         for service in self.service_store.values():
