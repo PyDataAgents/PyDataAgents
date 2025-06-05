@@ -51,6 +51,12 @@ class DictBuffer(Buffer):
                 for k in self.elements.keys():
                     self.elements[k].clear()
                 return d
+            
+    def data_with_meta(self, n = 0, persistent = True) -> dict:        
+        d = {}
+        d["data"] = self.data(n, persistent)
+        d["meta"] = self.config_options()
+        return d
 
     def size(self) -> int:
         return len(self.elements[self.elements.keys()[0]])

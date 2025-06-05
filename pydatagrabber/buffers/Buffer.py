@@ -42,11 +42,9 @@ class Buffer(GrabberElement):
             int: number of samples
         """
 
+    @abstractmethod
     def data_with_meta(self, n : int = 0, persistent : bool = True) -> dict:
-        d = {}
-        d["data"] = self.data(n, persistent)
-        d["meta"] = self.config_options()
-        return d
+        pass
 
     def json(self, n=None, persistent=True):
         return json.dumps(self.data_with_meta(n, persistent), ensure_ascii=False)
