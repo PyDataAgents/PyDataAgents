@@ -31,15 +31,9 @@ class CsvReadAdapter(ReadAdapter):
                     dialect = csv.Sniffer().sniff(csv_sample)
                     self.has_header = csv.Sniffer().has_header(csv_sample)                    
                     self.csv_file.seek(0)
-                    if self.force_numeric:
-                        self.csv_reader = csv.DictReader(self.csv_file, delimiter=self.delimiter, quoting=csv.QUOTE_NONNUMERIC)    
-                    else:
-                        self.csv_reader = csv.DictReader(self.csv_file, delimiter=self.delimiter)
+                    self.csv_reader = csv.DictReader(self.csv_file, delimiter=self.delimiter)    
                 else:
-                    if self.force_numeric:
-                        self.csv_reader = csv.reader(self.csv_file, delimiter=self.delimiter, quoting=csv.QUOTE_NONNUMERIC)
-                    else:
-                        self.csv_reader = csv.reader(self.csv_file, delimiter=self.delimiter)                
+                    self.csv_reader = csv.reader(self.csv_file, delimiter=self.delimiter)                
                 if self.has_header:
                     # skip first row of data if header is present
                     row = next(self.csv_reader)
@@ -73,23 +67,49 @@ class CsvReadAdapter(ReadAdapter):
                             if isinstance(row, list):
                                 c = 0
                                 d = {}
-                                for item in list:
-                                    d["COL" + c] = item
-                                    c = c + 1
+                                if self.force_numeric:
+                                    for item in list:
+                                        d["COL" + c] = self.__try_numeric(item)                                        
+                                        c = c + 1
+                                else:
+                                    for item in list:
+                                        d["COL" + c] = item                                     
+                                        c = c + 1
                                 buffer.push(d)    
                             else:
-                                buffer.push(row)
+                                if self.force_numeric:
+                                    converted_row = {key: self.__try_numeric(value) for key, value in row.items()}
+                                    buffer.push(converted_row)
+                                else:
+                                    buffer.push(row)
                     else:
                         row = next(self.csv_reader)
                         if isinstance(row, list):
                             c = 0
                             d = {}
-                            for item in list:
-                                d["COL" + c] = item
-                                c = c + 1
+                            if self.force_numeric:
+                                for item in list:
+                                    d["COL" + c] = self.__try_numeric(item) 
+                                    c = c + 1
+                            else:
+                                for item in list:
+                                    d["COL" + c] = item
+                                    c = c + 1
                             buffer.push(d)    
                         else:
-                            buffer.push(row)
+                            if self.force_numeric:
+                                converted_row = [self.__try_numeric(value) for value in row]
+                                buffer.push(converted_row)
+                            else:    
+                                buffer.push(row)
                 else:
                     raise AdapterException("Buffer must be of type DictBuffer")                        
     
+    def __try_numeric(self, value):
+        try:
+            return int(value)
+        except ValueError:
+            try:
+                return float(value)
+            except ValueError:
+                return value  # Keep as string if not numeric
