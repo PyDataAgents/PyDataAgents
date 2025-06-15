@@ -35,7 +35,8 @@ dependencies = [
     "websocket-client",
     "selenium",
     "requests_ntlm",
-    "openpyxl"
+    "openpyxl",
+    "pyodbc"
 ]
 
 [tool.setuptools.packages.find]
