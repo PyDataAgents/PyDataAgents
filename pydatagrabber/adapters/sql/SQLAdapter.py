@@ -67,12 +67,14 @@ class SQLAdapter(ReadAdapter, WriteAdapter):
         if len(buffers) == 1:
             for buffer in buffers:
                 if isinstance(buffer, DictBuffer):
-                    # TODO
+                    #TODO
                     data = buffer.data(n, persistent)
                     address = addresses[0]
                     if "columns=" in address:
+                        #TODO
                         pass
                     else:
+                        #TODO
                         pass                   
                 elif isinstance(buffer, ListBuffer):
                     pass
