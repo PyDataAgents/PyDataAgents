@@ -34,7 +34,8 @@ dependencies = [
     "APScheduler",
     "websocket-client",
     "selenium",
-    "requests_ntlm"
+    "requests_ntlm",
+    "openpyxl"
 ]
 
 [tool.setuptools.packages.find]

@@ -5,6 +5,7 @@ from ...adapters.ReadAdapter import ReadAdapter
 from ...buffers.Buffer import Buffer
 from ...utils.FileUtils import FileUtils
 from ...buffers.DictBuffer import DictBuffer
+from ...utils.DataUtils import DataUtils
 
 @dataclass
 class CsvReadAdapter(ReadAdapter):
@@ -69,7 +70,7 @@ class CsvReadAdapter(ReadAdapter):
                                 d = {}
                                 if self.force_numeric:
                                     for item in list:
-                                        d["COL" + c] = self.__try_numeric(item)                                        
+                                        d["COL" + c] = DataUtils.force_numeric(item)                                        
                                         c = c + 1
                                 else:
                                     for item in list:
@@ -78,7 +79,7 @@ class CsvReadAdapter(ReadAdapter):
                                 buffer.push(d)    
                             else:
                                 if self.force_numeric:
-                                    converted_row = {key: self.__try_numeric(value) for key, value in row.items()}
+                                    converted_row = {key: DataUtils.force_numeric(value) for key, value in row.items()}
                                     buffer.push(converted_row)
                                 else:
                                     buffer.push(row)
@@ -89,7 +90,7 @@ class CsvReadAdapter(ReadAdapter):
                             d = {}
                             if self.force_numeric:
                                 for item in list:
-                                    d["COL" + c] = self.__try_numeric(item) 
+                                    d["COL" + c] = DataUtils.force_numeric(item) 
                                     c = c + 1
                             else:
                                 for item in list:
@@ -98,18 +99,9 @@ class CsvReadAdapter(ReadAdapter):
                             buffer.push(d)    
                         else:
                             if self.force_numeric:
-                                converted_row = [self.__try_numeric(value) for value in row]
+                                converted_row = [DataUtils.force_numeric(value) for value in row]
                                 buffer.push(converted_row)
                             else:    
                                 buffer.push(row)
                 else:
-                    raise AdapterException("Buffer must be of type DictBuffer")                        
-    
-    def __try_numeric(self, value):
-        try:
-            return int(value)
-        except ValueError:
-            try:
-                return float(value)
-            except ValueError:
-                return value  # Keep as string if not numeric
+                    raise AdapterException("Buffer must be of type DictBuffer")
