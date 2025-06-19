@@ -1,12 +1,16 @@
 from __future__ import annotations
+import json
 from typing import TYPE_CHECKING
 from abc import ABC
 from dataclasses import dataclass, field, fields
 import uuid
 from loguru import logger
 
+from ..utils.ClassUtils import ClassUtils
+from ..utils.FileUtils import FileUtils
+
 if TYPE_CHECKING:
-    from pydatagrabber.grabbers.Grabber import Grabber
+    from .Grabber import Grabber
     
 @dataclass
 class GrabberElement(ABC):
@@ -16,6 +20,7 @@ class GrabberElement(ABC):
 
     type : str = field(default=None, metadata={"description": "fully qualified package and class name descriptor"})
     id : str = field(default=None, metadata = {"description": "unique identifier of element in DataGrabber application"})
+    load_on_install : bool = field(default=False, metadata = {"description": "specifies whether the GrabberElement should try to load from local json config file on install"})
     
     LOGGER = logger
     
@@ -83,10 +88,28 @@ class GrabberElement(ABC):
     def install(self, grabber : Grabber = None):
         """initializes the element with respect to startup functionality or initial internal object creation,
            if grabber is not None, it can be used to reference or create other grabber elements
+           the method should always be used in child classes with super().install()
         """
-        return
+        if self.load_on_install:
+            self.load()
+
         
     def deinstall(self, grabber : Grabber = None):
         """resets the element, this method can be used to stop internal element logic or reset objects that were initialized on creation
         """
         return
+    
+    def load(self):
+        file = self.id + ".json"
+        if FileUtils.exists_file(file):
+            with open(file, "r") as json_file:
+                d = json.load(json_file)
+                ClassUtils.set_properties(self, d)
+        else:
+            self.LOGGER.warning("no configuration file " + self.id + ".json to load from was found")
+    
+    def save(self):
+        # Write config options to JSON file
+        d = self.config_options()
+        with open(self.id + ".json", "w") as json_file:
+            json.dump(d, json_file, indent = 4)  # "indent" makes the output more readable

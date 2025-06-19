@@ -36,7 +36,13 @@ dependencies = [
     "selenium",
     "requests_ntlm",
     "openpyxl",
-    "pyodbc"
+    "pyodbc",
+    "langchain",
+    "openai",
+    "chromadb",
+    "sentence-transformers",
+    "pypdf",
+    "unstructured"
 ]
 
 [tool.setuptools.packages.find]
