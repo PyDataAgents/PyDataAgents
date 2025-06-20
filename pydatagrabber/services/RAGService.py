@@ -6,12 +6,14 @@ from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_unstructured import UnstructuredLoader
 from langchain_text_splitters import CharacterTextSplitter
 from langchain_openai import ChatOpenAI
+from langchain_ollama import Ollama
 from langchain.memory import ConversationBufferMemory
 from langchain.chains import RetrievalQA
 from langchain.chains import ConversationalRetrievalChain
 from langchain_community.vectorstores.utils import filter_complex_metadata
 import requests
 
+from .ServiceException import ServiceException
 from ..grabbers.Grabber import Grabber
 from .Service import Service
 
@@ -54,7 +56,9 @@ class RAGService(Service):
             case "OPENAI":
                 llm = ChatOpenAI(model_name=self.model, openai_api_key=self.api_key)
             case "OLLAMA":
-                pass
+                llm = Ollama(model = self.model, base_url = self.endpoint)
+            case _:
+                raise ServiceException("Unknown Model " + self.model + " for " + self.cname())
                 
         if self.retain_messages:
             self.retrieval_chain = ConversationalRetrievalChain.from_llm(

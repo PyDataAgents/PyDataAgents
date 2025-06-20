@@ -42,6 +42,7 @@ dependencies = [
     "langchain-huggingface",
     "langchain-unstructured",
     "langchain-openai",
+    "langchain-ollama",
     "sentence-transformers",
     "pypdf",
     "unstructured[all-docs]"
