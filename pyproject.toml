@@ -38,11 +38,13 @@ dependencies = [
     "openpyxl",
     "pyodbc",
     "langchain",
-    "openai",
-    "chromadb",
+    "langchain-chroma",
+    "langchain-huggingface",
+    "langchain-unstructured",
+    "langchain-openai",
     "sentence-transformers",
     "pypdf",
-    "unstructured"
+    "unstructured[all-docs]"
 ]
 
 [tool.setuptools.packages.find]

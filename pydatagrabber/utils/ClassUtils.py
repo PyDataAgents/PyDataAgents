@@ -1,9 +1,11 @@
+from __future__ import annotations
+from typing import TYPE_CHECKING
 import importlib
 
-from ..grabbers.GrabberElement import GrabberElement
-from ..grabbers.GrabberException import GrabberException
-
-
+if TYPE_CHECKING:
+    from ..grabbers.GrabberElement import GrabberElement
+    from ..grabbers.GrabberException import GrabberException
+    
 class ClassUtils:
     
     @staticmethod
