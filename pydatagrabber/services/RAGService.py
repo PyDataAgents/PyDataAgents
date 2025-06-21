@@ -6,7 +6,7 @@ from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_unstructured import UnstructuredLoader
 from langchain_text_splitters import CharacterTextSplitter
 from langchain_openai import ChatOpenAI
-from langchain_ollama import Ollama
+from langchain_community.llms import Ollama
 from langchain.memory import ConversationBufferMemory
 from langchain.chains import RetrievalQA
 from langchain.chains import ConversationalRetrievalChain
@@ -28,7 +28,7 @@ class RAGService(Service):
     endpoint : str = field(default=None, metadata={"description": "endpoint of the LLM provider"})
     model_provider : str = field(default=None, metadata={"description": "name of the model provider, e.g. OPENAI | OLLAMA | ..."})
     model : str = field(default=None, metadata={"description": "name of the model, e.g. gpt-4o | gemma:1b | ... "})
-    document_links : list[str] = field(default=None, metadata={"description": "list of document links to load into embedded store on startup"})
+    document_links : list[str] = field(default_factory=list(), metadata={"description": "list of document links to load into embedded store on startup"})
     retain_messages : bool = field(default=False, metadata={"description": "specify True if you want to retain the chat history for context"})
     ignore_invalid_documents : bool = field(default=False, metadata={"description": "api token for a web based model provider, e.g. OPENAI"})
     embedding_model : str = field(default="all-MiniLM-L6-v2", metadata={"description": "name of the embedding model to use for embedding store"})
@@ -39,6 +39,7 @@ class RAGService(Service):
         self.embedding_store = None
         self.retriever = None
         self.retrieval_chain = None
+        self.document_links = list()
     
     def install(self, grabber : Grabber = None):
         super().install()
@@ -75,7 +76,7 @@ class RAGService(Service):
             )
     
     def stop(self):
-        self.qa_chain = None
+        self.retrieval_chain = None
         self.embedding_store.persist()
         self.embedding_store = None
         self.embedding_model = None
@@ -95,7 +96,7 @@ class RAGService(Service):
         if self.persist_directory is not None:
             self.embedding_store.persist()
 
-    def chat(self, question : str) -> str:
+    def chat(self, question : str) -> dict:
         result = self.retrieval_chain.invoke(question)
         return result
     

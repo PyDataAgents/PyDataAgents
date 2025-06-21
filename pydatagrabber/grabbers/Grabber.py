@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Type
 from dataclasses import dataclass
 import time
 from loguru import logger
@@ -142,6 +142,21 @@ class Grabber(GrabberElement):
         else:
             logger.error("No " + Service.__class__.__name__ + " with id=" + id + " was found")
             return None
+        
+    def get_services(self, type : Type) -> list[Service]:
+        """returns all services of a specified type/class
+
+        Args:
+            type (Type): class
+
+        Returns:
+            list[Service]: list of services with the specified type
+        """
+        services = list()
+        for service in self.service_store.values():
+            if isinstance(service, type):
+                services.append(service)
+        return services
         
     def get_element(self, id : str) -> GrabberElement:        
         if id in self.adapter_store:

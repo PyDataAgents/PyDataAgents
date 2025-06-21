@@ -1,6 +1,9 @@
 import configparser
 import os
+from pydatagrabber.grabbers.Grabber import Grabber
+from pydatagrabber.services.LLMService import LLMService
 from pydatagrabber.services.RAGService import RAGService
+from pydatagrabber.services.rest.LLMRestService import LLMRestService
 
 def test_000():
     
@@ -38,3 +41,33 @@ def test_010():
     resp = rs.chat("What cluster transition types are mentioned in the publication?")    
     print(resp)
     
+def test_020():
+    
+    config = configparser.ConfigParser()
+    config.read("config.ini")
+    
+    g = Grabber()
+    
+    rs = RAGService()
+    rs.id = "RAG1"
+    rs.api_key = config["OPENAI"]["OPENAI_API_KEY"]
+    rs.model = "gpt-4o"
+    rs.model_provider = "OPENAI"
+    
+    g.add_service(rs)
+    
+    ls = LLMService()
+    ls.id = "LLM1"
+    ls.api_key = config["OPENAI"]["OPENAI_API_KEY"]
+    ls.model = "gpt-4o-mini"
+    ls.model_provider = "OPENAI"
+    
+    g.add_service(ls)
+    
+    lrs = LLMRestService()
+    lrs.id = "LLM-REST1"
+    lrs.port = 8001
+    
+    g.add_service(lrs)
+    
+    g.start_blocking()

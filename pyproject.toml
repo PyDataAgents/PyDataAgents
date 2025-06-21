@@ -38,6 +38,7 @@ dependencies = [
     "openpyxl",
     "pyodbc",
     "langchain",
+    "langchain-community",
     "langchain-chroma",
     "langchain-huggingface",
     "langchain-unstructured",
