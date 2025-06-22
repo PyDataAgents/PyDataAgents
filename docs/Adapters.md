@@ -1,4 +1,27 @@
-#Adapter Documentation
+# Adapter Documentation
+
+## Summary
+
+| Class | Description |
+|-------|-------------|
+| [`PublishAdapter`](#publishadapter-from-PublishAdapter) | abstract class for Adapter Interface for publishing to data sinks |
+| [`ReadAdapter`](#readadapter-from-ReadAdapter) | abstract class for Adapter Interface for reading from data sources |
+| [`SubscribeAdapter`](#subscribeadapter-from-SubscribeAdapter) | abstract class for Adapter Interface for subscribing from data sources |
+| [`WriteAdapter`](#writeadapter-from-WriteAdapter) | abstract class for Adapter Interface for writing to data sinks |
+| [`AdsAdapter`](#adsadapter-from-ads\AdsAdapter) |  |
+| [`AudioAdapter`](#audioadapter-from-audio\AudioAdapter) |  |
+| [`CsvReadAdapter`](#csvreadadapter-from-csv\CsvReadAdapter) |  |
+| [`CsvWriteAdapter`](#csvwriteadapter-from-csv\CsvWriteAdapter) |  |
+| [`HttpAdapter`](#httpadapter-from-http\HttpAdapter) | Adapter for reading and writing data from/to http endpoints |
+| [`InfluxDbAdapter`](#influxdbadapter-from-influxdb\InfluxDbAdapter) | InfluxAdapter is a specialized adapter for reading from and writing to InfluxDB. |
+| [`MQTTAdapter`](#mqttadapter-from-mqtt\MQTTAdapter) |  |
+| [`OpcUaAdapter`](#opcuaadapter-from-opcua\OpcUaAdapter) |  |
+| [`S7Adapter`](#s7adapter-from-s7\S7Adapter) | S7Adapter is a specialized adapter for reading from and writing to S7 PLCs. |
+| [`ByteStreamAdapter`](#bytestreamadapter-from-socket\ByteStreamAdapter) |  |
+| [`WebSocketAdapter`](#websocketadapter-from-socket\WebSocketAdapter) |  |
+| [`SQLAdapter`](#sqladapter-from-sql\SQLAdapter) |  |
+
+
 
 ## `PublishAdapter` (from `PublishAdapter.py`)
 

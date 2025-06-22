@@ -1,4 +1,18 @@
-#Service Documentation
+# Service Documentation
+
+## Summary
+
+| Class | Description |
+|-------|-------------|
+| [`BrowserAutomationService`](#browserautomationservice-from-BrowserAutomationService) |  |
+| [`LLMService`](#llmservice-from-LLMService) | LLM Service for chat based LLM interaction |
+| [`PlotService`](#plotservice-from-PlotService) |  |
+| [`RAGService`](#ragservice-from-RAGService) | Retrieval Augmented Generation (RAG) Service for document based LLM knowledge retrieval in chat form |
+| [`ExcelRestService`](#excelrestservice-from-rest\ExcelRestService) | Service for creating a REST API for accessing named Tables in Excel |
+| [`LLMRestService`](#llmrestservice-from-rest\LLMRestService) | Service for creating a REST API for accessing LLM Models |
+| [`RestService`](#restservice-from-rest\RestService) | Service for creating a REST API for DataGrabber using FastAPI |
+
+
 
 ## `BrowserAutomationService` (from `BrowserAutomationService.py`)
 

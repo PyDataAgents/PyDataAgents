@@ -1,4 +1,39 @@
-#Node Documentation
+# Node Documentation
+
+## Summary
+
+| Class | Description |
+|-------|-------------|
+| [`Action`](#action-from-Action) |  |
+| [`AdapterNode`](#adapternode-from-AdapterNode) | AdapterNode is a specialized BufferNode that integrates an adapter for data processing. |
+| [`BufferNode`](#buffernode-from-BufferNode) |  |
+| [`GrabberNode`](#grabbernode-from-GrabberNode) |  |
+| [`JoinTransition`](#jointransition-from-JoinTransition) |  |
+| [`MappingNode`](#mappingnode-from-MappingNode) |  |
+| [`ServiceNode`](#servicenode-from-ServiceNode) | A class representing a service node in a state machine. |
+| [`Transition`](#transition-from-Transition) |  |
+| [`AdapterReadAction`](#adapterreadaction-from-actions\AdapterReadAction) | Action to read data from an adapter. |
+| [`AdapterWriteAction`](#adapterwriteaction-from-actions\AdapterWriteAction) | Action to write data with an adapter. |
+| [`AddBufferAction`](#addbufferaction-from-actions\AddBufferAction) | Action to add a buffer to the grabber node. |
+| [`BrowserAutomationAction`](#browserautomationaction-from-actions\BrowserAutomationAction) |  |
+| [`ConfigureElementAction`](#configureelementaction-from-actions\ConfigureElementAction) | this `Action` configures a `GrabberElement` property by the provided `element_id` and name of the `option`, which is the class' property |
+| [`CopyFilesAction`](#copyfilesaction-from-actions\CopyFilesAction) |  |
+| [`ListFilesAction`](#listfilesaction-from-actions\ListFilesAction) |  |
+| [`MailAction`](#mailaction-from-actions\MailAction) |  |
+| [`MoveFilesAction`](#movefilesaction-from-actions\MoveFilesAction) |  |
+| [`ReadCsvAction`](#readcsvaction-from-actions\ReadCsvAction) |  |
+| [`ReadJsonAction`](#readjsonaction-from-actions\ReadJsonAction) |  |
+| [`SetElementAction`](#setelementaction-from-actions\SetElementAction) |  |
+| [`SleepAction`](#sleepaction-from-actions\SleepAction) | An action that sleeps for a specified number of seconds. |
+| [`StartAction`](#startaction-from-actions\StartAction) | An action that starts the state machine. |
+| [`StopAction`](#stopaction-from-actions\StopAction) | An action that stops the state machine. |
+| [`UrlNavigateAction`](#urlnavigateaction-from-actions\UrlNavigateAction) |  |
+| [`BufferInRangeTransition`](#bufferinrangetransition-from-transitions\BufferInRangeTransition) | A transition that compares the current buffer with a target value. |
+| [`CompareBufferTransition`](#comparebuffertransition-from-transitions\CompareBufferTransition) | A transition that compares the current buffer with a target value. |
+| [`FalseTransition`](#falsetransition-from-transitions\FalseTransition) | A transition that always returns False. |
+| [`TrueTransition`](#truetransition-from-transitions\TrueTransition) | A transition that always returns True. |
+
+
 
 ## `Action` (from `Action.py`)
 

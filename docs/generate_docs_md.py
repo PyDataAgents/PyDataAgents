@@ -4,10 +4,6 @@ from typing import List, Dict, Set
 
 from pydatagrabber.utils.TimeUtils import TimeUtils
 
-# Adjust the base directory as needed
-BASE_DIR = Path("pydatagrabber")
-DOCS_DIR = Path("docs")
-
 
 # Stores class inheritance and definitions across the codebase
 class_hierarchy: Dict[str, List[str]] = {}
@@ -104,7 +100,20 @@ def scan_repository(base_dir: Path, type : str):
     return summary
 
 def generate_readme(class_data: List[Dict], output_file: Path, type : str):
-    lines = ["#" + type + " Documentation\n"]
+    lines = ["# " + type + " Documentation\n"]
+    
+    # class summary
+    lines.append("## Summary\n")
+    lines.append("| Class | Description |")
+    lines.append("|-------|-------------|")
+
+    for cls in sorted(class_data, key=lambda x: str(x["file"])):
+        anchor = f"{cls['name'].lower()}-from-{str(cls['file']).replace('/', '').replace('.py', '')}"
+        docstring = cls["docstring"].strip().split("\n")[0] if cls["docstring"] else ""
+        lines.append(f"| [`{cls['name']}`](#{anchor}) | {docstring} |")
+    lines.append("\n\n")
+    
+    # class details    
     for cls in sorted(class_data, key=lambda x: str(x["file"])):
         lines.append(f"## `{cls['name']}` (from `{cls['file']}`)\n")
         if cls["docstring"]:
