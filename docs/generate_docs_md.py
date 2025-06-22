@@ -134,7 +134,7 @@ def generate_readme(class_data: List[Dict], output_file: Path, type : str):
                 value = field["default"]
             else:
                 # Otherwise, guess a placeholder value based on the type
-                value = guess_placeholder_value(field["type"])
+                value = guess_placeholder_value(field["type"], field["name"])
             init_args.append(f"{field['name']}={value}")
         constructor = f"{cls['name']}(\n    " + ",\n    ".join(init_args) + "\n)"
         lines.append(f"obj = {constructor}")
@@ -148,11 +148,22 @@ def generate_readme(class_data: List[Dict], output_file: Path, type : str):
         
     output_file.write_text("\n".join(lines), encoding="utf-8")
 
-def guess_placeholder_value(type_str: str) -> str:
-    """Returns a placeholder value as a string based on type string."""
+def guess_placeholder_value(type_str: str, field : str) -> str:
+    """Returns a placeholder value as a string based on type or field string."""
     type_str = type_str.lower()
     if "str" in type_str:
-        return '"example"'
+        if "file" in field.lower():
+            return '"path/to/file.txt"'
+        elif "url" in field.lower():
+            return '"https://example.com"'
+        elif "email" in field.lower():
+            return '"john.doe@example.com"'
+        elif "name" in field.lower():
+            return '"John Doe"'
+        elif "folder" in field.lower():
+            return '"path/to/folder"'
+        else:
+            return '"<string>"'
     elif "int" in type_str:
         return '123'
     elif "float" in type_str:

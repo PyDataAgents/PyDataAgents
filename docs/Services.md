@@ -35,10 +35,10 @@ LLM Service for chat based LLM interaction
 from pydatagrabber import LLMService  # Adjust import if needed
 
 obj = LLMService(
-    api_key="example",
-    endpoint="example",
-    model_provider="example",
-    model="example",
+    api_key="<string>",
+    endpoint="<string>",
+    model_provider="<string>",
+    model="<string>",
     retain_messages=False
 )
 ```
@@ -70,15 +70,15 @@ Retrieval Augmented Generation (RAG) Service for document based LLM knowledge re
 from pydatagrabber import RAGService  # Adjust import if needed
 
 obj = RAGService(
-    api_key="example",
-    endpoint="example",
-    model_provider="example",
-    model="example",
+    api_key="<string>",
+    endpoint="<string>",
+    model_provider="<string>",
+    model="<string>",
     document_links='list()()',
     retain_messages=False,
     ignore_invalid_documents=False,
     embedding_model='all-MiniLM-L6-v2',
-    persist_directory="example"
+    persist_directory="<string>"
 )
 ```
 
@@ -96,7 +96,7 @@ Service for creating a REST API for accessing named Tables in Excel
 from pydatagrabber import ExcelRestService  # Adjust import if needed
 
 obj = ExcelRestService(
-    excel_file="example"
+    excel_file="path/to/file.txt"
 )
 ```
 

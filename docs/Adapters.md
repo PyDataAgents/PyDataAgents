@@ -37,7 +37,7 @@ _No fields defined._
 from pydatagrabber import AdsAdapter  # Adjust import if needed
 
 obj = AdsAdapter(
-    ams_net_id="example",
+    ams_net_id="<string>",
     twincat=3
 )
 ```
@@ -77,7 +77,7 @@ obj = AudioAdapter(
 from pydatagrabber import CsvReadAdapter  # Adjust import if needed
 
 obj = CsvReadAdapter(
-    file_path="example",
+    file_path="path/to/file.txt",
     all_at_once=True,
     delimiter=';',
     has_header=True,
@@ -104,8 +104,8 @@ obj = CsvReadAdapter(
 from pydatagrabber import CsvWriteAdapter  # Adjust import if needed
 
 obj = CsvWriteAdapter(
-    folder="example",
-    file_post_fix="example",
+    folder="path/to/folder",
+    file_post_fix="path/to/file.txt",
     file_extension='csv',
     with_timestamp=False,
     max_samples=1000000,
@@ -130,8 +130,8 @@ Adapter for reading and writing data from/to http endpoints
 from pydatagrabber import HttpAdapter  # Adjust import if needed
 
 obj = HttpAdapter(
-    base_url="example",
-    headers="example",
+    base_url="https://example.com",
+    headers="<string>",
     json_path=False
 )
 ```
@@ -153,7 +153,7 @@ from pydatagrabber import InfluxDbAdapter  # Adjust import if needed
 
 obj = InfluxDbAdapter(
     endpoint='http://localhost:8086',
-    token="example",
+    token="<string>",
     org='my-org'
 )
 ```
@@ -175,7 +175,7 @@ obj = InfluxDbAdapter(
 from pydatagrabber import MQTTAdapter  # Adjust import if needed
 
 obj = MQTTAdapter(
-    endpoint="example",
+    endpoint="<string>",
     port=1883,
     keep_alive=60,
     force_numeric=False,
@@ -196,7 +196,7 @@ obj = MQTTAdapter(
 from pydatagrabber import OpcUaAdapter  # Adjust import if needed
 
 obj = OpcUaAdapter(
-    endpoint="example"
+    endpoint="<string>"
 )
 ```
 
@@ -238,7 +238,7 @@ _No fields defined._
 from pydatagrabber import WebSocketAdapter  # Adjust import if needed
 
 obj = WebSocketAdapter(
-    url="example"
+    url="https://example.com"
 )
 ```
 
@@ -254,6 +254,6 @@ obj = WebSocketAdapter(
 from pydatagrabber import SQLAdapter  # Adjust import if needed
 
 obj = SQLAdapter(
-    connection_str="example"
+    connection_str="<string>"
 )
 ```

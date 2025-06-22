@@ -18,7 +18,7 @@ It inherits from BufferNode to manage buffers and provides methods to interact w
 from pydatagrabber import AdapterNode  # Adjust import if needed
 
 obj = AdapterNode(
-    adapter_id="example"
+    adapter_id="<string>"
 )
 ```
 
@@ -34,7 +34,7 @@ obj = AdapterNode(
 from pydatagrabber import BufferNode  # Adjust import if needed
 
 obj = BufferNode(
-    buffer_id="example"
+    buffer_id="<string>"
 )
 ```
 
@@ -58,7 +58,7 @@ _No fields defined._
 from pydatagrabber import MappingNode  # Adjust import if needed
 
 obj = MappingNode(
-    mapping_id="example"
+    mapping_id="<string>"
 )
 ```
 
@@ -76,7 +76,7 @@ Inherits from Node and adds functionality specific to service nodes.
 from pydatagrabber import ServiceNode  # Adjust import if needed
 
 obj = ServiceNode(
-    service_id="example"
+    service_id="<string>"
 )
 ```
 
@@ -98,7 +98,7 @@ Action to read data from an adapter.
 from pydatagrabber import AdapterReadAction  # Adjust import if needed
 
 obj = AdapterReadAction(
-    address="example",
+    address="<string>",
     n=1
 )
 ```
@@ -118,7 +118,7 @@ Action to write data with an adapter.
 from pydatagrabber import AdapterWriteAction  # Adjust import if needed
 
 obj = AdapterWriteAction(
-    address="example",
+    address="<string>",
     n=1,
     persistent=False
 )
@@ -153,7 +153,7 @@ obj = AddBufferAction(
 from pydatagrabber import BrowserAutomationAction  # Adjust import if needed
 
 obj = BrowserAutomationAction(
-    service_id="example"
+    service_id="<string>"
 )
 ```
 
@@ -180,8 +180,8 @@ Raises:
 from pydatagrabber import ConfigureElementAction  # Adjust import if needed
 
 obj = ConfigureElementAction(
-    option="example",
-    element_id="example",
+    option="<string>",
+    element_id="<string>",
     n=1
 )
 ```
@@ -198,7 +198,7 @@ obj = ConfigureElementAction(
 from pydatagrabber import CopyFilesAction  # Adjust import if needed
 
 obj = CopyFilesAction(
-    target_folder="example"
+    target_folder="path/to/folder"
 )
 ```
 
@@ -217,9 +217,9 @@ obj = CopyFilesAction(
 from pydatagrabber import ListFilesAction  # Adjust import if needed
 
 obj = ListFilesAction(
-    folder="example",
-    pattern="example",
-    extension="example",
+    folder="path/to/folder",
+    pattern="<string>",
+    extension="<string>",
     newer_than_seconds=123
 )
 ```
@@ -242,13 +242,13 @@ obj = ListFilesAction(
 from pydatagrabber import MailAction  # Adjust import if needed
 
 obj = MailAction(
-    smtp_server="example",
+    smtp_server="<string>",
     port=123,
-    mail_account="example",
-    pw="example",
-    recipient="example",
-    subject="example",
-    body="example"
+    mail_account="<string>",
+    pw="<string>",
+    recipient="<string>",
+    subject="<string>",
+    body="<string>"
 )
 ```
 
@@ -264,7 +264,7 @@ obj = MailAction(
 from pydatagrabber import MoveFilesAction  # Adjust import if needed
 
 obj = MoveFilesAction(
-    target_folder="example"
+    target_folder="path/to/folder"
 )
 ```
 
@@ -281,7 +281,7 @@ obj = MoveFilesAction(
 from pydatagrabber import ReadCsvAction  # Adjust import if needed
 
 obj = ReadCsvAction(
-    file_path="example",
+    file_path="path/to/file.txt",
     delimiter=';'
 )
 ```
@@ -299,8 +299,8 @@ obj = ReadCsvAction(
 from pydatagrabber import ReadJsonAction  # Adjust import if needed
 
 obj = ReadJsonAction(
-    file_path="example",
-    json_path="example"
+    file_path="path/to/file.txt",
+    json_path="<string>"
 )
 ```
 
@@ -316,7 +316,7 @@ obj = ReadJsonAction(
 from pydatagrabber import SetElementAction  # Adjust import if needed
 
 obj = SetElementAction(
-    xpath="example"
+    xpath="<string>"
 )
 ```
 
@@ -347,7 +347,7 @@ _No fields defined._
 from pydatagrabber import UrlNavigateAction  # Adjust import if needed
 
 obj = UrlNavigateAction(
-    url="example"
+    url="https://example.com"
 )
 ```
 
@@ -366,7 +366,7 @@ If the buffer matches the target, the transition is successful.
 from pydatagrabber import BufferInRangeTransition  # Adjust import if needed
 
 obj = BufferInRangeTransition(
-    comparator="example",
+    comparator="<string>",
     value="<value>"
 )
 ```
@@ -386,7 +386,7 @@ If the buffer matches the target, the transition is successful.
 from pydatagrabber import CompareBufferTransition  # Adjust import if needed
 
 obj = CompareBufferTransition(
-    comparator="example",
+    comparator="<string>",
     value="<value>"
 )
 ```
