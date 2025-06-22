@@ -1,0 +1,29 @@
+# Grabbers Documentation
+
+## Summary
+
+| Class | Description |
+|-------|-------------|
+| [`Grabber`](#grabber-from-Grabber) |  |
+
+
+
+## `Grabber` (from `Grabber.py`)
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `type` | `str` | `` | fully qualified package and class name descriptor |
+| `id` | `str` | `` | unique identifier of element in DataGrabber application |
+| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+
+
+```python
+# Example usage of `Grabber`
+from pydatagrabber import Grabber  # Adjust import if needed
+
+obj = Grabber(
+    type="<string>",
+    id="<string>",
+    load_on_install=False
+)
+```

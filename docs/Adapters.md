@@ -1,4 +1,4 @@
-# Adapter Documentation
+# Adapters Documentation
 
 ## Summary
 
