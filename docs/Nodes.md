@@ -1,4 +1,4 @@
-# + Node Documentation
+#Node Documentation
 
 ## `Action` (from `Action.py`)
 
@@ -8,15 +8,35 @@ _No fields defined._
 
 AdapterNode is a specialized BufferNode that integrates an adapter for data processing.
 It inherits from BufferNode to manage buffers and provides methods to interact with the adapter.
-| Field | Type | Description |
-|-------|------|-------------|
-| `adapter_id` | `str` | ID of the adapter |
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `adapter_id` | `str` | `` | ID of the adapter |
+
+
+```python
+# Example usage of `AdapterNode`
+from pydatagrabber import AdapterNode  # Adjust import if needed
+
+obj = AdapterNode(
+    adapter_id="example"
+)
+```
 
 ## `BufferNode` (from `BufferNode.py`)
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `buffer_id` | `str` | unique ID of the buffer |
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `buffer_id` | `str` | `` | unique ID of the buffer |
+
+
+```python
+# Example usage of `BufferNode`
+from pydatagrabber import BufferNode  # Adjust import if needed
+
+obj = BufferNode(
+    buffer_id="example"
+)
+```
 
 ## `GrabberNode` (from `GrabberNode.py`)
 
@@ -28,17 +48,37 @@ _No fields defined._
 
 ## `MappingNode` (from `MappingNode.py`)
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `mapping_id` | `str` | ID of the mapping |
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `mapping_id` | `str` | `` | ID of the mapping |
+
+
+```python
+# Example usage of `MappingNode`
+from pydatagrabber import MappingNode  # Adjust import if needed
+
+obj = MappingNode(
+    mapping_id="example"
+)
+```
 
 ## `ServiceNode` (from `ServiceNode.py`)
 
 A class representing a service node in a state machine.
 Inherits from Node and adds functionality specific to service nodes.
-| Field | Type | Description |
-|-------|------|-------------|
-| `service_id` | `str` | ID of the service |
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `service_id` | `str` | `` | ID of the service |
+
+
+```python
+# Example usage of `ServiceNode`
+from pydatagrabber import ServiceNode  # Adjust import if needed
+
+obj = ServiceNode(
+    service_id="example"
+)
+```
 
 ## `Transition` (from `Transition.py`)
 
@@ -47,32 +87,75 @@ _No fields defined._
 ## `AdapterReadAction` (from `actions\AdapterReadAction.py`)
 
 Action to read data from an adapter.
-| Field | Type | Description |
-|-------|------|-------------|
-| `address` | `str` | The address to read from the adapter. |
-| `n` | `int` | The number of samples to read. |
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `address` | `str` | `` | The address to read from the adapter. |
+| `n` | `int` | `1` | The number of samples to read. |
+
+
+```python
+# Example usage of `AdapterReadAction`
+from pydatagrabber import AdapterReadAction  # Adjust import if needed
+
+obj = AdapterReadAction(
+    address="example",
+    n=1
+)
+```
 
 ## `AdapterWriteAction` (from `actions\AdapterWriteAction.py`)
 
 Action to write data with an adapter.
-| Field | Type | Description |
-|-------|------|-------------|
-| `address` | `str` | The address to read from the adapter. |
-| `n` | `int` | The number of samples to read. |
-| `persistent` | `bool` | If True, the data will be stored in a persistent buffer. |
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `address` | `str` | `` | The address to read from the adapter. |
+| `n` | `int` | `1` | The number of samples to read. |
+| `persistent` | `bool` | `False` | If True, the data will be stored in a persistent buffer. |
+
+
+```python
+# Example usage of `AdapterWriteAction`
+from pydatagrabber import AdapterWriteAction  # Adjust import if needed
+
+obj = AdapterWriteAction(
+    address="example",
+    n=1,
+    persistent=False
+)
+```
 
 ## `AddBufferAction` (from `actions\AddBufferAction.py`)
 
 Action to add a buffer to the grabber node.
-| Field | Type | Description |
-|-------|------|-------------|
-| `config` | `dict` | Configuration for the buffer to be added. |
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `config` | `dict` | `` | Configuration for the buffer to be added. |
+
+
+```python
+# Example usage of `AddBufferAction`
+from pydatagrabber import AddBufferAction  # Adjust import if needed
+
+obj = AddBufferAction(
+    config={}
+)
+```
 
 ## `BrowserAutomationAction` (from `actions\BrowserAutomationAction.py`)
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `service_id` | `str` | ID of the service to reference for Browser Automation |
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `service_id` | `str` | `` | ID of the service to reference for Browser Automation |
+
+
+```python
+# Example usage of `BrowserAutomationAction`
+from pydatagrabber import BrowserAutomationAction  # Adjust import if needed
+
+obj = BrowserAutomationAction(
+    service_id="example"
+)
+```
 
 ## `ConfigureElementAction` (from `actions\ConfigureElementAction.py`)
 
@@ -85,64 +168,157 @@ Args:
 
 Raises:
     StatemachineException: if an error occurs during execute
-| Field | Type | Description |
-|-------|------|-------------|
-| `option` | `str` | option to configure with new value |
-| `element_id` | `str` | id of the element to change the option for |
-| `n` | `int` | specifies the number of samples to remove from buffer |
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `option` | `str` | `` | option to configure with new value |
+| `element_id` | `str` | `` | id of the element to change the option for |
+| `n` | `int` | `1` | specifies the number of samples to remove from buffer |
+
+
+```python
+# Example usage of `ConfigureElementAction`
+from pydatagrabber import ConfigureElementAction  # Adjust import if needed
+
+obj = ConfigureElementAction(
+    option="example",
+    element_id="example",
+    n=1
+)
+```
 
 ## `CopyFilesAction` (from `actions\CopyFilesAction.py`)
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `target_folder` | `str` | target folder to copy all the files to in Buffer |
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `target_folder` | `str` | `` | target folder to copy all the files to in Buffer |
+
+
+```python
+# Example usage of `CopyFilesAction`
+from pydatagrabber import CopyFilesAction  # Adjust import if needed
+
+obj = CopyFilesAction(
+    target_folder="example"
+)
+```
 
 ## `ListFilesAction` (from `actions\ListFilesAction.py`)
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `folder` | `str` | folder to list the files from into a Buffer |
-| `pattern` | `str` | paatern to look for in file names |
-| `extension` | `str` | extension to include |
-| `newer_than_seconds` | `int` | specifies how old in seconds a file can be to be included |
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `folder` | `str` | `` | folder to list the files from into a Buffer |
+| `pattern` | `str` | `` | paatern to look for in file names |
+| `extension` | `str` | `` | extension to include |
+| `newer_than_seconds` | `int` | `` | specifies how old in seconds a file can be to be included |
+
+
+```python
+# Example usage of `ListFilesAction`
+from pydatagrabber import ListFilesAction  # Adjust import if needed
+
+obj = ListFilesAction(
+    folder="example",
+    pattern="example",
+    extension="example",
+    newer_than_seconds=123
+)
+```
 
 ## `MailAction` (from `actions\MailAction.py`)
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `smtp_server` | `str` | host of the mail server to use |
-| `port` | `int` | port of the smtp server |
-| `mail_account` | `str` | mail account to use for login |
-| `pw` | `str` | password of the mail server |
-| `recipient` | `str` | mail address of the recipient |
-| `subject` | `str` | subject of the mail |
-| `body` | `str` | body of the mail |
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `smtp_server` | `str` | `` | host of the mail server to use |
+| `port` | `int` | `` | port of the smtp server |
+| `mail_account` | `str` | `` | mail account to use for login |
+| `pw` | `str` | `` | password of the mail server |
+| `recipient` | `str` | `` | mail address of the recipient |
+| `subject` | `str` | `` | subject of the mail |
+| `body` | `str` | `` | body of the mail |
+
+
+```python
+# Example usage of `MailAction`
+from pydatagrabber import MailAction  # Adjust import if needed
+
+obj = MailAction(
+    smtp_server="example",
+    port=123,
+    mail_account="example",
+    pw="example",
+    recipient="example",
+    subject="example",
+    body="example"
+)
+```
 
 ## `MoveFilesAction` (from `actions\MoveFilesAction.py`)
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `target_folder` | `str` | target folder to move all the files to in Buffer |
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `target_folder` | `str` | `` | target folder to move all the files to in Buffer |
+
+
+```python
+# Example usage of `MoveFilesAction`
+from pydatagrabber import MoveFilesAction  # Adjust import if needed
+
+obj = MoveFilesAction(
+    target_folder="example"
+)
+```
 
 ## `ReadCsvAction` (from `actions\ReadCsvAction.py`)
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `file_path` | `str` | path to the csv file to read the data from |
-| `delimiter` | `str` | delimiter character(s) for this csv file |
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `file_path` | `str` | `` | path to the csv file to read the data from |
+| `delimiter` | `str` | `';'` | delimiter character(s) for this csv file |
+
+
+```python
+# Example usage of `ReadCsvAction`
+from pydatagrabber import ReadCsvAction  # Adjust import if needed
+
+obj = ReadCsvAction(
+    file_path="example",
+    delimiter=';'
+)
+```
 
 ## `ReadJsonAction` (from `actions\ReadJsonAction.py`)
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `file_path` | `str` | path to the json file to read the data from |
-| `json_path` | `str` |  |
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `file_path` | `str` | `` | path to the json file to read the data from |
+| `json_path` | `str` | `` | path to the json file to read the data from |
+
+
+```python
+# Example usage of `ReadJsonAction`
+from pydatagrabber import ReadJsonAction  # Adjust import if needed
+
+obj = ReadJsonAction(
+    file_path="example",
+    json_path="example"
+)
+```
 
 ## `SetElementAction` (from `actions\SetElementAction.py`)
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `xpath` | `str` | XPath definition to locate the element to set a value to |
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `xpath` | `str` | `` | XPath definition to locate the element to set a value to |
+
+
+```python
+# Example usage of `SetElementAction`
+from pydatagrabber import SetElementAction  # Adjust import if needed
+
+obj = SetElementAction(
+    xpath="example"
+)
+```
 
 ## `SleepAction` (from `actions\SleepAction.py`)
 
@@ -161,27 +337,59 @@ _No fields defined._
 
 ## `UrlNavigateAction` (from `actions\UrlNavigateAction.py`)
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `url` | `str` | url to navigate to in browser |
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `url` | `str` | `` | url to navigate to in browser |
+
+
+```python
+# Example usage of `UrlNavigateAction`
+from pydatagrabber import UrlNavigateAction  # Adjust import if needed
+
+obj = UrlNavigateAction(
+    url="example"
+)
+```
 
 ## `BufferInRangeTransition` (from `transitions\BufferInRangeTransition.py`)
 
 A transition that compares the current buffer with a target value.
 If the buffer matches the target, the transition is successful.
-| Field | Type | Description |
-|-------|------|-------------|
-| `comparator` | `str` | The comparison operator to use. |
-| `value` | `any` | The value to compare against the buffer. |
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `comparator` | `str` | `` | The comparison operator to use. |
+| `value` | `any` | `` | The value to compare against the buffer. |
+
+
+```python
+# Example usage of `BufferInRangeTransition`
+from pydatagrabber import BufferInRangeTransition  # Adjust import if needed
+
+obj = BufferInRangeTransition(
+    comparator="example",
+    value="<value>"
+)
+```
 
 ## `CompareBufferTransition` (from `transitions\CompareBufferTransition.py`)
 
 A transition that compares the current buffer with a target value.
 If the buffer matches the target, the transition is successful.
-| Field | Type | Description |
-|-------|------|-------------|
-| `comparator` | `str` | The comparison operator to use. |
-| `value` | `any` | The value to compare against the buffer. |
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `comparator` | `str` | `` | The comparison operator to use. |
+| `value` | `any` | `` | The value to compare against the buffer. |
+
+
+```python
+# Example usage of `CompareBufferTransition`
+from pydatagrabber import CompareBufferTransition  # Adjust import if needed
+
+obj = CompareBufferTransition(
+    comparator="example",
+    value="<value>"
+)
+```
 
 ## `FalseTransition` (from `transitions\FalseTransition.py`)
 

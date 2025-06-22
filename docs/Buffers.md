@@ -1,4 +1,4 @@
-# + Buffer Documentation
+#Buffer Documentation
 
 ## `DictBuffer` (from `DictBuffer.py`)
 
@@ -24,10 +24,21 @@ A buffer that holds signals with a specific start time and elapsed time.
 Attributes:
     start_time (int): The start time of the signal in milliseconds.
     elapsed_time (float): The elapsed time since the start in seconds.
-| Field | Type | Description |
-|-------|------|-------------|
-| `signal` | `Signal` | a signal object to simulate data |
-| `sampling_period` | `int` | interval in milliseconds for update |
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `signal` | `Signal` | `` | a signal object to simulate data |
+| `sampling_period` | `int` | `100` | interval in milliseconds for update |
+
+
+```python
+# Example usage of `SignalBuffer`
+from pydatagrabber import SignalBuffer  # Adjust import if needed
+
+obj = SignalBuffer(
+    signal="<value>",
+    sampling_period=100
+)
+```
 
 ## `TimedBuffer` (from `TimedBuffer.py`)
 
@@ -39,6 +50,16 @@ _No fields defined._
 
 TransformsBuffer is a subclass of ListBuffer that allows for data transformation.
 It is used to transform data from one format to another.
-| Field | Type | Description |
-|-------|------|-------------|
-| `transformations` | `list[ObjectTransformation]` | List of transformations to apply to the data |
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `transformations` | `list[ObjectTransformation]` | `[]` | List of transformations to apply to the data |
+
+
+```python
+# Example usage of `TransformsBuffer`
+from pydatagrabber import TransformsBuffer  # Adjust import if needed
+
+obj = TransformsBuffer(
+    transformations=[]
+)
+```
