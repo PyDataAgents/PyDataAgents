@@ -56,7 +56,7 @@ from pydatagrabber import AudioAdapter  # Adjust import if needed
 
 obj = AudioAdapter(
     sample_rate=44100,
-    device=123
+    device=1
 )
 ```
 

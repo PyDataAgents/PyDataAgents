@@ -2,6 +2,8 @@ import ast
 from pathlib import Path
 from typing import List, Dict, Set
 
+from pydatagrabber.utils.TimeUtils import TimeUtils
+
 # Adjust the base directory as needed
 BASE_DIR = Path("pydatagrabber")
 DOCS_DIR = Path("docs")
@@ -165,7 +167,7 @@ def guess_placeholder_value(type_str: str, field : str) -> str:
         else:
             return '"<string>"'
     elif "int" in type_str:
-        return '123'
+        return '1'
     elif "float" in type_str:
         return '3.14'
     elif "bool" in type_str:
@@ -175,7 +177,7 @@ def guess_placeholder_value(type_str: str, field : str) -> str:
     elif "dict" in type_str:
         return '{}'
     elif "datetime" in type_str:
-        return '"2023-01-01T00:00:00"  # datetime as ISO string'
+        return '"' + TimeUtils.now_iso8601() + '"  # datetime as ISO string'
     else:
         return '"<value>"'
 

@@ -220,7 +220,7 @@ obj = ListFilesAction(
     folder="path/to/folder",
     pattern="<string>",
     extension="<string>",
-    newer_than_seconds=123
+    newer_than_seconds=1
 )
 ```
 
@@ -243,7 +243,7 @@ from pydatagrabber import MailAction  # Adjust import if needed
 
 obj = MailAction(
     smtp_server="<string>",
-    port=123,
+    port=1,
     mail_account="<string>",
     pw="<string>",
     recipient="<string>",
