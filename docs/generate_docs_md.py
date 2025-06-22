@@ -59,14 +59,27 @@ def extract_fields(class_def: ast.ClassDef) -> List[Dict]:
             if stmt.value and isinstance(stmt.value, ast.Call):
                 if isinstance(stmt.value.func, ast.Name) and stmt.value.func.id == "field":
                     for keyword in stmt.value.keywords:
+                        if keyword.arg == "default":
+                            default = ast.literal_eval(keyword.value)
+                        elif keyword.arg == "default_factory":
+                            default = f"{ast.unparse(keyword.value)}()"
                         if keyword.arg == "metadata":
                             if isinstance(keyword.value, ast.Dict):
                                 for key_node, value_node in zip(keyword.value.keys, keyword.value.values):
                                     if isinstance(key_node, ast.Constant) and key_node.value == "description":
-                                        field_info["description"] = (
-                                            value_node.value if isinstance(value_node, ast.Constant) else ""
-                                        )
-            fields.append(field_info)
+                                        description = value_node.value if isinstance(value_node, ast.Constant) else ""
+                else:
+                    try:
+                        default = ast.literal_eval(stmt.value)
+                    except Exception:
+                        default = ast.unparse(stmt.value)
+                        
+            fields.append({
+                "name": field_name,
+                "type": field_type,
+                "description": description,
+                "default": repr(default) if default is not None else ""
+            })
     return fields
 
 def scan_repository(base_dir: Path, type : str):
@@ -89,7 +102,7 @@ def scan_repository(base_dir: Path, type : str):
     return summary
 
 def generate_readme(class_data: List[Dict], output_file: Path, type : str):
-    lines = ["# + " + type + " Documentation\n"]
+    lines = ["#" + type + " Documentation\n"]
     for cls in sorted(class_data, key=lambda x: str(x["file"])):
         lines.append(f"## `{cls['name']}` (from `{cls['file']}`)\n")
         if cls["docstring"]:
@@ -97,12 +110,63 @@ def generate_readme(class_data: List[Dict], output_file: Path, type : str):
         if not cls["fields"]:
             lines.append("_No fields defined._\n")
             continue
-        lines.append("| Field | Type | Description |")
-        lines.append("|-------|------|-------------|")
+        # Table headers
+        lines.append("| Field | Type | Default | Description |")
+        lines.append("|-------|------|---------|-------------|")
+
+        # Table rows
         for field in cls["fields"]:
-            lines.append(f"| `{field['name']}` | `{field['type']}` | {field['description']} |")
+            lines.append(f"| `{field['name']}` | `{field['type']}` | `{field['default']}` | {field['description']} |")
+        
         lines.append("")  # newline between classes
+        
+        # code section
+        lines.append("")  # Newline after table
+        # Code Example
+        lines.append("```python")
+        lines.append(f"# Example usage of `{cls['name']}`")
+        lines.append(f"from pydatagrabber import {cls['name']}  # Adjust import if needed\n")
+        # Instantiate the class with placeholder values
+        init_args = []
+        for field in cls["fields"]:
+            if field["default"]:
+                # If a default value is provided, use it
+                value = field["default"]
+            else:
+                # Otherwise, guess a placeholder value based on the type
+                value = guess_placeholder_value(field["type"])
+            init_args.append(f"{field['name']}={value}")
+        constructor = f"{cls['name']}(\n    " + ",\n    ".join(init_args) + "\n)"
+        lines.append(f"obj = {constructor}")
+
+        # Optional method call
+        #lines.append("obj.run()  # or obj.grab(), etc.\n")
+        
+        # end code section
+        lines.append("```")
+        lines.append("")  # Extra newline between classes
+        
     output_file.write_text("\n".join(lines), encoding="utf-8")
+
+def guess_placeholder_value(type_str: str) -> str:
+    """Returns a placeholder value as a string based on type string."""
+    type_str = type_str.lower()
+    if "str" in type_str:
+        return '"example"'
+    elif "int" in type_str:
+        return '123'
+    elif "float" in type_str:
+        return '3.14'
+    elif "bool" in type_str:
+        return 'True'
+    elif "list" in type_str or "sequence" in type_str:
+        return '[]'
+    elif "dict" in type_str:
+        return '{}'
+    elif "datetime" in type_str:
+        return '"2023-01-01T00:00:00"  # datetime as ISO string'
+    else:
+        return '"<value>"'
 
 def generate_docs_for_type(type : str, src_folder : Path, docu_folder : Path):
     """Generate documentation for a specific type of class."""
