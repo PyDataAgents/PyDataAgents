@@ -4,6 +4,7 @@
 
 | Class | Description |
 |-------|-------------|
+| [`Adapter`](#adapter-from-Adapter) | Abstract base class for data adapters. |
 | [`PublishAdapter`](#publishadapter-from-PublishAdapter) | abstract class for Adapter Interface for publishing to data sinks |
 | [`ReadAdapter`](#readadapter-from-ReadAdapter) | abstract class for Adapter Interface for reading from data sources |
 | [`SubscribeAdapter`](#subscribeadapter-from-SubscribeAdapter) | abstract class for Adapter Interface for subscribing from data sources |
@@ -22,6 +23,11 @@
 | [`SQLAdapter`](#sqladapter-from-sql\SQLAdapter) |  |
 
 
+
+## `Adapter` (from `Adapter.py`)
+
+Abstract base class for data adapters.
+_No fields defined._
 
 ## `PublishAdapter` (from `PublishAdapter.py`)
 

@@ -47,18 +47,66 @@ def inherits_from_type(cls_name: str, type : str, seen: Set[str] = None) -> bool
                 return True
     return False
 
+def inherits_from_types(class_name: str, types: List[str], seen: Set[str] = None) -> bool:
+    """Check if `class_name` inherits from any class in `types`, recursively."""
+    if seen is None:
+        seen = set()
+    if class_name in seen:
+        return False
+    seen.add(class_name)
+
+    bases = class_hierarchy.get(class_name, [])
+
+    for base in bases:
+        # Check direct match or qualified match
+        if base in types or any(base.endswith("." + t) for t in types):
+            return True
+        if base in class_hierarchy and inherits_from_types(base, types, seen):
+            return True
+    return False
+
+def get_all_fields(cls_name: str, seen: Set[str] = None) -> List[Dict]:
+    """Get fields from the entire class hierarchy, starting from base classes."""
+    if seen is None:
+        seen = set()
+    if cls_name in seen:
+        return []
+    seen.add(cls_name)
+
+    fields = []
+
+    # First, get fields from base classes
+    for base in class_hierarchy.get(cls_name, []):
+        if base in class_defs:
+            fields.extend(get_all_fields(base, seen))
+
+    # Then add fields from this class (overrides will replace duplicates by name)
+    class_def = class_defs[cls_name]
+    own_fields = extract_fields(class_def)
+
+    # Replace duplicates by field name (child overrides parent)
+    seen_names = {f['name'] for f in own_fields}
+    fields = [f for f in fields if f['name'] not in seen_names]
+    fields.extend(own_fields)
+
+    return fields
+
 def extract_fields(class_def: ast.ClassDef) -> List[Dict]:
     fields = []
     for stmt in class_def.body:
         if isinstance(stmt, ast.AnnAssign) and isinstance(stmt.target, ast.Name):
             field_name = stmt.target.id
             field_type = ast.unparse(stmt.annotation) if stmt.annotation else "Unknown"
-            field_info = {"name": field_name, "type": field_type, "description": ""}
+            description = ""
+            default = None
             if stmt.value and isinstance(stmt.value, ast.Call):
                 if isinstance(stmt.value.func, ast.Name) and stmt.value.func.id == "field":
                     for keyword in stmt.value.keywords:
                         if keyword.arg == "default":
-                            default = ast.literal_eval(keyword.value)
+                            try:
+                                default = ast.literal_eval(keyword.value)
+                            except Exception:
+                                default = ast.unparse(keyword.value)
                         elif keyword.arg == "default_factory":
                             default = f"{ast.unparse(keyword.value)}()"
                         if keyword.arg == "metadata":
@@ -80,7 +128,7 @@ def extract_fields(class_def: ast.ClassDef) -> List[Dict]:
             })
     return fields
 
-def scan_repository(base_dir: Path, type : str):
+def scan_repository(base_dir: Path, types : list[str]):
     # First pass: collect class definitions and hierarchy
     for py_file in base_dir.rglob("*.py"):
         extract_class_info(py_file, base_dir)
@@ -88,8 +136,8 @@ def scan_repository(base_dir: Path, type : str):
     # Second pass: identify grabber classes
     summary = []
     for class_name, class_def in class_defs.items():
-        if inherits_from_type(class_name, type):
-            fields = extract_fields(class_def)
+        if inherits_from_types(class_name, types):
+            fields = get_all_fields(class_name)
             docstring = ast.get_docstring(class_def) or ""
             summary.append({
                 "name": class_name,
@@ -99,8 +147,8 @@ def scan_repository(base_dir: Path, type : str):
             })
     return summary
 
-def generate_readme(class_data: List[Dict], output_file: Path, type : str):
-    lines = ["# " + type + " Documentation\n"]
+def generate_readme(class_data: List[Dict], output_file: Path, types : list[str]):
+    lines = ["# " + types[0] + " Documentation\n"]
     
     # class summary
     lines.append("## Summary\n")
@@ -190,27 +238,27 @@ def guess_placeholder_value(type_str: str, field : str) -> str:
     else:
         return '"<value>"'
 
-def generate_docs_for_type(type : str, src_folder : Path, docu_folder : Path):
+def generate_docs_for_type(types : list[str], src_folder : Path, docu_folder : Path):
     """Generate documentation for a specific type of class."""
-    class_info = scan_repository(src_folder, type)
-    generate_readme(class_info, docu_folder / (type + "s" + ".md"), type)    
+    class_info = scan_repository(src_folder, types)
+    generate_readme(class_info, docu_folder / (types[0] + "s" + ".md"), types)    
 
 # Run the whole process
 if __name__ == "__main__":
     
     # find all adapters
-    generate_docs_for_type("Adapter", Path("pydatagrabber\\adapters"), Path("docs\\"))
+    generate_docs_for_type(["Adapter", "GrabberElement"], Path("pydatagrabber\\adapters"), Path("docs\\"))
 
     # find all buffers
-    generate_docs_for_type("Buffer", Path("pydatagrabber\\buffers"), Path("docs\\"))
+    generate_docs_for_type(["Buffer", "GrabberElement"], Path("pydatagrabber\\buffers"), Path("docs\\"))
 
     # find all mappings
-    generate_docs_for_type("Mapping", Path("pydatagrabber\\mappings"), Path("docs\\"))
+    generate_docs_for_type(["Mapping", "GrabberElement"], Path("pydatagrabber\\mappings"), Path("docs\\"))
 
     # find all services
-    generate_docs_for_type("Service", Path("pydatagrabber\\services"), Path("docs\\"))
+    generate_docs_for_type(["Service", "GrabberElement"], Path("pydatagrabber\\services"), Path("docs\\"))
     
     # find Statemachine Nodes
-    generate_docs_for_type("Node", Path("pydatagrabber\\statemachine"), Path("docs\\"))
+    generate_docs_for_type(["Node", "GrabberElement"], Path("pydatagrabber\\statemachine"), Path("docs\\"))
 
 
