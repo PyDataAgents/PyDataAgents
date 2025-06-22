@@ -22,10 +22,13 @@ a grabber can consists of one or more of the following [GrabberElements](pydatag
 ### Grabber
 
 ### Adapter
+an overview of all available adapters and their usage is given [here](docs/Adapters.md)
 
 ### Buffer
+an overview of all available buffers and their usage is given [here](docs/Buffers.md)
 
 ### Mapping
+an overview of all available mappings and their usage is given [here](docs/Mappings.md)
 
 ### Service
-
+an overview of all available services and their usage is given [here](docs/Services.md)
