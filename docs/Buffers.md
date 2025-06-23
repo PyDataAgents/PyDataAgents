@@ -5,29 +5,15 @@
 | Class | Description |
 |-------|-------------|
 | [`Buffer`](#buffer-from-Buffer) | Abstract base class for buffers. |
-| [`DictBuffer`](#dictbuffer-from-DictBuffer) | buffer that stores its values in a dictionary in a table like fashion, where every key contains a list of data
-     |
-| [`ListBuffer`](#listbuffer-from-ListBuffer) | buffer that stores its values in a capacity limited list
-     |
+| [`DictBuffer`](#dictbuffer-from-DictBuffer) | buffer that stores its values in a dictionary in a table like fashion, where every key contains a list of data     |
+| [`ListBuffer`](#listbuffer-from-ListBuffer) | buffer that stores its values in a capacity limited list     |
 | [`ObjectTransformation`](#objecttransformation-from-ObjectTransformation) | Abstract base class for object transformations for buffers |
 | [`SampledBuffer`](#sampledbuffer-from-SampledBuffer) | A buffer that samples a signal at a specified interval. |
-| [`SignalBuffer`](#signalbuffer-from-SignalBuffer) | A buffer that holds signals with a specific start time and elapsed time.
-
-Attributes:
-    start_time (int): The start time of the signal in milliseconds.
-    elapsed_time (float): The elapsed time since the start in seconds. |
-| [`TimedBuffer`](#timedbuffer-from-TimedBuffer) | A buffer that stores data with timestamps.
-Inherits from ListBuffer. |
-| [`TransformsBuffer`](#transformsbuffer-from-TransformsBuffer) | TransformsBuffer is a subclass of ListBuffer that allows for data transformation.
-It is used to transform data from one format to another. |
+| [`SignalBuffer`](#signalbuffer-from-SignalBuffer) | A buffer that holds signals with a specific start time and elapsed time.Attributes:    start_time (int): The start time of the signal in milliseconds.    elapsed_time (float): The elapsed time since the start in seconds. |
+| [`TimedBuffer`](#timedbuffer-from-TimedBuffer) | A buffer that stores data with timestamps.Inherits from ListBuffer. |
+| [`TransformsBuffer`](#transformsbuffer-from-TransformsBuffer) | TransformsBuffer is a subclass of ListBuffer that allows for data transformation.It is used to transform data from one format to another. |
 | [`SampledSignal`](#sampledsignal-from-signals\SampledSignal) | A class representing a sampled signal for continuously sampled data |
-| [`SampledSine`](#sampledsine-from-signals\SampledSine) | A class to represent a sampled sine wave signal.
-
-Attributes:
-    f (float): The frequency of the sine wave in Hz.
-    a (float): The amplitude of the sine wave.
-    sample_rate (int): The number of samples per second.
-    p (float): The phase of the sine wave in °. |
+| [`SampledSine`](#sampledsine-from-signals\SampledSine) | A class to represent a sampled sine wave signal.Attributes:    f (float): The frequency of the sine wave in Hz.    a (float): The amplitude of the sine wave.    sample_rate (int): The number of samples per second.    p (float): The phase of the sine wave in °. |
 | [`Signal`](#signal-from-signals\Signal) | Abstract base class for signals. |
 | [`Sine`](#sine-from-signals\Sine) | A class to represent a sine wave signal. |
 | [`ClippingTransformation`](#clippingtransformation-from-transformations\ClippingTransformation) |  |

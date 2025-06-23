@@ -5,26 +5,19 @@
 | Class | Description |
 |-------|-------------|
 | [`Adapter`](#adapter-from-Adapter) | Abstract base class for `Adapters`. All `Adapters` must inherit from this class. |
-| [`PublishAdapter`](#publishadapter-from-PublishAdapter) | abstract class for `Adapter` Interface for publishing to data sinks.
-<br>new `Adapters` that allow for publishing to a sink via callback must inherit this class next to `Adapter`. |
-| [`ReadAdapter`](#readadapter-from-ReadAdapter) | abstract class for Adapter Interface for reading from data sources
-     |
-| [`SubscribeAdapter`](#subscribeadapter-from-SubscribeAdapter) | abstract class for Adapter Interface for subscribing from data sources
-     |
-| [`WriteAdapter`](#writeadapter-from-WriteAdapter) | abstract class for Adapter Interface for writing to data sinks
-     |
+| [`PublishAdapter`](#publishadapter-from-PublishAdapter) | abstract class for `Adapter` Interface for publishing to data sinks.<br>new `Adapters` that allow for publishing to a sink via callback must inherit this class next to `Adapter`. |
+| [`ReadAdapter`](#readadapter-from-ReadAdapter) | abstract class for Adapter Interface for reading from data sources     |
+| [`SubscribeAdapter`](#subscribeadapter-from-SubscribeAdapter) | abstract class for Adapter Interface for subscribing from data sources     |
+| [`WriteAdapter`](#writeadapter-from-WriteAdapter) | abstract class for Adapter Interface for writing to data sinks     |
 | [`AdsAdapter`](#adsadapter-from-ads\AdsAdapter) |  |
 | [`AudioAdapter`](#audioadapter-from-audio\AudioAdapter) |  |
 | [`CsvReadAdapter`](#csvreadadapter-from-csv\CsvReadAdapter) |  |
 | [`CsvWriteAdapter`](#csvwriteadapter-from-csv\CsvWriteAdapter) |  |
-| [`HttpAdapter`](#httpadapter-from-http\HttpAdapter) | Adapter for reading and writing data from/to http endpoints
-     |
-| [`InfluxDbAdapter`](#influxdbadapter-from-influxdb\InfluxDbAdapter) | InfluxAdapter is a specialized adapter for reading from and writing to InfluxDB.
-It inherits from ReadAdapter and WriteAdapter to provide both functionalities. |
+| [`HttpAdapter`](#httpadapter-from-http\HttpAdapter) | Adapter for reading and writing data from/to http endpoints     |
+| [`InfluxDbAdapter`](#influxdbadapter-from-influxdb\InfluxDbAdapter) | InfluxAdapter is a specialized adapter for reading from and writing to InfluxDB.It inherits from ReadAdapter and WriteAdapter to provide both functionalities. |
 | [`MQTTAdapter`](#mqttadapter-from-mqtt\MQTTAdapter) |  |
 | [`OpcUaAdapter`](#opcuaadapter-from-opcua\OpcUaAdapter) |  |
-| [`S7Adapter`](#s7adapter-from-s7\S7Adapter) | S7Adapter is a specialized adapter for reading from and writing to S7 PLCs.
-It inherits from ReadAdapter and WriteAdapter to provide both functionalities. |
+| [`S7Adapter`](#s7adapter-from-s7\S7Adapter) | S7Adapter is a specialized adapter for reading from and writing to S7 PLCs.It inherits from ReadAdapter and WriteAdapter to provide both functionalities. |
 | [`ByteStreamAdapter`](#bytestreamadapter-from-socket\ByteStreamAdapter) |  |
 | [`WebSocketAdapter`](#websocketadapter-from-socket\WebSocketAdapter) |  |
 | [`SQLAdapter`](#sqladapter-from-sql\SQLAdapter) |  |

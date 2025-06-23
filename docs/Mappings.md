@@ -5,8 +5,7 @@
 | Class | Description |
 |-------|-------------|
 | [`Mapping`](#mapping-from-Mapping) |      |
-| [`MappingObserver`](#mappingobserver-from-MappingObserver) | abstract base class for mapping observers
-     |
+| [`MappingObserver`](#mappingobserver-from-MappingObserver) | abstract base class for mapping observers     |
 | [`MappingThread`](#mappingthread-from-MappingThread) |  |
 | [`Observer`](#observer-from-Observer) |  |
 | [`ObserverThread`](#observerthread-from-ObserverThread) |  |

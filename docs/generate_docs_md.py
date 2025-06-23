@@ -174,7 +174,7 @@ def generate_readme(class_data: List[Dict], output_file: Path, name : str):
 
     for cls in sorted(class_data, key=lambda x: str(x["file"])):
         anchor = f"{cls['name'].lower()}-from-{str(cls['file']).replace('/', '').replace('.py', '')}"
-        docstring = cls["docstring"] if cls["docstring"] else ""
+        docstring = cls["docstring"].replace("\n", "") if cls["docstring"] else ""
         lines.append(f"| [`{cls['name']}`](#{anchor}) | {docstring} |")
     lines.append("\n\n")
     

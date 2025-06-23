@@ -5,29 +5,19 @@
 | Class | Description |
 |-------|-------------|
 | [`Action`](#action-from-Action) |  |
-| [`AdapterNode`](#adapternode-from-AdapterNode) | AdapterNode is a specialized BufferNode that integrates an adapter for data processing.
-It inherits from BufferNode to manage buffers and provides methods to interact with the adapter. |
+| [`AdapterNode`](#adapternode-from-AdapterNode) | AdapterNode is a specialized BufferNode that integrates an adapter for data processing.It inherits from BufferNode to manage buffers and provides methods to interact with the adapter. |
 | [`BufferNode`](#buffernode-from-BufferNode) |  |
 | [`GrabberNode`](#grabbernode-from-GrabberNode) |  |
 | [`JoinTransition`](#jointransition-from-JoinTransition) |  |
 | [`MappingNode`](#mappingnode-from-MappingNode) |  |
 | [`Node`](#node-from-Node) |  |
-| [`ServiceNode`](#servicenode-from-ServiceNode) | A class representing a service node in a state machine.
-Inherits from Node and adds functionality specific to service nodes. |
+| [`ServiceNode`](#servicenode-from-ServiceNode) | A class representing a service node in a state machine.Inherits from Node and adds functionality specific to service nodes. |
 | [`Transition`](#transition-from-Transition) |  |
 | [`AdapterReadAction`](#adapterreadaction-from-actions\AdapterReadAction) | Action to read data from an adapter. |
 | [`AdapterWriteAction`](#adapterwriteaction-from-actions\AdapterWriteAction) | Action to write data with an adapter. |
 | [`AddBufferAction`](#addbufferaction-from-actions\AddBufferAction) | Action to add a buffer to the grabber node. |
 | [`BrowserAutomationAction`](#browserautomationaction-from-actions\BrowserAutomationAction) |  |
-| [`ConfigureElementAction`](#configureelementaction-from-actions\ConfigureElementAction) | this `Action` configures a `GrabberElement` property by the provided `element_id` and name of the `option`, which is the class' property
-<br>the new property value is derived from the `Node`'s `buffer`
-
-Args:
-    GrabberNode (_type_): inherits from class GrabberNode
-    BufferNode (_type_): inherits from class BufferNode
-
-Raises:
-    StatemachineException: if an error occurs during execute |
+| [`ConfigureElementAction`](#configureelementaction-from-actions\ConfigureElementAction) | this `Action` configures a `GrabberElement` property by the provided `element_id` and name of the `option`, which is the class' property<br>the new property value is derived from the `Node`'s `buffer`Args:    GrabberNode (_type_): inherits from class GrabberNode    BufferNode (_type_): inherits from class BufferNodeRaises:    StatemachineException: if an error occurs during execute |
 | [`CopyFilesAction`](#copyfilesaction-from-actions\CopyFilesAction) |  |
 | [`ListFilesAction`](#listfilesaction-from-actions\ListFilesAction) |  |
 | [`MailAction`](#mailaction-from-actions\MailAction) |  |
@@ -39,13 +29,10 @@ Raises:
 | [`StartAction`](#startaction-from-actions\StartAction) | An action that starts the state machine. |
 | [`StopAction`](#stopaction-from-actions\StopAction) | An action that stops the state machine. |
 | [`UrlNavigateAction`](#urlnavigateaction-from-actions\UrlNavigateAction) |  |
-| [`BufferInRangeTransition`](#bufferinrangetransition-from-transitions\BufferInRangeTransition) | A transition that compares the current buffer with a target value.
-If the buffer matches the target, the transition is successful. |
-| [`CompareBufferTransition`](#comparebuffertransition-from-transitions\CompareBufferTransition) | A transition that compares the current buffer with a target value.
-If the buffer matches the target, the transition is successful. |
+| [`BufferInRangeTransition`](#bufferinrangetransition-from-transitions\BufferInRangeTransition) | A transition that compares the current buffer with a target value.If the buffer matches the target, the transition is successful. |
+| [`CompareBufferTransition`](#comparebuffertransition-from-transitions\CompareBufferTransition) | A transition that compares the current buffer with a target value.If the buffer matches the target, the transition is successful. |
 | [`FalseTransition`](#falsetransition-from-transitions\FalseTransition) | A transition that always returns False. |
-| [`TrueTransition`](#truetransition-from-transitions\TrueTransition) | A transition that always returns True.
-This is used to test the statemachine without any conditions. |
+| [`TrueTransition`](#truetransition-from-transitions\TrueTransition) | A transition that always returns True.This is used to test the statemachine without any conditions. |
 
 
 
