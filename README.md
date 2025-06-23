@@ -25,11 +25,29 @@ The `Grabber` application follows a strict lifecycle, when being initialized and
 
 ### Adapter
 an overview of all available adapters and their usage is given [here](docs/Adapters.md)
-All `Adapter`'s adhere to the same composition of interfaces and their methods.
+<br>All `Adapter`'s adhere to the same composition of interfaces and their methods.
 Every `Adapter` is initialized, installed, connected/disconnected and then depending on source or sink interaction: reads/subscribes from sources or writes/publishes to sinks.
-It is paramount, that `Adapter` methods are always used in the right order. Within a `Grabber` application, this is made sure by design, but when used outside, it must be taken care of by the developer.
-Here is an example workflow for the usage of an `Adapter`:
+<br>It is paramount, that `Adapter` methods are always used in the right order. Within a `Grabber` application, this is made sure by design, but when used outside, it must be taken care of by the developer.
+<br>Here is an example workflow for the usage of an `Adapter`:
 ```python
+adapter = CSVReadAdapter(
+    id = "CSV1",
+    file_path="path/to/file.txt",
+    delimiter=';',
+    has_header=True,
+    auto_detect=True,
+    force_numeric=True
+)
+
+adapter.install()
+
+adapter.connect()
+
+adapter.read_from_source()
+
+adapter.disconnect()
+
+adapter.deinstall()
 
 ```
 
