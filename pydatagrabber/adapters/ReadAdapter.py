@@ -3,7 +3,8 @@ from .Adapter import Adapter
 from ..buffers.Buffer import Buffer
 
 class ReadAdapter(Adapter):
-    """abstract class for Adapter Interface for reading from data sources
+    """abstract class for `Adapter` Interface for reading from data sources.
+       <br>new `Adapters` that allow for reading from a source via one-shot polling must inherit this class next to `Adapter`.
     """
     
     @abstractmethod

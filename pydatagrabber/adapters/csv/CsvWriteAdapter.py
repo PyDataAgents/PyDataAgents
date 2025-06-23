@@ -10,6 +10,8 @@ from ...utils.TimeUtils import TimeUtils
 
 @dataclass
 class CsvWriteAdapter(WriteAdapter):
+    """`Adapter` for writing data to CSV files.
+    """
     
     folder : str = field(default=None, metadata={"description": "folder to save the csv files to"})
     file_post_fix : str = field(default=None, metadata={"description": "postfix to use with every file"})

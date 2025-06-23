@@ -10,7 +10,7 @@ from ...utils.AdapterUtils import AdapterUtils
 
 @dataclass
 class HttpAdapter(ReadAdapter, WriteAdapter):
-    """Adapter for reading and writing data from/to http endpoints
+    """`Adapter` for reading and writing data from/to http endpoints
     """
     
     base_url : str = field(default=None, metadata={"description": "base URL for the HTTP requests, e.g. http://localhost:8080/api"})

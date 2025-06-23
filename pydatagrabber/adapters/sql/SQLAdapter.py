@@ -10,6 +10,9 @@ from ...adapters.WriteAdapter import WriteAdapter
 
 @dataclass
 class SQLAdapter(ReadAdapter, WriteAdapter):
+    """`Adapter` for reading and writing data from/to SQL databases using pyodbc.
+        <br>Required ODBC driver must be installed for the specific SQL database (e.g. MySQL, PostgreSQL, SQLite, etc.) and sytem
+    """
 
     connection_str : str = field(default=None, metadata={"description": "connection string for the specific SQL database"})
 

@@ -4,6 +4,7 @@ from ..buffers.Buffer import Buffer
 
 class WriteAdapter(Adapter):
     """abstract class for Adapter Interface for writing to data sinks
+       <br>new `Adapters` that allow for writing to a sink via one-shot polling must inherit this class next to `Adapter`.
     """
     
     @abstractmethod

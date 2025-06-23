@@ -1,7 +1,7 @@
+from dataclasses import dataclass, field
 import influxdb_client
 from influxdb_client.client.write_api import SYNCHRONOUS
 
-from dataclasses import dataclass, field
 from ...adapters.AdapterException import AdapterException
 from ...adapters.ReadAdapter import ReadAdapter
 from ...adapters.WriteAdapter import WriteAdapter
@@ -13,9 +13,7 @@ from ...utils.AdapterUtils import AdapterUtils
 
 @dataclass
 class InfluxDbAdapter(ReadAdapter, WriteAdapter):
-    """
-    InfluxAdapter is a specialized adapter for reading from and writing to InfluxDB.
-    It inherits from ReadAdapter and WriteAdapter to provide both functionalities.
+    """`Adapter` thats reads or writes to InfluxDB.
     """
     
     endpoint : str = field(default="http://localhost:8086", metadata={"description": "The endpoint URL for the InfluxDB instance."})

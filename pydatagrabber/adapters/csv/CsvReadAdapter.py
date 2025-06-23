@@ -9,6 +9,8 @@ from ...utils.DataUtils import DataUtils
 
 @dataclass
 class CsvReadAdapter(ReadAdapter):
+    """`Adapter` for reading data from CSV files.
+    """
     
     file_path : str = field(default=None, metadata={"description": "path to the csv file to read"})
     all_at_once : bool = field(default=True, metadata={"description": "read all data at once"})

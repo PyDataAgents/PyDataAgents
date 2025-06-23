@@ -8,6 +8,8 @@ from ...buffers.Buffer import Buffer
 
 @dataclass
 class AdsAdapter(ReadAdapter, WriteAdapter):
+    """`Adapter` for reading and writing data from/to Beckhoff TwinCAT PLCs via ADS (Automation Device Specification).
+    """
     
     ams_net_id : str = field(default=None, metadata = {"description": "AMS Net Id to connect to for ADS Connection"})
     twincat : int = field(default=3, metadata = {"description": "Twincat version to use, e.g. 2 or 3 for TwinCAT 2/3"})

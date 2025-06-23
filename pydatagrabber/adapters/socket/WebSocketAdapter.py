@@ -10,6 +10,8 @@ from ..WriteAdapter import WriteAdapter
 
 @dataclass
 class WebSocketAdapter(WriteAdapter, SubscribeAdapter):
+    """`Adapter` for subscribing and writing data from/to WebSocket endpoints.
+    """
     
     url : str = field(default=None, metadata={"description":"socket url, e.g. wss://localhost:10001"})
     

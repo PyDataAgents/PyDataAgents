@@ -6,21 +6,21 @@
 |-------|-------------|
 | [`Adapter`](#adapter-from-Adapter) | Abstract base class for `Adapters`. All `Adapters` must inherit from this class. |
 | [`PublishAdapter`](#publishadapter-from-PublishAdapter) | abstract class for `Adapter` Interface for publishing to data sinks.<br>new `Adapters` that allow for publishing to a sink via callback must inherit this class next to `Adapter`. |
-| [`ReadAdapter`](#readadapter-from-ReadAdapter) | abstract class for Adapter Interface for reading from data sources     |
-| [`SubscribeAdapter`](#subscribeadapter-from-SubscribeAdapter) | abstract class for Adapter Interface for subscribing from data sources     |
-| [`WriteAdapter`](#writeadapter-from-WriteAdapter) | abstract class for Adapter Interface for writing to data sinks     |
-| [`AdsAdapter`](#adsadapter-from-ads\AdsAdapter) |  |
-| [`AudioAdapter`](#audioadapter-from-audio\AudioAdapter) |  |
-| [`CsvReadAdapter`](#csvreadadapter-from-csv\CsvReadAdapter) |  |
-| [`CsvWriteAdapter`](#csvwriteadapter-from-csv\CsvWriteAdapter) |  |
-| [`HttpAdapter`](#httpadapter-from-http\HttpAdapter) | Adapter for reading and writing data from/to http endpoints     |
-| [`InfluxDbAdapter`](#influxdbadapter-from-influxdb\InfluxDbAdapter) | InfluxAdapter is a specialized adapter for reading from and writing to InfluxDB.It inherits from ReadAdapter and WriteAdapter to provide both functionalities. |
-| [`MQTTAdapter`](#mqttadapter-from-mqtt\MQTTAdapter) |  |
-| [`OpcUaAdapter`](#opcuaadapter-from-opcua\OpcUaAdapter) |  |
-| [`S7Adapter`](#s7adapter-from-s7\S7Adapter) | S7Adapter is a specialized adapter for reading from and writing to S7 PLCs.It inherits from ReadAdapter and WriteAdapter to provide both functionalities. |
+| [`ReadAdapter`](#readadapter-from-ReadAdapter) | abstract class for `Adapter` Interface for reading from data sources.<br>new `Adapters` that allow for reading from a source via one-shot polling must inherit this class next to `Adapter`. |
+| [`SubscribeAdapter`](#subscribeadapter-from-SubscribeAdapter) | abstract class for `Adapter` Interface for subscribing from data sources<br>new `Adapters` that allow for subscribing to a source via callback must inherit this class next to `Adapter`. |
+| [`WriteAdapter`](#writeadapter-from-WriteAdapter) | abstract class for Adapter Interface for writing to data sinks<br>new `Adapters` that allow for writing to a sink via one-shot polling must inherit this class next to `Adapter`. |
+| [`AdsAdapter`](#adsadapter-from-ads\AdsAdapter) | `Adapter` for reading and writing data from/to Beckhoff TwinCAT PLCs via ADS (Automation Device Specification).     |
+| [`AudioAdapter`](#audioadapter-from-audio\AudioAdapter) | `Adapter` for subscribing to a system's audio input channels (e.g. from a USB microphone) using the `sounddevice` library.     |
+| [`CsvReadAdapter`](#csvreadadapter-from-csv\CsvReadAdapter) | `Adapter` for reading data from CSV files.     |
+| [`CsvWriteAdapter`](#csvwriteadapter-from-csv\CsvWriteAdapter) | `Adapter` for writing data to CSV files.     |
+| [`HttpAdapter`](#httpadapter-from-http\HttpAdapter) | `Adapter` for reading and writing data from/to http endpoints     |
+| [`InfluxDbAdapter`](#influxdbadapter-from-influxdb\InfluxDbAdapter) | `Adapter` thats reads or writes to InfluxDB.     |
+| [`MQTTAdapter`](#mqttadapter-from-mqtt\MQTTAdapter) | `Adapter` for subscribing or writing data from/to MQTT topics.     |
+| [`OpcUaAdapter`](#opcuaadapter-from-opcua\OpcUaAdapter) | `Adapter` for reading and writing data from/to OPC UA servers.     |
+| [`S7Adapter`](#s7adapter-from-s7\S7Adapter) | `Adapter`reading from and writing to S7 PLCs.     |
 | [`ByteStreamAdapter`](#bytestreamadapter-from-socket\ByteStreamAdapter) |  |
-| [`WebSocketAdapter`](#websocketadapter-from-socket\WebSocketAdapter) |  |
-| [`SQLAdapter`](#sqladapter-from-sql\SQLAdapter) |  |
+| [`WebSocketAdapter`](#websocketadapter-from-socket\WebSocketAdapter) | `Adapter` for subscribing and writing data from/to WebSocket endpoints.     |
+| [`SQLAdapter`](#sqladapter-from-sql\SQLAdapter) | `Adapter` for reading and writing data from/to SQL databases using pyodbc.<br>Required ODBC driver must be installed for the specific SQL database (e.g. MySQL, PostgreSQL, SQLite, etc.) and sytem |
 
 
 
@@ -65,8 +65,8 @@ obj = PublishAdapter(
 
 ## `ReadAdapter` (from `ReadAdapter.py`)
 
-abstract class for Adapter Interface for reading from data sources
-    
+abstract class for `Adapter` Interface for reading from data sources.
+<br>new `Adapters` that allow for reading from a source via one-shot polling must inherit this class next to `Adapter`.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `id` | `str` | `` | unique identifier of element in DataGrabber application |
@@ -85,8 +85,8 @@ obj = ReadAdapter(
 
 ## `SubscribeAdapter` (from `SubscribeAdapter.py`)
 
-abstract class for Adapter Interface for subscribing from data sources
-    
+abstract class for `Adapter` Interface for subscribing from data sources
+<br>new `Adapters` that allow for subscribing to a source via callback must inherit this class next to `Adapter`.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `id` | `str` | `` | unique identifier of element in DataGrabber application |
@@ -106,7 +106,7 @@ obj = SubscribeAdapter(
 ## `WriteAdapter` (from `WriteAdapter.py`)
 
 abstract class for Adapter Interface for writing to data sinks
-    
+<br>new `Adapters` that allow for writing to a sink via one-shot polling must inherit this class next to `Adapter`.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `id` | `str` | `` | unique identifier of element in DataGrabber application |
@@ -125,6 +125,8 @@ obj = WriteAdapter(
 
 ## `AdsAdapter` (from `ads\AdsAdapter.py`)
 
+`Adapter` for reading and writing data from/to Beckhoff TwinCAT PLCs via ADS (Automation Device Specification).
+    
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `id` | `str` | `` | unique identifier of element in DataGrabber application |
@@ -147,6 +149,8 @@ obj = AdsAdapter(
 
 ## `AudioAdapter` (from `audio\AudioAdapter.py`)
 
+`Adapter` for subscribing to a system's audio input channels (e.g. from a USB microphone) using the `sounddevice` library.
+    
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `id` | `str` | `` | unique identifier of element in DataGrabber application |
@@ -169,6 +173,8 @@ obj = AudioAdapter(
 
 ## `CsvReadAdapter` (from `csv\CsvReadAdapter.py`)
 
+`Adapter` for reading data from CSV files.
+    
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `id` | `str` | `` | unique identifier of element in DataGrabber application |
@@ -199,6 +205,8 @@ obj = CsvReadAdapter(
 
 ## `CsvWriteAdapter` (from `csv\CsvWriteAdapter.py`)
 
+`Adapter` for writing data to CSV files.
+    
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `id` | `str` | `` | unique identifier of element in DataGrabber application |
@@ -231,7 +239,7 @@ obj = CsvWriteAdapter(
 
 ## `HttpAdapter` (from `http\HttpAdapter.py`)
 
-Adapter for reading and writing data from/to http endpoints
+`Adapter` for reading and writing data from/to http endpoints
     
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
@@ -257,8 +265,8 @@ obj = HttpAdapter(
 
 ## `InfluxDbAdapter` (from `influxdb\InfluxDbAdapter.py`)
 
-InfluxAdapter is a specialized adapter for reading from and writing to InfluxDB.
-It inherits from ReadAdapter and WriteAdapter to provide both functionalities.
+`Adapter` thats reads or writes to InfluxDB.
+    
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `id` | `str` | `` | unique identifier of element in DataGrabber application |
@@ -283,6 +291,8 @@ obj = InfluxDbAdapter(
 
 ## `MQTTAdapter` (from `mqtt\MQTTAdapter.py`)
 
+`Adapter` for subscribing or writing data from/to MQTT topics.
+    
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `id` | `str` | `` | unique identifier of element in DataGrabber application |
@@ -313,6 +323,8 @@ obj = MQTTAdapter(
 
 ## `OpcUaAdapter` (from `opcua\OpcUaAdapter.py`)
 
+`Adapter` for reading and writing data from/to OPC UA servers.
+    
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `id` | `str` | `` | unique identifier of element in DataGrabber application |
@@ -333,8 +345,8 @@ obj = OpcUaAdapter(
 
 ## `S7Adapter` (from `s7\S7Adapter.py`)
 
-S7Adapter is a specialized adapter for reading from and writing to S7 PLCs.
-It inherits from ReadAdapter and WriteAdapter to provide both functionalities.
+`Adapter`reading from and writing to S7 PLCs.
+    
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `id` | `str` | `` | unique identifier of element in DataGrabber application |
@@ -377,6 +389,8 @@ obj = ByteStreamAdapter(
 
 ## `WebSocketAdapter` (from `socket\WebSocketAdapter.py`)
 
+`Adapter` for subscribing and writing data from/to WebSocket endpoints.
+    
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `id` | `str` | `` | unique identifier of element in DataGrabber application |
@@ -397,6 +411,8 @@ obj = WebSocketAdapter(
 
 ## `SQLAdapter` (from `sql\SQLAdapter.py`)
 
+`Adapter` for reading and writing data from/to SQL databases using pyodbc.
+<br>Required ODBC driver must be installed for the specific SQL database (e.g. MySQL, PostgreSQL, SQLite, etc.) and sytem
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `id` | `str` | `` | unique identifier of element in DataGrabber application |

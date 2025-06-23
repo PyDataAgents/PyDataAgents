@@ -7,6 +7,8 @@ from ...buffers.Buffer import Buffer
 
 @dataclass
 class OpcUaAdapter(ReadAdapter, WriteAdapter):
+    """`Adapter` for reading and writing data from/to OPC UA servers.
+    """
     
     endpoint : str = field(default=None, metadata={"description" : "endpoint of the opc ua server, e.g. opc.tcp://localhost:48010"})
     

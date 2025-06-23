@@ -10,9 +10,7 @@ from ...utils.AdapterUtils import AdapterUtils
 
 @dataclass
 class S7Adapter(ReadAdapter, WriteAdapter):
-    """
-    S7Adapter is a specialized adapter for reading from and writing to S7 PLCs.
-    It inherits from ReadAdapter and WriteAdapter to provide both functionalities.
+    """`Adapter`reading from and writing to S7 PLCs.
     """
 
     host : str = field(default="127.0.0.1", metadata={"description": "The IP address or hostname of the S7 PLC."})

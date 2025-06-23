@@ -10,6 +10,8 @@ ROOT_TOPIC = "#"
 
 @dataclass
 class MQTTAdapter(SubscribeAdapter, WriteAdapter):
+    """`Adapter` for subscribing or writing data from/to MQTT topics.
+    """
     
     endpoint : str = field(default=None, metadata={"description": "endpoint of the MQTT broker, e.g. test.mosquitto.org (public test broker)"})
     port : int = field(default=1883, metadata={"description": "port of the mqtt broker"})

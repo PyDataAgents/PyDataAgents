@@ -3,7 +3,8 @@ from .Adapter import Adapter
 from ..buffers.Buffer import Buffer
 
 class SubscribeAdapter(Adapter):
-    """abstract class for Adapter Interface for subscribing from data sources
+    """abstract class for `Adapter` Interface for subscribing from data sources
+       <br>new `Adapters` that allow for subscribing to a source via callback must inherit this class next to `Adapter`.
     """
     
     @abstractmethod
