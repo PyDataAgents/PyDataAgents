@@ -20,9 +20,18 @@ the core element of the framework is a [(data)grabber](pydatagrabber/grabbers/Gr
 <br>each [GrabberElement](pydatagrabber/grabbers/GrabberElement.py) is dedicated for a special task within the datagrabber framework
 <br>these tasks are highlighted below
 ### Grabber
+In order to create a `Grabber` application, you create a `Grabber` object with one or more of the elements described in the following sections.
+The `Grabber` application follows a strict lifecycle, when being initialized and started.
 
 ### Adapter
 an overview of all available adapters and their usage is given [here](docs/Adapters.md)
+All `Adapter`'s adhere to the same composition of interfaces and their methods.
+Every `Adapter` is initialized, installed, connected/disconnected and then depending on source or sink interaction: reads/subscribes from sources or writes/publishes to sinks.
+It is paramount, that `Adapter` methods are always used in the right order. Within a `Grabber` application, this is made sure by design, but when used outside, it must be taken care of by the developer.
+Here is an example workflow for the usage of an `Adapter`:
+```python
+
+```
 
 ### Buffer
 an overview of all available buffers and their usage is given [here](docs/Buffers.md)
