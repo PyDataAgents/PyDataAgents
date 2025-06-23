@@ -2,13 +2,8 @@ import ast
 from pathlib import Path
 from typing import List, Dict, Set
 
-from pydatagrabber.adapters.Adapter import Adapter
-from pydatagrabber.buffers import Buffer
-from pydatagrabber.grabbers.Grabber import Grabber
 from pydatagrabber.grabbers.GrabberElement import GrabberElement
-from pydatagrabber.mappings import Mapping
-from pydatagrabber.services.Service import Service
-from pydatagrabber.statemachine.Node import Node
+from pydatagrabber.utils.ClassUtils import ClassUtils
 from pydatagrabber.utils.TimeUtils import TimeUtils
 
 
@@ -101,8 +96,18 @@ def get_all_fields(cls_name: str, seen: Set[str] = None) -> List[Dict]:
 def extract_fields(class_def: ast.ClassDef) -> List[Dict]:
     fields = []
     
+    # always retrieve GrabberElement fields
+    ge_fields = ClassUtils.get_dataclass_fields(GrabberElement)
+    for ge_field in ge_fields:
+        fields.append({
+            "name": ge_field.name,
+            "type": ge_field.type if ge_field.type else None,
+            "description": ge_field.metadata.get("description", ""),
+            "default": repr(ge_field.default) if ge_field.default is not None else ""
+        })
+    
     # remove type field
-    fields = [f for f in fields if f['name'] != 'type']        
+    fields = [f for f in fields if f['name'] != 'type']
     
     for stmt in class_def.body:
         if isinstance(stmt, ast.AnnAssign) and isinstance(stmt.target, ast.Name):
@@ -169,7 +174,7 @@ def generate_readme(class_data: List[Dict], output_file: Path, name : str):
 
     for cls in sorted(class_data, key=lambda x: str(x["file"])):
         anchor = f"{cls['name'].lower()}-from-{str(cls['file']).replace('/', '').replace('.py', '')}"
-        docstring = cls["docstring"].strip().split("\n")[0] if cls["docstring"] else ""
+        docstring = cls["docstring"] if cls["docstring"] else ""
         lines.append(f"| [`{cls['name']}`](#{anchor}) | {docstring} |")
     lines.append("\n\n")
     

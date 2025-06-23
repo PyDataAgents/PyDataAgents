@@ -5,13 +5,21 @@
 | Class | Description |
 |-------|-------------|
 | [`BrowserAutomationService`](#browserautomationservice-from-BrowserAutomationService) |  |
-| [`LLMService`](#llmservice-from-LLMService) | LLM Service for chat based LLM interaction |
+| [`LLMService`](#llmservice-from-LLMService) | LLM Service for chat based LLM interaction
+
+     |
 | [`PlotService`](#plotservice-from-PlotService) |  |
-| [`RAGService`](#ragservice-from-RAGService) | Retrieval Augmented Generation (RAG) Service for document based LLM knowledge retrieval in chat form |
-| [`Service`](#service-from-Service) | abstract base class for Grabber Services |
-| [`ExcelRestService`](#excelrestservice-from-rest\ExcelRestService) | Service for creating a REST API for accessing named Tables in Excel |
-| [`LLMRestService`](#llmrestservice-from-rest\LLMRestService) | Service for creating a REST API for accessing LLM Models |
-| [`RestService`](#restservice-from-rest\RestService) | Service for creating a REST API for DataGrabber using FastAPI |
+| [`RAGService`](#ragservice-from-RAGService) | Retrieval Augmented Generation (RAG) Service for document based LLM knowledge retrieval in chat form
+
+     |
+| [`Service`](#service-from-Service) | abstract base class for Grabber Services
+     |
+| [`ExcelRestService`](#excelrestservice-from-rest\ExcelRestService) | Service for creating a REST API for accessing named Tables in Excel
+     |
+| [`LLMRestService`](#llmrestservice-from-rest\LLMRestService) | Service for creating a REST API for accessing LLM Models
+     |
+| [`RestService`](#restservice-from-rest\RestService) | Service for creating a REST API for DataGrabber using FastAPI
+     |
 
 
 
@@ -19,6 +27,8 @@
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
+| `id` | `str` | `` | unique identifier of element in DataGrabber application |
+| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
 | `browser_type` | `str` | `'EDGE'` | type of browser, EDGE | FIREFOX | CHROME |
 
 
@@ -27,6 +37,8 @@
 from pydatagrabber import BrowserAutomationService  # Adjust import if needed
 
 obj = BrowserAutomationService(
+    id="<string>",
+    load_on_install=False,
     browser_type='EDGE'
 )
 ```
@@ -38,6 +50,8 @@ LLM Service for chat based LLM interaction
     
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
+| `id` | `str` | `` | unique identifier of element in DataGrabber application |
+| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
 | `api_key` | `str` | `` | api token for a web based model provider, e.g. OPENAI |
 | `endpoint` | `str` | `` | endpoint of the LLM provider |
 | `model_provider` | `str` | `` | name of the model provider, e.g. OPENAI | OLLAMA | ... |
@@ -50,6 +64,8 @@ LLM Service for chat based LLM interaction
 from pydatagrabber import LLMService  # Adjust import if needed
 
 obj = LLMService(
+    id="<string>",
+    load_on_install=False,
     api_key="<string>",
     endpoint="<string>",
     model_provider="<string>",
@@ -60,7 +76,21 @@ obj = LLMService(
 
 ## `PlotService` (from `PlotService.py`)
 
-_No fields defined._
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `id` | `str` | `` | unique identifier of element in DataGrabber application |
+| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+
+
+```python
+# Example usage of `PlotService`
+from pydatagrabber import PlotService  # Adjust import if needed
+
+obj = PlotService(
+    id="<string>",
+    load_on_install=False
+)
+```
 
 ## `RAGService` (from `RAGService.py`)
 
@@ -69,6 +99,8 @@ Retrieval Augmented Generation (RAG) Service for document based LLM knowledge re
     
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
+| `id` | `str` | `` | unique identifier of element in DataGrabber application |
+| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
 | `api_key` | `str` | `` | api token for a web based model provider, e.g. OPENAI |
 | `endpoint` | `str` | `` | endpoint of the LLM provider |
 | `model_provider` | `str` | `` | name of the model provider, e.g. OPENAI | OLLAMA | ... |
@@ -85,6 +117,8 @@ Retrieval Augmented Generation (RAG) Service for document based LLM knowledge re
 from pydatagrabber import RAGService  # Adjust import if needed
 
 obj = RAGService(
+    id="<string>",
+    load_on_install=False,
     api_key="<string>",
     endpoint="<string>",
     model_provider="<string>",
@@ -101,7 +135,21 @@ obj = RAGService(
 
 abstract base class for Grabber Services
     
-_No fields defined._
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `id` | `str` | `` | unique identifier of element in DataGrabber application |
+| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+
+
+```python
+# Example usage of `Service`
+from pydatagrabber import Service  # Adjust import if needed
+
+obj = Service(
+    id="<string>",
+    load_on_install=False
+)
+```
 
 ## `ExcelRestService` (from `rest\ExcelRestService.py`)
 
@@ -110,6 +158,8 @@ Service for creating a REST API for accessing named Tables in Excel
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `port` | `int` | `8001` | port of the REST API endpoint |
+| `id` | `str` | `` | unique identifier of element in DataGrabber application |
+| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
 | `excel_file` | `str` | `` | path of the excel file to open for tables |
 
 
@@ -119,6 +169,8 @@ from pydatagrabber import ExcelRestService  # Adjust import if needed
 
 obj = ExcelRestService(
     port=8001,
+    id="<string>",
+    load_on_install=False,
     excel_file="path/to/file.txt"
 )
 ```
@@ -130,6 +182,8 @@ Service for creating a REST API for accessing LLM Models
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `port` | `int` | `8001` | port of the REST API endpoint |
+| `id` | `str` | `` | unique identifier of element in DataGrabber application |
+| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
 
 
 ```python
@@ -137,7 +191,9 @@ Service for creating a REST API for accessing LLM Models
 from pydatagrabber import LLMRestService  # Adjust import if needed
 
 obj = LLMRestService(
-    port=8001
+    port=8001,
+    id="<string>",
+    load_on_install=False
 )
 ```
 
@@ -147,6 +203,8 @@ Service for creating a REST API for DataGrabber using FastAPI
     
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
+| `id` | `str` | `` | unique identifier of element in DataGrabber application |
+| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
 | `port` | `int` | `8001` | port of the REST API endpoint |
 
 
@@ -155,6 +213,8 @@ Service for creating a REST API for DataGrabber using FastAPI
 from pydatagrabber import RestService  # Adjust import if needed
 
 obj = RestService(
+    id="<string>",
+    load_on_install=False,
     port=8001
 )
 ```

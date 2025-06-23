@@ -4,7 +4,7 @@ from ..grabbers.GrabberElement import GrabberElement
 
 class Adapter(GrabberElement):
     """
-    Abstract base class for data adapters.
+    Abstract base class for `Adapters`. All `Adapters` must inherit from this class.
     """
     
     @abstractmethod

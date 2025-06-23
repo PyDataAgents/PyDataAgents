@@ -3,7 +3,8 @@ from .Adapter import Adapter
 from ..buffers.Buffer import Buffer
 
 class PublishAdapter(Adapter):
-    """abstract class for Adapter Interface for publishing to data sinks
+    """abstract class for `Adapter` Interface for publishing to data sinks.
+       <br>new `Adapters` that allow for publishing to a sink via callback must inherit this class next to `Adapter`.
     """
     
     @abstractmethod

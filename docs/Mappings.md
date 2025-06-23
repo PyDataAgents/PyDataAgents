@@ -4,8 +4,9 @@
 
 | Class | Description |
 |-------|-------------|
-| [`Mapping`](#mapping-from-Mapping) |  |
-| [`MappingObserver`](#mappingobserver-from-MappingObserver) | abstract base class for mapping observers |
+| [`Mapping`](#mapping-from-Mapping) |      |
+| [`MappingObserver`](#mappingobserver-from-MappingObserver) | abstract base class for mapping observers
+     |
 | [`MappingThread`](#mappingthread-from-MappingThread) |  |
 | [`Observer`](#observer-from-Observer) |  |
 | [`ObserverThread`](#observerthread-from-ObserverThread) |  |
@@ -21,6 +22,8 @@
     
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
+| `id` | `str` | `` | unique identifier of element in DataGrabber application |
+| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
 | `buffer_ids` | `list[str]` | `` | list of buffer ids to map from |
 | `adapter_id` | `str` | `` | id of the Adapter used for this Mapping |
 | `addresses` | `list[str]` | `` | list of addresses to read/subscribe from or write/publish to |
@@ -37,6 +40,8 @@
 from pydatagrabber import Mapping  # Adjust import if needed
 
 obj = Mapping(
+    id="<string>",
+    load_on_install=False,
     buffer_ids="<string>",
     adapter_id="<string>",
     addresses="<string>",
@@ -53,20 +58,64 @@ obj = Mapping(
 
 abstract base class for mapping observers
     
-_No fields defined._
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `id` | `str` | `` | unique identifier of element in DataGrabber application |
+| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+
+
+```python
+# Example usage of `MappingObserver`
+from pydatagrabber import MappingObserver  # Adjust import if needed
+
+obj = MappingObserver(
+    id="<string>",
+    load_on_install=False
+)
+```
 
 ## `MappingThread` (from `MappingThread.py`)
 
-_No fields defined._
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `id` | `str` | `` | unique identifier of element in DataGrabber application |
+| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+
+
+```python
+# Example usage of `MappingThread`
+from pydatagrabber import MappingThread  # Adjust import if needed
+
+obj = MappingThread(
+    id="<string>",
+    load_on_install=False
+)
+```
 
 ## `Observer` (from `Observer.py`)
 
-_No fields defined._
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `id` | `str` | `` | unique identifier of element in DataGrabber application |
+| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+
+
+```python
+# Example usage of `Observer`
+from pydatagrabber import Observer  # Adjust import if needed
+
+obj = Observer(
+    id="<string>",
+    load_on_install=False
+)
+```
 
 ## `ObserverThread` (from `ObserverThread.py`)
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
+| `id` | `str` | `` | unique identifier of element in DataGrabber application |
+| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
 | `SAFETY_DIFF_TIME_UNITS` | `int` | `` |  |
 | `SLEEP_WITH_HOLD_FACTOR` | `float` | `` |  |
 
@@ -76,6 +125,8 @@ _No fields defined._
 from pydatagrabber import ObserverThread  # Adjust import if needed
 
 obj = ObserverThread(
+    id="<string>",
+    load_on_install=False,
     SAFETY_DIFF_TIME_UNITS=1,
     SLEEP_WITH_HOLD_FACTOR=3.14
 )
@@ -83,16 +134,72 @@ obj = ObserverThread(
 
 ## `PublishMappingObserver` (from `PublishMappingObserver.py`)
 
-_No fields defined._
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `id` | `str` | `` | unique identifier of element in DataGrabber application |
+| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+
+
+```python
+# Example usage of `PublishMappingObserver`
+from pydatagrabber import PublishMappingObserver  # Adjust import if needed
+
+obj = PublishMappingObserver(
+    id="<string>",
+    load_on_install=False
+)
+```
 
 ## `ReadMappingObserver` (from `ReadMappingObserver.py`)
 
-_No fields defined._
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `id` | `str` | `` | unique identifier of element in DataGrabber application |
+| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+
+
+```python
+# Example usage of `ReadMappingObserver`
+from pydatagrabber import ReadMappingObserver  # Adjust import if needed
+
+obj = ReadMappingObserver(
+    id="<string>",
+    load_on_install=False
+)
+```
 
 ## `SubscribeMappingObserver` (from `SubscribeMappingObserver.py`)
 
-_No fields defined._
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `id` | `str` | `` | unique identifier of element in DataGrabber application |
+| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+
+
+```python
+# Example usage of `SubscribeMappingObserver`
+from pydatagrabber import SubscribeMappingObserver  # Adjust import if needed
+
+obj = SubscribeMappingObserver(
+    id="<string>",
+    load_on_install=False
+)
+```
 
 ## `WriteMappingObserver` (from `WriteMappingObserver.py`)
 
-_No fields defined._
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `id` | `str` | `` | unique identifier of element in DataGrabber application |
+| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+
+
+```python
+# Example usage of `WriteMappingObserver`
+from pydatagrabber import WriteMappingObserver  # Adjust import if needed
+
+obj = WriteMappingObserver(
+    id="<string>",
+    load_on_install=False
+)
+```

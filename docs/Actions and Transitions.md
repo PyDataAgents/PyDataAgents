@@ -5,19 +5,29 @@
 | Class | Description |
 |-------|-------------|
 | [`Action`](#action-from-Action) |  |
-| [`AdapterNode`](#adapternode-from-AdapterNode) | AdapterNode is a specialized BufferNode that integrates an adapter for data processing. |
+| [`AdapterNode`](#adapternode-from-AdapterNode) | AdapterNode is a specialized BufferNode that integrates an adapter for data processing.
+It inherits from BufferNode to manage buffers and provides methods to interact with the adapter. |
 | [`BufferNode`](#buffernode-from-BufferNode) |  |
 | [`GrabberNode`](#grabbernode-from-GrabberNode) |  |
 | [`JoinTransition`](#jointransition-from-JoinTransition) |  |
 | [`MappingNode`](#mappingnode-from-MappingNode) |  |
 | [`Node`](#node-from-Node) |  |
-| [`ServiceNode`](#servicenode-from-ServiceNode) | A class representing a service node in a state machine. |
+| [`ServiceNode`](#servicenode-from-ServiceNode) | A class representing a service node in a state machine.
+Inherits from Node and adds functionality specific to service nodes. |
 | [`Transition`](#transition-from-Transition) |  |
 | [`AdapterReadAction`](#adapterreadaction-from-actions\AdapterReadAction) | Action to read data from an adapter. |
 | [`AdapterWriteAction`](#adapterwriteaction-from-actions\AdapterWriteAction) | Action to write data with an adapter. |
 | [`AddBufferAction`](#addbufferaction-from-actions\AddBufferAction) | Action to add a buffer to the grabber node. |
 | [`BrowserAutomationAction`](#browserautomationaction-from-actions\BrowserAutomationAction) |  |
-| [`ConfigureElementAction`](#configureelementaction-from-actions\ConfigureElementAction) | this `Action` configures a `GrabberElement` property by the provided `element_id` and name of the `option`, which is the class' property |
+| [`ConfigureElementAction`](#configureelementaction-from-actions\ConfigureElementAction) | this `Action` configures a `GrabberElement` property by the provided `element_id` and name of the `option`, which is the class' property
+<br>the new property value is derived from the `Node`'s `buffer`
+
+Args:
+    GrabberNode (_type_): inherits from class GrabberNode
+    BufferNode (_type_): inherits from class BufferNode
+
+Raises:
+    StatemachineException: if an error occurs during execute |
 | [`CopyFilesAction`](#copyfilesaction-from-actions\CopyFilesAction) |  |
 | [`ListFilesAction`](#listfilesaction-from-actions\ListFilesAction) |  |
 | [`MailAction`](#mailaction-from-actions\MailAction) |  |
@@ -29,10 +39,13 @@
 | [`StartAction`](#startaction-from-actions\StartAction) | An action that starts the state machine. |
 | [`StopAction`](#stopaction-from-actions\StopAction) | An action that stops the state machine. |
 | [`UrlNavigateAction`](#urlnavigateaction-from-actions\UrlNavigateAction) |  |
-| [`BufferInRangeTransition`](#bufferinrangetransition-from-transitions\BufferInRangeTransition) | A transition that compares the current buffer with a target value. |
-| [`CompareBufferTransition`](#comparebuffertransition-from-transitions\CompareBufferTransition) | A transition that compares the current buffer with a target value. |
+| [`BufferInRangeTransition`](#bufferinrangetransition-from-transitions\BufferInRangeTransition) | A transition that compares the current buffer with a target value.
+If the buffer matches the target, the transition is successful. |
+| [`CompareBufferTransition`](#comparebuffertransition-from-transitions\CompareBufferTransition) | A transition that compares the current buffer with a target value.
+If the buffer matches the target, the transition is successful. |
 | [`FalseTransition`](#falsetransition-from-transitions\FalseTransition) | A transition that always returns False. |
-| [`TrueTransition`](#truetransition-from-transitions\TrueTransition) | A transition that always returns True. |
+| [`TrueTransition`](#truetransition-from-transitions\TrueTransition) | A transition that always returns True.
+This is used to test the statemachine without any conditions. |
 
 
 
@@ -41,6 +54,8 @@
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()()'` | List of child node IDs |
+| `id` | `str` | `` | unique identifier of element in DataGrabber application |
+| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
 
 
 ```python
@@ -48,7 +63,9 @@
 from pydatagrabber import Action  # Adjust import if needed
 
 obj = Action(
-    child_ids='list()()'
+    child_ids='list()()',
+    id="<string>",
+    load_on_install=False
 )
 ```
 
@@ -60,6 +77,8 @@ It inherits from BufferNode to manage buffers and provides methods to interact w
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()()'` | List of child node IDs |
 | `buffer_id` | `str` | `` | unique ID of the buffer |
+| `id` | `str` | `` | unique identifier of element in DataGrabber application |
+| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
 | `adapter_id` | `str` | `` | ID of the adapter |
 
 
@@ -70,6 +89,8 @@ from pydatagrabber import AdapterNode  # Adjust import if needed
 obj = AdapterNode(
     child_ids='list()()',
     buffer_id="<string>",
+    id="<string>",
+    load_on_install=False,
     adapter_id="<string>"
 )
 ```
@@ -79,6 +100,8 @@ obj = AdapterNode(
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()()'` | List of child node IDs |
+| `id` | `str` | `` | unique identifier of element in DataGrabber application |
+| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
 | `buffer_id` | `str` | `` | unique ID of the buffer |
 
 
@@ -88,6 +111,8 @@ from pydatagrabber import BufferNode  # Adjust import if needed
 
 obj = BufferNode(
     child_ids='list()()',
+    id="<string>",
+    load_on_install=False,
     buffer_id="<string>"
 )
 ```
@@ -97,6 +122,8 @@ obj = BufferNode(
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()()'` | List of child node IDs |
+| `id` | `str` | `` | unique identifier of element in DataGrabber application |
+| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
 
 
 ```python
@@ -104,7 +131,9 @@ obj = BufferNode(
 from pydatagrabber import GrabberNode  # Adjust import if needed
 
 obj = GrabberNode(
-    child_ids='list()()'
+    child_ids='list()()',
+    id="<string>",
+    load_on_install=False
 )
 ```
 
@@ -113,6 +142,8 @@ obj = GrabberNode(
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()()'` | List of child node IDs |
+| `id` | `str` | `` | unique identifier of element in DataGrabber application |
+| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
 
 
 ```python
@@ -120,7 +151,9 @@ obj = GrabberNode(
 from pydatagrabber import JoinTransition  # Adjust import if needed
 
 obj = JoinTransition(
-    child_ids='list()()'
+    child_ids='list()()',
+    id="<string>",
+    load_on_install=False
 )
 ```
 
@@ -129,6 +162,8 @@ obj = JoinTransition(
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()()'` | List of child node IDs |
+| `id` | `str` | `` | unique identifier of element in DataGrabber application |
+| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
 | `mapping_id` | `str` | `` | ID of the mapping |
 
 
@@ -138,6 +173,8 @@ from pydatagrabber import MappingNode  # Adjust import if needed
 
 obj = MappingNode(
     child_ids='list()()',
+    id="<string>",
+    load_on_install=False,
     mapping_id="<string>"
 )
 ```
@@ -146,6 +183,8 @@ obj = MappingNode(
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
+| `id` | `str` | `` | unique identifier of element in DataGrabber application |
+| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
 | `child_ids` | `list[str]` | `'list()()'` | List of child node IDs |
 
 
@@ -154,6 +193,8 @@ obj = MappingNode(
 from pydatagrabber import Node  # Adjust import if needed
 
 obj = Node(
+    id="<string>",
+    load_on_install=False,
     child_ids='list()()'
 )
 ```
@@ -165,6 +206,8 @@ Inherits from Node and adds functionality specific to service nodes.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()()'` | List of child node IDs |
+| `id` | `str` | `` | unique identifier of element in DataGrabber application |
+| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
 | `service_id` | `str` | `` | ID of the service |
 
 
@@ -174,6 +217,8 @@ from pydatagrabber import ServiceNode  # Adjust import if needed
 
 obj = ServiceNode(
     child_ids='list()()',
+    id="<string>",
+    load_on_install=False,
     service_id="<string>"
 )
 ```
@@ -183,6 +228,8 @@ obj = ServiceNode(
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()()'` | List of child node IDs |
+| `id` | `str` | `` | unique identifier of element in DataGrabber application |
+| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
 
 
 ```python
@@ -190,7 +237,9 @@ obj = ServiceNode(
 from pydatagrabber import Transition  # Adjust import if needed
 
 obj = Transition(
-    child_ids='list()()'
+    child_ids='list()()',
+    id="<string>",
+    load_on_install=False
 )
 ```
 
@@ -202,6 +251,8 @@ Action to read data from an adapter.
 | `child_ids` | `list[str]` | `'list()()'` | List of child node IDs |
 | `buffer_id` | `str` | `` | unique ID of the buffer |
 | `adapter_id` | `str` | `` | ID of the adapter |
+| `id` | `str` | `` | unique identifier of element in DataGrabber application |
+| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
 | `address` | `str` | `` | The address to read from the adapter. |
 | `n` | `int` | `1` | The number of samples to read. |
 
@@ -214,6 +265,8 @@ obj = AdapterReadAction(
     child_ids='list()()',
     buffer_id="<string>",
     adapter_id="<string>",
+    id="<string>",
+    load_on_install=False,
     address="<string>",
     n=1
 )
@@ -227,6 +280,8 @@ Action to write data with an adapter.
 | `child_ids` | `list[str]` | `'list()()'` | List of child node IDs |
 | `buffer_id` | `str` | `` | unique ID of the buffer |
 | `adapter_id` | `str` | `` | ID of the adapter |
+| `id` | `str` | `` | unique identifier of element in DataGrabber application |
+| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
 | `address` | `str` | `` | The address to read from the adapter. |
 | `n` | `int` | `1` | The number of samples to read. |
 | `persistent` | `bool` | `False` | If True, the data will be stored in a persistent buffer. |
@@ -240,6 +295,8 @@ obj = AdapterWriteAction(
     child_ids='list()()',
     buffer_id="<string>",
     adapter_id="<string>",
+    id="<string>",
+    load_on_install=False,
     address="<string>",
     n=1,
     persistent=False
@@ -252,6 +309,8 @@ Action to add a buffer to the grabber node.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()()'` | List of child node IDs |
+| `id` | `str` | `` | unique identifier of element in DataGrabber application |
+| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
 | `config` | `dict` | `` | Configuration for the buffer to be added. |
 
 
@@ -261,6 +320,8 @@ from pydatagrabber import AddBufferAction  # Adjust import if needed
 
 obj = AddBufferAction(
     child_ids='list()()',
+    id="<string>",
+    load_on_install=False,
     config={}
 )
 ```
@@ -270,6 +331,8 @@ obj = AddBufferAction(
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()()'` | List of child node IDs |
+| `id` | `str` | `` | unique identifier of element in DataGrabber application |
+| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
 | `service_id` | `str` | `` | ID of the service to reference for Browser Automation |
 
 
@@ -279,6 +342,8 @@ from pydatagrabber import BrowserAutomationAction  # Adjust import if needed
 
 obj = BrowserAutomationAction(
     child_ids='list()()',
+    id="<string>",
+    load_on_install=False,
     service_id="<string>"
 )
 ```
@@ -298,6 +363,8 @@ Raises:
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()()'` | List of child node IDs |
 | `buffer_id` | `str` | `` | unique ID of the buffer |
+| `id` | `str` | `` | unique identifier of element in DataGrabber application |
+| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
 | `option` | `str` | `` | option to configure with new value |
 | `element_id` | `str` | `` | id of the element to change the option for |
 | `n` | `int` | `1` | specifies the number of samples to remove from buffer |
@@ -310,6 +377,8 @@ from pydatagrabber import ConfigureElementAction  # Adjust import if needed
 obj = ConfigureElementAction(
     child_ids='list()()',
     buffer_id="<string>",
+    id="<string>",
+    load_on_install=False,
     option="<string>",
     element_id="<string>",
     n=1
@@ -322,6 +391,8 @@ obj = ConfigureElementAction(
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()()'` | List of child node IDs |
 | `buffer_id` | `str` | `` | unique ID of the buffer |
+| `id` | `str` | `` | unique identifier of element in DataGrabber application |
+| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
 | `target_folder` | `str` | `` | target folder to copy all the files to in Buffer |
 
 
@@ -332,6 +403,8 @@ from pydatagrabber import CopyFilesAction  # Adjust import if needed
 obj = CopyFilesAction(
     child_ids='list()()',
     buffer_id="<string>",
+    id="<string>",
+    load_on_install=False,
     target_folder="path/to/folder"
 )
 ```
@@ -342,6 +415,8 @@ obj = CopyFilesAction(
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()()'` | List of child node IDs |
 | `buffer_id` | `str` | `` | unique ID of the buffer |
+| `id` | `str` | `` | unique identifier of element in DataGrabber application |
+| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
 | `folder` | `str` | `` | folder to list the files from into a Buffer |
 | `pattern` | `str` | `` | paatern to look for in file names |
 | `extension` | `str` | `` | extension to include |
@@ -355,6 +430,8 @@ from pydatagrabber import ListFilesAction  # Adjust import if needed
 obj = ListFilesAction(
     child_ids='list()()',
     buffer_id="<string>",
+    id="<string>",
+    load_on_install=False,
     folder="path/to/folder",
     pattern="<string>",
     extension="<string>",
@@ -367,6 +444,8 @@ obj = ListFilesAction(
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()()'` | List of child node IDs |
+| `id` | `str` | `` | unique identifier of element in DataGrabber application |
+| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
 | `smtp_server` | `str` | `` | host of the mail server to use |
 | `port` | `int` | `` | port of the smtp server |
 | `mail_account` | `str` | `` | mail account to use for login |
@@ -382,6 +461,8 @@ from pydatagrabber import MailAction  # Adjust import if needed
 
 obj = MailAction(
     child_ids='list()()',
+    id="<string>",
+    load_on_install=False,
     smtp_server="<string>",
     port=1,
     mail_account="<string>",
@@ -398,6 +479,8 @@ obj = MailAction(
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()()'` | List of child node IDs |
 | `buffer_id` | `str` | `` | unique ID of the buffer |
+| `id` | `str` | `` | unique identifier of element in DataGrabber application |
+| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
 | `target_folder` | `str` | `` | target folder to move all the files to in Buffer |
 
 
@@ -408,6 +491,8 @@ from pydatagrabber import MoveFilesAction  # Adjust import if needed
 obj = MoveFilesAction(
     child_ids='list()()',
     buffer_id="<string>",
+    id="<string>",
+    load_on_install=False,
     target_folder="path/to/folder"
 )
 ```
@@ -418,6 +503,8 @@ obj = MoveFilesAction(
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()()'` | List of child node IDs |
 | `buffer_id` | `str` | `` | unique ID of the buffer |
+| `id` | `str` | `` | unique identifier of element in DataGrabber application |
+| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
 | `file_path` | `str` | `` | path to the csv file to read the data from |
 | `delimiter` | `str` | `';'` | delimiter character(s) for this csv file |
 
@@ -429,6 +516,8 @@ from pydatagrabber import ReadCsvAction  # Adjust import if needed
 obj = ReadCsvAction(
     child_ids='list()()',
     buffer_id="<string>",
+    id="<string>",
+    load_on_install=False,
     file_path="path/to/file.txt",
     delimiter=';'
 )
@@ -440,6 +529,8 @@ obj = ReadCsvAction(
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()()'` | List of child node IDs |
 | `buffer_id` | `str` | `` | unique ID of the buffer |
+| `id` | `str` | `` | unique identifier of element in DataGrabber application |
+| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
 | `file_path` | `str` | `` | path to the json file to read the data from |
 | `json_path` | `str` | `` |  |
 
@@ -451,6 +542,8 @@ from pydatagrabber import ReadJsonAction  # Adjust import if needed
 obj = ReadJsonAction(
     child_ids='list()()',
     buffer_id="<string>",
+    id="<string>",
+    load_on_install=False,
     file_path="path/to/file.txt",
     json_path="<string>"
 )
@@ -463,6 +556,8 @@ obj = ReadJsonAction(
 | `child_ids` | `list[str]` | `'list()()'` | List of child node IDs |
 | `service_id` | `str` | `` | ID of the service to reference for Browser Automation |
 | `buffer_id` | `str` | `` | unique ID of the buffer |
+| `id` | `str` | `` | unique identifier of element in DataGrabber application |
+| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
 | `xpath` | `str` | `` | XPath definition to locate the element to set a value to |
 
 
@@ -474,6 +569,8 @@ obj = SetElementAction(
     child_ids='list()()',
     service_id="<string>",
     buffer_id="<string>",
+    id="<string>",
+    load_on_install=False,
     xpath="<string>"
 )
 ```
@@ -484,6 +581,8 @@ An action that sleeps for a specified number of seconds.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()()'` | List of child node IDs |
+| `id` | `str` | `` | unique identifier of element in DataGrabber application |
+| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
 
 
 ```python
@@ -491,7 +590,9 @@ An action that sleeps for a specified number of seconds.
 from pydatagrabber import SleepAction  # Adjust import if needed
 
 obj = SleepAction(
-    child_ids='list()()'
+    child_ids='list()()',
+    id="<string>",
+    load_on_install=False
 )
 ```
 
@@ -501,6 +602,8 @@ An action that starts the state machine.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()()'` | List of child node IDs |
+| `id` | `str` | `` | unique identifier of element in DataGrabber application |
+| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
 
 
 ```python
@@ -508,7 +611,9 @@ An action that starts the state machine.
 from pydatagrabber import StartAction  # Adjust import if needed
 
 obj = StartAction(
-    child_ids='list()()'
+    child_ids='list()()',
+    id="<string>",
+    load_on_install=False
 )
 ```
 
@@ -518,6 +623,8 @@ An action that stops the state machine.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()()'` | List of child node IDs |
+| `id` | `str` | `` | unique identifier of element in DataGrabber application |
+| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
 
 
 ```python
@@ -525,7 +632,9 @@ An action that stops the state machine.
 from pydatagrabber import StopAction  # Adjust import if needed
 
 obj = StopAction(
-    child_ids='list()()'
+    child_ids='list()()',
+    id="<string>",
+    load_on_install=False
 )
 ```
 
@@ -535,6 +644,8 @@ obj = StopAction(
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()()'` | List of child node IDs |
 | `service_id` | `str` | `` | ID of the service to reference for Browser Automation |
+| `id` | `str` | `` | unique identifier of element in DataGrabber application |
+| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
 | `url` | `str` | `` | url to navigate to in browser |
 
 
@@ -545,6 +656,8 @@ from pydatagrabber import UrlNavigateAction  # Adjust import if needed
 obj = UrlNavigateAction(
     child_ids='list()()',
     service_id="<string>",
+    id="<string>",
+    load_on_install=False,
     url="https://example.com"
 )
 ```
@@ -557,6 +670,8 @@ If the buffer matches the target, the transition is successful.
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()()'` | List of child node IDs |
 | `buffer_id` | `str` | `` | unique ID of the buffer |
+| `id` | `str` | `` | unique identifier of element in DataGrabber application |
+| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
 | `comparator` | `str` | `` | The comparison operator to use. |
 | `value` | `any` | `` | The value to compare against the buffer. |
 
@@ -568,6 +683,8 @@ from pydatagrabber import BufferInRangeTransition  # Adjust import if needed
 obj = BufferInRangeTransition(
     child_ids='list()()',
     buffer_id="<string>",
+    id="<string>",
+    load_on_install=False,
     comparator="<string>",
     value="<value>"
 )
@@ -581,6 +698,8 @@ If the buffer matches the target, the transition is successful.
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()()'` | List of child node IDs |
 | `buffer_id` | `str` | `` | unique ID of the buffer |
+| `id` | `str` | `` | unique identifier of element in DataGrabber application |
+| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
 | `comparator` | `str` | `` | The comparison operator to use. |
 | `value` | `any` | `` | The value to compare against the buffer. |
 
@@ -592,6 +711,8 @@ from pydatagrabber import CompareBufferTransition  # Adjust import if needed
 obj = CompareBufferTransition(
     child_ids='list()()',
     buffer_id="<string>",
+    id="<string>",
+    load_on_install=False,
     comparator="<string>",
     value="<value>"
 )
@@ -603,6 +724,8 @@ A transition that always returns False.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()()'` | List of child node IDs |
+| `id` | `str` | `` | unique identifier of element in DataGrabber application |
+| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
 
 
 ```python
@@ -610,7 +733,9 @@ A transition that always returns False.
 from pydatagrabber import FalseTransition  # Adjust import if needed
 
 obj = FalseTransition(
-    child_ids='list()()'
+    child_ids='list()()',
+    id="<string>",
+    load_on_install=False
 )
 ```
 
@@ -621,6 +746,8 @@ This is used to test the statemachine without any conditions.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()()'` | List of child node IDs |
+| `id` | `str` | `` | unique identifier of element in DataGrabber application |
+| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
 
 
 ```python
@@ -628,6 +755,8 @@ This is used to test the statemachine without any conditions.
 from pydatagrabber import TrueTransition  # Adjust import if needed
 
 obj = TrueTransition(
-    child_ids='list()()'
+    child_ids='list()()',
+    id="<string>",
+    load_on_install=False
 )
 ```
