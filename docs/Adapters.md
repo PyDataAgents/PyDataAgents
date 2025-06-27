@@ -37,10 +37,9 @@ Abstract base class for `Adapters`. All `Adapters` must inherit from this class.
 # Example usage of `Adapter`
 from pydatagrabber import Adapter  # Adjust import if needed
 
-obj = Adapter(
-    id="<string>",
-    load_on_install=False
-)
+obj = Adapter()
+obj.id="<string>"
+obj.load_on_install=False
 ```
 
 ## `PublishAdapter` (from `PublishAdapter.py`)
@@ -57,10 +56,9 @@ abstract class for `Adapter` Interface for publishing to data sinks.
 # Example usage of `PublishAdapter`
 from pydatagrabber import PublishAdapter  # Adjust import if needed
 
-obj = PublishAdapter(
-    id="<string>",
-    load_on_install=False
-)
+obj = PublishAdapter()
+obj.id="<string>"
+obj.load_on_install=False
 ```
 
 ## `ReadAdapter` (from `ReadAdapter.py`)
@@ -77,10 +75,9 @@ abstract class for `Adapter` Interface for reading from data sources.
 # Example usage of `ReadAdapter`
 from pydatagrabber import ReadAdapter  # Adjust import if needed
 
-obj = ReadAdapter(
-    id="<string>",
-    load_on_install=False
-)
+obj = ReadAdapter()
+obj.id="<string>"
+obj.load_on_install=False
 ```
 
 ## `SubscribeAdapter` (from `SubscribeAdapter.py`)
@@ -97,10 +94,9 @@ abstract class for `Adapter` Interface for subscribing from data sources
 # Example usage of `SubscribeAdapter`
 from pydatagrabber import SubscribeAdapter  # Adjust import if needed
 
-obj = SubscribeAdapter(
-    id="<string>",
-    load_on_install=False
-)
+obj = SubscribeAdapter()
+obj.id="<string>"
+obj.load_on_install=False
 ```
 
 ## `WriteAdapter` (from `WriteAdapter.py`)
@@ -117,10 +113,9 @@ abstract class for Adapter Interface for writing to data sinks
 # Example usage of `WriteAdapter`
 from pydatagrabber import WriteAdapter  # Adjust import if needed
 
-obj = WriteAdapter(
-    id="<string>",
-    load_on_install=False
-)
+obj = WriteAdapter()
+obj.id="<string>"
+obj.load_on_install=False
 ```
 
 ## `AdsAdapter` (from `ads\AdsAdapter.py`)
@@ -139,12 +134,11 @@ obj = WriteAdapter(
 # Example usage of `AdsAdapter`
 from pydatagrabber import AdsAdapter  # Adjust import if needed
 
-obj = AdsAdapter(
-    id="<string>",
-    load_on_install=False,
-    ams_net_id="<string>",
-    twincat=3
-)
+obj = AdsAdapter()
+obj.id="<string>"
+obj.load_on_install=False
+obj.ams_net_id="<string>"
+obj.twincat=3
 ```
 
 ## `AudioAdapter` (from `audio\AudioAdapter.py`)
@@ -163,12 +157,11 @@ obj = AdsAdapter(
 # Example usage of `AudioAdapter`
 from pydatagrabber import AudioAdapter  # Adjust import if needed
 
-obj = AudioAdapter(
-    id="<string>",
-    load_on_install=False,
-    sample_rate=44100,
-    device=1
-)
+obj = AudioAdapter()
+obj.id="<string>"
+obj.load_on_install=False
+obj.sample_rate=44100
+obj.device=1
 ```
 
 ## `CsvReadAdapter` (from `csv\CsvReadAdapter.py`)
@@ -191,16 +184,15 @@ obj = AudioAdapter(
 # Example usage of `CsvReadAdapter`
 from pydatagrabber import CsvReadAdapter  # Adjust import if needed
 
-obj = CsvReadAdapter(
-    id="<string>",
-    load_on_install=False,
-    file_path="path/to/file.txt",
-    all_at_once=True,
-    delimiter=';',
-    has_header=True,
-    auto_detect=False,
-    force_numeric=True
-)
+obj = CsvReadAdapter()
+obj.id="<string>"
+obj.load_on_install=False
+obj.file_path="path/to/file.txt"
+obj.all_at_once=True
+obj.delimiter=';'
+obj.has_header=True
+obj.auto_detect=False
+obj.force_numeric=True
 ```
 
 ## `CsvWriteAdapter` (from `csv\CsvWriteAdapter.py`)
@@ -224,17 +216,16 @@ obj = CsvReadAdapter(
 # Example usage of `CsvWriteAdapter`
 from pydatagrabber import CsvWriteAdapter  # Adjust import if needed
 
-obj = CsvWriteAdapter(
-    id="<string>",
-    load_on_install=False,
-    folder="path/to/folder",
-    file_post_fix="path/to/file.txt",
-    file_extension='csv',
-    with_timestamp=False,
-    max_samples=1000000,
-    delimiter=';',
-    decimal_precision=3
-)
+obj = CsvWriteAdapter()
+obj.id="<string>"
+obj.load_on_install=False
+obj.folder="path/to/folder"
+obj.file_post_fix="path/to/file.txt"
+obj.file_extension='csv'
+obj.with_timestamp=False
+obj.max_samples=1000000
+obj.delimiter=';'
+obj.decimal_precision=3
 ```
 
 ## `HttpAdapter` (from `http\HttpAdapter.py`)
@@ -254,13 +245,12 @@ obj = CsvWriteAdapter(
 # Example usage of `HttpAdapter`
 from pydatagrabber import HttpAdapter  # Adjust import if needed
 
-obj = HttpAdapter(
-    id="<string>",
-    load_on_install=False,
-    base_url="https://example.com",
-    headers="<string>",
-    json_path=False
-)
+obj = HttpAdapter()
+obj.id="<string>"
+obj.load_on_install=False
+obj.base_url="https://example.com"
+obj.headers="<string>"
+obj.json_path=False
 ```
 
 ## `InfluxDbAdapter` (from `influxdb\InfluxDbAdapter.py`)
@@ -280,13 +270,12 @@ obj = HttpAdapter(
 # Example usage of `InfluxDbAdapter`
 from pydatagrabber import InfluxDbAdapter  # Adjust import if needed
 
-obj = InfluxDbAdapter(
-    id="<string>",
-    load_on_install=False,
-    endpoint='http://localhost:8086',
-    token="<string>",
-    org='my-org'
-)
+obj = InfluxDbAdapter()
+obj.id="<string>"
+obj.load_on_install=False
+obj.endpoint='http://localhost:8086'
+obj.token="<string>"
+obj.org='my-org'
 ```
 
 ## `MQTTAdapter` (from `mqtt\MQTTAdapter.py`)
@@ -309,16 +298,15 @@ obj = InfluxDbAdapter(
 # Example usage of `MQTTAdapter`
 from pydatagrabber import MQTTAdapter  # Adjust import if needed
 
-obj = MQTTAdapter(
-    id="<string>",
-    load_on_install=False,
-    endpoint="<string>",
-    port=1883,
-    keep_alive=60,
-    force_numeric=False,
-    retain=False,
-    qos=0
-)
+obj = MQTTAdapter()
+obj.id="<string>"
+obj.load_on_install=False
+obj.endpoint="<string>"
+obj.port=1883
+obj.keep_alive=60
+obj.force_numeric=False
+obj.retain=False
+obj.qos=0
 ```
 
 ## `OpcUaAdapter` (from `opcua\OpcUaAdapter.py`)
@@ -336,11 +324,10 @@ obj = MQTTAdapter(
 # Example usage of `OpcUaAdapter`
 from pydatagrabber import OpcUaAdapter  # Adjust import if needed
 
-obj = OpcUaAdapter(
-    id="<string>",
-    load_on_install=False,
-    endpoint="<string>"
-)
+obj = OpcUaAdapter()
+obj.id="<string>"
+obj.load_on_install=False
+obj.endpoint="<string>"
 ```
 
 ## `S7Adapter` (from `s7\S7Adapter.py`)
@@ -360,13 +347,12 @@ obj = OpcUaAdapter(
 # Example usage of `S7Adapter`
 from pydatagrabber import S7Adapter  # Adjust import if needed
 
-obj = S7Adapter(
-    id="<string>",
-    load_on_install=False,
-    host='127.0.0.1',
-    rack=0,
-    slot=1
-)
+obj = S7Adapter()
+obj.id="<string>"
+obj.load_on_install=False
+obj.host='127.0.0.1'
+obj.rack=0
+obj.slot=1
 ```
 
 ## `ByteStreamAdapter` (from `socket\ByteStreamAdapter.py`)
@@ -381,10 +367,9 @@ obj = S7Adapter(
 # Example usage of `ByteStreamAdapter`
 from pydatagrabber import ByteStreamAdapter  # Adjust import if needed
 
-obj = ByteStreamAdapter(
-    id="<string>",
-    load_on_install=False
-)
+obj = ByteStreamAdapter()
+obj.id="<string>"
+obj.load_on_install=False
 ```
 
 ## `WebSocketAdapter` (from `socket\WebSocketAdapter.py`)
@@ -402,11 +387,10 @@ obj = ByteStreamAdapter(
 # Example usage of `WebSocketAdapter`
 from pydatagrabber import WebSocketAdapter  # Adjust import if needed
 
-obj = WebSocketAdapter(
-    id="<string>",
-    load_on_install=False,
-    url="https://example.com"
-)
+obj = WebSocketAdapter()
+obj.id="<string>"
+obj.load_on_install=False
+obj.url="https://example.com"
 ```
 
 ## `SQLAdapter` (from `sql\SQLAdapter.py`)
@@ -424,9 +408,8 @@ obj = WebSocketAdapter(
 # Example usage of `SQLAdapter`
 from pydatagrabber import SQLAdapter  # Adjust import if needed
 
-obj = SQLAdapter(
-    id="<string>",
-    load_on_install=False,
-    connection_str="<string>"
-)
+obj = SQLAdapter()
+obj.id="<string>"
+obj.load_on_install=False
+obj.connection_str="<string>"
 ```

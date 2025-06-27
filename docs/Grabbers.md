@@ -21,9 +21,8 @@
 # Example usage of `Grabber`
 from pydatagrabber import Grabber  # Adjust import if needed
 
-obj = Grabber(
-    type="<string>",
-    id="<string>",
-    load_on_install=False
-)
+obj = Grabber()
+obj.type="<string>"
+obj.id="<string>"
+obj.load_on_install=False
 ```

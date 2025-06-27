@@ -83,3 +83,27 @@ class FileUtils:
         else:
             logger.error("Folder " + folder + " does not exist")
             return None
+        
+    @staticmethod
+    def get_folder_bytes(folder : str) -> float:
+        if os.path.isdir(folder):
+            total_size = 0
+            for dirpath, dirnames, filenames in os.walk(folder):
+                for f in filenames:
+                    fp = os.path.join(dirpath, f)
+                    if os.path.isfile(fp):
+                        total_size += os.path.getsize(fp)
+            return total_size
+        else:
+            logger.error("Folder " + folder + " does not exist")
+            return 0
+    
+    @staticmethod    
+    def get_extensions_from_folder(folder : str) -> list[str]:
+        if os.path.isdir(folder):
+            files = FileUtils.list_files(folder)
+            file_extensions = list(set(list(f.split('.')[-1] for f in files if '.' in f)))
+            return file_extensions
+        else:
+            logger.error("Folder " + folder + " does not exist")
+            return []

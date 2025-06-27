@@ -33,7 +33,7 @@ def extract_class_info(file_path: Path, base_dir : Path):
             class_modules[class_name] = file_path.relative_to(base_dir)
 
 def inherits_from_type(cls_name: str, type : str, seen: Set[str] = None) -> bool:
-    """Recursively check if a class inherits from GrabberElement."""
+    """Recursively check if a class inherits from type."""
     if seen is None:
         seen = set()
     if cls_name in seen:
@@ -211,9 +211,12 @@ def generate_readme(class_data: List[Dict], output_file: Path, name : str):
             else:
                 # Otherwise, guess a placeholder value based on the type
                 value = guess_placeholder_value(field["type"], field["name"])
-            init_args.append(f"{field['name']}={value}")
-        constructor = f"{cls['name']}(\n    " + ",\n    ".join(init_args) + "\n)"
+            init_args.append(f"obj.{field['name']}={value}")
+        constructor = f"{cls['name']}()"
         lines.append(f"obj = {constructor}")
+        if init_args:
+            for arg in init_args:
+                lines.append(f"{arg}")
 
         # Optional method call
         #lines.append("obj.run()  # or obj.grab(), etc.\n")

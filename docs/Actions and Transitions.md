@@ -49,11 +49,10 @@
 # Example usage of `Action`
 from pydatagrabber import Action  # Adjust import if needed
 
-obj = Action(
-    child_ids='list()()',
-    id="<string>",
-    load_on_install=False
-)
+obj = Action()
+obj.child_ids='list()()'
+obj.id="<string>"
+obj.load_on_install=False
 ```
 
 ## `AdapterNode` (from `AdapterNode.py`)
@@ -73,13 +72,12 @@ It inherits from BufferNode to manage buffers and provides methods to interact w
 # Example usage of `AdapterNode`
 from pydatagrabber import AdapterNode  # Adjust import if needed
 
-obj = AdapterNode(
-    child_ids='list()()',
-    buffer_id="<string>",
-    id="<string>",
-    load_on_install=False,
-    adapter_id="<string>"
-)
+obj = AdapterNode()
+obj.child_ids='list()()'
+obj.buffer_id="<string>"
+obj.id="<string>"
+obj.load_on_install=False
+obj.adapter_id="<string>"
 ```
 
 ## `BufferNode` (from `BufferNode.py`)
@@ -96,12 +94,11 @@ obj = AdapterNode(
 # Example usage of `BufferNode`
 from pydatagrabber import BufferNode  # Adjust import if needed
 
-obj = BufferNode(
-    child_ids='list()()',
-    id="<string>",
-    load_on_install=False,
-    buffer_id="<string>"
-)
+obj = BufferNode()
+obj.child_ids='list()()'
+obj.id="<string>"
+obj.load_on_install=False
+obj.buffer_id="<string>"
 ```
 
 ## `GrabberNode` (from `GrabberNode.py`)
@@ -117,11 +114,10 @@ obj = BufferNode(
 # Example usage of `GrabberNode`
 from pydatagrabber import GrabberNode  # Adjust import if needed
 
-obj = GrabberNode(
-    child_ids='list()()',
-    id="<string>",
-    load_on_install=False
-)
+obj = GrabberNode()
+obj.child_ids='list()()'
+obj.id="<string>"
+obj.load_on_install=False
 ```
 
 ## `JoinTransition` (from `JoinTransition.py`)
@@ -137,11 +133,10 @@ obj = GrabberNode(
 # Example usage of `JoinTransition`
 from pydatagrabber import JoinTransition  # Adjust import if needed
 
-obj = JoinTransition(
-    child_ids='list()()',
-    id="<string>",
-    load_on_install=False
-)
+obj = JoinTransition()
+obj.child_ids='list()()'
+obj.id="<string>"
+obj.load_on_install=False
 ```
 
 ## `MappingNode` (from `MappingNode.py`)
@@ -158,12 +153,11 @@ obj = JoinTransition(
 # Example usage of `MappingNode`
 from pydatagrabber import MappingNode  # Adjust import if needed
 
-obj = MappingNode(
-    child_ids='list()()',
-    id="<string>",
-    load_on_install=False,
-    mapping_id="<string>"
-)
+obj = MappingNode()
+obj.child_ids='list()()'
+obj.id="<string>"
+obj.load_on_install=False
+obj.mapping_id="<string>"
 ```
 
 ## `Node` (from `Node.py`)
@@ -179,11 +173,10 @@ obj = MappingNode(
 # Example usage of `Node`
 from pydatagrabber import Node  # Adjust import if needed
 
-obj = Node(
-    id="<string>",
-    load_on_install=False,
-    child_ids='list()()'
-)
+obj = Node()
+obj.id="<string>"
+obj.load_on_install=False
+obj.child_ids='list()()'
 ```
 
 ## `ServiceNode` (from `ServiceNode.py`)
@@ -202,12 +195,11 @@ Inherits from Node and adds functionality specific to service nodes.
 # Example usage of `ServiceNode`
 from pydatagrabber import ServiceNode  # Adjust import if needed
 
-obj = ServiceNode(
-    child_ids='list()()',
-    id="<string>",
-    load_on_install=False,
-    service_id="<string>"
-)
+obj = ServiceNode()
+obj.child_ids='list()()'
+obj.id="<string>"
+obj.load_on_install=False
+obj.service_id="<string>"
 ```
 
 ## `Transition` (from `Transition.py`)
@@ -223,11 +215,10 @@ obj = ServiceNode(
 # Example usage of `Transition`
 from pydatagrabber import Transition  # Adjust import if needed
 
-obj = Transition(
-    child_ids='list()()',
-    id="<string>",
-    load_on_install=False
-)
+obj = Transition()
+obj.child_ids='list()()'
+obj.id="<string>"
+obj.load_on_install=False
 ```
 
 ## `AdapterReadAction` (from `actions\AdapterReadAction.py`)
@@ -248,15 +239,14 @@ Action to read data from an adapter.
 # Example usage of `AdapterReadAction`
 from pydatagrabber import AdapterReadAction  # Adjust import if needed
 
-obj = AdapterReadAction(
-    child_ids='list()()',
-    buffer_id="<string>",
-    adapter_id="<string>",
-    id="<string>",
-    load_on_install=False,
-    address="<string>",
-    n=1
-)
+obj = AdapterReadAction()
+obj.child_ids='list()()'
+obj.buffer_id="<string>"
+obj.adapter_id="<string>"
+obj.id="<string>"
+obj.load_on_install=False
+obj.address="<string>"
+obj.n=1
 ```
 
 ## `AdapterWriteAction` (from `actions\AdapterWriteAction.py`)
@@ -278,16 +268,15 @@ Action to write data with an adapter.
 # Example usage of `AdapterWriteAction`
 from pydatagrabber import AdapterWriteAction  # Adjust import if needed
 
-obj = AdapterWriteAction(
-    child_ids='list()()',
-    buffer_id="<string>",
-    adapter_id="<string>",
-    id="<string>",
-    load_on_install=False,
-    address="<string>",
-    n=1,
-    persistent=False
-)
+obj = AdapterWriteAction()
+obj.child_ids='list()()'
+obj.buffer_id="<string>"
+obj.adapter_id="<string>"
+obj.id="<string>"
+obj.load_on_install=False
+obj.address="<string>"
+obj.n=1
+obj.persistent=False
 ```
 
 ## `AddBufferAction` (from `actions\AddBufferAction.py`)
@@ -305,12 +294,11 @@ Action to add a buffer to the grabber node.
 # Example usage of `AddBufferAction`
 from pydatagrabber import AddBufferAction  # Adjust import if needed
 
-obj = AddBufferAction(
-    child_ids='list()()',
-    id="<string>",
-    load_on_install=False,
-    config={}
-)
+obj = AddBufferAction()
+obj.child_ids='list()()'
+obj.id="<string>"
+obj.load_on_install=False
+obj.config={}
 ```
 
 ## `BrowserAutomationAction` (from `actions\BrowserAutomationAction.py`)
@@ -327,12 +315,11 @@ obj = AddBufferAction(
 # Example usage of `BrowserAutomationAction`
 from pydatagrabber import BrowserAutomationAction  # Adjust import if needed
 
-obj = BrowserAutomationAction(
-    child_ids='list()()',
-    id="<string>",
-    load_on_install=False,
-    service_id="<string>"
-)
+obj = BrowserAutomationAction()
+obj.child_ids='list()()'
+obj.id="<string>"
+obj.load_on_install=False
+obj.service_id="<string>"
 ```
 
 ## `ConfigureElementAction` (from `actions\ConfigureElementAction.py`)
@@ -361,15 +348,14 @@ Raises:
 # Example usage of `ConfigureElementAction`
 from pydatagrabber import ConfigureElementAction  # Adjust import if needed
 
-obj = ConfigureElementAction(
-    child_ids='list()()',
-    buffer_id="<string>",
-    id="<string>",
-    load_on_install=False,
-    option="<string>",
-    element_id="<string>",
-    n=1
-)
+obj = ConfigureElementAction()
+obj.child_ids='list()()'
+obj.buffer_id="<string>"
+obj.id="<string>"
+obj.load_on_install=False
+obj.option="<string>"
+obj.element_id="<string>"
+obj.n=1
 ```
 
 ## `CopyFilesAction` (from `actions\CopyFilesAction.py`)
@@ -387,13 +373,12 @@ obj = ConfigureElementAction(
 # Example usage of `CopyFilesAction`
 from pydatagrabber import CopyFilesAction  # Adjust import if needed
 
-obj = CopyFilesAction(
-    child_ids='list()()',
-    buffer_id="<string>",
-    id="<string>",
-    load_on_install=False,
-    target_folder="path/to/folder"
-)
+obj = CopyFilesAction()
+obj.child_ids='list()()'
+obj.buffer_id="<string>"
+obj.id="<string>"
+obj.load_on_install=False
+obj.target_folder="path/to/folder"
 ```
 
 ## `ListFilesAction` (from `actions\ListFilesAction.py`)
@@ -414,16 +399,15 @@ obj = CopyFilesAction(
 # Example usage of `ListFilesAction`
 from pydatagrabber import ListFilesAction  # Adjust import if needed
 
-obj = ListFilesAction(
-    child_ids='list()()',
-    buffer_id="<string>",
-    id="<string>",
-    load_on_install=False,
-    folder="path/to/folder",
-    pattern="<string>",
-    extension="<string>",
-    newer_than_seconds=1
-)
+obj = ListFilesAction()
+obj.child_ids='list()()'
+obj.buffer_id="<string>"
+obj.id="<string>"
+obj.load_on_install=False
+obj.folder="path/to/folder"
+obj.pattern="<string>"
+obj.extension="<string>"
+obj.newer_than_seconds=1
 ```
 
 ## `MailAction` (from `actions\MailAction.py`)
@@ -446,18 +430,17 @@ obj = ListFilesAction(
 # Example usage of `MailAction`
 from pydatagrabber import MailAction  # Adjust import if needed
 
-obj = MailAction(
-    child_ids='list()()',
-    id="<string>",
-    load_on_install=False,
-    smtp_server="<string>",
-    port=1,
-    mail_account="<string>",
-    pw="<string>",
-    recipient="<string>",
-    subject="<string>",
-    body="<string>"
-)
+obj = MailAction()
+obj.child_ids='list()()'
+obj.id="<string>"
+obj.load_on_install=False
+obj.smtp_server="<string>"
+obj.port=1
+obj.mail_account="<string>"
+obj.pw="<string>"
+obj.recipient="<string>"
+obj.subject="<string>"
+obj.body="<string>"
 ```
 
 ## `MoveFilesAction` (from `actions\MoveFilesAction.py`)
@@ -475,13 +458,12 @@ obj = MailAction(
 # Example usage of `MoveFilesAction`
 from pydatagrabber import MoveFilesAction  # Adjust import if needed
 
-obj = MoveFilesAction(
-    child_ids='list()()',
-    buffer_id="<string>",
-    id="<string>",
-    load_on_install=False,
-    target_folder="path/to/folder"
-)
+obj = MoveFilesAction()
+obj.child_ids='list()()'
+obj.buffer_id="<string>"
+obj.id="<string>"
+obj.load_on_install=False
+obj.target_folder="path/to/folder"
 ```
 
 ## `ReadCsvAction` (from `actions\ReadCsvAction.py`)
@@ -500,14 +482,13 @@ obj = MoveFilesAction(
 # Example usage of `ReadCsvAction`
 from pydatagrabber import ReadCsvAction  # Adjust import if needed
 
-obj = ReadCsvAction(
-    child_ids='list()()',
-    buffer_id="<string>",
-    id="<string>",
-    load_on_install=False,
-    file_path="path/to/file.txt",
-    delimiter=';'
-)
+obj = ReadCsvAction()
+obj.child_ids='list()()'
+obj.buffer_id="<string>"
+obj.id="<string>"
+obj.load_on_install=False
+obj.file_path="path/to/file.txt"
+obj.delimiter=';'
 ```
 
 ## `ReadJsonAction` (from `actions\ReadJsonAction.py`)
@@ -526,14 +507,13 @@ obj = ReadCsvAction(
 # Example usage of `ReadJsonAction`
 from pydatagrabber import ReadJsonAction  # Adjust import if needed
 
-obj = ReadJsonAction(
-    child_ids='list()()',
-    buffer_id="<string>",
-    id="<string>",
-    load_on_install=False,
-    file_path="path/to/file.txt",
-    json_path="<string>"
-)
+obj = ReadJsonAction()
+obj.child_ids='list()()'
+obj.buffer_id="<string>"
+obj.id="<string>"
+obj.load_on_install=False
+obj.file_path="path/to/file.txt"
+obj.json_path="<string>"
 ```
 
 ## `SetElementAction` (from `actions\SetElementAction.py`)
@@ -552,14 +532,13 @@ obj = ReadJsonAction(
 # Example usage of `SetElementAction`
 from pydatagrabber import SetElementAction  # Adjust import if needed
 
-obj = SetElementAction(
-    child_ids='list()()',
-    service_id="<string>",
-    buffer_id="<string>",
-    id="<string>",
-    load_on_install=False,
-    xpath="<string>"
-)
+obj = SetElementAction()
+obj.child_ids='list()()'
+obj.service_id="<string>"
+obj.buffer_id="<string>"
+obj.id="<string>"
+obj.load_on_install=False
+obj.xpath="<string>"
 ```
 
 ## `SleepAction` (from `actions\SleepAction.py`)
@@ -576,11 +555,10 @@ An action that sleeps for a specified number of seconds.
 # Example usage of `SleepAction`
 from pydatagrabber import SleepAction  # Adjust import if needed
 
-obj = SleepAction(
-    child_ids='list()()',
-    id="<string>",
-    load_on_install=False
-)
+obj = SleepAction()
+obj.child_ids='list()()'
+obj.id="<string>"
+obj.load_on_install=False
 ```
 
 ## `StartAction` (from `actions\StartAction.py`)
@@ -597,11 +575,10 @@ An action that starts the state machine.
 # Example usage of `StartAction`
 from pydatagrabber import StartAction  # Adjust import if needed
 
-obj = StartAction(
-    child_ids='list()()',
-    id="<string>",
-    load_on_install=False
-)
+obj = StartAction()
+obj.child_ids='list()()'
+obj.id="<string>"
+obj.load_on_install=False
 ```
 
 ## `StopAction` (from `actions\StopAction.py`)
@@ -618,11 +595,10 @@ An action that stops the state machine.
 # Example usage of `StopAction`
 from pydatagrabber import StopAction  # Adjust import if needed
 
-obj = StopAction(
-    child_ids='list()()',
-    id="<string>",
-    load_on_install=False
-)
+obj = StopAction()
+obj.child_ids='list()()'
+obj.id="<string>"
+obj.load_on_install=False
 ```
 
 ## `UrlNavigateAction` (from `actions\UrlNavigateAction.py`)
@@ -640,13 +616,12 @@ obj = StopAction(
 # Example usage of `UrlNavigateAction`
 from pydatagrabber import UrlNavigateAction  # Adjust import if needed
 
-obj = UrlNavigateAction(
-    child_ids='list()()',
-    service_id="<string>",
-    id="<string>",
-    load_on_install=False,
-    url="https://example.com"
-)
+obj = UrlNavigateAction()
+obj.child_ids='list()()'
+obj.service_id="<string>"
+obj.id="<string>"
+obj.load_on_install=False
+obj.url="https://example.com"
 ```
 
 ## `BufferInRangeTransition` (from `transitions\BufferInRangeTransition.py`)
@@ -667,14 +642,13 @@ If the buffer matches the target, the transition is successful.
 # Example usage of `BufferInRangeTransition`
 from pydatagrabber import BufferInRangeTransition  # Adjust import if needed
 
-obj = BufferInRangeTransition(
-    child_ids='list()()',
-    buffer_id="<string>",
-    id="<string>",
-    load_on_install=False,
-    comparator="<string>",
-    value="<value>"
-)
+obj = BufferInRangeTransition()
+obj.child_ids='list()()'
+obj.buffer_id="<string>"
+obj.id="<string>"
+obj.load_on_install=False
+obj.comparator="<string>"
+obj.value="<value>"
 ```
 
 ## `CompareBufferTransition` (from `transitions\CompareBufferTransition.py`)
@@ -695,14 +669,13 @@ If the buffer matches the target, the transition is successful.
 # Example usage of `CompareBufferTransition`
 from pydatagrabber import CompareBufferTransition  # Adjust import if needed
 
-obj = CompareBufferTransition(
-    child_ids='list()()',
-    buffer_id="<string>",
-    id="<string>",
-    load_on_install=False,
-    comparator="<string>",
-    value="<value>"
-)
+obj = CompareBufferTransition()
+obj.child_ids='list()()'
+obj.buffer_id="<string>"
+obj.id="<string>"
+obj.load_on_install=False
+obj.comparator="<string>"
+obj.value="<value>"
 ```
 
 ## `FalseTransition` (from `transitions\FalseTransition.py`)
@@ -719,11 +692,10 @@ A transition that always returns False.
 # Example usage of `FalseTransition`
 from pydatagrabber import FalseTransition  # Adjust import if needed
 
-obj = FalseTransition(
-    child_ids='list()()',
-    id="<string>",
-    load_on_install=False
-)
+obj = FalseTransition()
+obj.child_ids='list()()'
+obj.id="<string>"
+obj.load_on_install=False
 ```
 
 ## `TrueTransition` (from `transitions\TrueTransition.py`)
@@ -741,9 +713,8 @@ This is used to test the statemachine without any conditions.
 # Example usage of `TrueTransition`
 from pydatagrabber import TrueTransition  # Adjust import if needed
 
-obj = TrueTransition(
-    child_ids='list()()',
-    id="<string>",
-    load_on_install=False
-)
+obj = TrueTransition()
+obj.child_ids='list()()'
+obj.id="<string>"
+obj.load_on_install=False
 ```

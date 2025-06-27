@@ -38,19 +38,18 @@
 # Example usage of `Mapping`
 from pydatagrabber import Mapping  # Adjust import if needed
 
-obj = Mapping(
-    id="<string>",
-    load_on_install=False,
-    buffer_ids="<string>",
-    adapter_id="<string>",
-    addresses="<string>",
-    thread_type='ThreadType.MILLI_SECOND.value',
-    mapping_type="<string>",
-    n=1,
-    sampling_period=100,
-    persistent=True,
-    auto_start=True
-)
+obj = Mapping()
+obj.id="<string>"
+obj.load_on_install=False
+obj.buffer_ids="<string>"
+obj.adapter_id="<string>"
+obj.addresses="<string>"
+obj.thread_type='ThreadType.MILLI_SECOND.value'
+obj.mapping_type="<string>"
+obj.n=1
+obj.sampling_period=100
+obj.persistent=True
+obj.auto_start=True
 ```
 
 ## `MappingObserver` (from `MappingObserver.py`)
@@ -67,10 +66,9 @@ abstract base class for mapping observers
 # Example usage of `MappingObserver`
 from pydatagrabber import MappingObserver  # Adjust import if needed
 
-obj = MappingObserver(
-    id="<string>",
-    load_on_install=False
-)
+obj = MappingObserver()
+obj.id="<string>"
+obj.load_on_install=False
 ```
 
 ## `MappingThread` (from `MappingThread.py`)
@@ -85,10 +83,9 @@ obj = MappingObserver(
 # Example usage of `MappingThread`
 from pydatagrabber import MappingThread  # Adjust import if needed
 
-obj = MappingThread(
-    id="<string>",
-    load_on_install=False
-)
+obj = MappingThread()
+obj.id="<string>"
+obj.load_on_install=False
 ```
 
 ## `Observer` (from `Observer.py`)
@@ -103,10 +100,9 @@ obj = MappingThread(
 # Example usage of `Observer`
 from pydatagrabber import Observer  # Adjust import if needed
 
-obj = Observer(
-    id="<string>",
-    load_on_install=False
-)
+obj = Observer()
+obj.id="<string>"
+obj.load_on_install=False
 ```
 
 ## `ObserverThread` (from `ObserverThread.py`)
@@ -123,12 +119,11 @@ obj = Observer(
 # Example usage of `ObserverThread`
 from pydatagrabber import ObserverThread  # Adjust import if needed
 
-obj = ObserverThread(
-    id="<string>",
-    load_on_install=False,
-    SAFETY_DIFF_TIME_UNITS=1,
-    SLEEP_WITH_HOLD_FACTOR=3.14
-)
+obj = ObserverThread()
+obj.id="<string>"
+obj.load_on_install=False
+obj.SAFETY_DIFF_TIME_UNITS=1
+obj.SLEEP_WITH_HOLD_FACTOR=3.14
 ```
 
 ## `PublishMappingObserver` (from `PublishMappingObserver.py`)
@@ -143,10 +138,9 @@ obj = ObserverThread(
 # Example usage of `PublishMappingObserver`
 from pydatagrabber import PublishMappingObserver  # Adjust import if needed
 
-obj = PublishMappingObserver(
-    id="<string>",
-    load_on_install=False
-)
+obj = PublishMappingObserver()
+obj.id="<string>"
+obj.load_on_install=False
 ```
 
 ## `ReadMappingObserver` (from `ReadMappingObserver.py`)
@@ -161,10 +155,9 @@ obj = PublishMappingObserver(
 # Example usage of `ReadMappingObserver`
 from pydatagrabber import ReadMappingObserver  # Adjust import if needed
 
-obj = ReadMappingObserver(
-    id="<string>",
-    load_on_install=False
-)
+obj = ReadMappingObserver()
+obj.id="<string>"
+obj.load_on_install=False
 ```
 
 ## `SubscribeMappingObserver` (from `SubscribeMappingObserver.py`)
@@ -179,10 +172,9 @@ obj = ReadMappingObserver(
 # Example usage of `SubscribeMappingObserver`
 from pydatagrabber import SubscribeMappingObserver  # Adjust import if needed
 
-obj = SubscribeMappingObserver(
-    id="<string>",
-    load_on_install=False
-)
+obj = SubscribeMappingObserver()
+obj.id="<string>"
+obj.load_on_install=False
 ```
 
 ## `WriteMappingObserver` (from `WriteMappingObserver.py`)
@@ -197,8 +189,7 @@ obj = SubscribeMappingObserver(
 # Example usage of `WriteMappingObserver`
 from pydatagrabber import WriteMappingObserver  # Adjust import if needed
 
-obj = WriteMappingObserver(
-    id="<string>",
-    load_on_install=False
-)
+obj = WriteMappingObserver()
+obj.id="<string>"
+obj.load_on_install=False
 ```

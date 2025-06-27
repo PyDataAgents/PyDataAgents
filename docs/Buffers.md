@@ -38,15 +38,14 @@ Abstract base class for buffers.
 # Example usage of `Buffer`
 from pydatagrabber import Buffer  # Adjust import if needed
 
-obj = Buffer(
-    id="<string>",
-    load_on_install=False,
-    capacity=1,
-    data_type='DataType.FLOAT.value',
-    initial_values="<value>",
-    unit="<value>",
-    description="<string>"
-)
+obj = Buffer()
+obj.id="<string>"
+obj.load_on_install=False
+obj.capacity=1
+obj.data_type='DataType.FLOAT.value'
+obj.initial_values="<value>"
+obj.unit="<value>"
+obj.description="<string>"
 ```
 
 ## `DictBuffer` (from `DictBuffer.py`)
@@ -68,15 +67,14 @@ buffer that stores its values in a dictionary in a table like fashion, where eve
 # Example usage of `DictBuffer`
 from pydatagrabber import DictBuffer  # Adjust import if needed
 
-obj = DictBuffer(
-    capacity=1,
-    data_type='DataType.FLOAT.value',
-    initial_values="<value>",
-    unit="<value>",
-    description="<string>",
-    id="<string>",
-    load_on_install=False
-)
+obj = DictBuffer()
+obj.capacity=1
+obj.data_type='DataType.FLOAT.value'
+obj.initial_values="<value>"
+obj.unit="<value>"
+obj.description="<string>"
+obj.id="<string>"
+obj.load_on_install=False
 ```
 
 ## `ListBuffer` (from `ListBuffer.py`)
@@ -98,15 +96,14 @@ buffer that stores its values in a capacity limited list
 # Example usage of `ListBuffer`
 from pydatagrabber import ListBuffer  # Adjust import if needed
 
-obj = ListBuffer(
-    capacity=1,
-    data_type='DataType.FLOAT.value',
-    initial_values="<value>",
-    unit="<value>",
-    description="<string>",
-    id="<string>",
-    load_on_install=False
-)
+obj = ListBuffer()
+obj.capacity=1
+obj.data_type='DataType.FLOAT.value'
+obj.initial_values="<value>"
+obj.unit="<value>"
+obj.description="<string>"
+obj.id="<string>"
+obj.load_on_install=False
 ```
 
 ## `ObjectTransformation` (from `ObjectTransformation.py`)
@@ -123,11 +120,10 @@ Abstract base class for object transformations for buffers
 # Example usage of `ObjectTransformation`
 from pydatagrabber import ObjectTransformation  # Adjust import if needed
 
-obj = ObjectTransformation(
-    id="<string>",
-    load_on_install=False,
-    datatype='DataType.FLOAT.value'
-)
+obj = ObjectTransformation()
+obj.id="<string>"
+obj.load_on_install=False
+obj.datatype='DataType.FLOAT.value'
 ```
 
 ## `SampledBuffer` (from `SampledBuffer.py`)
@@ -148,15 +144,14 @@ A buffer that samples a signal at a specified interval.
 # Example usage of `SampledBuffer`
 from pydatagrabber import SampledBuffer  # Adjust import if needed
 
-obj = SampledBuffer(
-    capacity=1,
-    data_type='DataType.FLOAT.value',
-    initial_values="<value>",
-    unit="<value>",
-    description="<string>",
-    id="<string>",
-    load_on_install=False
-)
+obj = SampledBuffer()
+obj.capacity=1
+obj.data_type='DataType.FLOAT.value'
+obj.initial_values="<value>"
+obj.unit="<value>"
+obj.description="<string>"
+obj.id="<string>"
+obj.load_on_install=False
 ```
 
 ## `SignalBuffer` (from `SignalBuffer.py`)
@@ -183,17 +178,16 @@ Attributes:
 # Example usage of `SignalBuffer`
 from pydatagrabber import SignalBuffer  # Adjust import if needed
 
-obj = SignalBuffer(
-    capacity=1,
-    data_type='DataType.FLOAT.value',
-    initial_values="<value>",
-    unit="<value>",
-    description="<string>",
-    id="<string>",
-    load_on_install=False,
-    signal="<value>",
-    sampling_period=100
-)
+obj = SignalBuffer()
+obj.capacity=1
+obj.data_type='DataType.FLOAT.value'
+obj.initial_values="<value>"
+obj.unit="<value>"
+obj.description="<string>"
+obj.id="<string>"
+obj.load_on_install=False
+obj.signal="<value>"
+obj.sampling_period=100
 ```
 
 ## `TimedBuffer` (from `TimedBuffer.py`)
@@ -215,15 +209,14 @@ Inherits from ListBuffer.
 # Example usage of `TimedBuffer`
 from pydatagrabber import TimedBuffer  # Adjust import if needed
 
-obj = TimedBuffer(
-    capacity=1,
-    data_type='DataType.FLOAT.value',
-    initial_values="<value>",
-    unit="<value>",
-    description="<string>",
-    id="<string>",
-    load_on_install=False
-)
+obj = TimedBuffer()
+obj.capacity=1
+obj.data_type='DataType.FLOAT.value'
+obj.initial_values="<value>"
+obj.unit="<value>"
+obj.description="<string>"
+obj.id="<string>"
+obj.load_on_install=False
 ```
 
 ## `TransformsBuffer` (from `TransformsBuffer.py`)
@@ -246,16 +239,15 @@ It is used to transform data from one format to another.
 # Example usage of `TransformsBuffer`
 from pydatagrabber import TransformsBuffer  # Adjust import if needed
 
-obj = TransformsBuffer(
-    capacity=1,
-    data_type='DataType.FLOAT.value',
-    initial_values="<value>",
-    unit="<value>",
-    description="<string>",
-    id="<string>",
-    load_on_install=False,
-    transformations=[]
-)
+obj = TransformsBuffer()
+obj.capacity=1
+obj.data_type='DataType.FLOAT.value'
+obj.initial_values="<value>"
+obj.unit="<value>"
+obj.description="<string>"
+obj.id="<string>"
+obj.load_on_install=False
+obj.transformations=[]
 ```
 
 ## `SampledSignal` (from `signals\SampledSignal.py`)
@@ -272,11 +264,10 @@ A class representing a sampled signal for continuously sampled data
 # Example usage of `SampledSignal`
 from pydatagrabber import SampledSignal  # Adjust import if needed
 
-obj = SampledSignal(
-    id="<string>",
-    load_on_install=False,
-    sample_rate=1.0
-)
+obj = SampledSignal()
+obj.id="<string>"
+obj.load_on_install=False
+obj.sample_rate=1.0
 ```
 
 ## `SampledSine` (from `signals\SampledSine.py`)
@@ -303,15 +294,14 @@ Attributes:
 # Example usage of `SampledSine`
 from pydatagrabber import SampledSine  # Adjust import if needed
 
-obj = SampledSine(
-    sample_rate=1.0,
-    id="<string>",
-    load_on_install=False,
-    f=1.0,
-    a=1.0,
-    p=0.0,
-    n=0.0
-)
+obj = SampledSine()
+obj.sample_rate=1.0
+obj.id="<string>"
+obj.load_on_install=False
+obj.f=1.0
+obj.a=1.0
+obj.p=0.0
+obj.n=0.0
 ```
 
 ## `Signal` (from `signals\Signal.py`)
@@ -327,10 +317,9 @@ Abstract base class for signals.
 # Example usage of `Signal`
 from pydatagrabber import Signal  # Adjust import if needed
 
-obj = Signal(
-    id="<string>",
-    load_on_install=False
-)
+obj = Signal()
+obj.id="<string>"
+obj.load_on_install=False
 ```
 
 ## `Sine` (from `signals\Sine.py`)
@@ -350,14 +339,13 @@ A class to represent a sine wave signal.
 # Example usage of `Sine`
 from pydatagrabber import Sine  # Adjust import if needed
 
-obj = Sine(
-    id="<string>",
-    load_on_install=False,
-    f=1.0,
-    a=1.0,
-    p=0.0,
-    n=0.0
-)
+obj = Sine()
+obj.id="<string>"
+obj.load_on_install=False
+obj.f=1.0
+obj.a=1.0
+obj.p=0.0
+obj.n=0.0
 ```
 
 ## `ClippingTransformation` (from `transformations\ClippingTransformation.py`)
@@ -375,11 +363,10 @@ obj = Sine(
 # Example usage of `ClippingTransformation`
 from pydatagrabber import ClippingTransformation  # Adjust import if needed
 
-obj = ClippingTransformation(
-    datatype='DataType.FLOAT.value',
-    id="<string>",
-    load_on_install=False,
-    lower_limit=0.0,
-    upper_limit=1.0
-)
+obj = ClippingTransformation()
+obj.datatype='DataType.FLOAT.value'
+obj.id="<string>"
+obj.load_on_install=False
+obj.lower_limit=0.0
+obj.upper_limit=1.0
 ```

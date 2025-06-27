@@ -9,6 +9,7 @@
 | [`PlotService`](#plotservice-from-PlotService) |  |
 | [`RAGService`](#ragservice-from-RAGService) | Retrieval Augmented Generation (RAG) Service for document based LLM knowledge retrieval in chat form     |
 | [`Service`](#service-from-Service) | abstract base class for Grabber Services     |
+| [`FolderObserveMailService`](#folderobservemailservice-from-documents\FolderObserveMailService) | `Service` to observe a folder for new files and alert by mail on events. |
 | [`ExcelRestService`](#excelrestservice-from-rest\ExcelRestService) | Service for creating a REST API for accessing named Tables in Excel     |
 | [`LLMRestService`](#llmrestservice-from-rest\LLMRestService) | Service for creating a REST API for accessing LLM Models     |
 | [`RestService`](#restservice-from-rest\RestService) | Service for creating a REST API for DataGrabber using FastAPI     |
@@ -28,11 +29,10 @@
 # Example usage of `BrowserAutomationService`
 from pydatagrabber import BrowserAutomationService  # Adjust import if needed
 
-obj = BrowserAutomationService(
-    id="<string>",
-    load_on_install=False,
-    browser_type='EDGE'
-)
+obj = BrowserAutomationService()
+obj.id="<string>"
+obj.load_on_install=False
+obj.browser_type='EDGE'
 ```
 
 ## `LLMService` (from `LLMService.py`)
@@ -55,15 +55,14 @@ LLM Service for chat based LLM interaction
 # Example usage of `LLMService`
 from pydatagrabber import LLMService  # Adjust import if needed
 
-obj = LLMService(
-    id="<string>",
-    load_on_install=False,
-    api_key="<string>",
-    endpoint="<string>",
-    model_provider="<string>",
-    model="<string>",
-    retain_messages=False
-)
+obj = LLMService()
+obj.id="<string>"
+obj.load_on_install=False
+obj.api_key="<string>"
+obj.endpoint="<string>"
+obj.model_provider="<string>"
+obj.model="<string>"
+obj.retain_messages=False
 ```
 
 ## `PlotService` (from `PlotService.py`)
@@ -78,10 +77,9 @@ obj = LLMService(
 # Example usage of `PlotService`
 from pydatagrabber import PlotService  # Adjust import if needed
 
-obj = PlotService(
-    id="<string>",
-    load_on_install=False
-)
+obj = PlotService()
+obj.id="<string>"
+obj.load_on_install=False
 ```
 
 ## `RAGService` (from `RAGService.py`)
@@ -108,19 +106,18 @@ Retrieval Augmented Generation (RAG) Service for document based LLM knowledge re
 # Example usage of `RAGService`
 from pydatagrabber import RAGService  # Adjust import if needed
 
-obj = RAGService(
-    id="<string>",
-    load_on_install=False,
-    api_key="<string>",
-    endpoint="<string>",
-    model_provider="<string>",
-    model="<string>",
-    document_links='list()()',
-    retain_messages=False,
-    ignore_invalid_documents=False,
-    embedding_model='all-MiniLM-L6-v2',
-    persist_directory="<string>"
-)
+obj = RAGService()
+obj.id="<string>"
+obj.load_on_install=False
+obj.api_key="<string>"
+obj.endpoint="<string>"
+obj.model_provider="<string>"
+obj.model="<string>"
+obj.document_links='list()()'
+obj.retain_messages=False
+obj.ignore_invalid_documents=False
+obj.embedding_model='all-MiniLM-L6-v2'
+obj.persist_directory="<string>"
 ```
 
 ## `Service` (from `Service.py`)
@@ -137,10 +134,53 @@ abstract base class for Grabber Services
 # Example usage of `Service`
 from pydatagrabber import Service  # Adjust import if needed
 
-obj = Service(
-    id="<string>",
-    load_on_install=False
-)
+obj = Service()
+obj.id="<string>"
+obj.load_on_install=False
+```
+
+## `FolderObserveMailService` (from `documents\FolderObserveMailService.py`)
+
+`Service` to observe a folder for new files and alert by mail on events.
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `id` | `str` | `` | unique identifier of element in DataGrabber application |
+| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+| `folder` | `str` | `` | Path to the folder to observe. |
+| `interval` | `int` | `'60 * 60 * 24'` | Interval in seconds to check the folder for new files. |
+| `skip_weekends` | `bool` | `True` | If True, the service will not check for new files on weekends. |
+| `max_entries` | `int` | `5` | Maximum number of entries to keep as history. |
+| `list_files` | `bool` | `True` | If True, the service will list files in the mail body. |
+| `html_report` | `bool` | `True` | If True, the mail will be sent as HTML. |
+| `mail_action` | `MailAction` | `'None()'` | MailAction object to send a mail with file infos. |
+| `COL_DATE` | `str` | `` |  |
+| `COL_NUM_FILES` | `str` | `` |  |
+| `COL_FOLDER_SIZE` | `str` | `` |  |
+| `COL_FILE_EXTENSIONS` | `str` | `` |  |
+| `COL_FILENAME` | `str` | `` |  |
+| `COL_LINK` | `str` | `` |  |
+
+
+```python
+# Example usage of `FolderObserveMailService`
+from pydatagrabber import FolderObserveMailService  # Adjust import if needed
+
+obj = FolderObserveMailService()
+obj.id="<string>"
+obj.load_on_install=False
+obj.folder="path/to/folder"
+obj.interval='60 * 60 * 24'
+obj.skip_weekends=True
+obj.max_entries=5
+obj.list_files=True
+obj.html_report=True
+obj.mail_action='None()'
+obj.COL_DATE="<string>"
+obj.COL_NUM_FILES="path/to/file.txt"
+obj.COL_FOLDER_SIZE="path/to/folder"
+obj.COL_FILE_EXTENSIONS="path/to/file.txt"
+obj.COL_FILENAME="path/to/file.txt"
+obj.COL_LINK="<string>"
 ```
 
 ## `ExcelRestService` (from `rest\ExcelRestService.py`)
@@ -159,12 +199,11 @@ Service for creating a REST API for accessing named Tables in Excel
 # Example usage of `ExcelRestService`
 from pydatagrabber import ExcelRestService  # Adjust import if needed
 
-obj = ExcelRestService(
-    port=8001,
-    id="<string>",
-    load_on_install=False,
-    excel_file="path/to/file.txt"
-)
+obj = ExcelRestService()
+obj.port=8001
+obj.id="<string>"
+obj.load_on_install=False
+obj.excel_file="path/to/file.txt"
 ```
 
 ## `LLMRestService` (from `rest\LLMRestService.py`)
@@ -182,11 +221,10 @@ Service for creating a REST API for accessing LLM Models
 # Example usage of `LLMRestService`
 from pydatagrabber import LLMRestService  # Adjust import if needed
 
-obj = LLMRestService(
-    port=8001,
-    id="<string>",
-    load_on_install=False
-)
+obj = LLMRestService()
+obj.port=8001
+obj.id="<string>"
+obj.load_on_install=False
 ```
 
 ## `RestService` (from `rest\RestService.py`)
@@ -204,9 +242,8 @@ Service for creating a REST API for DataGrabber using FastAPI
 # Example usage of `RestService`
 from pydatagrabber import RestService  # Adjust import if needed
 
-obj = RestService(
-    id="<string>",
-    load_on_install=False,
-    port=8001
-)
+obj = RestService()
+obj.id="<string>"
+obj.load_on_install=False
+obj.port=8001
 ```
