@@ -3,7 +3,7 @@ from dataclasses import dataclass, field
 from .BrowserAutomationAction import BrowserAutomationAction
 
 @dataclass
-class UrlNavigateAction(BrowserAutomationAction):
+class BrowserUrlNavigateAction(BrowserAutomationAction):
     
     url : str = field(default=None, metadata={"description" : "url to navigate to in browser"})
     

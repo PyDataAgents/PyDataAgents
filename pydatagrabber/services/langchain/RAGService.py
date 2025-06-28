@@ -12,23 +12,16 @@ from langchain.chains.llm import LLMChain
 from langchain_community.vectorstores.utils import filter_complex_metadata
 import requests
 
-from ...services.Service import Service
+from ...services.langchain.LLMService import LLMService
 from ...services.ServiceException import ServiceException
-from ...grabbers.Grabber import Grabber
 
 
 @dataclass
-class RAGService(Service):
+class RAGService(LLMService):
     """Retrieval Augmented Generation (RAG) Service for document based LLM knowledge retrieval in chat form
-
     """
     
-    api_key : str = field(default=None, metadata={"description": "api token for a web based model provider, e.g. OPENAI"})
-    endpoint : str = field(default=None, metadata={"description": "endpoint of the LLM provider"})
-    model_provider : str = field(default=None, metadata={"description": "name of the model provider, e.g. OPENAI | OLLAMA | ..."})
-    model : str = field(default=None, metadata={"description": "name of the model, e.g. gpt-4o | gemma:1b | ... "})
     document_links : list[str] = field(default_factory=list(), metadata={"description": "list of document links to load into embedded store on startup"})
-    retain_messages : bool = field(default=False, metadata={"description": "specify True if you want to retain the chat history for context"})
     ignore_invalid_documents : bool = field(default=False, metadata={"description": "api token for a web based model provider, e.g. OPENAI"})
     embedding_model : str = field(default="all-MiniLM-L6-v2", metadata={"description": "name of the embedding model to use for embedding store"})
     persist_directory : str = field(default=None, metadata={"description": "directory for persisting the embedded store"})
@@ -39,10 +32,7 @@ class RAGService(Service):
         self.retriever = None
         self.retrieval_chain = None
         self.document_links = list()
-    
-    def install(self, grabber : Grabber = None):
-        super().install()
-        
+            
     def start(self):
         self.embedding_model = HuggingFaceEmbeddings(model_name=self.embedding_model)
         if self.persist_directory is None:
@@ -98,7 +88,7 @@ class RAGService(Service):
     
     @staticmethod
     def __load_pdf_from_url(url, local_path="temp.pdf"):
-        r = requests.get(url)
+        r = requests.get(url, timeout=20)
         with open(local_path, "wb") as f:
             f.write(r.content)
 
