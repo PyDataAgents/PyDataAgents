@@ -159,6 +159,7 @@ obj.load_on_install=False
 | `COL_FILE_EXTENSIONS` | `str` | `` |  |
 | `COL_FILENAME` | `str` | `` |  |
 | `COL_LINK` | `str` | `` |  |
+| `MAX_FILES` | `int` | `` |  |
 
 
 ```python
@@ -181,6 +182,7 @@ obj.COL_FOLDER_SIZE="path/to/folder"
 obj.COL_FILE_EXTENSIONS="path/to/file.txt"
 obj.COL_FILENAME="path/to/file.txt"
 obj.COL_LINK="<string>"
+obj.MAX_FILES=1
 ```
 
 ## `ExcelRestService` (from `rest\ExcelRestService.py`)
