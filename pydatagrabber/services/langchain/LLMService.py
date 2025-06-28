@@ -1,13 +1,13 @@
 from dataclasses import dataclass, field
 
 from langchain_openai import ChatOpenAI
-from langchain_community.llms import Ollama
-from langchain.chains import ConversationChain
+from langchain_ollama import OllamaLLM
 from langchain.memory import ConversationBufferMemory
+from langchain.chains.llm import LLMChain
 
-from .ServiceException import ServiceException
-from ..grabbers.Grabber import Grabber
-from .Service import Service
+from ...services.ServiceException import ServiceException
+from ...grabbers.Grabber import Grabber
+from ...services.Service import Service
 
 
 @dataclass
@@ -36,17 +36,17 @@ class LLMService(Service):
             case "OPENAI":
                 llm = ChatOpenAI(model_name=self.model, openai_api_key=self.api_key)
             case "OLLAMA":
-                llm = Ollama(model = self.model, base_url = self.endpoint)
+                llm = OllamaLLM(model = self.model, base_url = self.endpoint)
             case _:
                 raise ServiceException("Unknown Model " + self.model + " for " + self.cname())
                 
         if self.retain_messages:
-            self.retrieval_chain = ConversationChain(
+            self.retrieval_chain = LLMChain(
                 llm=llm,
                 memory=ConversationBufferMemory()
             )
         else:
-            self.retrieval_chain = ConversationChain(
+            self.retrieval_chain = LLMChain(
                 llm=llm
             )
     
@@ -54,5 +54,5 @@ class LLMService(Service):
         self.retrieval_chain = None
     
     def chat(self, question : str) -> dict:
-        result = self.retrieval_chain.invoke(question)
+        result = self.retrieval_chain.run(question)
         return result

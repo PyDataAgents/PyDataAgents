@@ -6,16 +6,15 @@ from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_unstructured import UnstructuredLoader
 from langchain_text_splitters import CharacterTextSplitter
 from langchain_openai import ChatOpenAI
-from langchain_community.llms import Ollama
+from langchain_ollama import OllamaLLM
 from langchain.memory import ConversationBufferMemory
-from langchain.chains import RetrievalQA
-from langchain.chains import ConversationalRetrievalChain
+from langchain.chains.llm import LLMChain
 from langchain_community.vectorstores.utils import filter_complex_metadata
 import requests
 
-from .ServiceException import ServiceException
-from ..grabbers.Grabber import Grabber
-from .Service import Service
+from ...services.Service import Service
+from ...services.ServiceException import ServiceException
+from ...grabbers.Grabber import Grabber
 
 
 @dataclass
@@ -57,19 +56,19 @@ class RAGService(Service):
             case "OPENAI":
                 llm = ChatOpenAI(model_name=self.model, openai_api_key=self.api_key)
             case "OLLAMA":
-                llm = Ollama(model = self.model, base_url = self.endpoint)
+                llm = OllamaLLM(model = self.model, base_url = self.endpoint)
             case _:
                 raise ServiceException("Unknown Model " + self.model + " for " + self.cname())
                 
         if self.retain_messages:
-            self.retrieval_chain = ConversationalRetrievalChain.from_llm(
+            self.retrieval_chain = LLMChain(
                 llm = llm,
                 retriever = self.retriever,
                 memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True),
                 return_source_documents = True
             )
         else:
-            self.retrieval_chain = RetrievalQA.from_chain_type(
+            self.retrieval_chain = LLMChain(
                 llm = llm,
                 retriever = self.retriever,
                 return_source_documents = True
@@ -77,7 +76,6 @@ class RAGService(Service):
     
     def stop(self):
         self.retrieval_chain = None
-        self.embedding_store.persist()
         self.embedding_store = None
         self.embedding_model = None
     
@@ -93,8 +91,6 @@ class RAGService(Service):
         text_splitter = CharacterTextSplitter(chunk_size=500, chunk_overlap=100)
         split_docs = text_splitter.split_documents(filtered_docs)
         self.embedding_store.add_documents(split_docs)
-        if self.persist_directory is not None:
-            self.embedding_store.persist()
 
     def chat(self, question : str) -> dict:
         result = self.retrieval_chain.invoke(question)

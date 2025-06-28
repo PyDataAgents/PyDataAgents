@@ -2,8 +2,8 @@ from __future__ import annotations
 from fastapi import APIRouter, Path, Query
 from loguru import logger
 
-from ...services.LLMService import LLMService
-from ...services.RAGService import RAGService
+from ..langchain.LLMService import LLMService
+from ..langchain.RAGService import RAGService
 from ...grabbers.Grabber import Grabber
 
 ROOT_URL : str = "/api/v1/llm"
