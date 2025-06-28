@@ -24,23 +24,24 @@ class RAGService(LLMService):
     
     document_links : list[str] = field(default_factory=list(), metadata={"description": "list of document links to load into embedded store on startup"})
     ignore_invalid_documents : bool = field(default=False, metadata={"description": "api token for a web based model provider, e.g. OPENAI"})
-    embedding_model : str = field(default="all-MiniLM-L6-v2", metadata={"description": "name of the embedding model to use for embedding store"})
+    embedding_model_name : str = field(default="all-MiniLM-L6-v2", metadata={"description": "name of the embedding model to use for embedding store"})
     persist_directory : str = field(default=None, metadata={"description": "directory for persisting the embedded store"})
     
     def __init__(self):
         super().__init__()
         self.langchain = None
         self.embedding_store = None
+        self.embedding_model = None
         self.retriever = None
         self.document_links = list()
             
     def start(self):
-        self.embedding_model = HuggingFaceEmbeddings(model_name=self.embedding_model)
+        self.embedding_model = HuggingFaceEmbeddings(model_name=self.embedding_model_name)
         if self.persist_directory is None:
             self.embedding_store = Chroma(embedding_function=self.embedding_model)                       
         else:
             self.embedding_store = Chroma(persist_directory=self.persist_directory, embedding_function=self.embedding_model)
-        self.LOGGER.debug("created embedding store with embedding model " + self.embedding_model)
+        self.LOGGER.debug("created embedding store with embedding model " + self.embedding_model_name)
         for document_link in self.document_links:
             self.add_document(document_link)
             self.LOGGER.debug("emebedded cocument " + document_link + " into embedding store")
