@@ -1,0 +1,16 @@
+{
+    "name": "#NAME",
+    "type": "yesoreyeram-infinity-datasource",
+    "typeName": "Infinity",
+    "typeLogoUrl": "public/plugins/yesoreyeram-infinity-datasource/img/icon.svg",
+    "access": "proxy",
+    "url": "#ENDPOINT",
+    "user": "",
+    "database": "",
+    "basicAuth": false,
+    "isDefault": false,
+    "jsonData": {
+      "global_queries": []
+    },
+    "readOnly": false
+}

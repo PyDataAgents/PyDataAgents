@@ -1,0 +1,57 @@
+{
+  "type": "ae3e-plotly-panel",
+  "title": "#TITLE",
+  "description": "Plotly Panel for TimedBuffer",
+  "gridPos": #GRID_POS,  
+  "fieldConfig": {
+    "defaults": {},
+    "overrides": []
+  },
+  "pluginVersion": "0.5.0",
+	"targets": [
+        {
+          "columns": [
+            {
+              "selector": "timestamps",
+              "text": "time",
+              "type": "timestamp_epoch"
+            },
+            {
+              "selector": "values",
+              "text": "amplitude",
+              "type": "number"
+            }
+          ],
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "#UID"
+          },
+          "filters": [],
+          "format": "dataframe",
+          "global_query_id": "",
+          "json_options": {
+            "columnar": true
+          },
+          "refId": "A",
+          "root_selector": "",
+          "source": "url",
+          "type": "json",
+          "url": "/buffers/#BUFFER_ID/data?n=#NUM_OF_SAMPLES",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        }
+  	],
+  "datasource": {
+    "type": "yesoreyeram-infinity-datasource",
+    "uid": "#UID"
+  },
+  "options": {
+  	"config": "",
+    "data": "",
+    "layout": "",
+    "onclick": "",
+    "script": "//console.log(data);\n//console.log(data.series[0].fields[0].values);\nvar trace = {\n  x: data.series[0].fields[0].values,\n  y: data.series[0].fields[1].values,\n};\n\nvar layout = {\n  title: '#TITLE',\n  xaxis: {\n    title: {\n      text: 'X'\n    },\n  },\n  yaxis: {\n    title: {\n      text: 'Y'\n    }\n  }\n}\n\nreturn {data:[trace],layout: layout};"
+  }
+}

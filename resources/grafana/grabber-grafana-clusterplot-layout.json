@@ -1,0 +1,23 @@
+{
+    "font": {
+      "family": "Inter, Helvetica, Arial, sans-serif"
+    },
+    "margin": {
+      "b": 0,
+      "l": 0,
+      "r": 0,
+      "t": 0
+    },
+    "title": {
+      "automargin": true
+    },
+    "xaxis": {
+      "automargin": true,
+      "autorange": true,
+      "type": "number"
+    },
+    "yaxis": {
+      "automargin": true,
+      "autorange": true
+    }
+}
