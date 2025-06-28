@@ -7,8 +7,9 @@ from langchain_unstructured import UnstructuredLoader
 from langchain_text_splitters import CharacterTextSplitter
 from langchain_openai import ChatOpenAI
 from langchain_ollama import OllamaLLM
-from langchain.memory import ConversationBufferMemory
-from langchain.chains.llm import LLMChain
+from langchain_core.prompts import PromptTemplate, ChatPromptTemplate, MessagesPlaceholder
+from langchain_core.runnables import RunnableSequence, RunnableWithMessageHistory
+from langchain_core.chat_history import InMemoryChatMessageHistory
 from langchain_community.vectorstores.utils import filter_complex_metadata
 import requests
 
@@ -28,9 +29,9 @@ class RAGService(LLMService):
     
     def __init__(self):
         super().__init__()
+        self.langchain = None
         self.embedding_store = None
         self.retriever = None
-        self.retrieval_chain = None
         self.document_links = list()
             
     def start(self):
@@ -51,21 +52,29 @@ class RAGService(LLMService):
                 raise ServiceException("Unknown Model " + self.model + " for " + self.cname())
                 
         if self.retain_messages:
-            self.retrieval_chain = LLMChain(
-                llm = llm,
-                retriever = self.retriever,
-                memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True),
-                return_source_documents = True
+            prompt = ChatPromptTemplate.from_messages([
+                MessagesPlaceholder(variable_name="history"),
+                ("human", "{question}"),
+            ])
+            
+            chain  = prompt | llm # using pip operator to chain prompt and llm
+            
+            self.langchain = RunnableWithMessageHistory(
+                chain,
+                InMemoryChatMessageHistory(),
+                input_messages_key="question",     # where to pull current user input
+                history_messages_key="history"  # matches MessagesPlaceholder
             )
+            
         else:
-            self.retrieval_chain = LLMChain(
-                llm = llm,
-                retriever = self.retriever,
-                return_source_documents = True
+            prompt = PromptTemplate.from_template(
+                "You are a helpful assistant. Answer the following question:\n\n{question}"
             )
+            self.langchain = prompt | llm # using pip operator to chain prompt and llm
+
     
     def stop(self):
-        self.retrieval_chain = None
+        self.langchain = None
         self.embedding_store = None
         self.embedding_model = None
     
@@ -83,7 +92,7 @@ class RAGService(LLMService):
         self.embedding_store.add_documents(split_docs)
 
     def chat(self, question : str) -> dict:
-        result = self.retrieval_chain.invoke(question)
+        result = self.langchain.invoke({"question": question})
         return result
     
     @staticmethod

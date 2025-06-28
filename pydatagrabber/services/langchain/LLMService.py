@@ -2,8 +2,10 @@ from dataclasses import dataclass, field
 
 from langchain_openai import ChatOpenAI
 from langchain_ollama import OllamaLLM
-from langchain.memory import ConversationBufferMemory
-from langchain.chains.llm import LLMChain
+from langchain_core.prompts import PromptTemplate, ChatPromptTemplate, MessagesPlaceholder
+from langchain_core.runnables import RunnableWithMessageHistory
+from langchain_core.chat_history import InMemoryChatMessageHistory
+
 
 from ...services.ServiceException import ServiceException
 from ...grabbers.Grabber import Grabber
@@ -26,7 +28,7 @@ class LLMService(Service):
         super().__init__()
         self.embedding_store = None
         self.retriever = None
-        self.retrieval_chain = None
+        self.langchain = None
     
     def install(self, grabber : Grabber = None):
         super().install()
@@ -34,25 +36,36 @@ class LLMService(Service):
     def start(self):
         match self.model_provider:
             case "OPENAI":
-                llm = ChatOpenAI(model_name=self.model, openai_api_key=self.api_key)
+                llm = ChatOpenAI(model_name=self.model, openai_api_key=self.api_key, temperature=0)
             case "OLLAMA":
                 llm = OllamaLLM(model = self.model, base_url = self.endpoint)
             case _:
                 raise ServiceException("Unknown Model " + self.model + " for " + self.cname())
                 
         if self.retain_messages:
-            self.retrieval_chain = LLMChain(
-                llm=llm,
-                memory=ConversationBufferMemory()
-            )
+            prompt = ChatPromptTemplate.from_messages([
+                MessagesPlaceholder(variable_name="history"),
+                ("human", "{question}"),
+            ])
+            
+            chain  = prompt | llm # using pip operator to chain prompt and llm
+            
+            self.langchain = RunnableWithMessageHistory(
+                chain,
+                InMemoryChatMessageHistory(),
+                input_messages_key="question",     # where to pull current user input
+                history_messages_key="history"  # matches MessagesPlaceholder
+            )           
+           
         else:
-            self.retrieval_chain = LLMChain(
-                llm=llm
+            prompt = PromptTemplate.from_template(
+                "You are a helpful assistant. Answer the following question:\n\n{question}"
             )
+            self.langchain = prompt | llm
     
     def stop(self):
-        self.retrieval_chain = None
+        self.langchain = None
     
     def chat(self, question : str) -> dict:
-        result = self.retrieval_chain.run(question)
+        result = self.langchain.invoke(question)
         return result
