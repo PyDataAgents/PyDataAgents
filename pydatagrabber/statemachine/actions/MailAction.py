@@ -24,7 +24,7 @@ class MailAction(Action):
     def execute(self):
         # Create message
         message = MIMEMultipart("alternative")
-        message["Subject"] = "Test Email from Python via GMX"
+        message["Subject"] = self.subject if self.subject else "Do Not Reply - Mail from " + self.cname()
         message["From"] = self.mail_account
         message["To"] = self.recipient
         

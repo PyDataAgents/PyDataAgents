@@ -18,11 +18,11 @@ class Service(GrabberElement):
         
     @abstractmethod
     def start(self):
-        pass
+        self.is_running = True
     
     @abstractmethod
     def stop(self):
-        pass
+        self.is_running = False
     
     
     

@@ -1,8 +1,8 @@
 from dataclasses import dataclass, field
 from datetime import datetime
 
-from pydatagrabber.utils.FileUtils import FileUtils
-
+from ...utils.BufferUtils import BufferUtils
+from ...utils.FileUtils import FileUtils
 from ...utils.TimeUtils import TimeUtils
 from ...mappings.Observer import Observer
 from ...mappings.ThreadType import ThreadType
@@ -34,6 +34,8 @@ class FolderObserveMailService(Service):
     COL_FILE_EXTENSIONS : str = "File Extensions"
     COL_FILENAME : str = "Filename"
     COL_LINK : str = "Link"
+    
+    MAX_FILES : int = 50  # Maximum number of files to list in the mail body
         
     def __init__(self):
         super().__init__()
@@ -44,16 +46,17 @@ class FolderObserveMailService(Service):
         super().install()
         # instatiate buffer for file history
         self.file_history_buffer = DictBuffer()
-        self.file_history_buffer.id = self.id + " - FILE HISTORY",
-        self.file_history_buffer.capacity = self.max_entries,
-        self.file_history_buffer.description = "Buffer to keep track of file history in the observed folder."        
+        self.file_history_buffer.id = self.id + " - FILE HISTORY"
+        self.file_history_buffer.capacity = self.max_entries
+        self.file_history_buffer.description = "Buffer to keep track of file history in the observed folder."
 
     def start(self):
         super().start()
         # create new thread for update interval of folder observation
         self.service_thread = ObserverThread(self.unique_id() + "-Thread", ThreadType.MILLI_SECOND, self.interval * 1000)
         observer = FolderMailObserver(self)
-        self.service_thread.add_observer(observer)     
+        self.service_thread.add_observer(observer)
+        self.service_thread.start()     
 
     def stop(self):
         pass
@@ -81,7 +84,7 @@ class FolderMailObserver(Observer):
             return
 
         nf = len(files)
-        fb = FileUtils.get_folder_bytes(self.service.folder) / (1024 * 1024)  # Convert to MB
+        fb = round(FileUtils.get_folder_bytes(self.service.folder) / (1024 * 1024),2)  # Convert to MB
         file_extensions = FileUtils.get_extensions_from_folder(self.service.folder)
         
         row_data = {
@@ -94,8 +97,30 @@ class FolderMailObserver(Observer):
         self.service.file_history_buffer.push(row_data)
         
         # create html table from dictbuffer
-        # TODO
+        body = BufferUtils.dict_buffer_to_html(self.service.file_history_buffer)
+        body = "<h4>" + FolderObserveMailService.cname() + " - " + self.service.folder + "</h4>\n" + body
         
+        # add file infos to body
+        if self.service.list_files:
+            body += "\n<hr><h4>Files:</h4>"
+            file_buf = DictBuffer()
+            file_buf.capacity = self.service.MAX_FILES
+            for f in files:
+                file_row = {
+                    self.service.COL_FILENAME: f,
+                    self.service.COL_LINK: f"<a href='file://{f}'>LINK</a>"
+                }
+                file_buf.push(file_row)
+                        
+            body += BufferUtils.dict_buffer_to_html(file_buf)
+            if len(files) > self.service.MAX_FILES:
+                body += f"Note: Only the last {self.service.MAX_FILES} files are listed."
+        
+        # send mail
+        if self.service.mail_action.subject is None:
+            self.service.mail_action.subject = FolderObserveMailService.cname() + " for " + self.service.folder + " - Do Not Reply"
+        self.service.mail_action.body = body
+        self.service.mail_action.execute()
     
     def unobserve(self):
         pass
