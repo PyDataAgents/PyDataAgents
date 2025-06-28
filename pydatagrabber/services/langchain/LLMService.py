@@ -41,6 +41,7 @@ class LLMService(Service):
                 llm = OllamaLLM(model = self.model, base_url = self.endpoint)
             case _:
                 raise ServiceException("Unknown Model " + self.model + " for " + self.cname())
+        self.LOGGER.debug("created LLM with model " + self.model + " from provider " + self.model_provider)
                 
         if self.retain_messages:
             prompt = ChatPromptTemplate.from_messages([
@@ -62,6 +63,8 @@ class LLMService(Service):
                 "You are a helpful assistant. Answer the following question:\n\n{question}"
             )
             self.langchain = prompt | llm
+            
+        self.LOGGER.debug("created langchain with prompt template and llm")
     
     def stop(self):
         self.langchain = None

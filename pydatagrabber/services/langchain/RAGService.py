@@ -37,11 +37,13 @@ class RAGService(LLMService):
     def start(self):
         self.embedding_model = HuggingFaceEmbeddings(model_name=self.embedding_model)
         if self.persist_directory is None:
-            self.embedding_store = Chroma(embedding_function=self.embedding_model)
-            for document_link in self.document_links:
-                self.add_document(document_link)
+            self.embedding_store = Chroma(embedding_function=self.embedding_model)                       
         else:
             self.embedding_store = Chroma(persist_directory=self.persist_directory, embedding_function=self.embedding_model)
+        self.LOGGER.debug("created embedding store with embedding model " + self.embedding_model)
+        for document_link in self.document_links:
+            self.add_document(document_link)
+            self.LOGGER.debug("emebedded cocument " + document_link + " into embedding store")
         self.retriever = self.embedding_store.as_retriever()
         match self.model_provider:
             case "OPENAI":
@@ -50,6 +52,7 @@ class RAGService(LLMService):
                 llm = OllamaLLM(model = self.model, base_url = self.endpoint)
             case _:
                 raise ServiceException("Unknown Model " + self.model + " for " + self.cname())
+        self.LOGGER.debug("created LLM with model " + self.model + " from provider " + self.model_provider)
                 
         if self.retain_messages:
             prompt = ChatPromptTemplate.from_messages([
@@ -71,7 +74,7 @@ class RAGService(LLMService):
                 "You are a helpful assistant. Answer the following question:\n\n{question}"
             )
             self.langchain = prompt | llm # using pip operator to chain prompt and llm
-
+        self.LOGGER.debug("created langchain with prompt template and llm")
     
     def stop(self):
         self.langchain = None
