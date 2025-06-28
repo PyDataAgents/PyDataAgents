@@ -9,6 +9,7 @@
 | [`PlotService`](#plotservice-from-PlotService) |  |
 | [`RAGService`](#ragservice-from-RAGService) | Retrieval Augmented Generation (RAG) Service for document based LLM knowledge retrieval in chat form     |
 | [`Service`](#service-from-Service) | abstract base class for Grabber Services     |
+| [`CopyFileService`](#copyfileservice-from-documents\CopyFileService) | `Service`to copy files from one location to another |
 | [`FolderObserveMailService`](#folderobservemailservice-from-documents\FolderObserveMailService) | `Service` to observe a folder for new files and alert by mail on events. |
 | [`ExcelRestService`](#excelrestservice-from-rest\ExcelRestService) | Service for creating a REST API for accessing named Tables in Excel     |
 | [`LLMRestService`](#llmrestservice-from-rest\LLMRestService) | Service for creating a REST API for accessing LLM Models     |
@@ -137,6 +138,34 @@ from pydatagrabber import Service  # Adjust import if needed
 obj = Service()
 obj.id="<string>"
 obj.load_on_install=False
+```
+
+## `CopyFileService` (from `documents\CopyFileService.py`)
+
+`Service`to copy files from one location to another
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `id` | `str` | `` | unique identifier of element in DataGrabber application |
+| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+| `source_folders` | `list[str]` | `'list()'` | List of source folders to copy files from. |
+| `target_folder` | `str` | `` | Target folder where files will be copied to. |
+| `move` | `bool` | `False` | If True, files will be moved instead of copied. |
+| `older_than_milliseconds` | `int` | `` | If set, only files older than this time will be copied or moved. |
+| `interval` | `int` | `'60 * 60 * 24'` | Interval in seconds to check for new files. |
+
+
+```python
+# Example usage of `CopyFileService`
+from pydatagrabber import CopyFileService  # Adjust import if needed
+
+obj = CopyFileService()
+obj.id="<string>"
+obj.load_on_install=False
+obj.source_folders='list()'
+obj.target_folder="path/to/folder"
+obj.move=False
+obj.older_than_milliseconds=1
+obj.interval='60 * 60 * 24'
 ```
 
 ## `FolderObserveMailService` (from `documents\FolderObserveMailService.py`)

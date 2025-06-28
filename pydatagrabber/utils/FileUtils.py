@@ -51,6 +51,19 @@ class FileUtils:
         else:
             logger.error("target_file " + target_file + " does not exist")
             return False
+    
+    @staticmethod    
+    def delete_file(file_path : str) -> bool:
+        if FileUtils.exists_file(file_path):
+            try:
+                os.remove(file_path)
+                return True
+            except Exception as e:
+                logger.error(f"Error deleting file {file_path}: {e}")
+                return False
+        else:
+            logger.error("File " + file_path + " does not exist")
+            return False
       
     @staticmethod  
     def list_files(folder : str, pattern : str = None, extension : str = None, newer_than_seconds : int = None) -> list[str]:
@@ -107,3 +120,12 @@ class FileUtils:
         else:
             logger.error("Folder " + folder + " does not exist")
             return []
+    
+    @staticmethod    
+    def get_modified_date_ms(file_path : str) -> int:
+        if FileUtils.exists_file(file_path):
+            timestamp = os.path.getmtime(file_path) * 1000  # Convert to milliseconds
+            return int(timestamp)
+        else:
+            logger.error("File " + file_path + " does not exist")
+            return 0
