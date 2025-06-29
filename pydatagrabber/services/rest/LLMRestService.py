@@ -19,7 +19,7 @@ class LLMRestService(RestService):
     def install(self, grabber : Grabber = None):
         super(Service, self).install()
         self.app = FastAPI(title="DataGrabber " + self.cname(), docs_url="/docs")
-        self.__add_cors()
+        self.add_cors()
         self.app.include_router(LLMRestAPI.get_api_router(grabber))
         
     def deinstall(self, grabber : Grabber = None):

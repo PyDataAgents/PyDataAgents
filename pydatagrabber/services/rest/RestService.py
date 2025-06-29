@@ -25,11 +25,11 @@ class RestService(Service):
     def install(self, grabber : Grabber = None):
         super().install(grabber)
         self.app = FastAPI(title="DataGrabber", docs_url="/docs")
-        self.__add_cors()
+        self.add_cors()
         self.app.include_router(GrabberRESTAPI.get_api_router(self.grabber))
         self.app.include_router(BufferRESTAPI.get_api_router(self.grabber))
     
-    def __add_cors(self):
+    def add_cors(self):
         """Add CORS middleware to the FastAPI app.
         This allows cross-origin requests to the REST API.
         """
