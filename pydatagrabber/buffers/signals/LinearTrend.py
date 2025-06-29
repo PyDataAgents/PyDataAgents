@@ -11,8 +11,8 @@ class LinearTrend(Signal):
     A signal that simulates a linear trend
     """
     
-    min : float = field()
-    max : float = field()
+    min : float = field(default=0.0, metadata={"description": "minimum value of the trend"})
+    max : float = field(default=100.0, metadata={"description": "maximum value of the trend"})
     duration : int = field(default=1000 * 1000, metadata={"description": "duration of the trend in milliseconds"})
     noise : float = field(default=0.0, metadata={"description": "noise to add to the trend [0..1]"})
     
