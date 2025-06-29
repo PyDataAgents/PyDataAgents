@@ -27,11 +27,10 @@ class RestService(Service):
         self.app = FastAPI(title="DataGrabber", docs_url="/docs")
         
         # Enable CORS for all origins
-        origins = ["*"]
         self.app.add_middleware(
             CORSMiddleware,
-            allow_origins=origins,  # Allows all origins
-            allow_credentials=True,
+            allow_origins=["*"],  # Allows all origins
+            allow_credentials=False,
             allow_methods=["*"],  # Allows all methods (GET, POST, etc.)
             allow_headers=["*"],  # Allows all headers
         )
