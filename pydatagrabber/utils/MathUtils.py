@@ -17,3 +17,10 @@ class MathUtils:
         """
         x = a / 2 * sin(2 * pi * f * t + 2 * pi * p / 360.0) + n * a / 2 * (random.random() - 0.5)
         return x
+    
+    @staticmethod
+    def rand() -> float:
+        """
+        Returns a random float value between 0 and 1.
+        """
+        return random.random()

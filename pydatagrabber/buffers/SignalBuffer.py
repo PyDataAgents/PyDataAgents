@@ -1,4 +1,5 @@
 from dataclasses import dataclass, field
+from time import time
 from apscheduler.schedulers.background import BackgroundScheduler
 from .BufferException import BufferException
 from .TimedBuffer import TimedBuffer
@@ -38,7 +39,7 @@ class SignalBuffer(TimedBuffer):
         This method should be overridden in subclasses to implement specific sampling logic.
         """
         if self.signal is not None:
-            t, v = self.signal.value()
+            t, v = self.signal.value()  # Get the current time in milliseconds
             self.push_timestamps(v, t)                        
         else:
             raise BufferException("No signal set for sampling.")
