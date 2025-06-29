@@ -20,7 +20,7 @@ class MappingThread(GrabberElement):
         self.observer_thread : ObserverThread = None
         
     def start(self, grabber : Grabber):
-        self.observer_thread = ObserverThread(self.observer_thread.unique_id(), self.mapping.thread_type, self.mapping.sampling_period)
+        self.observer_thread = ObserverThread(ObserverThread.unique_id(), self.mapping.thread_type, self.mapping.sampling_period)
         # assemble adapters and buffers from Grabber
         if self.mapping.adapter is None and len(self.mapping.buffers) == 0:
             for buffer_id in self.mapping.buffer_ids:

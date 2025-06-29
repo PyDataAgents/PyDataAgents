@@ -16,6 +16,9 @@ class LinearTrend(Signal):
     duration : int = field(default=1000 * 1000, metadata={"description": "duration of the trend in milliseconds"})
     noise : float = field(default=0.0, metadata={"description": "noise to add to the trend [0..1]"})
     
+    def __init__(self):
+        super().__init__()
+    
     def value(self, t : int = None) -> Tuple[int, float]:
         ti, tf = super().value(t)
         if tf > self.duration:

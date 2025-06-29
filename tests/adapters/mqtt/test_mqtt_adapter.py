@@ -30,8 +30,3 @@ def test_000():
         print(buf.data(1, False))
         time.sleep(1)
         i = i + 1
-    
-    
-        
-    
-    

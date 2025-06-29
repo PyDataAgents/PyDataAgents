@@ -1,4 +1,5 @@
 from dataclasses import dataclass, field
+import json
 import paho.mqtt.client as mqtt
 from ...adapters.AdapterException import AdapterException
 from ...adapters.SubscribeAdapter import SubscribeAdapter
@@ -69,12 +70,12 @@ class MQTTAdapter(SubscribeAdapter, WriteAdapter):
     def unsubscribe(self):
         self.client.unsubscribe(ROOT_TOPIC)
     
-    def write_to_sink(self, buffers : dict[str, Buffer], addresses : list[str], n : int = 1, persistent : bool = True):
+    def write_to_sink(self, buffers : dict[str, Buffer], addresses : list[str], n : int = 0, persistent : bool = True):
         """publish buffer values to mqtt topcis by writing single publish messages
 
         Args:
             buffers (dict[str, Buffer]): dictionary of buffers
-            addresses (list[str]): list of topics to write to
+            addresses (list[str]): list of topics to write to, the topics are just strings in the list, e.g. addresses = ["path/to/topic/value", "path/to/other/topic/status"]
             n (int, optional): number of samples to extract from buffer. Defaults to 1.
             persistent (bool, optional): specifies whether to keep values in buffer after writing to sink. Defaults to True.
 
@@ -86,6 +87,14 @@ class MQTTAdapter(SubscribeAdapter, WriteAdapter):
         a = 0
         for buffer in buffers.values():
             address = addresses[a]
-            val = buffer.data(n = n, persistent = persistent)
+            data = buffer.data(n = n, persistent = persistent)
+            if self.force_numeric:
+                values = data['values']
+                if len(values) > 1:
+                    val = json.dumps(values)
+                else:
+                    val = float(values[0])
+            else:
+                val = json.dumps(data)
             self.client.publish(address, val, retain = self.retain, qos = self.qos)
             a = a + 1

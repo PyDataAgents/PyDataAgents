@@ -14,13 +14,6 @@ class Sine(Signal):
     n : float = field(default=0.0, metadata={"description": "noise level of sine wave in respect to ampltidue [0..1]"})
 
     def __init__(self):
-        """
-        Initializes the Sine signal with frequency, amplitude, and phase.
-
-        :param frequency: Frequency of the sine wave in Hz.
-        :param amplitude: Amplitude of the sine wave.
-        :param phase: Phase shift of the sine wave in radians.
-        """
         super().__init__()
         
     def value(self, t: int = None) -> tuple[int, float]:
