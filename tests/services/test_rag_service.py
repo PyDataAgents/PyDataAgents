@@ -61,6 +61,7 @@ def test_020():
     ls.api_key = config["OPENAI"]["OPENAI_API_KEY"]
     ls.model = "gpt-4o-mini"
     ls.model_provider = "OPENAI"
+    ls.retain_messages = True
     
     g.add_service(ls)
     

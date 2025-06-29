@@ -1,5 +1,6 @@
 from dataclasses import dataclass, field
 import os
+from pathlib import Path
 
 from langchain_chroma import Chroma
 from langchain_huggingface import HuggingFaceEmbeddings
@@ -8,19 +9,22 @@ from langchain_text_splitters import CharacterTextSplitter
 from langchain_openai import ChatOpenAI
 from langchain_ollama import OllamaLLM
 from langchain_core.prompts import PromptTemplate, ChatPromptTemplate, MessagesPlaceholder
-from langchain_core.runnables import RunnableSequence, RunnableWithMessageHistory
+from langchain_core.runnables import RunnableWithMessageHistory
 from langchain_core.chat_history import InMemoryChatMessageHistory
+from sentence_transformers import SentenceTransformer
 from langchain_community.vectorstores.utils import filter_complex_metadata
 import requests
 
 from ...services.langchain.LLMService import LLMService
 from ...services.ServiceException import ServiceException
 
-
 @dataclass
 class RAGService(LLMService):
     """Retrieval Augmented Generation (RAG) Service for document based LLM knowledge retrieval in chat form
     """
+    
+    # Constants
+    MODEL_RESOURCE_FOLDER = Path("./resources/models/")
     
     document_links : list[str] = field(default_factory=list(), metadata={"description": "list of document links to load into embedded store on startup"})
     ignore_invalid_documents : bool = field(default=False, metadata={"description": "api token for a web based model provider, e.g. OPENAI"})
@@ -36,7 +40,12 @@ class RAGService(LLMService):
         self.document_links = list()
             
     def start(self):
-        self.embedding_model = HuggingFaceEmbeddings(model_name=self.embedding_model_name)
+        # attempt local download of embedding model
+        if not os.path.exists(RAGService.MODEL_RESOURCE_FOLDER / self.embedding_model_name):    
+            model = SentenceTransformer(self.embedding_model_name)
+            model.save(str(RAGService.MODEL_RESOURCE_FOLDER / self.embedding_model_name))
+            self.LOGGER.debug("downloaded embedding model " + self.embedding_model_name + " to " + str(RAGService.MODEL_RESOURCE_FOLDER / self.embedding_model_name))
+        self.embedding_model = HuggingFaceEmbeddings(model_name=str(RAGService.MODEL_RESOURCE_FOLDER / self.embedding_model_name))
         if self.persist_directory is None:
             self.embedding_store = Chroma(embedding_function=self.embedding_model)                       
         else:
@@ -65,7 +74,7 @@ class RAGService(LLMService):
             
             self.langchain = RunnableWithMessageHistory(
                 chain,
-                InMemoryChatMessageHistory(),
+                get_session_history=lambda session_id: InMemoryChatMessageHistory(),
                 input_messages_key="question",     # where to pull current user input
                 history_messages_key="history"  # matches MessagesPlaceholder
             )
@@ -94,10 +103,6 @@ class RAGService(LLMService):
         text_splitter = CharacterTextSplitter(chunk_size=500, chunk_overlap=100)
         split_docs = text_splitter.split_documents(filtered_docs)
         self.embedding_store.add_documents(split_docs)
-
-    def chat(self, question : str) -> dict:
-        result = self.langchain.invoke({"question": question})
-        return result
     
     @staticmethod
     def __load_pdf_from_url(url, local_path="temp.pdf"):

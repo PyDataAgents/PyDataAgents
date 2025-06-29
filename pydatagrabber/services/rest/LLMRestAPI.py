@@ -29,7 +29,7 @@ class LLMRestAPI:
             """
             service_ids = list()
             for service in grabber.service_store.values():
-                if isinstance(service, LLMService):
+                if isinstance(service, LLMService) and not isinstance(service, RAGService):
                     service_ids.append(service.id)
             return service_ids
         
@@ -47,7 +47,7 @@ class LLMRestAPI:
             return service_ids
         
         @router.get("/chat/{service_id}")
-        def chat(service_id : str = Path(..., description="unique id of the LLM service"), question : str = Query(..., description="prompt for the LLM to answer to")) -> dict:
+        def chat(service_id : str = Path(..., description="unique id of the LLM service"), question : str = Query(..., description="prompt for the LLM to answer to")) -> str:
             """
             returns an answer to the question being asked
             """
@@ -63,7 +63,7 @@ class LLMRestAPI:
                 return {"error": "No Service with id=" + service_id + " was found"}
         
         @router.get("/rag/chat/{service_id}")
-        def rag_chat(service_id : str = Path(..., description="unique id of the RAG service"), question : str = Query(..., description="prompt for the RAG engine to answer to")) -> dict:
+        def rag_chat(service_id : str = Path(..., description="unique id of the RAG service"), question : str = Query(..., description="prompt for the RAG engine to answer to")) -> str:
             """
             returns an answer to the question being asked
             """

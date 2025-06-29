@@ -29,9 +29,16 @@ class LLMService(Service):
         self.embedding_store = None
         self.retriever = None
         self.langchain = None
+        self.session_histories = dict()  # to store chat history
     
     def install(self, grabber : Grabber = None):
-        super().install()
+        super().install()    
+    
+    def __get_session_history(self, session_id: str):
+        """Returns a persistent chat history for a given session."""
+        if session_id not in self.session_histories:
+            self.session_histories[session_id] = InMemoryChatMessageHistory()
+        return self.session_histories[session_id]
         
     def start(self):
         match self.model_provider:
@@ -53,10 +60,11 @@ class LLMService(Service):
             
             self.langchain = RunnableWithMessageHistory(
                 chain,
-                InMemoryChatMessageHistory(),
+                get_session_history=self.__get_session_history,
                 input_messages_key="question",     # where to pull current user input
                 history_messages_key="history"  # matches MessagesPlaceholder
-            )           
+            )
+              
            
         else:
             prompt = PromptTemplate.from_template(
@@ -69,6 +77,10 @@ class LLMService(Service):
     def stop(self):
         self.langchain = None
     
-    def chat(self, question : str) -> dict:
-        result = self.langchain.invoke(question)
-        return result
+    def chat(self, question : str) -> str:
+        if self.retain_messages:        
+            ai_message = self.langchain.invoke({"question" : question}, config={"configurable" : {"session_id": "DEFAULT_SESSION"}})
+        else:
+            ai_message = self.langchain.invoke({"question" : question})
+        #print(type(result))
+        return ai_message.content

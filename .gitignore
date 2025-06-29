@@ -15,3 +15,6 @@ __pycache__
 *.egg-info
 
 *.code-workspace
+
+# exclude llm models
+/resources/models
