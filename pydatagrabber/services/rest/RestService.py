@@ -2,6 +2,7 @@ from dataclasses import dataclass, field
 import multiprocessing
 import threading
 from fastapi import APIRouter, FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 from ...grabbers.Grabber import Grabber
 from ..Service import Service
@@ -24,6 +25,17 @@ class RestService(Service):
     def install(self, grabber : Grabber = None):
         super().install(grabber)
         self.app = FastAPI(title="DataGrabber", docs_url="/docs")
+        
+        # Enable CORS for all origins
+        origins = ["*"]
+        self.app.add_middleware(
+            CORSMiddleware,
+            allow_origins=origins,  # Allows all origins
+            allow_credentials=True,
+            allow_methods=["*"],  # Allows all methods (GET, POST, etc.)
+            allow_headers=["*"],  # Allows all headers
+        )
+        
         self.app.include_router(GrabberRESTAPI.get_api_router(self.grabber))
         self.app.include_router(BufferRESTAPI.get_api_router(self.grabber))
         
