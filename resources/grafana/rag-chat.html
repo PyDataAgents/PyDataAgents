@@ -32,8 +32,8 @@
     //var chatUrl = "http://localhost:10001/api/v1/llm/rag/S2/chat?question="; // URL to the chat service
     //var documentUrl = "http://localhost:10001/api/v1/llm/rag/S2/document?link="; // URL to the document service
 
-    var chatUrl = "http://localhost:10001/grabber/api/v1/llm/rag/chat/${RAGServiceID}?question="; // URL to the chat service
-    var documentUrl = "http://localhost:10001/grabber/api/v1/llm/rag/${RAGServiceID}/document?link="; // URL to the document service
+    var chatUrl = "http://localhost:10001/api/v1/llm/rag/chat/${RAGServiceID}?question="; // URL to the chat service
+    var documentUrl = "http://localhost:10001/api/v1/llm/rag/${RAGServiceID}/document?link="; // URL to the document service
 
     function submitPrompt(){
         var prompt = document.getElementById("prompt").value;
