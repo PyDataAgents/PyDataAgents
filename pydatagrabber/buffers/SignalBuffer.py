@@ -40,6 +40,6 @@ class SignalBuffer(TimedBuffer):
         """
         if self.signal is not None:
             t, v = self.signal.value()  # Get the current time in milliseconds
-            self.push_timestamps([v], [t])
+            self.push_timestamps(v, t)
         else:
             raise BufferException("No signal set for sampling.")
