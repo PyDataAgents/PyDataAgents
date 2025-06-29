@@ -27,6 +27,7 @@ class ExcelRestService(RestService):
     def install(self, grabber : Grabber = None):
         super(Service, self).install()
         self.app = FastAPI(title="DataGrabber ExcelRestService", docs_url="/docs")
+        self.__add_cors()
         self.app.include_router(ExcelRestAPI.get_api_router(self))
         self.__init_tables()
         
