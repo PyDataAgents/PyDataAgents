@@ -46,7 +46,7 @@ class LLMRestAPI:
                     service_ids.append(service.id)
             return service_ids
         
-        @router.get("/chat/{service_id}")
+        @router.get("/{service_id}/chat")
         def chat(service_id : str = Path(..., description="unique id of the LLM service"), question : str = Query(..., description="prompt for the LLM to answer to")) -> str:
             """
             returns an answer to the question being asked
@@ -62,7 +62,7 @@ class LLMRestAPI:
                 LOGGER.error("No Service with id=" + service_id + " was found")    
                 return {"error": "No Service with id=" + service_id + " was found"}
         
-        @router.get("/rag/chat/{service_id}")
+        @router.get("/rag/{service_id}/chat")
         def rag_chat(service_id : str = Path(..., description="unique id of the RAG service"), question : str = Query(..., description="prompt for the RAG engine to answer to")) -> str:
             """
             returns an answer to the question being asked
@@ -79,12 +79,12 @@ class LLMRestAPI:
                 return {"error": "No Service with id=" + service_id + " was found"}
         
         @router.put("/rag/{service_id}/document")
-        def rag_document(service_id : str = Path(..., description="unique id of the RAG service"), document_link : str = Query(..., description="link to the document to add to RAG engine")):
+        def rag_document(service_id : str = Path(..., description="unique id of the RAG service"), link : str = Query(..., description="link to the document to add to RAG engine")):
             if service_id in grabber.service_store:
                 if isinstance(grabber.service_store[service_id], RAGService):
                     rag_service : RAGService = grabber.service_store[service_id]
-                    rag_service.add_document(document_link)
-                    return {"success": "Document " + document_link + " was added to " + RAGService.cname() + " with id=" + service_id}
+                    rag_service.add_document(link)
+                    return {"success": "Document " + link + " was added to " + RAGService.cname() + " with id=" + service_id}
                 else:
                     LOGGER.error("Service with id=" + service_id + " is not of type " + RAGService.cname() + " found")    
                     return {"error": "Service with id=" + service_id + " is not of type " + RAGService.cname() + " found"}
