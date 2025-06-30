@@ -96,6 +96,8 @@ pip install git+https://github.com/jhillenbrand/PyDataGrabber.git@<branch>
 pip uninstall pydatagrabber -y; pip install git+https://github.com/jhillenbrand/PyDataGrabber.git
 ```
 
+Project Dependencies can be found in [pyproject.toml](pyproject.toml)
+
 
 ## Examples and Testing
 All Unittests and Examples are found in [tests](tests/)
