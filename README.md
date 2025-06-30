@@ -80,3 +80,7 @@ an overview of all available mappings and their usage is given [here](docs/Mappi
 
 ### Service
 an overview of all available services and their usage is given [here](docs/Services.md)
+
+
+## Examples and Testing
+All Unittests and Examples are found in [tests](tests/)
