@@ -23,6 +23,31 @@ the core element of the framework is a [(data)grabber](pydatagrabber/grabbers/Gr
 In order to create a `Grabber` application, you create a `Grabber` object with one or more of the elements described in the following sections.
 The `Grabber` application follows a strict lifecycle, when being initialized and started.
 
+### Buffer
+an overview of all available buffers and their usage is given [here](docs/Buffers.md)
+<br>A `Buffer` is the central element for data streaming and temporary storage inside a `Grabber` application.
+<br>All `Buffer`s follow the FiFo-principle and are specified with a maximum `capacity` and datatypes (optional).
+<br>Whenever data is transfered, it moves through a buffer.
+<br>All `Buffer`'s adhere to the same interface:
+```python
+buffer = ListBuffer()
+buffer.id = "BUF-1"
+buffer.capacity = 10
+buffer.datatype = "FLOAT"
+buffer.description = "this is a float buffer"
+buffer.unit = "mA"
+buffer.initial_values = [0.02, 0.089]
+
+buffer.push(elements) # push new elements to buffer
+
+buffer.data(n=0, persistent=True) # get the buffers data, or n samples, with persistent True/False you specify whether to keep the elements n buffer the return type depends on the buffer implementation
+
+buffer.size() # returns the size of the buffer --> int: number of samples
+       
+buffer.data_with_meta(n = 0, persistent = True): # returns the buffer data and all its meta data inside a defined json schema as dictionary
+
+```
+
 ### Adapter
 an overview of all available adapters and their usage is given [here](docs/Adapters.md)
 <br>All `Adapter`'s adhere to the same composition of interfaces and their methods.
@@ -30,14 +55,13 @@ Every `Adapter` is initialized, installed, connected/disconnected and then depen
 <br>It is paramount, that `Adapter` methods are always used in the right order. Within a `Grabber` application, this is made sure by design, but when used outside, it must be taken care of by the developer.
 <br>Here is an example workflow for the usage of an `Adapter`:
 ```python
-adapter = CSVReadAdapter(
-    id = "CSV1",
-    file_path="path/to/file.txt",
-    delimiter=';',
-    has_header=True,
-    auto_detect=True,
-    force_numeric=True
-)
+adapter = CSVReadAdapter()
+adapter.id = "CSV1",
+adapter.file_path="path/to/file.txt",
+adapter.delimiter=';',
+adapter.has_header=True,
+adapter.auto_detect=True,
+adapter.force_numeric=True
 
 adapter.install()
 
@@ -50,9 +74,6 @@ adapter.disconnect()
 adapter.deinstall()
 
 ```
-
-### Buffer
-an overview of all available buffers and their usage is given [here](docs/Buffers.md)
 
 ### Mapping
 an overview of all available mappings and their usage is given [here](docs/Mappings.md)
