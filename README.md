@@ -82,5 +82,20 @@ an overview of all available mappings and their usage is given [here](docs/Mappi
 an overview of all available services and their usage is given [here](docs/Services.md)
 
 
+## Installation and Usage
+In order to install `pydatagrabber` use pip:
+```python
+pip install git+https://github.com/jhillenbrand/PyDataGrabber.git
+
+# this will install the default branch, for a specific branch use
+
+pip install git+https://github.com/jhillenbrand/PyDataGrabber.git@<branch>
+
+# if the repo was installed already, use an uninstall before installing again
+
+pip uninstall pydatagrabber -y; pip install git+https://github.com/jhillenbrand/PyDataGrabber.git
+```
+
+
 ## Examples and Testing
 All Unittests and Examples are found in [tests](tests/)
