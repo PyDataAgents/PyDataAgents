@@ -3,6 +3,14 @@ from pathlib import Path
 import shutil
 import time
 from loguru import logger
+from unstructured.partition.xlsx import partition_xlsx
+from unstructured.partition.docx import partition_docx
+from unstructured.partition.html import partition_html
+from unstructured.partition.pdf import partition_pdf
+from unstructured.partition.email import partition_email
+from unstructured.partition.text import partition_text
+from unstructured.partition.pptx import partition_pptx
+from unstructured.partition.image import partition_image
 
 class FileUtils:
     
@@ -66,19 +74,20 @@ class FileUtils:
             return False
       
     @staticmethod  
-    def list_files(folder : str, pattern : str = None, extension : str = None, newer_than_seconds : int = None) -> list[str]:
+    def list_files(folder : str, pattern : str = None, extension : str = None, newer_than_seconds : int = None, recursive : bool = False) -> list[str]:
         if os.path.isdir(folder):
             path = Path(folder)
+            iterator = path.rglob("*") if recursive else path.iterdir()
             #cutoff = time.time() - older_than_seconds            
             if newer_than_seconds is not None:
                 cutoff = time.time() - newer_than_seconds
                 files = [
-                    f for f in path.iterdir()
+                    f for f in iterator
                     if f.is_file() and f.stat().st_mtime > cutoff
                 ]
             else:
                 files = [
-                    str(f) for f in path.iterdir()
+                    str(f) for f in iterator
                     if f.is_file()
                 ]
             if pattern is not None:
@@ -129,3 +138,36 @@ class FileUtils:
         else:
             logger.error("File " + file_path + " does not exist")
             return 0
+        
+    @staticmethod
+    def extract_text(file : str) -> str:
+        if FileUtils.exists_file(file):
+            _, ext = os.path.splitext(file)
+            ext = ext.lower().replace(".", "")
+            match ext:
+                case "xlsx":
+                    elements = partition_xlsx(file)                                
+                case "docx":
+                    elements = partition_docx(file)
+                case "txt" | "csv" | "json":
+                    elements = partition_text(file)
+                case "pptx":
+                    elements = partition_pptx(file)
+                case "pdf":
+                    elements = partition_pdf(file)
+                case "html":
+                    elements = partition_html(file)
+                case "msg":
+                    elements = partition_email(file)
+                case "jpg" | "jpeg" | "png":
+                    elements = partition_image(file)
+                case _:
+                    logger.warning("File Extension " + ext + " is not supported")
+                    return None
+            
+            s = ""
+            for element in elements:
+                s = s + "\n" + element.text
+            return s
+        else:
+            return None

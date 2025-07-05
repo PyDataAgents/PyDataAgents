@@ -36,6 +36,16 @@ class SQLAdapter(ReadAdapter, WriteAdapter):
         return True
         
     def read_from_source(self, buffers, addresses, n : int = 0):
+        """_summary_
+
+        Args:
+            buffers (_type_): dict of `Buffer`s to store the query result
+            addresses (list[str]): addresses can be used to specify SELECT querys
+            n (int, optional): Number of samples. Defaults to 0.
+
+        Raises:
+            AdapterException: if Buffer is not supported or inputs are not correct
+        """
         if len(buffers) == 1:
             for buffer in buffers:
                 if isinstance(buffer, DictBuffer):
@@ -56,7 +66,7 @@ class SQLAdapter(ReadAdapter, WriteAdapter):
             raise AdapterException("read_from_source is not supported for these inputs")
 
     def write_to_sink(self, buffers, addresses, n : int = 0, persistent : bool = True):
-        """_summary_
+        """writes data from buffer to SQL database
 
         Args:
             buffers (dict[str, Buffer]): map of buffers to write data to sql database

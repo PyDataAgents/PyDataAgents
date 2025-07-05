@@ -2,10 +2,12 @@ from pathlib import Path
 from pydatagrabber.utils.FileUtils import FileUtils
 
 
-def test_000():
+def test_000():    
+    files = FileUtils.list_files(Path.home() / "Downloads")    
+    print(files)
     
-    files = FileUtils.list_files(Path.home() / "Downloads")
-    
+def test_001():    
+    files = FileUtils.list_files(Path.home() / "Downloads", recursive=True)
     print(files)
     
 def test_010():
@@ -30,3 +32,8 @@ def test_050():
     print(file_extensions)
     file_extensions = FileUtils.get_extensions_from_folder(Path.home() / "Downloads")
     print(file_extensions)
+    
+def test_060():
+    file = str(Path.home() / "Downloads" / "slides.pptx")
+    s = FileUtils.extract_text(file)
+    print(s)

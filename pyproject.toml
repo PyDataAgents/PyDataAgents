@@ -46,7 +46,8 @@ dependencies = [
     "langchain-ollama",
     "sentence-transformers",
     "pypdf",
-    "unstructured[all-docs]"
+    "unstructured[all-docs]",
+    "watchdog"
 ]
 
 [tool.setuptools.packages.find]
