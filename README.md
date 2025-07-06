@@ -76,7 +76,21 @@ adapter.deinstall()
 ```
 
 ### Mapping
-an overview of all available mappings and their usage is given [here](docs/Mappings.md)
+an overview of all available mappings and their usage is given [here](docs/Mappings.md).
+<br>In general a `Mapping` defines the interaction between an `Adapter` and one or more `Buffer`s in term of how often, how many samples and which data/information (`addresses`) in the source or sink are being accessed.
+<br>The mapping defines this interaction and is used as data model to instantiate a background thread that runs for every specified `Mapping` and acquires or transfers the data from `Buffer`s to or from source or sinks. 
+```python
+m1 = Mapping()
+m1.id = "M1"
+m1.adapter_id = "MQTT1"
+m1.addresses = ["signals/sine", "signals/linear"]
+m1.buffer_ids = ["SINE1", "LINEAR1"]
+m1.thread_type = ThreadType.MILLI_SECOND.value
+m1.mapping_type = MappingType.WRITE.value
+m1.sampling_period = 1000
+m1.n = 0
+m1.persistent = False
+```
 
 ### Service
 an overview of all available services and their usage is given [here](docs/Services.md)

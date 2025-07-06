@@ -57,6 +57,8 @@ def test_000():
     m1.mapping_type = MappingType.WRITE.value
     m1.sampling_period = 1000
     m1.n = 0
+    m1.persistent = False
+    m1.auto_start = True
 
     g.add_mapping(m1)
 
