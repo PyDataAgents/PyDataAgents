@@ -19,9 +19,21 @@ the core element of the framework is a [(data)grabber](pydatagrabber/grabbers/Gr
 ![pydatagrabber_framework.png](docs/pydatagrabber_framework.png)
 <br>each [GrabberElement](pydatagrabber/grabbers/GrabberElement.py) is dedicated for a special task within the datagrabber framework
 <br>these tasks are highlighted below
+
 ### Grabber
 In order to create a `Grabber` application, you create a `Grabber` object with one or more of the elements described in the following sections.
 The `Grabber` application follows a strict lifecycle, when being initialized and started.
+
+### GrabberElement
+All elements within a `Grabber` application are derived from `GrabberElement`.
+<br>This class defines basic interface functions, that are inherited from each subclass and can be extended:
+- install(grabber : `Grabber`)
+- deinstall(grabber : `Grabber`)
+- save()
+- load()
+
+The parent class also ensures a unique identifier for each `GrabberElement` and the type declaration (fully qualified class path).
+All `GrabberElement` classes are supposed to be annotated with `@dataclass` and `field` declarations for their respective configuration properties. If these are used correctly, the properties can be set via YAML configuration files on startup or API and the method `config_options()` is exporting the configuration properties where needed. These properties are also used for auto-generated documentation.
 
 ### Buffer
 an overview of all available buffers and their usage is given [here](docs/Buffers.md)
@@ -54,6 +66,7 @@ an overview of all available adapters and their usage is given [here](docs/Adapt
 Every `Adapter` is initialized, installed, connected/disconnected and then depending on source or sink interaction: reads/subscribes from sources or writes/publishes to sinks.
 <br>It is paramount, that `Adapter` methods are always used in the right order. Within a `Grabber` application, this is made sure by design, but when used outside, it must be taken care of by the developer.
 <br>Here is an example workflow for the usage of an `Adapter`:
+
 ```python
 adapter = CSVReadAdapter()
 adapter.id = "CSV1",
