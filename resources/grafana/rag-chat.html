@@ -86,11 +86,7 @@
 
     function createDocumentLinkText(text){
         var documentLinkText = document.getElementById("documentlink-text");
-        if (String(text).toLowerCase() == "true"){
-            documentLinkText.innerHTML = "a new document was added to RAGEngine.";
-        } else {
-            documentLinkText.innerHTML = "the document could not be added.";
-        }
+        documentLinkText.innerHTML = text;
         documentLinkText.value = "";
     }
 

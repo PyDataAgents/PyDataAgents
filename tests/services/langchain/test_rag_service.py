@@ -53,7 +53,8 @@ def test_020():
     rs.api_key = config["OPENAI"]["OPENAI_API_KEY"]
     rs.model = "gpt-4o"
     rs.model_provider = "OPENAI"
-    
+    rs.retain_messages = True
+        
     g.add_service(rs)
     
     ls = LLMService()
@@ -65,6 +66,30 @@ def test_020():
     
     g.add_service(ls)
     
+    lrs = LLMRestService()
+    lrs.id = "LLM-REST1"
+    lrs.port = 8001
+    
+    g.add_service(lrs)
+    
+    g.start_blocking()
+    
+def test_021():
+    
+    config = configparser.ConfigParser()
+    config.read("config.ini")
+    
+    g = Grabber()
+    
+    rs = RAGService()
+    rs.id = "RAG1"
+    rs.api_key = config["OPENAI"]["OPENAI_API_KEY"]
+    rs.model = "gpt-4o"
+    rs.model_provider = "OPENAI"
+    rs.retain_messages = True
+        
+    g.add_service(rs)
+        
     lrs = LLMRestService()
     lrs.id = "LLM-REST1"
     lrs.port = 8001

@@ -83,4 +83,7 @@ class LLMService(Service):
         else:
             ai_message = self.langchain.invoke({"question" : question})
         #print(type(result))
-        return ai_message.content
+        if isinstance(ai_message, str):
+            return ai_message
+        else:
+            return ai_message.content

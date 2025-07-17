@@ -13,6 +13,7 @@ from langchain_core.runnables import RunnableWithMessageHistory
 from langchain_core.chat_history import InMemoryChatMessageHistory
 from sentence_transformers import SentenceTransformer
 from langchain_community.vectorstores.utils import filter_complex_metadata
+from langchain_core.runnables import RunnableMap
 import requests
 
 from ...services.langchain.LLMService import LLMService
@@ -66,14 +67,26 @@ class RAGService(LLMService):
                 
         if self.retain_messages:
             prompt = ChatPromptTemplate.from_messages([
+                ("system", "Nutze den folgenden Kontext, um die Frage zu beantworten:\n{context}"),
                 MessagesPlaceholder(variable_name="history"),
                 ("human", "{question}"),
             ])
             
-            chain  = prompt | llm # using pip operator to chain prompt and llm
+            #chain  = prompt | llm # using pipe operator to chain prompt and llm
+            
+            retrieval_chain = (
+                {"question": lambda x: x["question"], "history": lambda x: x["history"]}
+                | RunnableMap({
+                    "context": lambda x: "\n\n".join([doc.page_content for doc in self.retriever.get_relevant_documents(x["question"])]),
+                    "history": lambda x: x["history"],
+                    "question": lambda x: x["question"],
+                })
+                | prompt
+                | llm
+            )
             
             self.langchain = RunnableWithMessageHistory(
-                chain,
+                retrieval_chain,
                 get_session_history=lambda session_id: InMemoryChatMessageHistory(),
                 input_messages_key="question",     # where to pull current user input
                 history_messages_key="history"  # matches MessagesPlaceholder
@@ -83,13 +96,25 @@ class RAGService(LLMService):
             prompt = PromptTemplate.from_template(
                 "You are a helpful assistant. Answer the following question:\n\n{question}"
             )
-            self.langchain = prompt | llm # using pip operator to chain prompt and llm
+            
+            #self.langchain = prompt | llm # using pipe operator to chain prompt and llm
+            self.langchain = (
+                {"question": lambda x: x["question"]}
+                | RunnableMap({
+                    "context": lambda x: self.retriever.get_relevant_documents(x["question"]),
+                    "question": lambda x: x["question"]
+                })
+                | prompt
+                | llm
+            )
+            
         self.LOGGER.debug("created langchain with prompt template and llm")
     
     def stop(self):
         self.langchain = None
         self.embedding_store = None
         self.embedding_model = None
+        self.retriever = None
     
     def add_document(self, document_link):
         if "http" in  document_link and ".pdf" in document_link:
@@ -103,6 +128,18 @@ class RAGService(LLMService):
         text_splitter = CharacterTextSplitter(chunk_size=500, chunk_overlap=100)
         split_docs = text_splitter.split_documents(filtered_docs)
         self.embedding_store.add_documents(split_docs)
+    
+    def chat(self, question : str) -> str:
+        #self.LOGGER.debug(self.retriever.get_relevant_documents(question))
+        if self.retain_messages:        
+            ai_message = self.langchain.invoke({"question" : question}, config={"configurable" : {"session_id": "DEFAULT_SESSION"}})
+        else:
+            ai_message = self.langchain.invoke({"question" : question})
+        #print(type(result))
+        if isinstance(ai_message, str):
+            return ai_message
+        else:
+            return ai_message.content
     
     @staticmethod
     def __load_pdf_from_url(url, local_path="temp.pdf"):
