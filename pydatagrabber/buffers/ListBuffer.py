@@ -1,4 +1,5 @@
 from __future__ import annotations
+import copy
 import threading
 from .Buffer import Buffer
 from ..grabbers.Grabber import Grabber
@@ -52,7 +53,7 @@ class ListBuffer(Buffer):
                         del self.elements[0:n]
                     return d
                 else:
-                    d = self.elements
+                    d = copy.deepcopy(self.elements)
                     if not persistent:
                         self.elements.clear()
                     return d

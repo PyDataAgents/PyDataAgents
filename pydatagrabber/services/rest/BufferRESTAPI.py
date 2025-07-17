@@ -70,15 +70,18 @@ class BufferRESTAPI:
             return buffer.size()
         
         @router.get("/{id}/data")
-        def buffer_data(id : str = Path(..., description="unique ID of the buffer"), n : int = Query(1, description="number of samples to extract from buffer"), persistent : bool = Query(True, description="whether to keep the extracted data in the buffer or remove it on query")):
+        def buffer_data(id : str = Path(..., description="unique ID of the buffer"), n : int = Query(1, description="number of samples to extract from buffer"), persistent : bool = Query(True, description="whether to keep the extracted data in the buffer or remove it on query"), with_meta : bool = Query(False, description="specifies whether to include meta data")):
             """
             Returns the data stored in the specified buffer.
             """
             buffer : Buffer = grabber.get_buffer(id)
             if buffer is None:
                 return {"error": "Buffer not found"}
-            return buffer.data(n, persistent)
-        
+            if with_meta:
+                return buffer.data_with_meta(n, persistent)
+            else:
+                return buffer.data(n, persistent)
+               
         @router.post("/")
         def add_buffer(buffer_def : BufferDefinition) -> str:
             buffer : Buffer = ClassUtils.create_instance(buffer_def.type)

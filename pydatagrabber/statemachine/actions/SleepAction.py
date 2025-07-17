@@ -1,15 +1,18 @@
+from dataclasses import dataclass, field
 import time
 
 from ..Action import Action
 
+@dataclass
 class SleepAction(Action):
     """
     An action that sleeps for a specified number of seconds.
     """
+    
+    sleep_time : int = field(default=0, metadata={"description" : "number of seconds to sleep for"})
 
     def __init__(self):
         super().__init__()
-        self.sleep_time = 0
 
     def execute(self):
         print(f"Sleeping for {self.sleep_time} seconds")

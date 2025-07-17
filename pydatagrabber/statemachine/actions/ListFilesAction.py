@@ -9,7 +9,7 @@ from ...utils.FileUtils import FileUtils
 class ListFilesAction(BufferNode, Action):
     
     folder : str = field(default=None, metadata={"description": "folder to list the files from into a Buffer"})
-    pattern : str = field(default=None, metadata={"description": "paatern to look for in file names"})
+    pattern : str = field(default=None, metadata={"description": "pattern to look for in file names"})
     extension : str = field(default=None, metadata={"description": "extension to include"})
     newer_than_seconds : int = field(default=None, metadata={"description": "specifies how old in seconds a file can be to be included"})
     recursive : bool = field(default=False, metadata={"description": "specifies whether to search subdirectories aswell"})
