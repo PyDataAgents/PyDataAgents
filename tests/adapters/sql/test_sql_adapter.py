@@ -1,6 +1,6 @@
 import os
 import pyodbc
-from pydatagrabber.adapters.sql.SQLAdapter import SQLAdapter
+from pydg.adapters.sql.SQLAdapter import SQLAdapter
 
 
 def test_000():

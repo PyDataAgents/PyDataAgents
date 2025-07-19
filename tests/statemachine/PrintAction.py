@@ -1,4 +1,4 @@
-from pydatagrabber.statemachine.Action import Action
+from pydg.statemachine.Action import Action
 
 
 class PrintAction(Action):

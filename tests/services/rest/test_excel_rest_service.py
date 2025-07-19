@@ -1,5 +1,5 @@
 import os
-from pydatagrabber.services.rest.ExcelRestService import ExcelRestService
+from pydg.services.rest.ExcelRestService import ExcelRestService
 
 
 def test_000():

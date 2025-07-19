@@ -1,8 +1,8 @@
 import sys
-from pydatagrabber.grabbers.Grabber import Grabber
-from pydatagrabber.grabbers.GrabberConfig import GrabberConfig
-from pydatagrabber.grabbers.YAMLConfig import YAMLConfig
-from pydatagrabber.services.rest.RestService import RestService
+from pydg.grabbers.Grabber import Grabber
+from pydg.grabbers.GrabberConfig import GrabberConfig
+from pydg.grabbers.YAMLConfig import YAMLConfig
+from pydg.services.rest.RestService import RestService
 
 if __name__ == "__main__":
     

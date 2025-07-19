@@ -2,8 +2,8 @@ import time
 import sounddevice as sd
 import numpy as np
 
-from pydatagrabber.adapters.audio.AudioAdapter import AudioAdapter
-from pydatagrabber.buffers.ListBuffer import ListBuffer
+from pydg.adapters.audio.AudioAdapter import AudioAdapter
+from pydg.buffers.ListBuffer import ListBuffer
 
 def test_000():
 
@@ -28,6 +28,10 @@ def test_001():
     d = sd.query_devices(None, 'input')
     print(len(d))
     
+def test_002():
+    a = AudioAdapter()
+    print(a.config_options())    
+
     
 def test_010():
     sample_rate = 44100

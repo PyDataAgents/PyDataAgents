@@ -12,15 +12,17 @@
 | [`SignalBuffer`](#signalbuffer-from-SignalBuffer) | A buffer that holds signals with a specific start time and elapsed time.Attributes:    start_time (int): The start time of the signal in milliseconds.    elapsed_time (float): The elapsed time since the start in seconds. |
 | [`TimedBuffer`](#timedbuffer-from-TimedBuffer) | A buffer that stores data with timestamps.Inherits from ListBuffer. |
 | [`TransformsBuffer`](#transformsbuffer-from-TransformsBuffer) | TransformsBuffer is a subclass of ListBuffer that allows for data transformation.It is used to transform data from one format to another. |
+| [`LinearTrend`](#lineartrend-from-signals\LinearTrend) | A signal that simulates a linear trend |
 | [`SampledSignal`](#sampledsignal-from-signals\SampledSignal) | A class representing a sampled signal for continuously sampled data |
 | [`SampledSine`](#sampledsine-from-signals\SampledSine) | A class to represent a sampled sine wave signal.Attributes:    f (float): The frequency of the sine wave in Hz.    a (float): The amplitude of the sine wave.    sample_rate (int): The number of samples per second.    p (float): The phase of the sine wave in °. |
 | [`Signal`](#signal-from-signals\Signal) | Abstract base class for signals. |
 | [`Sine`](#sine-from-signals\Sine) | A class to represent a sine wave signal. |
+| [`TimedSignal`](#timedsignal-from-signals\TimedSignal) | A signal that emits values at specified time intervals. |
 | [`ClippingTransformation`](#clippingtransformation-from-transformations\ClippingTransformation) |  |
 
 
 
-## `Buffer` (from `Buffer.py`)
+## `Buffer` (in `pydg\buffers\Buffer.py`)
 
 Abstract base class for buffers.
 | Field | Type | Default | Description |
@@ -36,7 +38,7 @@ Abstract base class for buffers.
 
 ```python
 # Example usage of `Buffer`
-from pydatagrabber import Buffer  # Adjust import if needed
+from pydg.buffers.Buffer import Buffer  # Adjust import if needed
 
 obj = Buffer()
 obj.id="<string>"
@@ -48,7 +50,7 @@ obj.unit="<value>"
 obj.description="<string>"
 ```
 
-## `DictBuffer` (from `DictBuffer.py`)
+## `DictBuffer` (in `pydg\buffers\DictBuffer.py`)
 
 buffer that stores its values in a dictionary in a table like fashion, where every key contains a list of data
     
@@ -65,7 +67,7 @@ buffer that stores its values in a dictionary in a table like fashion, where eve
 
 ```python
 # Example usage of `DictBuffer`
-from pydatagrabber import DictBuffer  # Adjust import if needed
+from pydg.buffers.DictBuffer import DictBuffer  # Adjust import if needed
 
 obj = DictBuffer()
 obj.capacity=1
@@ -77,7 +79,7 @@ obj.id="<string>"
 obj.load_on_install=False
 ```
 
-## `ListBuffer` (from `ListBuffer.py`)
+## `ListBuffer` (in `pydg\buffers\ListBuffer.py`)
 
 buffer that stores its values in a capacity limited list
     
@@ -94,7 +96,7 @@ buffer that stores its values in a capacity limited list
 
 ```python
 # Example usage of `ListBuffer`
-from pydatagrabber import ListBuffer  # Adjust import if needed
+from pydg.buffers.ListBuffer import ListBuffer  # Adjust import if needed
 
 obj = ListBuffer()
 obj.capacity=1
@@ -106,7 +108,7 @@ obj.id="<string>"
 obj.load_on_install=False
 ```
 
-## `ObjectTransformation` (from `ObjectTransformation.py`)
+## `ObjectTransformation` (in `pydg\buffers\ObjectTransformation.py`)
 
 Abstract base class for object transformations for buffers
 | Field | Type | Default | Description |
@@ -118,7 +120,7 @@ Abstract base class for object transformations for buffers
 
 ```python
 # Example usage of `ObjectTransformation`
-from pydatagrabber import ObjectTransformation  # Adjust import if needed
+from pydg.buffers.ObjectTransformation import ObjectTransformation  # Adjust import if needed
 
 obj = ObjectTransformation()
 obj.id="<string>"
@@ -126,7 +128,7 @@ obj.load_on_install=False
 obj.datatype='DataType.FLOAT.value'
 ```
 
-## `SampledBuffer` (from `SampledBuffer.py`)
+## `SampledBuffer` (in `pydg\buffers\SampledBuffer.py`)
 
 A buffer that samples a signal at a specified interval.
 | Field | Type | Default | Description |
@@ -142,7 +144,7 @@ A buffer that samples a signal at a specified interval.
 
 ```python
 # Example usage of `SampledBuffer`
-from pydatagrabber import SampledBuffer  # Adjust import if needed
+from pydg.buffers.SampledBuffer import SampledBuffer  # Adjust import if needed
 
 obj = SampledBuffer()
 obj.capacity=1
@@ -154,7 +156,7 @@ obj.id="<string>"
 obj.load_on_install=False
 ```
 
-## `SignalBuffer` (from `SignalBuffer.py`)
+## `SignalBuffer` (in `pydg\buffers\SignalBuffer.py`)
 
 A buffer that holds signals with a specific start time and elapsed time.
 
@@ -176,7 +178,7 @@ Attributes:
 
 ```python
 # Example usage of `SignalBuffer`
-from pydatagrabber import SignalBuffer  # Adjust import if needed
+from pydg.buffers.SignalBuffer import SignalBuffer  # Adjust import if needed
 
 obj = SignalBuffer()
 obj.capacity=1
@@ -190,7 +192,7 @@ obj.signal="<value>"
 obj.sampling_period=100
 ```
 
-## `TimedBuffer` (from `TimedBuffer.py`)
+## `TimedBuffer` (in `pydg\buffers\TimedBuffer.py`)
 
 A buffer that stores data with timestamps.
 Inherits from ListBuffer.
@@ -207,7 +209,7 @@ Inherits from ListBuffer.
 
 ```python
 # Example usage of `TimedBuffer`
-from pydatagrabber import TimedBuffer  # Adjust import if needed
+from pydg.buffers.TimedBuffer import TimedBuffer  # Adjust import if needed
 
 obj = TimedBuffer()
 obj.capacity=1
@@ -219,7 +221,7 @@ obj.id="<string>"
 obj.load_on_install=False
 ```
 
-## `TransformsBuffer` (from `TransformsBuffer.py`)
+## `TransformsBuffer` (in `pydg\buffers\TransformsBuffer.py`)
 
 TransformsBuffer is a subclass of ListBuffer that allows for data transformation.
 It is used to transform data from one format to another.
@@ -237,7 +239,7 @@ It is used to transform data from one format to another.
 
 ```python
 # Example usage of `TransformsBuffer`
-from pydatagrabber import TransformsBuffer  # Adjust import if needed
+from pydg.buffers.TransformsBuffer import TransformsBuffer  # Adjust import if needed
 
 obj = TransformsBuffer()
 obj.capacity=1
@@ -250,7 +252,33 @@ obj.load_on_install=False
 obj.transformations=[]
 ```
 
-## `SampledSignal` (from `signals\SampledSignal.py`)
+## `LinearTrend` (in `pydg\buffers\signals\LinearTrend.py`)
+
+A signal that simulates a linear trend
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `id` | `str` | `` | unique identifier of element in DataGrabber application |
+| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+| `min` | `float` | `0.0` | minimum value of the trend |
+| `max` | `float` | `100.0` | maximum value of the trend |
+| `duration` | `int` | `'1000 * 1000'` | duration of the trend in milliseconds |
+| `noise` | `float` | `0.0` | noise to add to the trend [0..1] |
+
+
+```python
+# Example usage of `LinearTrend`
+from pydg.buffers.signals.LinearTrend import LinearTrend  # Adjust import if needed
+
+obj = LinearTrend()
+obj.id="<string>"
+obj.load_on_install=False
+obj.min=0.0
+obj.max=100.0
+obj.duration='1000 * 1000'
+obj.noise=0.0
+```
+
+## `SampledSignal` (in `pydg\buffers\signals\SampledSignal.py`)
 
 A class representing a sampled signal for continuously sampled data
 | Field | Type | Default | Description |
@@ -262,7 +290,7 @@ A class representing a sampled signal for continuously sampled data
 
 ```python
 # Example usage of `SampledSignal`
-from pydatagrabber import SampledSignal  # Adjust import if needed
+from pydg.buffers.signals.SampledSignal import SampledSignal  # Adjust import if needed
 
 obj = SampledSignal()
 obj.id="<string>"
@@ -270,7 +298,7 @@ obj.load_on_install=False
 obj.sample_rate=1.0
 ```
 
-## `SampledSine` (from `signals\SampledSine.py`)
+## `SampledSine` (in `pydg\buffers\signals\SampledSine.py`)
 
 A class to represent a sampled sine wave signal.
 
@@ -292,7 +320,7 @@ Attributes:
 
 ```python
 # Example usage of `SampledSine`
-from pydatagrabber import SampledSine  # Adjust import if needed
+from pydg.buffers.signals.SampledSine import SampledSine  # Adjust import if needed
 
 obj = SampledSine()
 obj.sample_rate=1.0
@@ -304,7 +332,7 @@ obj.p=0.0
 obj.n=0.0
 ```
 
-## `Signal` (from `signals\Signal.py`)
+## `Signal` (in `pydg\buffers\signals\Signal.py`)
 
 Abstract base class for signals.
 | Field | Type | Default | Description |
@@ -315,14 +343,14 @@ Abstract base class for signals.
 
 ```python
 # Example usage of `Signal`
-from pydatagrabber import Signal  # Adjust import if needed
+from pydg.buffers.signals.Signal import Signal  # Adjust import if needed
 
 obj = Signal()
 obj.id="<string>"
 obj.load_on_install=False
 ```
 
-## `Sine` (from `signals\Sine.py`)
+## `Sine` (in `pydg\buffers\signals\Sine.py`)
 
 A class to represent a sine wave signal.
 | Field | Type | Default | Description |
@@ -337,7 +365,7 @@ A class to represent a sine wave signal.
 
 ```python
 # Example usage of `Sine`
-from pydatagrabber import Sine  # Adjust import if needed
+from pydg.buffers.signals.Sine import Sine  # Adjust import if needed
 
 obj = Sine()
 obj.id="<string>"
@@ -348,7 +376,29 @@ obj.p=0.0
 obj.n=0.0
 ```
 
-## `ClippingTransformation` (from `transformations\ClippingTransformation.py`)
+## `TimedSignal` (in `pydg\buffers\signals\TimedSignal.py`)
+
+A signal that emits values at specified time intervals.
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `id` | `str` | `` | unique identifier of element in DataGrabber application |
+| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+| `times` | `list[float]` | `'list()'` | list of times in seconds when the signal should emit a value |
+| `values` | `list[float]` | `'list()'` | list of values to emit at the specified times |
+
+
+```python
+# Example usage of `TimedSignal`
+from pydg.buffers.signals.TimedSignal import TimedSignal  # Adjust import if needed
+
+obj = TimedSignal()
+obj.id="<string>"
+obj.load_on_install=False
+obj.times='list()'
+obj.values='list()'
+```
+
+## `ClippingTransformation` (in `pydg\buffers\transformations\ClippingTransformation.py`)
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
@@ -361,7 +411,7 @@ obj.n=0.0
 
 ```python
 # Example usage of `ClippingTransformation`
-from pydatagrabber import ClippingTransformation  # Adjust import if needed
+from pydg.buffers.transformations.ClippingTransformation import ClippingTransformation  # Adjust import if needed
 
 obj = ClippingTransformation()
 obj.datatype='DataType.FLOAT.value'

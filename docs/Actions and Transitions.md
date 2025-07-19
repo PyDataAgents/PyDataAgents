@@ -17,6 +17,8 @@
 | [`AdapterWriteAction`](#adapterwriteaction-from-actions\AdapterWriteAction) | Action to write data with an adapter. |
 | [`AddBufferAction`](#addbufferaction-from-actions\AddBufferAction) | Action to add a buffer to the grabber node. |
 | [`BrowserAutomationAction`](#browserautomationaction-from-actions\BrowserAutomationAction) |  |
+| [`BrowserSetElementAction`](#browsersetelementaction-from-actions\BrowserSetElementAction) |  |
+| [`BrowserUrlNavigateAction`](#browserurlnavigateaction-from-actions\BrowserUrlNavigateAction) |  |
 | [`ConfigureElementAction`](#configureelementaction-from-actions\ConfigureElementAction) | this `Action` configures a `GrabberElement` property by the provided `element_id` and name of the `option`, which is the class' property<br>the new property value is derived from the `Node`'s `buffer`Args:    GrabberNode (_type_): inherits from class GrabberNode    BufferNode (_type_): inherits from class BufferNodeRaises:    StatemachineException: if an error occurs during execute |
 | [`CopyFilesAction`](#copyfilesaction-from-actions\CopyFilesAction) |  |
 | [`ListFilesAction`](#listfilesaction-from-actions\ListFilesAction) |  |
@@ -24,11 +26,9 @@
 | [`MoveFilesAction`](#movefilesaction-from-actions\MoveFilesAction) |  |
 | [`ReadCsvAction`](#readcsvaction-from-actions\ReadCsvAction) |  |
 | [`ReadJsonAction`](#readjsonaction-from-actions\ReadJsonAction) |  |
-| [`SetElementAction`](#setelementaction-from-actions\SetElementAction) |  |
 | [`SleepAction`](#sleepaction-from-actions\SleepAction) | An action that sleeps for a specified number of seconds. |
 | [`StartAction`](#startaction-from-actions\StartAction) | An action that starts the state machine. |
 | [`StopAction`](#stopaction-from-actions\StopAction) | An action that stops the state machine. |
-| [`UrlNavigateAction`](#urlnavigateaction-from-actions\UrlNavigateAction) |  |
 | [`BufferInRangeTransition`](#bufferinrangetransition-from-transitions\BufferInRangeTransition) | A transition that compares the current buffer with a target value.If the buffer matches the target, the transition is successful. |
 | [`CompareBufferTransition`](#comparebuffertransition-from-transitions\CompareBufferTransition) | A transition that compares the current buffer with a target value.If the buffer matches the target, the transition is successful. |
 | [`FalseTransition`](#falsetransition-from-transitions\FalseTransition) | A transition that always returns False. |
@@ -36,7 +36,7 @@
 
 
 
-## `Action` (from `Action.py`)
+## `Action` (in `pydg\statemachine\Action.py`)
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
@@ -47,7 +47,7 @@
 
 ```python
 # Example usage of `Action`
-from pydatagrabber import Action  # Adjust import if needed
+from pydg.statemachine.Action import Action  # Adjust import if needed
 
 obj = Action()
 obj.child_ids='list()()'
@@ -55,7 +55,7 @@ obj.id="<string>"
 obj.load_on_install=False
 ```
 
-## `AdapterNode` (from `AdapterNode.py`)
+## `AdapterNode` (in `pydg\statemachine\AdapterNode.py`)
 
 AdapterNode is a specialized BufferNode that integrates an adapter for data processing.
 It inherits from BufferNode to manage buffers and provides methods to interact with the adapter.
@@ -70,7 +70,7 @@ It inherits from BufferNode to manage buffers and provides methods to interact w
 
 ```python
 # Example usage of `AdapterNode`
-from pydatagrabber import AdapterNode  # Adjust import if needed
+from pydg.statemachine.AdapterNode import AdapterNode  # Adjust import if needed
 
 obj = AdapterNode()
 obj.child_ids='list()()'
@@ -80,7 +80,7 @@ obj.load_on_install=False
 obj.adapter_id="<string>"
 ```
 
-## `BufferNode` (from `BufferNode.py`)
+## `BufferNode` (in `pydg\statemachine\BufferNode.py`)
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
@@ -92,7 +92,7 @@ obj.adapter_id="<string>"
 
 ```python
 # Example usage of `BufferNode`
-from pydatagrabber import BufferNode  # Adjust import if needed
+from pydg.statemachine.BufferNode import BufferNode  # Adjust import if needed
 
 obj = BufferNode()
 obj.child_ids='list()()'
@@ -101,7 +101,7 @@ obj.load_on_install=False
 obj.buffer_id="<string>"
 ```
 
-## `GrabberNode` (from `GrabberNode.py`)
+## `GrabberNode` (in `pydg\statemachine\GrabberNode.py`)
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
@@ -112,7 +112,7 @@ obj.buffer_id="<string>"
 
 ```python
 # Example usage of `GrabberNode`
-from pydatagrabber import GrabberNode  # Adjust import if needed
+from pydg.statemachine.GrabberNode import GrabberNode  # Adjust import if needed
 
 obj = GrabberNode()
 obj.child_ids='list()()'
@@ -120,7 +120,7 @@ obj.id="<string>"
 obj.load_on_install=False
 ```
 
-## `JoinTransition` (from `JoinTransition.py`)
+## `JoinTransition` (in `pydg\statemachine\JoinTransition.py`)
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
@@ -131,7 +131,7 @@ obj.load_on_install=False
 
 ```python
 # Example usage of `JoinTransition`
-from pydatagrabber import JoinTransition  # Adjust import if needed
+from pydg.statemachine.JoinTransition import JoinTransition  # Adjust import if needed
 
 obj = JoinTransition()
 obj.child_ids='list()()'
@@ -139,7 +139,7 @@ obj.id="<string>"
 obj.load_on_install=False
 ```
 
-## `MappingNode` (from `MappingNode.py`)
+## `MappingNode` (in `pydg\statemachine\MappingNode.py`)
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
@@ -151,7 +151,7 @@ obj.load_on_install=False
 
 ```python
 # Example usage of `MappingNode`
-from pydatagrabber import MappingNode  # Adjust import if needed
+from pydg.statemachine.MappingNode import MappingNode  # Adjust import if needed
 
 obj = MappingNode()
 obj.child_ids='list()()'
@@ -160,7 +160,7 @@ obj.load_on_install=False
 obj.mapping_id="<string>"
 ```
 
-## `Node` (from `Node.py`)
+## `Node` (in `pydg\statemachine\Node.py`)
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
@@ -171,7 +171,7 @@ obj.mapping_id="<string>"
 
 ```python
 # Example usage of `Node`
-from pydatagrabber import Node  # Adjust import if needed
+from pydg.statemachine.Node import Node  # Adjust import if needed
 
 obj = Node()
 obj.id="<string>"
@@ -179,7 +179,7 @@ obj.load_on_install=False
 obj.child_ids='list()()'
 ```
 
-## `ServiceNode` (from `ServiceNode.py`)
+## `ServiceNode` (in `pydg\statemachine\ServiceNode.py`)
 
 A class representing a service node in a state machine.
 Inherits from Node and adds functionality specific to service nodes.
@@ -193,7 +193,7 @@ Inherits from Node and adds functionality specific to service nodes.
 
 ```python
 # Example usage of `ServiceNode`
-from pydatagrabber import ServiceNode  # Adjust import if needed
+from pydg.statemachine.ServiceNode import ServiceNode  # Adjust import if needed
 
 obj = ServiceNode()
 obj.child_ids='list()()'
@@ -202,7 +202,7 @@ obj.load_on_install=False
 obj.service_id="<string>"
 ```
 
-## `Transition` (from `Transition.py`)
+## `Transition` (in `pydg\statemachine\Transition.py`)
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
@@ -213,7 +213,7 @@ obj.service_id="<string>"
 
 ```python
 # Example usage of `Transition`
-from pydatagrabber import Transition  # Adjust import if needed
+from pydg.statemachine.Transition import Transition  # Adjust import if needed
 
 obj = Transition()
 obj.child_ids='list()()'
@@ -221,7 +221,7 @@ obj.id="<string>"
 obj.load_on_install=False
 ```
 
-## `AdapterReadAction` (from `actions\AdapterReadAction.py`)
+## `AdapterReadAction` (in `pydg\statemachine\actions\AdapterReadAction.py`)
 
 Action to read data from an adapter.
 | Field | Type | Default | Description |
@@ -237,7 +237,7 @@ Action to read data from an adapter.
 
 ```python
 # Example usage of `AdapterReadAction`
-from pydatagrabber import AdapterReadAction  # Adjust import if needed
+from pydg.statemachine.actions.AdapterReadAction import AdapterReadAction  # Adjust import if needed
 
 obj = AdapterReadAction()
 obj.child_ids='list()()'
@@ -249,7 +249,7 @@ obj.address="<string>"
 obj.n=1
 ```
 
-## `AdapterWriteAction` (from `actions\AdapterWriteAction.py`)
+## `AdapterWriteAction` (in `pydg\statemachine\actions\AdapterWriteAction.py`)
 
 Action to write data with an adapter.
 | Field | Type | Default | Description |
@@ -266,7 +266,7 @@ Action to write data with an adapter.
 
 ```python
 # Example usage of `AdapterWriteAction`
-from pydatagrabber import AdapterWriteAction  # Adjust import if needed
+from pydg.statemachine.actions.AdapterWriteAction import AdapterWriteAction  # Adjust import if needed
 
 obj = AdapterWriteAction()
 obj.child_ids='list()()'
@@ -279,7 +279,7 @@ obj.n=1
 obj.persistent=False
 ```
 
-## `AddBufferAction` (from `actions\AddBufferAction.py`)
+## `AddBufferAction` (in `pydg\statemachine\actions\AddBufferAction.py`)
 
 Action to add a buffer to the grabber node.
 | Field | Type | Default | Description |
@@ -292,7 +292,7 @@ Action to add a buffer to the grabber node.
 
 ```python
 # Example usage of `AddBufferAction`
-from pydatagrabber import AddBufferAction  # Adjust import if needed
+from pydg.statemachine.actions.AddBufferAction import AddBufferAction  # Adjust import if needed
 
 obj = AddBufferAction()
 obj.child_ids='list()()'
@@ -301,7 +301,7 @@ obj.load_on_install=False
 obj.config={}
 ```
 
-## `BrowserAutomationAction` (from `actions\BrowserAutomationAction.py`)
+## `BrowserAutomationAction` (in `pydg\statemachine\actions\BrowserAutomationAction.py`)
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
@@ -313,7 +313,7 @@ obj.config={}
 
 ```python
 # Example usage of `BrowserAutomationAction`
-from pydatagrabber import BrowserAutomationAction  # Adjust import if needed
+from pydg.statemachine.actions.BrowserAutomationAction import BrowserAutomationAction  # Adjust import if needed
 
 obj = BrowserAutomationAction()
 obj.child_ids='list()()'
@@ -322,7 +322,55 @@ obj.load_on_install=False
 obj.service_id="<string>"
 ```
 
-## `ConfigureElementAction` (from `actions\ConfigureElementAction.py`)
+## `BrowserSetElementAction` (in `pydg\statemachine\actions\BrowserSetElementAction.py`)
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `child_ids` | `list[str]` | `'list()()'` | List of child node IDs |
+| `service_id` | `str` | `` | ID of the service to reference for Browser Automation |
+| `buffer_id` | `str` | `` | unique ID of the buffer |
+| `id` | `str` | `` | unique identifier of element in DataGrabber application |
+| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+| `xpath` | `str` | `` | XPath definition to locate the element to set a value to |
+
+
+```python
+# Example usage of `BrowserSetElementAction`
+from pydg.statemachine.actions.BrowserSetElementAction import BrowserSetElementAction  # Adjust import if needed
+
+obj = BrowserSetElementAction()
+obj.child_ids='list()()'
+obj.service_id="<string>"
+obj.buffer_id="<string>"
+obj.id="<string>"
+obj.load_on_install=False
+obj.xpath="<string>"
+```
+
+## `BrowserUrlNavigateAction` (in `pydg\statemachine\actions\BrowserUrlNavigateAction.py`)
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `child_ids` | `list[str]` | `'list()()'` | List of child node IDs |
+| `service_id` | `str` | `` | ID of the service to reference for Browser Automation |
+| `id` | `str` | `` | unique identifier of element in DataGrabber application |
+| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+| `url` | `str` | `` | url to navigate to in browser |
+
+
+```python
+# Example usage of `BrowserUrlNavigateAction`
+from pydg.statemachine.actions.BrowserUrlNavigateAction import BrowserUrlNavigateAction  # Adjust import if needed
+
+obj = BrowserUrlNavigateAction()
+obj.child_ids='list()()'
+obj.service_id="<string>"
+obj.id="<string>"
+obj.load_on_install=False
+obj.url="https://example.com"
+```
+
+## `ConfigureElementAction` (in `pydg\statemachine\actions\ConfigureElementAction.py`)
 
 this `Action` configures a `GrabberElement` property by the provided `element_id` and name of the `option`, which is the class' property
 <br>the new property value is derived from the `Node`'s `buffer`
@@ -346,7 +394,7 @@ Raises:
 
 ```python
 # Example usage of `ConfigureElementAction`
-from pydatagrabber import ConfigureElementAction  # Adjust import if needed
+from pydg.statemachine.actions.ConfigureElementAction import ConfigureElementAction  # Adjust import if needed
 
 obj = ConfigureElementAction()
 obj.child_ids='list()()'
@@ -358,7 +406,7 @@ obj.element_id="<string>"
 obj.n=1
 ```
 
-## `CopyFilesAction` (from `actions\CopyFilesAction.py`)
+## `CopyFilesAction` (in `pydg\statemachine\actions\CopyFilesAction.py`)
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
@@ -371,7 +419,7 @@ obj.n=1
 
 ```python
 # Example usage of `CopyFilesAction`
-from pydatagrabber import CopyFilesAction  # Adjust import if needed
+from pydg.statemachine.actions.CopyFilesAction import CopyFilesAction  # Adjust import if needed
 
 obj = CopyFilesAction()
 obj.child_ids='list()()'
@@ -381,7 +429,7 @@ obj.load_on_install=False
 obj.target_folder="path/to/folder"
 ```
 
-## `ListFilesAction` (from `actions\ListFilesAction.py`)
+## `ListFilesAction` (in `pydg\statemachine\actions\ListFilesAction.py`)
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
@@ -390,14 +438,15 @@ obj.target_folder="path/to/folder"
 | `id` | `str` | `` | unique identifier of element in DataGrabber application |
 | `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
 | `folder` | `str` | `` | folder to list the files from into a Buffer |
-| `pattern` | `str` | `` | paatern to look for in file names |
+| `pattern` | `str` | `` | pattern to look for in file names |
 | `extension` | `str` | `` | extension to include |
 | `newer_than_seconds` | `int` | `` | specifies how old in seconds a file can be to be included |
+| `recursive` | `bool` | `False` | specifies whether to search subdirectories aswell |
 
 
 ```python
 # Example usage of `ListFilesAction`
-from pydatagrabber import ListFilesAction  # Adjust import if needed
+from pydg.statemachine.actions.ListFilesAction import ListFilesAction  # Adjust import if needed
 
 obj = ListFilesAction()
 obj.child_ids='list()()'
@@ -408,9 +457,10 @@ obj.folder="path/to/folder"
 obj.pattern="<string>"
 obj.extension="<string>"
 obj.newer_than_seconds=1
+obj.recursive=False
 ```
 
-## `MailAction` (from `actions\MailAction.py`)
+## `MailAction` (in `pydg\statemachine\actions\MailAction.py`)
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
@@ -428,7 +478,7 @@ obj.newer_than_seconds=1
 
 ```python
 # Example usage of `MailAction`
-from pydatagrabber import MailAction  # Adjust import if needed
+from pydg.statemachine.actions.MailAction import MailAction  # Adjust import if needed
 
 obj = MailAction()
 obj.child_ids='list()()'
@@ -443,7 +493,7 @@ obj.subject="<string>"
 obj.body="<string>"
 ```
 
-## `MoveFilesAction` (from `actions\MoveFilesAction.py`)
+## `MoveFilesAction` (in `pydg\statemachine\actions\MoveFilesAction.py`)
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
@@ -456,7 +506,7 @@ obj.body="<string>"
 
 ```python
 # Example usage of `MoveFilesAction`
-from pydatagrabber import MoveFilesAction  # Adjust import if needed
+from pydg.statemachine.actions.MoveFilesAction import MoveFilesAction  # Adjust import if needed
 
 obj = MoveFilesAction()
 obj.child_ids='list()()'
@@ -466,7 +516,7 @@ obj.load_on_install=False
 obj.target_folder="path/to/folder"
 ```
 
-## `ReadCsvAction` (from `actions\ReadCsvAction.py`)
+## `ReadCsvAction` (in `pydg\statemachine\actions\ReadCsvAction.py`)
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
@@ -480,7 +530,7 @@ obj.target_folder="path/to/folder"
 
 ```python
 # Example usage of `ReadCsvAction`
-from pydatagrabber import ReadCsvAction  # Adjust import if needed
+from pydg.statemachine.actions.ReadCsvAction import ReadCsvAction  # Adjust import if needed
 
 obj = ReadCsvAction()
 obj.child_ids='list()()'
@@ -491,7 +541,7 @@ obj.file_path="path/to/file.txt"
 obj.delimiter=';'
 ```
 
-## `ReadJsonAction` (from `actions\ReadJsonAction.py`)
+## `ReadJsonAction` (in `pydg\statemachine\actions\ReadJsonAction.py`)
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
@@ -505,7 +555,7 @@ obj.delimiter=';'
 
 ```python
 # Example usage of `ReadJsonAction`
-from pydatagrabber import ReadJsonAction  # Adjust import if needed
+from pydg.statemachine.actions.ReadJsonAction import ReadJsonAction  # Adjust import if needed
 
 obj = ReadJsonAction()
 obj.child_ids='list()()'
@@ -516,32 +566,7 @@ obj.file_path="path/to/file.txt"
 obj.json_path="<string>"
 ```
 
-## `SetElementAction` (from `actions\SetElementAction.py`)
-
-| Field | Type | Default | Description |
-|-------|------|---------|-------------|
-| `child_ids` | `list[str]` | `'list()()'` | List of child node IDs |
-| `service_id` | `str` | `` | ID of the service to reference for Browser Automation |
-| `buffer_id` | `str` | `` | unique ID of the buffer |
-| `id` | `str` | `` | unique identifier of element in DataGrabber application |
-| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
-| `xpath` | `str` | `` | XPath definition to locate the element to set a value to |
-
-
-```python
-# Example usage of `SetElementAction`
-from pydatagrabber import SetElementAction  # Adjust import if needed
-
-obj = SetElementAction()
-obj.child_ids='list()()'
-obj.service_id="<string>"
-obj.buffer_id="<string>"
-obj.id="<string>"
-obj.load_on_install=False
-obj.xpath="<string>"
-```
-
-## `SleepAction` (from `actions\SleepAction.py`)
+## `SleepAction` (in `pydg\statemachine\actions\SleepAction.py`)
 
 An action that sleeps for a specified number of seconds.
 | Field | Type | Default | Description |
@@ -549,19 +574,21 @@ An action that sleeps for a specified number of seconds.
 | `child_ids` | `list[str]` | `'list()()'` | List of child node IDs |
 | `id` | `str` | `` | unique identifier of element in DataGrabber application |
 | `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+| `sleep_time` | `int` | `0` | number of seconds to sleep for |
 
 
 ```python
 # Example usage of `SleepAction`
-from pydatagrabber import SleepAction  # Adjust import if needed
+from pydg.statemachine.actions.SleepAction import SleepAction  # Adjust import if needed
 
 obj = SleepAction()
 obj.child_ids='list()()'
 obj.id="<string>"
 obj.load_on_install=False
+obj.sleep_time=0
 ```
 
-## `StartAction` (from `actions\StartAction.py`)
+## `StartAction` (in `pydg\statemachine\actions\StartAction.py`)
 
 An action that starts the state machine.
 | Field | Type | Default | Description |
@@ -573,7 +600,7 @@ An action that starts the state machine.
 
 ```python
 # Example usage of `StartAction`
-from pydatagrabber import StartAction  # Adjust import if needed
+from pydg.statemachine.actions.StartAction import StartAction  # Adjust import if needed
 
 obj = StartAction()
 obj.child_ids='list()()'
@@ -581,7 +608,7 @@ obj.id="<string>"
 obj.load_on_install=False
 ```
 
-## `StopAction` (from `actions\StopAction.py`)
+## `StopAction` (in `pydg\statemachine\actions\StopAction.py`)
 
 An action that stops the state machine.
 | Field | Type | Default | Description |
@@ -593,7 +620,7 @@ An action that stops the state machine.
 
 ```python
 # Example usage of `StopAction`
-from pydatagrabber import StopAction  # Adjust import if needed
+from pydg.statemachine.actions.StopAction import StopAction  # Adjust import if needed
 
 obj = StopAction()
 obj.child_ids='list()()'
@@ -601,30 +628,7 @@ obj.id="<string>"
 obj.load_on_install=False
 ```
 
-## `UrlNavigateAction` (from `actions\UrlNavigateAction.py`)
-
-| Field | Type | Default | Description |
-|-------|------|---------|-------------|
-| `child_ids` | `list[str]` | `'list()()'` | List of child node IDs |
-| `service_id` | `str` | `` | ID of the service to reference for Browser Automation |
-| `id` | `str` | `` | unique identifier of element in DataGrabber application |
-| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
-| `url` | `str` | `` | url to navigate to in browser |
-
-
-```python
-# Example usage of `UrlNavigateAction`
-from pydatagrabber import UrlNavigateAction  # Adjust import if needed
-
-obj = UrlNavigateAction()
-obj.child_ids='list()()'
-obj.service_id="<string>"
-obj.id="<string>"
-obj.load_on_install=False
-obj.url="https://example.com"
-```
-
-## `BufferInRangeTransition` (from `transitions\BufferInRangeTransition.py`)
+## `BufferInRangeTransition` (in `pydg\statemachine\transitions\BufferInRangeTransition.py`)
 
 A transition that compares the current buffer with a target value.
 If the buffer matches the target, the transition is successful.
@@ -640,7 +644,7 @@ If the buffer matches the target, the transition is successful.
 
 ```python
 # Example usage of `BufferInRangeTransition`
-from pydatagrabber import BufferInRangeTransition  # Adjust import if needed
+from pydg.statemachine.transitions.BufferInRangeTransition import BufferInRangeTransition  # Adjust import if needed
 
 obj = BufferInRangeTransition()
 obj.child_ids='list()()'
@@ -651,7 +655,7 @@ obj.comparator="<string>"
 obj.value="<value>"
 ```
 
-## `CompareBufferTransition` (from `transitions\CompareBufferTransition.py`)
+## `CompareBufferTransition` (in `pydg\statemachine\transitions\CompareBufferTransition.py`)
 
 A transition that compares the current buffer with a target value.
 If the buffer matches the target, the transition is successful.
@@ -667,7 +671,7 @@ If the buffer matches the target, the transition is successful.
 
 ```python
 # Example usage of `CompareBufferTransition`
-from pydatagrabber import CompareBufferTransition  # Adjust import if needed
+from pydg.statemachine.transitions.CompareBufferTransition import CompareBufferTransition  # Adjust import if needed
 
 obj = CompareBufferTransition()
 obj.child_ids='list()()'
@@ -678,7 +682,7 @@ obj.comparator="<string>"
 obj.value="<value>"
 ```
 
-## `FalseTransition` (from `transitions\FalseTransition.py`)
+## `FalseTransition` (in `pydg\statemachine\transitions\FalseTransition.py`)
 
 A transition that always returns False.
 | Field | Type | Default | Description |
@@ -690,7 +694,7 @@ A transition that always returns False.
 
 ```python
 # Example usage of `FalseTransition`
-from pydatagrabber import FalseTransition  # Adjust import if needed
+from pydg.statemachine.transitions.FalseTransition import FalseTransition  # Adjust import if needed
 
 obj = FalseTransition()
 obj.child_ids='list()()'
@@ -698,7 +702,7 @@ obj.id="<string>"
 obj.load_on_install=False
 ```
 
-## `TrueTransition` (from `transitions\TrueTransition.py`)
+## `TrueTransition` (in `pydg\statemachine\transitions\TrueTransition.py`)
 
 A transition that always returns True.
 This is used to test the statemachine without any conditions.
@@ -711,7 +715,7 @@ This is used to test the statemachine without any conditions.
 
 ```python
 # Example usage of `TrueTransition`
-from pydatagrabber import TrueTransition  # Adjust import if needed
+from pydg.statemachine.transitions.TrueTransition import TrueTransition  # Adjust import if needed
 
 obj = TrueTransition()
 obj.child_ids='list()()'

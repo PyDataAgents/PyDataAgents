@@ -1,6 +1,6 @@
 import time
-from pydatagrabber.buffers.SignalBuffer import SignalBuffer
-from pydatagrabber.buffers.signals.TimedSignal import TimedSignal
+from pydg.buffers.SignalBuffer import SignalBuffer
+from pydg.buffers.signals.TimedSignal import TimedSignal
 
 
 def test_000():

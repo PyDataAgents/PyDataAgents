@@ -1,8 +1,8 @@
 import configparser
 import time
 from pathlib import Path
-from pydatagrabber.services.documents.FolderObserveMailService import FolderObserveMailService
-from pydatagrabber.statemachine.actions.MailAction import MailAction
+from pydg.services.documents.FolderObserveMailService import FolderObserveMailService
+from pydg.statemachine.actions.MailAction import MailAction
 
 
 def test_000():

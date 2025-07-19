@@ -3,8 +3,8 @@ requires = ["setuptools>=61"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "pydatagrabber"
-version = "v0.0.1a5"
+name = "pydg"
+version = "v0.0.2a1"
 description = "An IIoT framework for reading and writing from sources/sinks."
 readme = "README.md"
 requires-python = ">=3.11"
@@ -52,7 +52,7 @@ dependencies = [
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["pydatagrabber*"]
+include = ["pydg*"]
 exclude = ["tests"]
 
 [project.urls]

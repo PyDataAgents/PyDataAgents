@@ -2,13 +2,13 @@ import importlib
 import os
 import yaml
 
-from pydatagrabber.adapters.opcua.OpcUaAdapter import OpcUaAdapter
-from pydatagrabber.buffers.ListBuffer import ListBuffer
-from pydatagrabber.grabbers.GrabberConfig import GrabberConfig
-from pydatagrabber.grabbers.YAMLConfig import YAMLConfig
-from pydatagrabber.grabbers.Grabber import Grabber
-from pydatagrabber.mappings.Mapping import Mapping
-from pydatagrabber.mappings.ThreadType import ThreadType
+from pydg.adapters.opcua.OpcUaAdapter import OpcUaAdapter
+from pydg.buffers.ListBuffer import ListBuffer
+from pydg.grabbers.GrabberConfig import GrabberConfig
+from pydg.grabbers.YAMLConfig import YAMLConfig
+from pydg.grabbers.Grabber import Grabber
+from pydg.mappings.Mapping import Mapping
+from pydg.mappings.ThreadType import ThreadType
 from tests.grabbers.ConfigObject import ConfigObject
 
 

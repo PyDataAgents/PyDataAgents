@@ -1,9 +1,9 @@
 import configparser
 import os
-from pydatagrabber.grabbers.Grabber import Grabber
-from pydatagrabber.services.langchain.LLMService import LLMService
-from pydatagrabber.services.langchain.RAGService import RAGService
-from pydatagrabber.services.rest.LLMRestService import LLMRestService
+from pydg.grabbers.Grabber import Grabber
+from pydg.services.langchain.LLMService import LLMService
+from pydg.services.langchain.RAGService import RAGService
+from pydg.services.rest.LLMRestService import LLMRestService
 
 def test_000():
     

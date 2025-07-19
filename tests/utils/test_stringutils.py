@@ -1,4 +1,4 @@
-from pydatagrabber.utils.StringUtils import StringUtils
+from pydg.utils.StringUtils import StringUtils
 
 
 def test_000():

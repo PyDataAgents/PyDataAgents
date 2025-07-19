@@ -1,5 +1,5 @@
-from pydatagrabber.grabbers.GrabberElement import GrabberElement
-from pydatagrabber.utils.ClassUtils import ClassUtils
+from pydg.grabbers.GrabberElement import GrabberElement
+from pydg.utils.ClassUtils import ClassUtils
 
 
 def test_000():

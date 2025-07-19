@@ -16,16 +16,16 @@
 
 
 
-## `Mapping` (from `Mapping.py`)
+## `Mapping` (in `pydg\mappings\Mapping.py`)
 
     
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `id` | `str` | `` | unique identifier of element in DataGrabber application |
 | `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
-| `buffer_ids` | `list[str]` | `` | list of buffer ids to map from |
+| `buffer_ids` | `list[str]` | `'list()'` | list of buffer ids to map from |
 | `adapter_id` | `str` | `` | id of the Adapter used for this Mapping |
-| `addresses` | `list[str]` | `` | list of addresses to read/subscribe from or write/publish to |
+| `addresses` | `list[str]` | `'list()'` | list of addresses to read/subscribe from or write/publish to |
 | `thread_type` | `str` | `'ThreadType.MILLI_SECOND.value'` | type of thread, e.g. MILLI_SECONDS, MICRO_SECONDS, INSTANT, ONLY_ONCE, ... |
 | `mapping_type` | `str` | `` | type of mapping, e.g. READ, WRITE, SUB or PUB |
 | `n` | `int` | `1` | number of samples to insert or remove from buffers |
@@ -36,14 +36,14 @@
 
 ```python
 # Example usage of `Mapping`
-from pydatagrabber import Mapping  # Adjust import if needed
+from pydg.mappings.Mapping import Mapping  # Adjust import if needed
 
 obj = Mapping()
 obj.id="<string>"
 obj.load_on_install=False
-obj.buffer_ids="<string>"
+obj.buffer_ids='list()'
 obj.adapter_id="<string>"
-obj.addresses="<string>"
+obj.addresses='list()'
 obj.thread_type='ThreadType.MILLI_SECOND.value'
 obj.mapping_type="<string>"
 obj.n=1
@@ -52,7 +52,7 @@ obj.persistent=True
 obj.auto_start=True
 ```
 
-## `MappingObserver` (from `MappingObserver.py`)
+## `MappingObserver` (in `pydg\mappings\MappingObserver.py`)
 
 abstract base class for mapping observers
     
@@ -64,14 +64,14 @@ abstract base class for mapping observers
 
 ```python
 # Example usage of `MappingObserver`
-from pydatagrabber import MappingObserver  # Adjust import if needed
+from pydg.mappings.MappingObserver import MappingObserver  # Adjust import if needed
 
 obj = MappingObserver()
 obj.id="<string>"
 obj.load_on_install=False
 ```
 
-## `MappingThread` (from `MappingThread.py`)
+## `MappingThread` (in `pydg\mappings\MappingThread.py`)
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
@@ -81,14 +81,14 @@ obj.load_on_install=False
 
 ```python
 # Example usage of `MappingThread`
-from pydatagrabber import MappingThread  # Adjust import if needed
+from pydg.mappings.MappingThread import MappingThread  # Adjust import if needed
 
 obj = MappingThread()
 obj.id="<string>"
 obj.load_on_install=False
 ```
 
-## `Observer` (from `Observer.py`)
+## `Observer` (in `pydg\mappings\Observer.py`)
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
@@ -98,14 +98,14 @@ obj.load_on_install=False
 
 ```python
 # Example usage of `Observer`
-from pydatagrabber import Observer  # Adjust import if needed
+from pydg.mappings.Observer import Observer  # Adjust import if needed
 
 obj = Observer()
 obj.id="<string>"
 obj.load_on_install=False
 ```
 
-## `ObserverThread` (from `ObserverThread.py`)
+## `ObserverThread` (in `pydg\mappings\ObserverThread.py`)
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
@@ -117,7 +117,7 @@ obj.load_on_install=False
 
 ```python
 # Example usage of `ObserverThread`
-from pydatagrabber import ObserverThread  # Adjust import if needed
+from pydg.mappings.ObserverThread import ObserverThread  # Adjust import if needed
 
 obj = ObserverThread()
 obj.id="<string>"
@@ -126,7 +126,7 @@ obj.SAFETY_DIFF_TIME_UNITS=1
 obj.SLEEP_WITH_HOLD_FACTOR=3.14
 ```
 
-## `PublishMappingObserver` (from `PublishMappingObserver.py`)
+## `PublishMappingObserver` (in `pydg\mappings\PublishMappingObserver.py`)
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
@@ -136,14 +136,14 @@ obj.SLEEP_WITH_HOLD_FACTOR=3.14
 
 ```python
 # Example usage of `PublishMappingObserver`
-from pydatagrabber import PublishMappingObserver  # Adjust import if needed
+from pydg.mappings.PublishMappingObserver import PublishMappingObserver  # Adjust import if needed
 
 obj = PublishMappingObserver()
 obj.id="<string>"
 obj.load_on_install=False
 ```
 
-## `ReadMappingObserver` (from `ReadMappingObserver.py`)
+## `ReadMappingObserver` (in `pydg\mappings\ReadMappingObserver.py`)
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
@@ -153,14 +153,14 @@ obj.load_on_install=False
 
 ```python
 # Example usage of `ReadMappingObserver`
-from pydatagrabber import ReadMappingObserver  # Adjust import if needed
+from pydg.mappings.ReadMappingObserver import ReadMappingObserver  # Adjust import if needed
 
 obj = ReadMappingObserver()
 obj.id="<string>"
 obj.load_on_install=False
 ```
 
-## `SubscribeMappingObserver` (from `SubscribeMappingObserver.py`)
+## `SubscribeMappingObserver` (in `pydg\mappings\SubscribeMappingObserver.py`)
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
@@ -170,14 +170,14 @@ obj.load_on_install=False
 
 ```python
 # Example usage of `SubscribeMappingObserver`
-from pydatagrabber import SubscribeMappingObserver  # Adjust import if needed
+from pydg.mappings.SubscribeMappingObserver import SubscribeMappingObserver  # Adjust import if needed
 
 obj = SubscribeMappingObserver()
 obj.id="<string>"
 obj.load_on_install=False
 ```
 
-## `WriteMappingObserver` (from `WriteMappingObserver.py`)
+## `WriteMappingObserver` (in `pydg\mappings\WriteMappingObserver.py`)
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
@@ -187,7 +187,7 @@ obj.load_on_install=False
 
 ```python
 # Example usage of `WriteMappingObserver`
-from pydatagrabber import WriteMappingObserver  # Adjust import if needed
+from pydg.mappings.WriteMappingObserver import WriteMappingObserver  # Adjust import if needed
 
 obj = WriteMappingObserver()
 obj.id="<string>"

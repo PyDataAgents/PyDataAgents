@@ -1,16 +1,18 @@
 import ast
+import os
 from pathlib import Path
 from typing import List, Dict, Set
 
-from pydatagrabber.grabbers.GrabberElement import GrabberElement
-from pydatagrabber.utils.ClassUtils import ClassUtils
-from pydatagrabber.utils.TimeUtils import TimeUtils
+from pydg.grabbers.GrabberElement import GrabberElement
+from pydg.utils.ClassUtils import ClassUtils
+from pydg.utils.TimeUtils import TimeUtils
 
 
 # Stores class inheritance and definitions across the codebase
 class_hierarchy: Dict[str, List[str]] = {}
 class_defs: Dict[str, ast.ClassDef] = {}
 class_modules: Dict[str, Path] = {}
+class_filepaths: Dict[str, str] = {}
 
 def get_full_name(node):
     """Extract the name from ast.Name or ast.Attribute nodes."""
@@ -31,6 +33,7 @@ def extract_class_info(file_path: Path, base_dir : Path):
             class_hierarchy[class_name] = bases
             class_defs[class_name] = item
             class_modules[class_name] = file_path.relative_to(base_dir)
+            class_filepaths[class_name] = str(file_path)
 
 def inherits_from_type(cls_name: str, type : str, seen: Set[str] = None) -> bool:
     """Recursively check if a class inherits from type."""
@@ -156,7 +159,10 @@ def scan_repository(base_dir: Path, type : str):
         if inherits_from_type(class_name, type):
             fields = get_all_fields(class_name)
             docstring = ast.get_docstring(class_def) or ""
+            package_file = class_filepaths[class_name]
+            package = package_file.removesuffix(".py").replace(os.sep, ".")
             summary.append({
+                "package": package,
                 "name": class_name,
                 "docstring": docstring,
                 "fields": fields,
@@ -180,7 +186,8 @@ def generate_readme(class_data: List[Dict], output_file: Path, name : str):
     
     # class details    
     for cls in sorted(class_data, key=lambda x: str(x["file"])):
-        lines.append(f"## `{cls['name']}` (from `{cls['file']}`)\n")
+        package_file = cls['package'].replace(".", os.sep) + ".py"
+        lines.append(f"## `{cls['name']}` (in `{package_file}`)\n")
         if cls["docstring"]:
             lines.append(cls["docstring"])
         if not cls["fields"]:
@@ -201,7 +208,7 @@ def generate_readme(class_data: List[Dict], output_file: Path, name : str):
         # Code Example
         lines.append("```python")
         lines.append(f"# Example usage of `{cls['name']}`")
-        lines.append(f"from pydatagrabber import {cls['name']}  # Adjust import if needed\n")
+        lines.append(f"from {cls['package']} import {cls['name']}  # Adjust import if needed\n")
         # Instantiate the class with placeholder values
         init_args = []
         for field in cls["fields"]:
@@ -270,21 +277,21 @@ def generate_docs_for_type(name : str, type : str, src_folder : Path, docu_folde
 if __name__ == "__main__":
     
     # find all grabbers
-    generate_docs_for_type("Grabbers", GrabberElement.cname(), Path("pydatagrabber\\grabbers"), Path("docs\\"))
+    generate_docs_for_type("Grabbers", GrabberElement.cname(), Path("pydg\\grabbers"), Path("docs\\"))
     
     # find all adapters
-    generate_docs_for_type("Adapters", GrabberElement.cname(), Path("pydatagrabber\\adapters"), Path("docs\\"))
+    generate_docs_for_type("Adapters", GrabberElement.cname(), Path("pydg\\adapters"), Path("docs\\"))
 
     # find all buffers
-    generate_docs_for_type("Buffers", GrabberElement.cname(), Path("pydatagrabber\\buffers"), Path("docs\\"))
+    generate_docs_for_type("Buffers", GrabberElement.cname(), Path("pydg\\buffers"), Path("docs\\"))
 
     # find all mappings
-    generate_docs_for_type("Mappings", GrabberElement.cname(), Path("pydatagrabber\\mappings"), Path("docs\\"))
+    generate_docs_for_type("Mappings", GrabberElement.cname(), Path("pydg\\mappings"), Path("docs\\"))
 
     # find all services
-    generate_docs_for_type("Services", GrabberElement.cname(), Path("pydatagrabber\\services"), Path("docs\\"))
+    generate_docs_for_type("Services", GrabberElement.cname(), Path("pydg\\services"), Path("docs\\"))
     
     # find Statemachine Nodes
-    generate_docs_for_type("Actions and Transitions", GrabberElement.cname(), Path("pydatagrabber\\statemachine"), Path("docs\\"))
+    generate_docs_for_type("Actions and Transitions", GrabberElement.cname(), Path("pydg\\statemachine"), Path("docs\\"))
 
 

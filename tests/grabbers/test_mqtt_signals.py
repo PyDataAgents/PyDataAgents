@@ -1,12 +1,12 @@
         
-from pydatagrabber.adapters.mqtt.MQTTAdapter import MQTTAdapter
-from pydatagrabber.buffers.SignalBuffer import SignalBuffer
-from pydatagrabber.buffers.signals.LinearTrend import LinearTrend
-from pydatagrabber.buffers.signals.Sine import Sine
-from pydatagrabber.grabbers.Grabber import Grabber
-from pydatagrabber.mappings.Mapping import Mapping
-from pydatagrabber.mappings.MappingType import MappingType
-from pydatagrabber.mappings.ThreadType import ThreadType
+from pydg.adapters.mqtt.MQTTAdapter import MQTTAdapter
+from pydg.buffers.SignalBuffer import SignalBuffer
+from pydg.buffers.signals.LinearTrend import LinearTrend
+from pydg.buffers.signals.Sine import Sine
+from pydg.grabbers.Grabber import Grabber
+from pydg.mappings.Mapping import Mapping
+from pydg.mappings.MappingType import MappingType
+from pydg.mappings.ThreadType import ThreadType
 
 
 def test_000():

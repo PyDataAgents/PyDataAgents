@@ -1,4 +1,4 @@
-from pydatagrabber.buffers.DictBuffer import DictBuffer
+from pydg.buffers.DictBuffer import DictBuffer
 
 def test000():
     buf = DictBuffer()

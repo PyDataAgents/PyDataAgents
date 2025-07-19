@@ -8,7 +8,7 @@
 
 
 
-## `Grabber` (from `Grabber.py`)
+## `Grabber` (in `pydg\grabbers\Grabber.py`)
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
@@ -19,7 +19,7 @@
 
 ```python
 # Example usage of `Grabber`
-from pydatagrabber import Grabber  # Adjust import if needed
+from pydg.grabbers.Grabber import Grabber  # Adjust import if needed
 
 obj = Grabber()
 obj.type="<string>"

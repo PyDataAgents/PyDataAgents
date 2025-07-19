@@ -1,6 +1,6 @@
 import os
-from pydatagrabber.buffers.DictBuffer import DictBuffer
-from pydatagrabber.utils.BufferUtils import BufferUtils
+from pydg.buffers.DictBuffer import DictBuffer
+from pydg.utils.BufferUtils import BufferUtils
 
 
 def test_000():

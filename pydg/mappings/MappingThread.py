@@ -10,7 +10,7 @@ from .SubscribeMappingObserver import SubscribeMappingObserver
 from .WriteMappingObserver import WriteMappingObserver
 
 if TYPE_CHECKING:
-    from pydatagrabber.grabbers.Grabber import Grabber
+    from pydg.grabbers.Grabber import Grabber
 
 class MappingThread(GrabberElement):
     

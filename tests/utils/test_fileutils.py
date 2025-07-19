@@ -1,5 +1,5 @@
 from pathlib import Path
-from pydatagrabber.utils.FileUtils import FileUtils
+from pydg.utils.FileUtils import FileUtils
 
 
 def test_000():    

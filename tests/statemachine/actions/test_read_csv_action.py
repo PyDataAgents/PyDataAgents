@@ -1,6 +1,6 @@
 import os
-from pydatagrabber.buffers.DictBuffer import DictBuffer
-from pydatagrabber.statemachine.actions.ReadCsvAction import ReadCsvAction
+from pydg.buffers.DictBuffer import DictBuffer
+from pydg.statemachine.actions.ReadCsvAction import ReadCsvAction
 
 
 def test_000():

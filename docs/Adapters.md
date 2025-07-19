@@ -5,7 +5,7 @@
 | Class | Description |
 |-------|-------------|
 | [`Adapter`](#adapter-from-Adapter) | Abstract base class for `Adapters`. All `Adapters` must inherit from this class. |
-| [`PublishAdapter`](#publishadapter-from-PublishAdapter) | abstract class for `Adapter` Interface for publishing to data sinks.<br>new `Adapters` that allow for publishing to a sink via callback must inherit this class next to `Adapter`. |
+| [`PublishAdapter`](##`PublishAdapter` (in `pydg\adapters\PublishAdapter.py`)) | abstract class for `Adapter` Interface for publishing to data sinks.<br>new `Adapters` that allow for publishing to a sink via callback must inherit this class next to `Adapter`. |
 | [`ReadAdapter`](#readadapter-from-ReadAdapter) | abstract class for `Adapter` Interface for reading from data sources.<br>new `Adapters` that allow for reading from a source via one-shot polling must inherit this class next to `Adapter`. |
 | [`SubscribeAdapter`](#subscribeadapter-from-SubscribeAdapter) | abstract class for `Adapter` Interface for subscribing from data sources<br>new `Adapters` that allow for subscribing to a source via callback must inherit this class next to `Adapter`. |
 | [`WriteAdapter`](#writeadapter-from-WriteAdapter) | abstract class for Adapter Interface for writing to data sinks<br>new `Adapters` that allow for writing to a sink via one-shot polling must inherit this class next to `Adapter`. |
@@ -18,13 +18,14 @@
 | [`MQTTAdapter`](#mqttadapter-from-mqtt\MQTTAdapter) | `Adapter` for subscribing or writing data from/to MQTT topics.     |
 | [`OpcUaAdapter`](#opcuaadapter-from-opcua\OpcUaAdapter) | `Adapter` for reading and writing data from/to OPC UA servers.     |
 | [`S7Adapter`](#s7adapter-from-s7\S7Adapter) | `Adapter`reading from and writing to S7 PLCs.     |
+| [`ScriptAdapter`](#scriptadapter-from-script\ScriptAdapter) | An `Adapter` that reads data from specified `Buffer`s using computations / transformations defined in a script file<br>new results are written back to specified output `Buffer`s |
 | [`ByteStreamAdapter`](#bytestreamadapter-from-socket\ByteStreamAdapter) |  |
 | [`WebSocketAdapter`](#websocketadapter-from-socket\WebSocketAdapter) | `Adapter` for subscribing and writing data from/to WebSocket endpoints.     |
 | [`SQLAdapter`](#sqladapter-from-sql\SQLAdapter) | `Adapter` for reading and writing data from/to SQL databases using pyodbc.<br>Required ODBC driver must be installed for the specific SQL database (e.g. MySQL, PostgreSQL, SQLite, etc.) and sytem |
 
 
 
-## `Adapter` (from `Adapter.py`)
+## `Adapter` (in `pydg\adapters\Adapter.py`)
 
 Abstract base class for `Adapters`. All `Adapters` must inherit from this class.
 | Field | Type | Default | Description |
@@ -35,14 +36,14 @@ Abstract base class for `Adapters`. All `Adapters` must inherit from this class.
 
 ```python
 # Example usage of `Adapter`
-from pydatagrabber import Adapter  # Adjust import if needed
+from pydg.adapters.Adapter import Adapter  # Adjust import if needed
 
 obj = Adapter()
 obj.id="<string>"
 obj.load_on_install=False
 ```
 
-## `PublishAdapter` (from `PublishAdapter.py`)
+## `PublishAdapter` (in `pydg\adapters\PublishAdapter.py`)
 
 abstract class for `Adapter` Interface for publishing to data sinks.
 <br>new `Adapters` that allow for publishing to a sink via callback must inherit this class next to `Adapter`.
@@ -54,14 +55,14 @@ abstract class for `Adapter` Interface for publishing to data sinks.
 
 ```python
 # Example usage of `PublishAdapter`
-from pydatagrabber import PublishAdapter  # Adjust import if needed
+from pydg.adapters.PublishAdapter import PublishAdapter  # Adjust import if needed
 
 obj = PublishAdapter()
 obj.id="<string>"
 obj.load_on_install=False
 ```
 
-## `ReadAdapter` (from `ReadAdapter.py`)
+## `ReadAdapter` (in `pydg\adapters\ReadAdapter.py`)
 
 abstract class for `Adapter` Interface for reading from data sources.
 <br>new `Adapters` that allow for reading from a source via one-shot polling must inherit this class next to `Adapter`.
@@ -73,14 +74,14 @@ abstract class for `Adapter` Interface for reading from data sources.
 
 ```python
 # Example usage of `ReadAdapter`
-from pydatagrabber import ReadAdapter  # Adjust import if needed
+from pydg.adapters.ReadAdapter import ReadAdapter  # Adjust import if needed
 
 obj = ReadAdapter()
 obj.id="<string>"
 obj.load_on_install=False
 ```
 
-## `SubscribeAdapter` (from `SubscribeAdapter.py`)
+## `SubscribeAdapter` (in `pydg\adapters\SubscribeAdapter.py`)
 
 abstract class for `Adapter` Interface for subscribing from data sources
 <br>new `Adapters` that allow for subscribing to a source via callback must inherit this class next to `Adapter`.
@@ -92,14 +93,14 @@ abstract class for `Adapter` Interface for subscribing from data sources
 
 ```python
 # Example usage of `SubscribeAdapter`
-from pydatagrabber import SubscribeAdapter  # Adjust import if needed
+from pydg.adapters.SubscribeAdapter import SubscribeAdapter  # Adjust import if needed
 
 obj = SubscribeAdapter()
 obj.id="<string>"
 obj.load_on_install=False
 ```
 
-## `WriteAdapter` (from `WriteAdapter.py`)
+## `WriteAdapter` (in `pydg\adapters\WriteAdapter.py`)
 
 abstract class for Adapter Interface for writing to data sinks
 <br>new `Adapters` that allow for writing to a sink via one-shot polling must inherit this class next to `Adapter`.
@@ -111,14 +112,14 @@ abstract class for Adapter Interface for writing to data sinks
 
 ```python
 # Example usage of `WriteAdapter`
-from pydatagrabber import WriteAdapter  # Adjust import if needed
+from pydg.adapters.WriteAdapter import WriteAdapter  # Adjust import if needed
 
 obj = WriteAdapter()
 obj.id="<string>"
 obj.load_on_install=False
 ```
 
-## `AdsAdapter` (from `ads\AdsAdapter.py`)
+## `AdsAdapter` (in `pydg\adapters\ads\AdsAdapter.py`)
 
 `Adapter` for reading and writing data from/to Beckhoff TwinCAT PLCs via ADS (Automation Device Specification).
     
@@ -132,7 +133,7 @@ obj.load_on_install=False
 
 ```python
 # Example usage of `AdsAdapter`
-from pydatagrabber import AdsAdapter  # Adjust import if needed
+from pydg.adapters.ads.AdsAdapter import AdsAdapter  # Adjust import if needed
 
 obj = AdsAdapter()
 obj.id="<string>"
@@ -141,7 +142,7 @@ obj.ams_net_id="<string>"
 obj.twincat=3
 ```
 
-## `AudioAdapter` (from `audio\AudioAdapter.py`)
+## `AudioAdapter` (in `pydg\adapters\audio\AudioAdapter.py`)
 
 `Adapter` for subscribing to a system's audio input channels (e.g. from a USB microphone) using the `sounddevice` library.
     
@@ -155,7 +156,7 @@ obj.twincat=3
 
 ```python
 # Example usage of `AudioAdapter`
-from pydatagrabber import AudioAdapter  # Adjust import if needed
+from pydg.adapters.audio.AudioAdapter import AudioAdapter  # Adjust import if needed
 
 obj = AudioAdapter()
 obj.id="<string>"
@@ -164,7 +165,7 @@ obj.sample_rate=44100
 obj.device=1
 ```
 
-## `CsvReadAdapter` (from `csv\CsvReadAdapter.py`)
+## `CsvReadAdapter` (in `pydg\adapters\csv\CsvReadAdapter.py`)
 
 `Adapter` for reading data from CSV files.
     
@@ -182,7 +183,7 @@ obj.device=1
 
 ```python
 # Example usage of `CsvReadAdapter`
-from pydatagrabber import CsvReadAdapter  # Adjust import if needed
+from pydg.adapters.csv.CsvReadAdapter import CsvReadAdapter  # Adjust import if needed
 
 obj = CsvReadAdapter()
 obj.id="<string>"
@@ -195,7 +196,7 @@ obj.auto_detect=False
 obj.force_numeric=True
 ```
 
-## `CsvWriteAdapter` (from `csv\CsvWriteAdapter.py`)
+## `CsvWriteAdapter` (in `pydg\adapters\csv\CsvWriteAdapter.py`)
 
 `Adapter` for writing data to CSV files.
     
@@ -214,7 +215,7 @@ obj.force_numeric=True
 
 ```python
 # Example usage of `CsvWriteAdapter`
-from pydatagrabber import CsvWriteAdapter  # Adjust import if needed
+from pydg.adapters.csv.CsvWriteAdapter import CsvWriteAdapter  # Adjust import if needed
 
 obj = CsvWriteAdapter()
 obj.id="<string>"
@@ -228,7 +229,7 @@ obj.delimiter=';'
 obj.decimal_precision=3
 ```
 
-## `HttpAdapter` (from `http\HttpAdapter.py`)
+## `HttpAdapter` (in `pydg\adapters\http\HttpAdapter.py`)
 
 `Adapter` for reading and writing data from/to http endpoints
     
@@ -243,7 +244,7 @@ obj.decimal_precision=3
 
 ```python
 # Example usage of `HttpAdapter`
-from pydatagrabber import HttpAdapter  # Adjust import if needed
+from pydg.adapters.http.HttpAdapter import HttpAdapter  # Adjust import if needed
 
 obj = HttpAdapter()
 obj.id="<string>"
@@ -253,7 +254,7 @@ obj.headers="<string>"
 obj.json_path=False
 ```
 
-## `InfluxDbAdapter` (from `influxdb\InfluxDbAdapter.py`)
+## `InfluxDbAdapter` (in `pydg\adapters\influxdb\InfluxDbAdapter.py`)
 
 `Adapter` thats reads or writes to InfluxDB.
     
@@ -268,7 +269,7 @@ obj.json_path=False
 
 ```python
 # Example usage of `InfluxDbAdapter`
-from pydatagrabber import InfluxDbAdapter  # Adjust import if needed
+from pydg.adapters.influxdb.InfluxDbAdapter import InfluxDbAdapter  # Adjust import if needed
 
 obj = InfluxDbAdapter()
 obj.id="<string>"
@@ -278,7 +279,7 @@ obj.token="<string>"
 obj.org='my-org'
 ```
 
-## `MQTTAdapter` (from `mqtt\MQTTAdapter.py`)
+## `MQTTAdapter` (in `pydg\adapters\mqtt\MQTTAdapter.py`)
 
 `Adapter` for subscribing or writing data from/to MQTT topics.
     
@@ -296,7 +297,7 @@ obj.org='my-org'
 
 ```python
 # Example usage of `MQTTAdapter`
-from pydatagrabber import MQTTAdapter  # Adjust import if needed
+from pydg.adapters.mqtt.MQTTAdapter import MQTTAdapter  # Adjust import if needed
 
 obj = MQTTAdapter()
 obj.id="<string>"
@@ -309,7 +310,7 @@ obj.retain=False
 obj.qos=0
 ```
 
-## `OpcUaAdapter` (from `opcua\OpcUaAdapter.py`)
+## `OpcUaAdapter` (in `pydg\adapters\opcua\OpcUaAdapter.py`)
 
 `Adapter` for reading and writing data from/to OPC UA servers.
     
@@ -322,7 +323,7 @@ obj.qos=0
 
 ```python
 # Example usage of `OpcUaAdapter`
-from pydatagrabber import OpcUaAdapter  # Adjust import if needed
+from pydg.adapters.opcua.OpcUaAdapter import OpcUaAdapter  # Adjust import if needed
 
 obj = OpcUaAdapter()
 obj.id="<string>"
@@ -330,7 +331,7 @@ obj.load_on_install=False
 obj.endpoint="<string>"
 ```
 
-## `S7Adapter` (from `s7\S7Adapter.py`)
+## `S7Adapter` (in `pydg\adapters\s7\S7Adapter.py`)
 
 `Adapter`reading from and writing to S7 PLCs.
     
@@ -345,7 +346,7 @@ obj.endpoint="<string>"
 
 ```python
 # Example usage of `S7Adapter`
-from pydatagrabber import S7Adapter  # Adjust import if needed
+from pydg.adapters.s7.S7Adapter import S7Adapter  # Adjust import if needed
 
 obj = S7Adapter()
 obj.id="<string>"
@@ -355,7 +356,28 @@ obj.rack=0
 obj.slot=1
 ```
 
-## `ByteStreamAdapter` (from `socket\ByteStreamAdapter.py`)
+## `ScriptAdapter` (in `pydg\adapters\script\ScriptAdapter.py`)
+
+An `Adapter` that reads data from specified `Buffer`s using computations / transformations defined in a script file
+<br>new results are written back to specified output `Buffer`s
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `id` | `str` | `` | unique identifier of element in DataGrabber application |
+| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+| `script_path` | `str` | `` | path to the script to load and execute |
+
+
+```python
+# Example usage of `ScriptAdapter`
+from pydg.adapters.script.ScriptAdapter import ScriptAdapter  # Adjust import if needed
+
+obj = ScriptAdapter()
+obj.id="<string>"
+obj.load_on_install=False
+obj.script_path="<string>"
+```
+
+## `ByteStreamAdapter` (in `pydg\adapters\socket\ByteStreamAdapter.py`)
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
@@ -365,14 +387,14 @@ obj.slot=1
 
 ```python
 # Example usage of `ByteStreamAdapter`
-from pydatagrabber import ByteStreamAdapter  # Adjust import if needed
+from pydg.adapters.socket.ByteStreamAdapter import ByteStreamAdapter  # Adjust import if needed
 
 obj = ByteStreamAdapter()
 obj.id="<string>"
 obj.load_on_install=False
 ```
 
-## `WebSocketAdapter` (from `socket\WebSocketAdapter.py`)
+## `WebSocketAdapter` (in `pydg\adapters\socket\WebSocketAdapter.py`)
 
 `Adapter` for subscribing and writing data from/to WebSocket endpoints.
     
@@ -385,7 +407,7 @@ obj.load_on_install=False
 
 ```python
 # Example usage of `WebSocketAdapter`
-from pydatagrabber import WebSocketAdapter  # Adjust import if needed
+from pydg.adapters.socket.WebSocketAdapter import WebSocketAdapter  # Adjust import if needed
 
 obj = WebSocketAdapter()
 obj.id="<string>"
@@ -393,7 +415,7 @@ obj.load_on_install=False
 obj.url="https://example.com"
 ```
 
-## `SQLAdapter` (from `sql\SQLAdapter.py`)
+## `SQLAdapter` (in `pydg\adapters\sql\SQLAdapter.py`)
 
 `Adapter` for reading and writing data from/to SQL databases using pyodbc.
 <br>Required ODBC driver must be installed for the specific SQL database (e.g. MySQL, PostgreSQL, SQLite, etc.) and sytem
@@ -406,7 +428,7 @@ obj.url="https://example.com"
 
 ```python
 # Example usage of `SQLAdapter`
-from pydatagrabber import SQLAdapter  # Adjust import if needed
+from pydg.adapters.sql.SQLAdapter import SQLAdapter  # Adjust import if needed
 
 obj = SQLAdapter()
 obj.id="<string>"

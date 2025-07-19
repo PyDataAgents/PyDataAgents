@@ -1,4 +1,4 @@
-from pydatagrabber.adapters.Adapter import Adapter
+from pydg.adapters.Adapter import Adapter
 
 class Adapter1(Adapter):
     """_summary_
