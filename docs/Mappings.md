@@ -52,6 +52,7 @@ obj.persistent=True
 obj.auto_start=True
 ```
 
+[Go to Summary](#summary)
 ## `MappingObserver` (in `pydg\mappings\MappingObserver.py`)
 
 abstract base class for mapping observers
@@ -71,6 +72,7 @@ obj.id="<string>"
 obj.load_on_install=False
 ```
 
+[Go to Summary](#summary)
 ## `MappingThread` (in `pydg\mappings\MappingThread.py`)
 
 | Field | Type | Default | Description |
@@ -88,6 +90,7 @@ obj.id="<string>"
 obj.load_on_install=False
 ```
 
+[Go to Summary](#summary)
 ## `Observer` (in `pydg\mappings\Observer.py`)
 
 | Field | Type | Default | Description |
@@ -105,6 +108,7 @@ obj.id="<string>"
 obj.load_on_install=False
 ```
 
+[Go to Summary](#summary)
 ## `ObserverThread` (in `pydg\mappings\ObserverThread.py`)
 
 | Field | Type | Default | Description |
@@ -126,6 +130,7 @@ obj.SAFETY_DIFF_TIME_UNITS=1
 obj.SLEEP_WITH_HOLD_FACTOR=3.14
 ```
 
+[Go to Summary](#summary)
 ## `PublishMappingObserver` (in `pydg\mappings\PublishMappingObserver.py`)
 
 | Field | Type | Default | Description |
@@ -143,6 +148,7 @@ obj.id="<string>"
 obj.load_on_install=False
 ```
 
+[Go to Summary](#summary)
 ## `ReadMappingObserver` (in `pydg\mappings\ReadMappingObserver.py`)
 
 | Field | Type | Default | Description |
@@ -160,6 +166,7 @@ obj.id="<string>"
 obj.load_on_install=False
 ```
 
+[Go to Summary](#summary)
 ## `SubscribeMappingObserver` (in `pydg\mappings\SubscribeMappingObserver.py`)
 
 | Field | Type | Default | Description |
@@ -177,6 +184,7 @@ obj.id="<string>"
 obj.load_on_install=False
 ```
 
+[Go to Summary](#summary)
 ## `WriteMappingObserver` (in `pydg\mappings\WriteMappingObserver.py`)
 
 | Field | Type | Default | Description |
@@ -193,3 +201,5 @@ obj = WriteMappingObserver()
 obj.id="<string>"
 obj.load_on_install=False
 ```
+
+[Go to Summary](#summary)

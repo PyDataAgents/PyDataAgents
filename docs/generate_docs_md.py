@@ -233,6 +233,8 @@ def generate_readme(class_data: List[Dict], output_file: Path, name : str):
         # end code section
         lines.append("```")
         lines.append("")  # Extra newline between classes
+        summary_anchor = "[Go to Summary](#summary)"
+        lines.append(summary_anchor)
         
     output_file.write_text("\n".join(lines), encoding="utf-8")
 

@@ -55,6 +55,7 @@ obj.id="<string>"
 obj.load_on_install=False
 ```
 
+[Go to Summary](#summary)
 ## `AdapterNode` (in `pydg\statemachine\AdapterNode.py`)
 
 AdapterNode is a specialized BufferNode that integrates an adapter for data processing.
@@ -80,6 +81,7 @@ obj.load_on_install=False
 obj.adapter_id="<string>"
 ```
 
+[Go to Summary](#summary)
 ## `BufferNode` (in `pydg\statemachine\BufferNode.py`)
 
 | Field | Type | Default | Description |
@@ -101,6 +103,7 @@ obj.load_on_install=False
 obj.buffer_id="<string>"
 ```
 
+[Go to Summary](#summary)
 ## `GrabberNode` (in `pydg\statemachine\GrabberNode.py`)
 
 | Field | Type | Default | Description |
@@ -120,6 +123,7 @@ obj.id="<string>"
 obj.load_on_install=False
 ```
 
+[Go to Summary](#summary)
 ## `JoinTransition` (in `pydg\statemachine\JoinTransition.py`)
 
 | Field | Type | Default | Description |
@@ -139,6 +143,7 @@ obj.id="<string>"
 obj.load_on_install=False
 ```
 
+[Go to Summary](#summary)
 ## `MappingNode` (in `pydg\statemachine\MappingNode.py`)
 
 | Field | Type | Default | Description |
@@ -160,6 +165,7 @@ obj.load_on_install=False
 obj.mapping_id="<string>"
 ```
 
+[Go to Summary](#summary)
 ## `Node` (in `pydg\statemachine\Node.py`)
 
 | Field | Type | Default | Description |
@@ -179,6 +185,7 @@ obj.load_on_install=False
 obj.child_ids='list()()'
 ```
 
+[Go to Summary](#summary)
 ## `ServiceNode` (in `pydg\statemachine\ServiceNode.py`)
 
 A class representing a service node in a state machine.
@@ -202,6 +209,7 @@ obj.load_on_install=False
 obj.service_id="<string>"
 ```
 
+[Go to Summary](#summary)
 ## `Transition` (in `pydg\statemachine\Transition.py`)
 
 | Field | Type | Default | Description |
@@ -221,6 +229,7 @@ obj.id="<string>"
 obj.load_on_install=False
 ```
 
+[Go to Summary](#summary)
 ## `AdapterReadAction` (in `pydg\statemachine\actions\AdapterReadAction.py`)
 
 Action to read data from an adapter.
@@ -249,6 +258,7 @@ obj.address="<string>"
 obj.n=1
 ```
 
+[Go to Summary](#summary)
 ## `AdapterWriteAction` (in `pydg\statemachine\actions\AdapterWriteAction.py`)
 
 Action to write data with an adapter.
@@ -279,6 +289,7 @@ obj.n=1
 obj.persistent=False
 ```
 
+[Go to Summary](#summary)
 ## `AddBufferAction` (in `pydg\statemachine\actions\AddBufferAction.py`)
 
 Action to add a buffer to the grabber node.
@@ -301,6 +312,7 @@ obj.load_on_install=False
 obj.config={}
 ```
 
+[Go to Summary](#summary)
 ## `BrowserAutomationAction` (in `pydg\statemachine\actions\BrowserAutomationAction.py`)
 
 | Field | Type | Default | Description |
@@ -322,6 +334,7 @@ obj.load_on_install=False
 obj.service_id="<string>"
 ```
 
+[Go to Summary](#summary)
 ## `BrowserSetElementAction` (in `pydg\statemachine\actions\BrowserSetElementAction.py`)
 
 | Field | Type | Default | Description |
@@ -347,6 +360,7 @@ obj.load_on_install=False
 obj.xpath="<string>"
 ```
 
+[Go to Summary](#summary)
 ## `BrowserUrlNavigateAction` (in `pydg\statemachine\actions\BrowserUrlNavigateAction.py`)
 
 | Field | Type | Default | Description |
@@ -370,6 +384,7 @@ obj.load_on_install=False
 obj.url="https://example.com"
 ```
 
+[Go to Summary](#summary)
 ## `ConfigureElementAction` (in `pydg\statemachine\actions\ConfigureElementAction.py`)
 
 this `Action` configures a `GrabberElement` property by the provided `element_id` and name of the `option`, which is the class' property
@@ -406,6 +421,7 @@ obj.element_id="<string>"
 obj.n=1
 ```
 
+[Go to Summary](#summary)
 ## `CopyFilesAction` (in `pydg\statemachine\actions\CopyFilesAction.py`)
 
 | Field | Type | Default | Description |
@@ -429,6 +445,7 @@ obj.load_on_install=False
 obj.target_folder="path/to/folder"
 ```
 
+[Go to Summary](#summary)
 ## `ListFilesAction` (in `pydg\statemachine\actions\ListFilesAction.py`)
 
 | Field | Type | Default | Description |
@@ -460,6 +477,7 @@ obj.newer_than_seconds=1
 obj.recursive=False
 ```
 
+[Go to Summary](#summary)
 ## `MailAction` (in `pydg\statemachine\actions\MailAction.py`)
 
 | Field | Type | Default | Description |
@@ -493,6 +511,7 @@ obj.subject="<string>"
 obj.body="<string>"
 ```
 
+[Go to Summary](#summary)
 ## `MoveFilesAction` (in `pydg\statemachine\actions\MoveFilesAction.py`)
 
 | Field | Type | Default | Description |
@@ -516,6 +535,7 @@ obj.load_on_install=False
 obj.target_folder="path/to/folder"
 ```
 
+[Go to Summary](#summary)
 ## `ReadCsvAction` (in `pydg\statemachine\actions\ReadCsvAction.py`)
 
 | Field | Type | Default | Description |
@@ -541,6 +561,7 @@ obj.file_path="path/to/file.txt"
 obj.delimiter=';'
 ```
 
+[Go to Summary](#summary)
 ## `ReadJsonAction` (in `pydg\statemachine\actions\ReadJsonAction.py`)
 
 | Field | Type | Default | Description |
@@ -566,6 +587,7 @@ obj.file_path="path/to/file.txt"
 obj.json_path="<string>"
 ```
 
+[Go to Summary](#summary)
 ## `SleepAction` (in `pydg\statemachine\actions\SleepAction.py`)
 
 An action that sleeps for a specified number of seconds.
@@ -588,6 +610,7 @@ obj.load_on_install=False
 obj.sleep_time=0
 ```
 
+[Go to Summary](#summary)
 ## `StartAction` (in `pydg\statemachine\actions\StartAction.py`)
 
 An action that starts the state machine.
@@ -608,6 +631,7 @@ obj.id="<string>"
 obj.load_on_install=False
 ```
 
+[Go to Summary](#summary)
 ## `StopAction` (in `pydg\statemachine\actions\StopAction.py`)
 
 An action that stops the state machine.
@@ -628,6 +652,7 @@ obj.id="<string>"
 obj.load_on_install=False
 ```
 
+[Go to Summary](#summary)
 ## `BufferInRangeTransition` (in `pydg\statemachine\transitions\BufferInRangeTransition.py`)
 
 A transition that compares the current buffer with a target value.
@@ -655,6 +680,7 @@ obj.comparator="<string>"
 obj.value="<value>"
 ```
 
+[Go to Summary](#summary)
 ## `CompareBufferTransition` (in `pydg\statemachine\transitions\CompareBufferTransition.py`)
 
 A transition that compares the current buffer with a target value.
@@ -682,6 +708,7 @@ obj.comparator="<string>"
 obj.value="<value>"
 ```
 
+[Go to Summary](#summary)
 ## `FalseTransition` (in `pydg\statemachine\transitions\FalseTransition.py`)
 
 A transition that always returns False.
@@ -702,6 +729,7 @@ obj.id="<string>"
 obj.load_on_install=False
 ```
 
+[Go to Summary](#summary)
 ## `TrueTransition` (in `pydg\statemachine\transitions\TrueTransition.py`)
 
 A transition that always returns True.
@@ -722,3 +750,5 @@ obj.child_ids='list()()'
 obj.id="<string>"
 obj.load_on_install=False
 ```
+
+[Go to Summary](#summary)

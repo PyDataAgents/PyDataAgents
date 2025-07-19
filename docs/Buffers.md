@@ -50,6 +50,7 @@ obj.unit="<value>"
 obj.description="<string>"
 ```
 
+[Go to Summary](#summary)
 ## `DictBuffer` (in `pydg\buffers\DictBuffer.py`)
 
 buffer that stores its values in a dictionary in a table like fashion, where every key contains a list of data
@@ -79,6 +80,7 @@ obj.id="<string>"
 obj.load_on_install=False
 ```
 
+[Go to Summary](#summary)
 ## `ListBuffer` (in `pydg\buffers\ListBuffer.py`)
 
 buffer that stores its values in a capacity limited list
@@ -108,6 +110,7 @@ obj.id="<string>"
 obj.load_on_install=False
 ```
 
+[Go to Summary](#summary)
 ## `ObjectTransformation` (in `pydg\buffers\ObjectTransformation.py`)
 
 Abstract base class for object transformations for buffers
@@ -128,6 +131,7 @@ obj.load_on_install=False
 obj.datatype='DataType.FLOAT.value'
 ```
 
+[Go to Summary](#summary)
 ## `SampledBuffer` (in `pydg\buffers\SampledBuffer.py`)
 
 A buffer that samples a signal at a specified interval.
@@ -156,6 +160,7 @@ obj.id="<string>"
 obj.load_on_install=False
 ```
 
+[Go to Summary](#summary)
 ## `SignalBuffer` (in `pydg\buffers\SignalBuffer.py`)
 
 A buffer that holds signals with a specific start time and elapsed time.
@@ -192,6 +197,7 @@ obj.signal="<value>"
 obj.sampling_period=100
 ```
 
+[Go to Summary](#summary)
 ## `TimedBuffer` (in `pydg\buffers\TimedBuffer.py`)
 
 A buffer that stores data with timestamps.
@@ -221,6 +227,7 @@ obj.id="<string>"
 obj.load_on_install=False
 ```
 
+[Go to Summary](#summary)
 ## `TransformsBuffer` (in `pydg\buffers\TransformsBuffer.py`)
 
 TransformsBuffer is a subclass of ListBuffer that allows for data transformation.
@@ -252,6 +259,7 @@ obj.load_on_install=False
 obj.transformations=[]
 ```
 
+[Go to Summary](#summary)
 ## `LinearTrend` (in `pydg\buffers\signals\LinearTrend.py`)
 
 A signal that simulates a linear trend
@@ -278,6 +286,7 @@ obj.duration='1000 * 1000'
 obj.noise=0.0
 ```
 
+[Go to Summary](#summary)
 ## `SampledSignal` (in `pydg\buffers\signals\SampledSignal.py`)
 
 A class representing a sampled signal for continuously sampled data
@@ -298,6 +307,7 @@ obj.load_on_install=False
 obj.sample_rate=1.0
 ```
 
+[Go to Summary](#summary)
 ## `SampledSine` (in `pydg\buffers\signals\SampledSine.py`)
 
 A class to represent a sampled sine wave signal.
@@ -332,6 +342,7 @@ obj.p=0.0
 obj.n=0.0
 ```
 
+[Go to Summary](#summary)
 ## `Signal` (in `pydg\buffers\signals\Signal.py`)
 
 Abstract base class for signals.
@@ -350,6 +361,7 @@ obj.id="<string>"
 obj.load_on_install=False
 ```
 
+[Go to Summary](#summary)
 ## `Sine` (in `pydg\buffers\signals\Sine.py`)
 
 A class to represent a sine wave signal.
@@ -376,6 +388,7 @@ obj.p=0.0
 obj.n=0.0
 ```
 
+[Go to Summary](#summary)
 ## `TimedSignal` (in `pydg\buffers\signals\TimedSignal.py`)
 
 A signal that emits values at specified time intervals.
@@ -398,6 +411,7 @@ obj.times='list()'
 obj.values='list()'
 ```
 
+[Go to Summary](#summary)
 ## `ClippingTransformation` (in `pydg\buffers\transformations\ClippingTransformation.py`)
 
 | Field | Type | Default | Description |
@@ -420,3 +434,5 @@ obj.load_on_install=False
 obj.lower_limit=0.0
 obj.upper_limit=1.0
 ```
+
+[Go to Summary](#summary)

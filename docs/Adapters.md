@@ -43,6 +43,7 @@ obj.id="<string>"
 obj.load_on_install=False
 ```
 
+[Go to Summary](#summary)
 ## `PublishAdapter` (in `pydg\adapters\PublishAdapter.py`)
 
 abstract class for `Adapter` Interface for publishing to data sinks.
@@ -62,6 +63,7 @@ obj.id="<string>"
 obj.load_on_install=False
 ```
 
+[Go to Summary](#summary)
 ## `ReadAdapter` (in `pydg\adapters\ReadAdapter.py`)
 
 abstract class for `Adapter` Interface for reading from data sources.
@@ -81,6 +83,7 @@ obj.id="<string>"
 obj.load_on_install=False
 ```
 
+[Go to Summary](#summary)
 ## `SubscribeAdapter` (in `pydg\adapters\SubscribeAdapter.py`)
 
 abstract class for `Adapter` Interface for subscribing from data sources
@@ -100,6 +103,7 @@ obj.id="<string>"
 obj.load_on_install=False
 ```
 
+[Go to Summary](#summary)
 ## `WriteAdapter` (in `pydg\adapters\WriteAdapter.py`)
 
 abstract class for Adapter Interface for writing to data sinks
@@ -119,6 +123,7 @@ obj.id="<string>"
 obj.load_on_install=False
 ```
 
+[Go to Summary](#summary)
 ## `AdsAdapter` (in `pydg\adapters\ads\AdsAdapter.py`)
 
 `Adapter` for reading and writing data from/to Beckhoff TwinCAT PLCs via ADS (Automation Device Specification).
@@ -142,6 +147,7 @@ obj.ams_net_id="<string>"
 obj.twincat=3
 ```
 
+[Go to Summary](#summary)
 ## `AudioAdapter` (in `pydg\adapters\audio\AudioAdapter.py`)
 
 `Adapter` for subscribing to a system's audio input channels (e.g. from a USB microphone) using the `sounddevice` library.
@@ -165,6 +171,7 @@ obj.sample_rate=44100
 obj.device=1
 ```
 
+[Go to Summary](#summary)
 ## `CsvReadAdapter` (in `pydg\adapters\csv\CsvReadAdapter.py`)
 
 `Adapter` for reading data from CSV files.
@@ -196,6 +203,7 @@ obj.auto_detect=False
 obj.force_numeric=True
 ```
 
+[Go to Summary](#summary)
 ## `CsvWriteAdapter` (in `pydg\adapters\csv\CsvWriteAdapter.py`)
 
 `Adapter` for writing data to CSV files.
@@ -229,6 +237,7 @@ obj.delimiter=';'
 obj.decimal_precision=3
 ```
 
+[Go to Summary](#summary)
 ## `HttpAdapter` (in `pydg\adapters\http\HttpAdapter.py`)
 
 `Adapter` for reading and writing data from/to http endpoints
@@ -254,6 +263,7 @@ obj.headers="<string>"
 obj.json_path=False
 ```
 
+[Go to Summary](#summary)
 ## `InfluxDbAdapter` (in `pydg\adapters\influxdb\InfluxDbAdapter.py`)
 
 `Adapter` thats reads or writes to InfluxDB.
@@ -279,6 +289,7 @@ obj.token="<string>"
 obj.org='my-org'
 ```
 
+[Go to Summary](#summary)
 ## `MQTTAdapter` (in `pydg\adapters\mqtt\MQTTAdapter.py`)
 
 `Adapter` for subscribing or writing data from/to MQTT topics.
@@ -310,6 +321,7 @@ obj.retain=False
 obj.qos=0
 ```
 
+[Go to Summary](#summary)
 ## `OpcUaAdapter` (in `pydg\adapters\opcua\OpcUaAdapter.py`)
 
 `Adapter` for reading and writing data from/to OPC UA servers.
@@ -331,6 +343,7 @@ obj.load_on_install=False
 obj.endpoint="<string>"
 ```
 
+[Go to Summary](#summary)
 ## `S7Adapter` (in `pydg\adapters\s7\S7Adapter.py`)
 
 `Adapter`reading from and writing to S7 PLCs.
@@ -356,6 +369,7 @@ obj.rack=0
 obj.slot=1
 ```
 
+[Go to Summary](#summary)
 ## `ScriptAdapter` (in `pydg\adapters\script\ScriptAdapter.py`)
 
 An `Adapter` that reads data from specified `Buffer`s using computations / transformations defined in a script file
@@ -377,6 +391,7 @@ obj.load_on_install=False
 obj.script_path="<string>"
 ```
 
+[Go to Summary](#summary)
 ## `ByteStreamAdapter` (in `pydg\adapters\socket\ByteStreamAdapter.py`)
 
 | Field | Type | Default | Description |
@@ -394,6 +409,7 @@ obj.id="<string>"
 obj.load_on_install=False
 ```
 
+[Go to Summary](#summary)
 ## `WebSocketAdapter` (in `pydg\adapters\socket\WebSocketAdapter.py`)
 
 `Adapter` for subscribing and writing data from/to WebSocket endpoints.
@@ -415,6 +431,7 @@ obj.load_on_install=False
 obj.url="https://example.com"
 ```
 
+[Go to Summary](#summary)
 ## `SQLAdapter` (in `pydg\adapters\sql\SQLAdapter.py`)
 
 `Adapter` for reading and writing data from/to SQL databases using pyodbc.
@@ -435,3 +452,5 @@ obj.id="<string>"
 obj.load_on_install=False
 obj.connection_str="<string>"
 ```
+
+[Go to Summary](#summary)

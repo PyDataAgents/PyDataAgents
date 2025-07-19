@@ -39,6 +39,7 @@ obj.load_on_install=False
 obj.browser_type='EDGE'
 ```
 
+[Go to Summary](#summary)
 ## `PlotService` (in `pydg\services\PlotService.py`)
 
 | Field | Type | Default | Description |
@@ -56,6 +57,7 @@ obj.id="<string>"
 obj.load_on_install=False
 ```
 
+[Go to Summary](#summary)
 ## `Service` (in `pydg\services\Service.py`)
 
 abstract base class for Grabber Services
@@ -75,6 +77,7 @@ obj.id="<string>"
 obj.load_on_install=False
 ```
 
+[Go to Summary](#summary)
 ## `CopyFileService` (in `pydg\services\documents\CopyFileService.py`)
 
 `Service`to copy files from one location to another
@@ -103,6 +106,7 @@ obj.older_than_milliseconds=1
 obj.interval='60 * 60 * 24'
 ```
 
+[Go to Summary](#summary)
 ## `DeleteFileService` (in `pydg\services\documents\DeleteFileService.py`)
 
 `Service` to delete files from folders
@@ -127,6 +131,7 @@ obj.older_than_milliseconds=1
 obj.interval='60 * 60 * 24'
 ```
 
+[Go to Summary](#summary)
 ## `FileTextSearchService` (in `pydg\services\documents\FileTextSearchService.py`)
 
 | Field | Type | Default | Description |
@@ -144,6 +149,7 @@ obj.id="<string>"
 obj.load_on_install=False
 ```
 
+[Go to Summary](#summary)
 ## `FileWatchdogService` (in `pydg\services\documents\FileWatchdogService.py`)
 
 | Field | Type | Default | Description |
@@ -167,6 +173,7 @@ obj.recursive=True
 obj.buffer_id="<string>"
 ```
 
+[Go to Summary](#summary)
 ## `FolderObserveMailService` (in `pydg\services\documents\FolderObserveMailService.py`)
 
 `Service` to observe a folder for new files and alert by mail on events.
@@ -213,6 +220,7 @@ obj.COL_LINK="<string>"
 obj.MAX_FILES=1
 ```
 
+[Go to Summary](#summary)
 ## `LLMService` (in `pydg\services\langchain\LLMService.py`)
 
 LLM Service for chat based LLM interaction
@@ -243,6 +251,7 @@ obj.model="<string>"
 obj.retain_messages=False
 ```
 
+[Go to Summary](#summary)
 ## `RAGService` (in `pydg\services\langchain\RAGService.py`)
 
 Retrieval Augmented Generation (RAG) Service for document based LLM knowledge retrieval in chat form
@@ -280,6 +289,7 @@ obj.embedding_model_name='all-MiniLM-L6-v2'
 obj.persist_directory="<string>"
 ```
 
+[Go to Summary](#summary)
 ## `ExcelRestService` (in `pydg\services\rest\ExcelRestService.py`)
 
 Service for creating a REST API for accessing named Tables in Excel
@@ -303,6 +313,7 @@ obj.load_on_install=False
 obj.excel_file="path/to/file.txt"
 ```
 
+[Go to Summary](#summary)
 ## `LLMRestService` (in `pydg\services\rest\LLMRestService.py`)
 
 Service for creating a REST API for accessing LLM Models
@@ -324,6 +335,7 @@ obj.id="<string>"
 obj.load_on_install=False
 ```
 
+[Go to Summary](#summary)
 ## `RestService` (in `pydg\services\rest\RestService.py`)
 
 Service for creating a REST API for DataGrabber using FastAPI
@@ -344,3 +356,5 @@ obj.id="<string>"
 obj.load_on_install=False
 obj.port=8001
 ```
+
+[Go to Summary](#summary)
