@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 from selenium import webdriver
-from .Service import Service
+from ...services.Service import Service
 
 @dataclass
 class BrowserAutomationService(Service):

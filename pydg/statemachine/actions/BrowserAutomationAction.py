@@ -3,7 +3,7 @@ from dataclasses import dataclass, field
 from ...services.Service import Service
 from ...statemachine.StatemachineException import StatemachineException
 from ...grabbers.Grabber import Grabber
-from ...services.BrowserAutomationService import BrowserAutomationService
+from ...services.browser.BrowserAutomationService import BrowserAutomationService
 from ..Action import Action
 from ..ServiceNode import ServiceNode
 
