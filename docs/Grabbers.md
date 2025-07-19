@@ -4,7 +4,7 @@
 
 | Class | Description |
 |-------|-------------|
-| [`Grabber`](#grabber-from-Grabber) |  |
+| [`Grabber`](#grabber-in-pydggrabbersgrabberpy) |  |
 
 
 

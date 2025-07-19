@@ -4,15 +4,15 @@
 
 | Class | Description |
 |-------|-------------|
-| [`Mapping`](#mapping-from-Mapping) |      |
-| [`MappingObserver`](#mappingobserver-from-MappingObserver) | abstract base class for mapping observers     |
-| [`MappingThread`](#mappingthread-from-MappingThread) |  |
-| [`Observer`](#observer-from-Observer) |  |
-| [`ObserverThread`](#observerthread-from-ObserverThread) |  |
-| [`PublishMappingObserver`](#publishmappingobserver-from-PublishMappingObserver) |  |
-| [`ReadMappingObserver`](#readmappingobserver-from-ReadMappingObserver) |  |
-| [`SubscribeMappingObserver`](#subscribemappingobserver-from-SubscribeMappingObserver) |  |
-| [`WriteMappingObserver`](#writemappingobserver-from-WriteMappingObserver) |  |
+| [`Mapping`](#mapping-in-pydgmappingsmappingpy) |      |
+| [`MappingObserver`](#mappingobserver-in-pydgmappingsmappingobserverpy) | abstract base class for mapping observers     |
+| [`MappingThread`](#mappingthread-in-pydgmappingsmappingthreadpy) |  |
+| [`Observer`](#observer-in-pydgmappingsobserverpy) |  |
+| [`ObserverThread`](#observerthread-in-pydgmappingsobserverthreadpy) |  |
+| [`PublishMappingObserver`](#publishmappingobserver-in-pydgmappingspublishmappingobserverpy) |  |
+| [`ReadMappingObserver`](#readmappingobserver-in-pydgmappingsreadmappingobserverpy) |  |
+| [`SubscribeMappingObserver`](#subscribemappingobserver-in-pydgmappingssubscribemappingobserverpy) |  |
+| [`WriteMappingObserver`](#writemappingobserver-in-pydgmappingswritemappingobserverpy) |  |
 
 
 

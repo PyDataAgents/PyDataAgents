@@ -4,24 +4,24 @@
 
 | Class | Description |
 |-------|-------------|
-| [`Adapter`](#adapter-from-Adapter) | Abstract base class for `Adapters`. All `Adapters` must inherit from this class. |
-| [`PublishAdapter`](#PublishAdapter) | abstract class for `Adapter` Interface for publishing to data sinks.<br>new `Adapters` that allow for publishing to a sink via callback must inherit this class next to `Adapter`. |
-| [`ReadAdapter`](#readadapter-from-ReadAdapter) | abstract class for `Adapter` Interface for reading from data sources.<br>new `Adapters` that allow for reading from a source via one-shot polling must inherit this class next to `Adapter`. |
-| [`SubscribeAdapter`](#subscribeadapter-from-SubscribeAdapter) | abstract class for `Adapter` Interface for subscribing from data sources<br>new `Adapters` that allow for subscribing to a source via callback must inherit this class next to `Adapter`. |
-| [`WriteAdapter`](#writeadapter-from-WriteAdapter) | abstract class for Adapter Interface for writing to data sinks<br>new `Adapters` that allow for writing to a sink via one-shot polling must inherit this class next to `Adapter`. |
-| [`AdsAdapter`](#adsadapter-from-ads\AdsAdapter) | `Adapter` for reading and writing data from/to Beckhoff TwinCAT PLCs via ADS (Automation Device Specification).     |
-| [`AudioAdapter`](#audioadapter-from-audio\AudioAdapter) | `Adapter` for subscribing to a system's audio input channels (e.g. from a USB microphone) using the `sounddevice` library.     |
-| [`CsvReadAdapter`](#csvreadadapter-from-csv\CsvReadAdapter) | `Adapter` for reading data from CSV files.     |
-| [`CsvWriteAdapter`](#csvwriteadapter-from-csv\CsvWriteAdapter) | `Adapter` for writing data to CSV files.     |
-| [`HttpAdapter`](#httpadapter-from-http\HttpAdapter) | `Adapter` for reading and writing data from/to http endpoints     |
-| [`InfluxDbAdapter`](#influxdbadapter-from-influxdb\InfluxDbAdapter) | `Adapter` thats reads or writes to InfluxDB.     |
-| [`MQTTAdapter`](#mqttadapter-from-mqtt\MQTTAdapter) | `Adapter` for subscribing or writing data from/to MQTT topics.     |
-| [`OpcUaAdapter`](#opcuaadapter-from-opcua\OpcUaAdapter) | `Adapter` for reading and writing data from/to OPC UA servers.     |
-| [`S7Adapter`](#s7adapter-from-s7\S7Adapter) | `Adapter`reading from and writing to S7 PLCs.     |
-| [`ScriptAdapter`](#scriptadapter-from-script\ScriptAdapter) | An `Adapter` that reads data from specified `Buffer`s using computations / transformations defined in a script file<br>new results are written back to specified output `Buffer`s |
-| [`ByteStreamAdapter`](#bytestreamadapter-from-socket\ByteStreamAdapter) |  |
-| [`WebSocketAdapter`](#websocketadapter-from-socket\WebSocketAdapter) | `Adapter` for subscribing and writing data from/to WebSocket endpoints.     |
-| [`SQLAdapter`](#sqladapter-from-sql\SQLAdapter) | `Adapter` for reading and writing data from/to SQL databases using pyodbc.<br>Required ODBC driver must be installed for the specific SQL database (e.g. MySQL, PostgreSQL, SQLite, etc.) and sytem |
+| [`Adapter`](#adapter-in-pydgadaptersadapterpy) | Abstract base class for `Adapters`. All `Adapters` must inherit from this class. |
+| [`PublishAdapter`](#publishadapter-in-pydgadapterspublishadapterpy) | abstract class for `Adapter` Interface for publishing to data sinks.<br>new `Adapters` that allow for publishing to a sink via callback must inherit this class next to `Adapter`. |
+| [`ReadAdapter`](#readadapter-in-pydgadaptersreadadapterpy) | abstract class for `Adapter` Interface for reading from data sources.<br>new `Adapters` that allow for reading from a source via one-shot polling must inherit this class next to `Adapter`. |
+| [`SubscribeAdapter`](#subscribeadapter-in-pydgadapterssubscribeadapterpy) | abstract class for `Adapter` Interface for subscribing from data sources<br>new `Adapters` that allow for subscribing to a source via callback must inherit this class next to `Adapter`. |
+| [`WriteAdapter`](#writeadapter-in-pydgadapterswriteadapterpy) | abstract class for Adapter Interface for writing to data sinks<br>new `Adapters` that allow for writing to a sink via one-shot polling must inherit this class next to `Adapter`. |
+| [`AdsAdapter`](#adsadapter-in-pydgadaptersadsadsadapterpy) | `Adapter` for reading and writing data from/to Beckhoff TwinCAT PLCs via ADS (Automation Device Specification).     |
+| [`AudioAdapter`](#audioadapter-in-pydgadaptersaudioaudioadapterpy) | `Adapter` for subscribing to a system's audio input channels (e.g. from a USB microphone) using the `sounddevice` library.     |
+| [`CsvReadAdapter`](#csvreadadapter-in-pydgadapterscsvcsvreadadapterpy) | `Adapter` for reading data from CSV files.     |
+| [`CsvWriteAdapter`](#csvwriteadapter-in-pydgadapterscsvcsvwriteadapterpy) | `Adapter` for writing data to CSV files.     |
+| [`HttpAdapter`](#httpadapter-in-pydgadaptershttphttpadapterpy) | `Adapter` for reading and writing data from/to http endpoints     |
+| [`InfluxDbAdapter`](#influxdbadapter-in-pydgadaptersinfluxdbinfluxdbadapterpy) | `Adapter` thats reads or writes to InfluxDB.     |
+| [`MQTTAdapter`](#mqttadapter-in-pydgadaptersmqttmqttadapterpy) | `Adapter` for subscribing or writing data from/to MQTT topics.     |
+| [`OpcUaAdapter`](#opcuaadapter-in-pydgadaptersopcuaopcuaadapterpy) | `Adapter` for reading and writing data from/to OPC UA servers.     |
+| [`S7Adapter`](#s7adapter-in-pydgadapterss7s7adapterpy) | `Adapter`reading from and writing to S7 PLCs.     |
+| [`ScriptAdapter`](#scriptadapter-in-pydgadaptersscriptscriptadapterpy) | An `Adapter` that reads data from specified `Buffer`s using computations / transformations defined in a script file<br>new results are written back to specified output `Buffer`s |
+| [`ByteStreamAdapter`](#bytestreamadapter-in-pydgadapterssocketbytestreamadapterpy) |  |
+| [`WebSocketAdapter`](#websocketadapter-in-pydgadapterssocketwebsocketadapterpy) | `Adapter` for subscribing and writing data from/to WebSocket endpoints.     |
+| [`SQLAdapter`](#sqladapter-in-pydgadapterssqlsqladapterpy) | `Adapter` for reading and writing data from/to SQL databases using pyodbc.<br>Required ODBC driver must be installed for the specific SQL database (e.g. MySQL, PostgreSQL, SQLite, etc.) and sytem |
 
 
 
@@ -43,7 +43,7 @@ obj.id="<string>"
 obj.load_on_install=False
 ```
 
-## `PublishAdapter`
+## `PublishAdapter` (in `pydg\adapters\PublishAdapter.py`)
 
 abstract class for `Adapter` Interface for publishing to data sinks.
 <br>new `Adapters` that allow for publishing to a sink via callback must inherit this class next to `Adapter`.

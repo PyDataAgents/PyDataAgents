@@ -4,35 +4,35 @@
 
 | Class | Description |
 |-------|-------------|
-| [`Action`](#action-from-Action) |  |
-| [`AdapterNode`](#adapternode-from-AdapterNode) | AdapterNode is a specialized BufferNode that integrates an adapter for data processing.It inherits from BufferNode to manage buffers and provides methods to interact with the adapter. |
-| [`BufferNode`](#buffernode-from-BufferNode) |  |
-| [`GrabberNode`](#grabbernode-from-GrabberNode) |  |
-| [`JoinTransition`](#jointransition-from-JoinTransition) |  |
-| [`MappingNode`](#mappingnode-from-MappingNode) |  |
-| [`Node`](#node-from-Node) |  |
-| [`ServiceNode`](#servicenode-from-ServiceNode) | A class representing a service node in a state machine.Inherits from Node and adds functionality specific to service nodes. |
-| [`Transition`](#transition-from-Transition) |  |
-| [`AdapterReadAction`](#adapterreadaction-from-actions\AdapterReadAction) | Action to read data from an adapter. |
-| [`AdapterWriteAction`](#adapterwriteaction-from-actions\AdapterWriteAction) | Action to write data with an adapter. |
-| [`AddBufferAction`](#addbufferaction-from-actions\AddBufferAction) | Action to add a buffer to the grabber node. |
-| [`BrowserAutomationAction`](#browserautomationaction-from-actions\BrowserAutomationAction) |  |
-| [`BrowserSetElementAction`](#browsersetelementaction-from-actions\BrowserSetElementAction) |  |
-| [`BrowserUrlNavigateAction`](#browserurlnavigateaction-from-actions\BrowserUrlNavigateAction) |  |
-| [`ConfigureElementAction`](#configureelementaction-from-actions\ConfigureElementAction) | this `Action` configures a `GrabberElement` property by the provided `element_id` and name of the `option`, which is the class' property<br>the new property value is derived from the `Node`'s `buffer`Args:    GrabberNode (_type_): inherits from class GrabberNode    BufferNode (_type_): inherits from class BufferNodeRaises:    StatemachineException: if an error occurs during execute |
-| [`CopyFilesAction`](#copyfilesaction-from-actions\CopyFilesAction) |  |
-| [`ListFilesAction`](#listfilesaction-from-actions\ListFilesAction) |  |
-| [`MailAction`](#mailaction-from-actions\MailAction) |  |
-| [`MoveFilesAction`](#movefilesaction-from-actions\MoveFilesAction) |  |
-| [`ReadCsvAction`](#readcsvaction-from-actions\ReadCsvAction) |  |
-| [`ReadJsonAction`](#readjsonaction-from-actions\ReadJsonAction) |  |
-| [`SleepAction`](#sleepaction-from-actions\SleepAction) | An action that sleeps for a specified number of seconds. |
-| [`StartAction`](#startaction-from-actions\StartAction) | An action that starts the state machine. |
-| [`StopAction`](#stopaction-from-actions\StopAction) | An action that stops the state machine. |
-| [`BufferInRangeTransition`](#bufferinrangetransition-from-transitions\BufferInRangeTransition) | A transition that compares the current buffer with a target value.If the buffer matches the target, the transition is successful. |
-| [`CompareBufferTransition`](#comparebuffertransition-from-transitions\CompareBufferTransition) | A transition that compares the current buffer with a target value.If the buffer matches the target, the transition is successful. |
-| [`FalseTransition`](#falsetransition-from-transitions\FalseTransition) | A transition that always returns False. |
-| [`TrueTransition`](#truetransition-from-transitions\TrueTransition) | A transition that always returns True.This is used to test the statemachine without any conditions. |
+| [`Action`](#action-in-pydgstatemachineactionpy) |  |
+| [`AdapterNode`](#adapternode-in-pydgstatemachineadapternodepy) | AdapterNode is a specialized BufferNode that integrates an adapter for data processing.It inherits from BufferNode to manage buffers and provides methods to interact with the adapter. |
+| [`BufferNode`](#buffernode-in-pydgstatemachinebuffernodepy) |  |
+| [`GrabberNode`](#grabbernode-in-pydgstatemachinegrabbernodepy) |  |
+| [`JoinTransition`](#jointransition-in-pydgstatemachinejointransitionpy) |  |
+| [`MappingNode`](#mappingnode-in-pydgstatemachinemappingnodepy) |  |
+| [`Node`](#node-in-pydgstatemachinenodepy) |  |
+| [`ServiceNode`](#servicenode-in-pydgstatemachineservicenodepy) | A class representing a service node in a state machine.Inherits from Node and adds functionality specific to service nodes. |
+| [`Transition`](#transition-in-pydgstatemachinetransitionpy) |  |
+| [`AdapterReadAction`](#adapterreadaction-in-pydgstatemachineactionsadapterreadactionpy) | Action to read data from an adapter. |
+| [`AdapterWriteAction`](#adapterwriteaction-in-pydgstatemachineactionsadapterwriteactionpy) | Action to write data with an adapter. |
+| [`AddBufferAction`](#addbufferaction-in-pydgstatemachineactionsaddbufferactionpy) | Action to add a buffer to the grabber node. |
+| [`BrowserAutomationAction`](#browserautomationaction-in-pydgstatemachineactionsbrowserautomationactionpy) |  |
+| [`BrowserSetElementAction`](#browsersetelementaction-in-pydgstatemachineactionsbrowsersetelementactionpy) |  |
+| [`BrowserUrlNavigateAction`](#browserurlnavigateaction-in-pydgstatemachineactionsbrowserurlnavigateactionpy) |  |
+| [`ConfigureElementAction`](#configureelementaction-in-pydgstatemachineactionsconfigureelementactionpy) | this `Action` configures a `GrabberElement` property by the provided `element_id` and name of the `option`, which is the class' property<br>the new property value is derived from the `Node`'s `buffer`Args:    GrabberNode (_type_): inherits from class GrabberNode    BufferNode (_type_): inherits from class BufferNodeRaises:    StatemachineException: if an error occurs during execute |
+| [`CopyFilesAction`](#copyfilesaction-in-pydgstatemachineactionscopyfilesactionpy) |  |
+| [`ListFilesAction`](#listfilesaction-in-pydgstatemachineactionslistfilesactionpy) |  |
+| [`MailAction`](#mailaction-in-pydgstatemachineactionsmailactionpy) |  |
+| [`MoveFilesAction`](#movefilesaction-in-pydgstatemachineactionsmovefilesactionpy) |  |
+| [`ReadCsvAction`](#readcsvaction-in-pydgstatemachineactionsreadcsvactionpy) |  |
+| [`ReadJsonAction`](#readjsonaction-in-pydgstatemachineactionsreadjsonactionpy) |  |
+| [`SleepAction`](#sleepaction-in-pydgstatemachineactionssleepactionpy) | An action that sleeps for a specified number of seconds. |
+| [`StartAction`](#startaction-in-pydgstatemachineactionsstartactionpy) | An action that starts the state machine. |
+| [`StopAction`](#stopaction-in-pydgstatemachineactionsstopactionpy) | An action that stops the state machine. |
+| [`BufferInRangeTransition`](#bufferinrangetransition-in-pydgstatemachinetransitionsbufferinrangetransitionpy) | A transition that compares the current buffer with a target value.If the buffer matches the target, the transition is successful. |
+| [`CompareBufferTransition`](#comparebuffertransition-in-pydgstatemachinetransitionscomparebuffertransitionpy) | A transition that compares the current buffer with a target value.If the buffer matches the target, the transition is successful. |
+| [`FalseTransition`](#falsetransition-in-pydgstatemachinetransitionsfalsetransitionpy) | A transition that always returns False. |
+| [`TrueTransition`](#truetransition-in-pydgstatemachinetransitionstruetransitionpy) | A transition that always returns True.This is used to test the statemachine without any conditions. |
 
 
 

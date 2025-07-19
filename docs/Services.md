@@ -4,19 +4,19 @@
 
 | Class | Description |
 |-------|-------------|
-| [`BrowserAutomationService`](#browserautomationservice-from-BrowserAutomationService) |  |
-| [`PlotService`](#plotservice-from-PlotService) |  |
-| [`Service`](#service-from-Service) | abstract base class for Grabber Services     |
-| [`CopyFileService`](#copyfileservice-from-documents\CopyFileService) | `Service`to copy files from one location to another |
-| [`DeleteFileService`](#deletefileservice-from-documents\DeleteFileService) | `Service` to delete files from folders |
-| [`FileTextSearchService`](#filetextsearchservice-from-documents\FileTextSearchService) |  |
-| [`FileWatchdogService`](#filewatchdogservice-from-documents\FileWatchdogService) |  |
-| [`FolderObserveMailService`](#folderobservemailservice-from-documents\FolderObserveMailService) | `Service` to observe a folder for new files and alert by mail on events. |
-| [`LLMService`](#llmservice-from-langchain\LLMService) | LLM Service for chat based LLM interaction     |
-| [`RAGService`](#ragservice-from-langchain\RAGService) | Retrieval Augmented Generation (RAG) Service for document based LLM knowledge retrieval in chat form     |
-| [`ExcelRestService`](#excelrestservice-from-rest\ExcelRestService) | Service for creating a REST API for accessing named Tables in Excel     |
-| [`LLMRestService`](#llmrestservice-from-rest\LLMRestService) | Service for creating a REST API for accessing LLM Models     |
-| [`RestService`](#restservice-from-rest\RestService) | Service for creating a REST API for DataGrabber using FastAPI     |
+| [`BrowserAutomationService`](#browserautomationservice-in-pydgservicesbrowserautomationservicepy) |  |
+| [`PlotService`](#plotservice-in-pydgservicesplotservicepy) |  |
+| [`Service`](#service-in-pydgservicesservicepy) | abstract base class for Grabber Services     |
+| [`CopyFileService`](#copyfileservice-in-pydgservicesdocumentscopyfileservicepy) | `Service`to copy files from one location to another |
+| [`DeleteFileService`](#deletefileservice-in-pydgservicesdocumentsdeletefileservicepy) | `Service` to delete files from folders |
+| [`FileTextSearchService`](#filetextsearchservice-in-pydgservicesdocumentsfiletextsearchservicepy) |  |
+| [`FileWatchdogService`](#filewatchdogservice-in-pydgservicesdocumentsfilewatchdogservicepy) |  |
+| [`FolderObserveMailService`](#folderobservemailservice-in-pydgservicesdocumentsfolderobservemailservicepy) | `Service` to observe a folder for new files and alert by mail on events. |
+| [`LLMService`](#llmservice-in-pydgserviceslangchainllmservicepy) | LLM Service for chat based LLM interaction     |
+| [`RAGService`](#ragservice-in-pydgserviceslangchainragservicepy) | Retrieval Augmented Generation (RAG) Service for document based LLM knowledge retrieval in chat form     |
+| [`ExcelRestService`](#excelrestservice-in-pydgservicesrestexcelrestservicepy) | Service for creating a REST API for accessing named Tables in Excel     |
+| [`LLMRestService`](#llmrestservice-in-pydgservicesrestllmrestservicepy) | Service for creating a REST API for accessing LLM Models     |
+| [`RestService`](#restservice-in-pydgservicesrestrestservicepy) | Service for creating a REST API for DataGrabber using FastAPI     |
 
 
 
