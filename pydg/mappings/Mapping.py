@@ -9,9 +9,9 @@ class Mapping(GrabberElement):
     """
     """
     
-    buffer_ids : list[str] = field(default_factory=list, metadata={"description": "list of buffer ids to map from"})
+    buffer_ids : list[str] = field(default_factory=None, metadata={"description": "list of buffer ids to map from"})
     adapter_id : str = field(default=None, metadata={"description": "id of the Adapter used for this Mapping"})
-    addresses : list[str] = field(default_factory=list, metadata={"description": "list of addresses to read/subscribe from or write/publish to"})
+    addresses : list[str] = field(default_factory=None, metadata={"description": "list of addresses to read/subscribe from or write/publish to"})
     thread_type : str = field(default=ThreadType.MILLI_SECOND.value, metadata={"description": "type of thread, e.g. MILLI_SECONDS, MICRO_SECONDS, INSTANT, ONLY_ONCE, ..."})
     mapping_type : str = field(default=None, metadata={"description": "type of mapping, e.g. READ, WRITE, SUB or PUB"})
     n : int = field(default=1, metadata={"description": "number of samples to insert or remove from buffers"})
