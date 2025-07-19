@@ -5,7 +5,7 @@
 | Class | Description |
 |-------|-------------|
 | [`Adapter`](#adapter-from-Adapter) | Abstract base class for `Adapters`. All `Adapters` must inherit from this class. |
-| [`PublishAdapter`](#`PublishAdapter` (in `pydg\adapters\PublishAdapter.py`)) | abstract class for `Adapter` Interface for publishing to data sinks.<br>new `Adapters` that allow for publishing to a sink via callback must inherit this class next to `Adapter`. |
+| [`PublishAdapter`](#PublishAdapter) | abstract class for `Adapter` Interface for publishing to data sinks.<br>new `Adapters` that allow for publishing to a sink via callback must inherit this class next to `Adapter`. |
 | [`ReadAdapter`](#readadapter-from-ReadAdapter) | abstract class for `Adapter` Interface for reading from data sources.<br>new `Adapters` that allow for reading from a source via one-shot polling must inherit this class next to `Adapter`. |
 | [`SubscribeAdapter`](#subscribeadapter-from-SubscribeAdapter) | abstract class for `Adapter` Interface for subscribing from data sources<br>new `Adapters` that allow for subscribing to a source via callback must inherit this class next to `Adapter`. |
 | [`WriteAdapter`](#writeadapter-from-WriteAdapter) | abstract class for Adapter Interface for writing to data sinks<br>new `Adapters` that allow for writing to a sink via one-shot polling must inherit this class next to `Adapter`. |
