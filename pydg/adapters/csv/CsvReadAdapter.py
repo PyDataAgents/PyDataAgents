@@ -56,14 +56,14 @@ class CsvReadAdapter(ReadAdapter):
     def read_from_source(self, buffers : dict[str, Buffer], addresses : list[str], n : int = 1):
         if addresses != None:
             if len(buffers) != len(addresses):
-                raise AdapterException("buffers and addresses must be of same size")
+                raise AdapterException(Buffer.cname() + "s and addresses must be of same size")
             if self.all_at_once:
                 pass
             else:
                 pass
         else:
             if len(buffers) == 1:
-                buffer = buffers[buffers.keys[0]]
+                buffer = next(iter(buffers.values()))
                 if isinstance(buffer, DictBuffer):
                     if self.all_at_once:
                         for row in self.csv_reader:
@@ -101,9 +101,9 @@ class CsvReadAdapter(ReadAdapter):
                             buffer.push(d)    
                         else:
                             if self.force_numeric:
-                                converted_row = [DataUtils.force_numeric(value) for value in row]
+                                converted_row = {k: DataUtils.force_numeric(v) for k, v in row.items()}
                                 buffer.push(converted_row)
                             else:    
                                 buffer.push(row)
                 else:
-                    raise AdapterException("Buffer must be of type DictBuffer")
+                    raise AdapterException(Buffer.cname() + " must be of type " + DictBuffer.cname())
