@@ -24,6 +24,26 @@ the core element of the framework is a [(data)grabber](pydatagrabber/grabbers/Gr
 In order to create a `Grabber` application, you create a `Grabber` object with one or more of the elements described in the following sections.
 The `Grabber` application follows a strict lifecycle, when being initialized and started.
 
+```python
+from pydg.grabbers.Grabber from Grabber
+
+g = Grabber()
+g.id = "G1"
+
+g.add_buffer(...) # add a buffer
+
+g.add_adapter(...) # add an adapter
+
+g.add_mapping(...) # add an mapping
+
+g.add_service(...) # add a service
+
+g.start_blocking() # starts a grabber application and blocks until finished (runs forever)
+# alterantive
+# g.start()
+
+```
+
 ### GrabberElement
 All elements within a `Grabber` application are derived from `GrabberElement`.
 <br>This class defines basic interface functions, that are inherited from each subclass and can be extended:
@@ -41,7 +61,10 @@ an overview of all available buffers and their usage is given [here](docs/Buffer
 <br>All `Buffer`s follow the FiFo-principle and are specified with a maximum `capacity` and datatypes (optional).
 <br>Whenever data is transfered, it moves through a buffer.
 <br>All `Buffer`'s adhere to the same interface:
+
 ```python
+from pydg.buffers.ListBuffer from ListBuffer
+
 buffer = ListBuffer()
 buffer.id = "BUF-1"
 buffer.capacity = 10
@@ -68,6 +91,8 @@ Every `Adapter` is initialized, installed, connected/disconnected and then depen
 <br>Here is an example workflow for the usage of an `Adapter`:
 
 ```python
+from pydg.adapters.csv.CSVReadAdapter from CSVReadAdapter
+
 adapter = CSVReadAdapter()
 adapter.id = "CSV1",
 adapter.file_path="path/to/file.txt",
@@ -92,7 +117,10 @@ adapter.deinstall()
 an overview of all available mappings and their usage is given [here](docs/Mappings.md).
 <br>In general a `Mapping` defines the interaction between an `Adapter` and one or more `Buffer`s in term of how often, how many samples and which data/information (`addresses`) in the source or sink are being accessed.
 <br>The mapping defines this interaction and is used as data model to instantiate a background thread that runs for every specified `Mapping` and acquires or transfers the data from `Buffer`s to or from source or sinks. 
+
 ```python
+from pydg.mappings.Mapping from Mapping
+
 m1 = Mapping()
 m1.id = "M1"
 m1.adapter_id = "MQTT1"
