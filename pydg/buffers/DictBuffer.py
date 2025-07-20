@@ -59,4 +59,4 @@ class DictBuffer(Buffer):
         return d
 
     def size(self) -> int:
-        return len(self.elements[self.elements.keys()[0]])
+        return len(next(iter(self.elements.values())))
