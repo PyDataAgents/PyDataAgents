@@ -40,7 +40,7 @@ class BufferRESTAPI:
             return list(grabber.buffer_store.keys())
         
         @router.get("/config")
-        def buffer_config(with_sizes : bool = Query(False, description="specifies whether to return the current size on top of configurations")) -> dict:
+        def buffer_config(with_sizes : bool = Query(False, description="specifies whether to return the current size on top of configurations")) -> list:
             """
             Returns a list of all buffer configurations.
             """
