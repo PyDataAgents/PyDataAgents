@@ -27,20 +27,20 @@ The `Grabber` application follows a strict lifecycle, when being initialized and
 ```python
 from pydg.grabbers.Grabber from Grabber
 
-g = Grabber()
-g.id = "G1"
+grabber = Grabber()
+grabber.id = "G1"
 
-g.add_buffer(...) # add a buffer
+grabber.add_buffer(...) # add a buffer
 
-g.add_adapter(...) # add an adapter
+grabber.add_adapter(...) # add an adapter
 
-g.add_mapping(...) # add an mapping
+grabber.add_mapping(...) # add an mapping
 
-g.add_service(...) # add a service
+grabber.add_service(...) # add a service
 
-g.start_blocking() # starts a grabber application and blocks until finished (runs forever)
+grabber.start_blocking() # starts a grabber application and blocks until finished (runs forever)
 # alterantive
-# g.start()
+# grabber.start()
 
 ```
 
@@ -73,6 +73,29 @@ buffer.description = "this is a float buffer"
 buffer.unit = "mA"
 buffer.initial_values = [0.02, 0.089]
 
+elements = [1.0, 2.23, 9.01]
+buffer.push(elements) # push new elements to buffer
+
+buffer.data(n=0, persistent=True) # get the buffers data, or n samples, with persistent True/False you specify whether to keep the elements n buffer the return type depends on the buffer implementation
+
+buffer.size() # returns the size of the buffer --> int: number of samples
+       
+buffer.data_with_meta(n = 0, persistent = True): # returns the buffer data and all its meta data inside a defined json schema as dictionary
+
+```
+
+```python
+from pydg.buffers.DictBuffer from DictBuffer
+
+buffer = DictBuffer()
+buffer.id = "BUF-1"
+buffer.capacity = 10
+buffer.datatype = "FLOAT"
+buffer.description = "this is a float buffer"
+buffer.unit = "mA"
+buffer.initial_values = {"A": [0.02], "B": [0.089]}
+
+elements = {"A": 1.89, "B": 423.09}
 buffer.push(elements) # push new elements to buffer
 
 buffer.data(n=0, persistent=True) # get the buffers data, or n samples, with persistent True/False you specify whether to keep the elements n buffer the return type depends on the buffer implementation
@@ -105,7 +128,66 @@ adapter.install()
 
 adapter.connect()
 
-adapter.read_from_source()
+adapter.read_from_source(buffers, addresses, n)
+
+adapter.disconnect()
+
+adapter.deinstall()
+
+```
+
+```python
+from pydg.adapters.csv.CSVWriteAdapter from CSVWriteAdapter
+
+adapter = CSVWriteAdapter()
+adapter.id = "CSV2",
+adapter.folder="path/to/folder"
+adapter.delimiter = ";"
+
+adapter.install()
+
+adapter.connect()
+
+adapter.write_to_sink(buffers, addresses, n, persistent)
+
+adapter.disconnect()
+
+adapter.deinstall()
+
+```
+
+```python
+from pydg.adapters.mqtt.MQTTAdapter from MQTTAdapter
+
+adapter = MQTTAdapter()
+adapter.id = "MQTT1"
+adapter.endpoint = "localhost"
+adapter.port = 1883
+adapter.qos = 0
+
+adapter.install()
+
+adapter.connect()
+
+adapter.subscribe(buffers, addresses, sampling_period, n)
+
+adapter.disconnect()
+
+adapter.deinstall()
+
+```
+
+```python
+from pydg.adapters.* from *
+
+adapter = <PublishAdapter>()
+adapter.id = "PA1"
+
+adapter.install()
+
+adapter.connect()
+
+adapter.publish(buffers, addresses, sampling_period, n, persistent)
 
 adapter.disconnect()
 
