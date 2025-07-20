@@ -114,7 +114,8 @@ Every `Adapter` is initialized, installed, connected/disconnected and then depen
 - WriteAdapter
 - SubscribeAdapter
 - PublishAdapter
-<br>It is paramount, that `Adapter` methods are always used in the right order. Within a `Grabber` application, this is made sure by design, but when used outside, it must be taken care of by the developer.
+
+It is paramount, that `Adapter` methods are always used in the right order. Within a `Grabber` application, this is made sure by design, but when used outside, it must be taken care of by the developer.
 <br>The following list outlines the correct order of method calls of an adpater:
 - __init__ or __post_init__ (done by constructor call)
 - install(...)
@@ -122,7 +123,7 @@ Every `Adapter` is initialized, installed, connected/disconnected and then depen
 - read_from_source(...) / write_to_sink(...) / subscribe(...) / publish(...)
 - disconnect()
 - deinstall(...)
-<br>
+
 <br>Here are some example workflows for the usage of an `Adapter`:
 
 ```python
@@ -135,6 +136,7 @@ adapter.delimiter=';',
 adapter.has_header=True,
 adapter.auto_detect=True,
 adapter.force_numeric=True
+adapter.mode = "LOOP"
 
 adapter.install()
 
