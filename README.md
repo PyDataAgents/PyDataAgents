@@ -109,9 +109,21 @@ buffer.data_with_meta(n = 0, persistent = True): # returns the buffer data and a
 ### Adapter
 an overview of all available adapters and their usage is given [here](docs/Adapters.md)
 <br>All `Adapter`'s adhere to the same composition of interfaces and their methods.
-Every `Adapter` is initialized, installed, connected/disconnected and then depending on source or sink interaction: reads/subscribes from sources or writes/publishes to sinks.
+Every `Adapter` is initialized, installed, connected/disconnected and then depending on source or sink interaction: reads/subscribes from sources or writes/publishes to sinks. Therefor an Adapter can inherit from the following interfaces (abstract super classes):
+- ReadAdapter
+- WriteAdapter
+- SubscribeAdapter
+- PublishAdapter
 <br>It is paramount, that `Adapter` methods are always used in the right order. Within a `Grabber` application, this is made sure by design, but when used outside, it must be taken care of by the developer.
-<br>Here is an example workflow for the usage of an `Adapter`:
+<br>The following list outlines the correct order of method calls of an adpater:
+- __init__ or __post_init__ (done by constructor call)
+- install(...)
+- connect()
+- read_from_source(...) / write_to_sink(...) / subscribe(...) / publish(...)
+- disconnect()
+- deinstall(...)
+<br>
+<br>Here are some example workflows for the usage of an `Adapter`:
 
 ```python
 from pydg.adapters.csv.CSVReadAdapter from CSVReadAdapter
