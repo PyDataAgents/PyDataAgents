@@ -40,7 +40,7 @@ class BufferRESTAPI:
             return list(grabber.buffer_store.keys())
         
         @router.get("/config")
-        def buffer_config(with_sizes : bool = Query(False, description="specifies whether to return the current size on top of configurations")):
+        def buffer_config(with_sizes : bool = Query(False, description="specifies whether to return the current size on top of configurations")) -> dict:
             """
             Returns a list of all buffer configurations.
             """
@@ -53,14 +53,14 @@ class BufferRESTAPI:
             return li
                 
         @router.get("/{id}")
-        def buffer(id : str = Path(..., description="unique ID of the buffer")):
+        def buffer(id : str = Path(..., description="unique ID of the buffer")) -> dict:
             buffer : Buffer = grabber.get_buffer(id)
             if buffer is None:
                 return {"error": "Buffer not found"}
             return buffer.config_options()
         
         @router.get("/{id}/size")
-        def buffer_size(id : str = Path(..., description="unique ID of the buffer")):
+        def buffer_size(id : str = Path(..., description="unique ID of the buffer")) -> int:
             """
             Returns the size of the specified buffer.
             """
@@ -70,7 +70,7 @@ class BufferRESTAPI:
             return buffer.size()
         
         @router.get("/{id}/data")
-        def buffer_data(id : str = Path(..., description="unique ID of the buffer"), n : int = Query(1, description="number of samples to extract from buffer"), persistent : bool = Query(True, description="whether to keep the extracted data in the buffer or remove it on query"), with_meta : bool = Query(False, description="specifies whether to include meta data")):
+        def buffer_data(id : str = Path(..., description="unique ID of the buffer"), n : int = Query(1, description="number of samples to extract from buffer"), persistent : bool = Query(True, description="whether to keep the extracted data in the buffer or remove it on query"), with_meta : bool = Query(False, description="specifies whether to include meta data")) -> dict:
             """
             Returns the data stored in the specified buffer.
             """
