@@ -234,7 +234,7 @@ an overview of all available services and their usage is given [here](docs/Servi
 
 
 ## Installation and Usage
-In order to install `pydatagrabber` use pip:
+In order to install `pydg` - pyd(ata)g(rabber) use pip:
 ```python
 pip install git+https://github.com/jhillenbrand/PyDataGrabber.git
 
@@ -244,7 +244,7 @@ pip install git+https://github.com/jhillenbrand/PyDataGrabber.git@<branch>
 
 # if the repo was installed already, use an uninstall before installing again
 
-pip uninstall pydatagrabber -y; pip install git+https://github.com/jhillenbrand/PyDataGrabber.git
+pip uninstall pydg -y; pip install git+https://github.com/jhillenbrand/PyDataGrabber.git
 ```
 
 Project Dependencies can be found in [pyproject.toml](pyproject.toml)
