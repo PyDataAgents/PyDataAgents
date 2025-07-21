@@ -46,33 +46,35 @@ class GrabberElement(ABC):
     def config_options(self, with_descriptions = False) -> dict:
         result = {}
         for f in fields(self):
-            value = getattr(self, f.name)
-            if with_descriptions:
-                result[f.name] = {
-                    "value": value,
-                    "description": f.metadata.get("description", "")
-                }
-            else:
-                if isinstance(value, GrabberElement):
-                    result[f.name] = value.config_options(with_descriptions)
-                elif isinstance(value, list):
-                    li = list()
-                    for item in value:
-                        if isinstance(item, GrabberElement):
-                            li.append(item.config_options())
-                        else:
-                            li.append(item)
-                    result[f.name] = li
-                elif isinstance(value, dict):
-                    d = dict()
-                    for k, v in value.items():
-                        if isinstance(v, GrabberElement):
-                            d[k] = v.config_options()
-                        else:
-                            d[k] = v
-                    result[f.name] = d
+            # check for fields with metadata only
+            if len(f.metadata) > 0:
+                value = getattr(self, f.name)
+                if with_descriptions:
+                    result[f.name] = {
+                        "value": value,
+                        "description": f.metadata.get("description", "")
+                    }
                 else:
-                    result[f.name] = value
+                    if isinstance(value, GrabberElement):
+                        result[f.name] = value.config_options(with_descriptions)
+                    elif isinstance(value, list):
+                        li = list()
+                        for item in value:
+                            if isinstance(item, GrabberElement):
+                                li.append(item.config_options())
+                            else:
+                                li.append(item)
+                        result[f.name] = li
+                    elif isinstance(value, dict):
+                        d = dict()
+                        for k, v in value.items():
+                            if isinstance(v, GrabberElement):
+                                d[k] = v.config_options()
+                            else:
+                                d[k] = v
+                        result[f.name] = d
+                    else:
+                        result[f.name] = value
         return result
 
     @classmethod
