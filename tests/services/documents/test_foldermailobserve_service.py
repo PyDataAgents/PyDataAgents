@@ -51,6 +51,7 @@ def test_010():
     mail_action.port = int(config["AST"]["SMTP_PORT"])
     mail_action.mail_account = config["AST"]["SMTP_ACCOUNT"]
     mail_action.recipient = config["AST"]["MY_MAIL"]
+    mail_action.tls = False
     
     folder_service = FolderObserveMailService()
     folder_service.id = "TestFolderObserveMailService"
