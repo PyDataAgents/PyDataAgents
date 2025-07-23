@@ -25,4 +25,7 @@ mappings:
   n: 1
   sampling_period: 100
   persistent: true
-services: []
+services:
+  - type: dataelements.services.DataElementService
+    pipeline: 
+      - 
