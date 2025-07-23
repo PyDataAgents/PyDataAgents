@@ -17,6 +17,7 @@ class MailAction(Action):
     recipient : str = field(default=None, metadata={"description": "mail address of the recipient"})
     subject : str = field(default=None,  metadata={"description": "subject of the mail"})
     body : str = field(default=None,  metadata={"description": "body of the mail"})
+    tls : bool = field(default=True, metadata={"description": "use TLS for the connection"})
     
     def __init__(self):
         super().__init__()
@@ -35,8 +36,10 @@ class MailAction(Action):
         # Send
         try:
             with smtplib.SMTP(self.smtp_server, self.port) as server:
-                server.starttls()  # Secure the connection
-                server.login(self.mail_account, self.pw)
+                if self.tls:
+                    server.starttls()  # Secure the connection
+                if self.pw is not None:
+                    server.login(self.mail_account, self.pw)
                 server.sendmail(self.mail_account, self.recipient, message.as_string())
                 #print("✅ Email sent successfully.")
         except Exception as e:
