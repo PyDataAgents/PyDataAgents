@@ -26,6 +26,18 @@ mappings:
   sampling_period: 100
   persistent: true
 services:
-  - type: dataelements.services.DataElementService
-    pipeline: 
-      - 
+  - type: pydatagrabber.services.DataElementService
+    nodes:
+      - type: pydatagrabber.services.statemachine.actions.dataelements.InputBufferAction
+        id: INPUTBUFFER
+        buffer_id: B1
+        data_type: NUMERIC
+        unit: 1
+        description: Input buffer for data elements 
+      - type: pyde.innovators.featureextraction.RocketExtractor
+        id: E1
+        feature: 10
+        parents: [INPUTBUFFER]
+
+      
+        
