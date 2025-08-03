@@ -26,7 +26,7 @@ class ListBuffer(Buffer):
         with self.lock:
             if isinstance(elements, str):
                 self.__push1(elements)
-            if hasattr(elements, "__len__"):
+            elif hasattr(elements, "__len__"):
                 # check for infinity capacity
                 if self.capacity != -1:
                     too_many =  len(elements) + self.size() - self.capacity
@@ -57,6 +57,7 @@ class ListBuffer(Buffer):
                         del self.elements[0:n]
                     return d
                 else:
+                    # always make a deep copy, otherwise a reference will be maintained
                     d = copy.deepcopy(self.elements)
                     if not persistent:
                         self.elements.clear()

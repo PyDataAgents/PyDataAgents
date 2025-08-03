@@ -1,4 +1,5 @@
 from __future__ import annotations
+import copy
 import threading
 from typing import Union
 from .Buffer import Buffer
@@ -57,13 +58,12 @@ class DictBuffer(Buffer):
                     del self.elements[k][0:n]
             return d
         else:
-            if persistent:
-                return self.elements
-            else:
-                d = self.elements.copy()
+            # always make a deep copy, otherwise a reference will be maintained
+            d = copy.deepcopy(self.elements)
+            if not persistent:
                 for k in self.elements.keys():
                     self.elements[k].clear()
-                return d
+            return d
             
     def data_with_meta(self, n = 0, persistent = True) -> dict:        
         d = {}

@@ -27,8 +27,10 @@ class BufferExtractAction(BufferNode, Action):
                     raise StatemachineException("parents' buffers must be of type " + DictBuffer.cname())
             d = {}
             for key in self.extract_keys:
-                if key in parent.buffer.elements:
-                    d[key] = parent.buffer.elements[key]
+                bd = parent.buffer.data()
+                if key in bd:
+                    d[key] = bd[key]
+            self.buffer.push(d)
             
                   
                         

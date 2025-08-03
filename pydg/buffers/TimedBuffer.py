@@ -1,3 +1,4 @@
+import copy
 import time
 from .ListBuffer import ListBuffer
 
@@ -81,8 +82,9 @@ class TimedBuffer(ListBuffer):
                     d = {"values": v, "timestamps": t}
                     return d
                 else:
-                    v = self.elements
-                    t = self.timestamps
+                    # always make a deep copy, otherwise a reference will be maintained
+                    v = copy.deepcopy(self.elements)
+                    t = copy.deepcopy(self.timestamps)
                     d = {"values": v, "timestamps": t}
                     if not persistent:
                         self.elements.clear()
