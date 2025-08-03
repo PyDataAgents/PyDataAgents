@@ -28,8 +28,10 @@ class DictBuffer(Buffer):
                 for k in elements:
                     if k in self.elements.keys():
                         self.elements[k].append(elements[k])
-                        if len(self.elements[k]) > self.capacity:
-                            self.elements[k].pop(0)
+                        # check for infinity capacity
+                        if self.capacity != -1:                            
+                            if len(self.elements[k]) > self.capacity:
+                                self.elements[k].pop(0)                        
                     else:
                         self.elements[k] = list()
                         self.elements[k].append(elements[k])

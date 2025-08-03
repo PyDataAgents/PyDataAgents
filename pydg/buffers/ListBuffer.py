@@ -27,7 +27,11 @@ class ListBuffer(Buffer):
             if isinstance(elements, str):
                 self.__push1(elements)
             if hasattr(elements, "__len__"):
-                too_many =  len(elements) + self.size() - self.capacity
+                # check for infinity capacity
+                if self.capacity != -1:
+                    too_many =  len(elements) + self.size() - self.capacity
+                else:
+                    too_many = 0
                 if too_many > 0:
                     rest = len(elements) - too_many
                     if rest > 0:
@@ -79,7 +83,8 @@ class ListBuffer(Buffer):
             object (any): a buffer object / sample
         """
         with self.lock:
-            if self.size() == self.capacity:
-                self.elements.pop(0)
-            
+            # check for infinity capacity
+            if self.capacity != -1:
+                if self.size() == self.capacity:
+                    self.elements.pop(0)            
             self.elements.append(element)

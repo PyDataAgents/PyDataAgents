@@ -18,7 +18,11 @@ class TimedBuffer(ListBuffer):
                 ts = round(time.time() * 1000)  # Current timestamp in milliseconds
                 self.__push_timestamp(elements, ts)
             if hasattr(elements, "__len__"):
-                too_many =  len(elements) + self.size() - self.capacity
+                # check for infinity capacity
+                if self.capacity != -1:
+                    too_many =  len(elements) + self.size() - self.capacity
+                else:
+                    too_many = 0
                 if too_many > 0:
                     rest = len(elements) - too_many
                     if rest > 0:
@@ -42,7 +46,11 @@ class TimedBuffer(ListBuffer):
                 self.__push_timestamp(elements, timestamps)
                 
             if hasattr(elements, "__len__"):
-                too_many =  len(elements) + self.size() - self.capacity
+                # check for infinity capacity
+                if self.capacity != -1:
+                    too_many =  len(elements) + self.size() - self.capacity
+                else:
+                    too_many = 0
                 if too_many > 0:
                     rest = len(elements) - too_many
                     if rest > 0:
@@ -92,9 +100,11 @@ class TimedBuffer(ListBuffer):
             timestamp (int): the timestamp of the element
         """
         with self.lock:
-            if self.size() == self.capacity:
-                self.timestamps.pop(0)
-                self.elements.pop(0)
-            
+            # check for infinity capacity
+            if self.capacity != -1:
+                if self.size() == self.capacity:
+                    self.timestamps.pop(0)
+                    self.elements.pop(0)
+                
             self.elements.append(element)
             self.timestamps.append(timestamp)

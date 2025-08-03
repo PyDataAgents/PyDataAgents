@@ -11,7 +11,7 @@ class Buffer(GrabberElement):
     Abstract base class for buffers.
     """
 
-    capacity : int = field(default=1, metadata={"description": "number of elements that can be stored in buffer before being discarded in FiFo fashion"})
+    capacity : int = field(default=1, metadata={"description": "Number of elements that can be stored in buffer before being discarded in FiFo fashion. If set to -1, then there is no capacity for this buffer."})
     data_type : str = field(default=DataType.FLOAT.value, metadata={"description": "datatype to expect from buffer elements, can be DataType enum or list of enums"})
     initial_values : any = field(default=None, metadata={"description": "initial values in buffer"})
     unit : any = field(default=None, metadata={"description": "unit of element values in this buffer, can be string or list of strings"})
