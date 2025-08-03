@@ -1,8 +1,8 @@
 from dataclasses import dataclass, field
-from ...adapters.ReadAdapter import ReadAdapter
-from ..Action import Action
-from ..AdapterNode import AdapterNode
-from ..StatemachineException import StatemachineException
+from ....adapters.ReadAdapter import ReadAdapter
+from ...Action import Action
+from ...AdapterNode import AdapterNode
+from ...StatemachineException import StatemachineException
 
 @dataclass
 class AdapterReadAction(AdapterNode, Action):

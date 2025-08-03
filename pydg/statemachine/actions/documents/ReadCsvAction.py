@@ -1,10 +1,10 @@
 import csv
 from dataclasses import dataclass, field
 
-from ...buffers.DictBuffer import DictBuffer
+from ....buffers.DictBuffer import DictBuffer
 
-from ..Action import Action
-from ..BufferNode import BufferNode
+from ...Action import Action
+from ...BufferNode import BufferNode
 
 
 @dataclass

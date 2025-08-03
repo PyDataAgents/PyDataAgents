@@ -3,8 +3,8 @@ import time
 from pydg.buffers.DataType import DataType
 from pydg.buffers.ListBuffer import ListBuffer
 from pydg.statemachine.StatemachineService import StatemachineService
-from pydg.statemachine.actions.ListFilesAction import ListFilesAction
-from pydg.statemachine.actions.MoveFilesAction import MoveFilesAction
+from pydg.statemachine.actions.documents.ListFilesAction import ListFilesAction
+from pydg.statemachine.actions.documents.MoveFilesAction import MoveFilesAction
 from pydg.statemachine.actions.SleepAction import SleepAction
 
 

@@ -1,10 +1,10 @@
 from dataclasses import dataclass, field
 
-from ...buffers.DictBuffer import DictBuffer
-from ...grabbers.GrabberElement import GrabberElement
-from ...grabbers.Grabber import Grabber
-from ..Action import Action
-from ..BufferNode import BufferNode
+from ....buffers.DictBuffer import DictBuffer
+from ....grabbers.GrabberElement import GrabberElement
+from ....grabbers.Grabber import Grabber
+from ...Action import Action
+from ...BufferNode import BufferNode
 
 
 @dataclass

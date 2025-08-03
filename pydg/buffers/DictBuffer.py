@@ -27,14 +27,20 @@ class DictBuffer(Buffer):
             if isinstance(elements, dict):
                 for k in elements:
                     if k in self.elements.keys():
-                        self.elements[k].append(elements[k])
+                        if isinstance(elements[k], list):
+                            self.elements[k].extend(elements[k])
+                        else:
+                            self.elements[k].append(elements[k])
                         # check for infinity capacity
                         if self.capacity != -1:                            
                             if len(self.elements[k]) > self.capacity:
                                 self.elements[k].pop(0)                        
                     else:
                         self.elements[k] = list()
-                        self.elements[k].append(elements[k])
+                        if isinstance(elements[k], list):
+                            self.elements[k].extend(elements[k])
+                        else:
+                            self.elements[k].append(elements[k])                        
             elif isinstance(elements, list) and all(isinstance(element, dict) for element in elements):
                 for element in elements:
                     self.push(element)

@@ -2,8 +2,8 @@ from dataclasses import dataclass, field
 import json
 
 import jsonpath_ng
-from ..Action import Action
-from ..BufferNode import BufferNode
+from ...Action import Action
+from ...BufferNode import BufferNode
 
 
 @dataclass
