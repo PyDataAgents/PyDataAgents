@@ -1,5 +1,6 @@
 from __future__ import annotations
 import threading
+from typing import Union
 from .Buffer import Buffer
 from ..grabbers import Grabber
 
@@ -21,16 +22,20 @@ class DictBuffer(Buffer):
         super().deinstall(grabber)
         self.elements = {}        
     
-    def push(self, elements : dict):
+    def push(self, elements : Union[list, dict]):
         with self.lock:
-            for k in elements:
-                if k in self.elements.keys():
-                    self.elements[k].append(elements[k])
-                    if len(self.elements[k]) > self.capacity:
-                        self.elements[k].pop(0)
-                else:
-                    self.elements[k] = list()
-                    self.elements[k].append(elements[k])
+            if isinstance(elements, dict):
+                for k in elements:
+                    if k in self.elements.keys():
+                        self.elements[k].append(elements[k])
+                        if len(self.elements[k]) > self.capacity:
+                            self.elements[k].pop(0)
+                    else:
+                        self.elements[k] = list()
+                        self.elements[k].append(elements[k])
+            elif isinstance(elements, list) and all(isinstance(element, dict) for element in elements):
+                for element in elements:
+                    self.push(element)
         
 
     def data(self, n=0, persistent=True) -> dict:
@@ -59,4 +64,7 @@ class DictBuffer(Buffer):
         return d
 
     def size(self) -> int:
-        return len(next(iter(self.elements.values())))
+        if len(self.elements) == 0:
+            return 0
+        else:
+            return len(next(iter(self.elements.values())))
