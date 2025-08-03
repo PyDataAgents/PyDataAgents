@@ -38,6 +38,6 @@ class ConfigureElementAction(GrabberNode, BufferNode):
         val = self.buffer.data(n = self.n, persistent = False)
         element = self.grabber.get_element(self.element_id)
         if element is not None:
-            ClassUtils.set_property(self, self.option, val)
+            ClassUtils.set_property(element, self.option, val)
         else:
             raise StatemachineException("No " + GrabberElement.cname() + " with id=" + self.element_id + " was found")

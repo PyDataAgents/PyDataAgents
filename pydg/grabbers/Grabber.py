@@ -1,8 +1,11 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING, Type
+from typing import TYPE_CHECKING, Type, cast
 from dataclasses import dataclass
 import time
 from loguru import logger
+
+from ..statemachine.Node import Node
+from ..statemachine.StatemachineService import StatemachineService
 from .GrabberElement import GrabberElement
 from ..mappings.MappingThread import MappingThread
 
@@ -183,21 +186,30 @@ class Grabber(GrabberElement):
             for attr_name, attr_value in vars(adapter).items():
                 #print(f"{attr_name}: {type(attr_value)}")
                 if isinstance(attr_value, GrabberElement):
-                    return attr_value
+                    if attr_value.id == id:
+                        return attr_value
             for buffer in self.buffer_store.values():
                 for attr_name, attr_value in vars(buffer).items():
                     #print(f"{attr_name}: {type(attr_value)}")
                     if isinstance(attr_value, GrabberElement):
-                        return attr_value
+                        if attr_value.id == id:
+                            return attr_value
         for mapping_thread in self.mapping_store.values():
             for attr_name, attr_value in vars(mapping_thread).items():
                 #print(f"{attr_name}: {type(attr_value)}")
                 if isinstance(attr_value, GrabberElement):
-                    return attr_value
+                    if attr_value.id == id:
+                        return attr_value
         for service in self.service_store.values():
             for attr_name, attr_value in vars(service).items():
                 #print(f"{attr_name}: {type(attr_value)}")
                 if isinstance(attr_value, GrabberElement):
-                    return attr_value
+                    if attr_value.id == id:
+                        return attr_value
+            # special case for statemachine services, look into nodes
+            if isinstance(service, StatemachineService):
+                for node in service.nodes:
+                    if cast(Node, node).id == id:
+                        return node          
         return None
      
