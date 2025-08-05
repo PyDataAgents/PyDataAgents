@@ -1,7 +1,11 @@
 from __future__ import annotations
 from abc import abstractmethod
-from ..grabbers.Grabber import Grabber
+from typing import TYPE_CHECKING
 from ..grabbers.GrabberElement import GrabberElement
+
+
+if TYPE_CHECKING:
+    from ..grabbers.Grabber import Grabber
 
 class Service(GrabberElement):
     """abstract base class for Grabber Services
