@@ -1,6 +1,6 @@
 from __future__ import annotations
 from dataclasses import dataclass, field
-from ..grabbers.Grabber import Grabber
+from typing import TYPE_CHECKING
 from ..mappings.ObserverThread import ObserverThread
 from ..mappings.ThreadType import ThreadType
 from ..services.Service import Service
@@ -12,6 +12,9 @@ from .StatemachineException import StatemachineException
 from .StatemachineObserver import StatemachineObserver
 from .Transition import Transition
 
+
+if TYPE_CHECKING:
+    from pydg.grabbers.Grabber import Grabber
 
 @dataclass
 class StatemachineService(Service):
