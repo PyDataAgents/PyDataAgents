@@ -19,11 +19,14 @@ class DataElementAction(BufferNode, Action):
            
     def install(self, grabber : Grabber = None):
         if self.buffer is None:
-            if self.buffer_id in grabber.buffer_store:
-                self.buffer = grabber.buffer_store[self.buffer_id]
+            if grabber is not None:
+                if self.buffer_id in grabber.buffer_store:
+                    self.buffer = grabber.buffer_store[self.buffer_id]
             else:
                 self.buffer = DictBuffer()
                 self.buffer.id = self.id + "-BUFFER"
                 self.buffer.capacity = DataElementAction.MAX_DEFAULT_CAPACITY
+                if grabber is not None:
+                    grabber.add_buffer(self.buffer)
         super().install(grabber)
     
