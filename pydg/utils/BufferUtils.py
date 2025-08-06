@@ -3,20 +3,6 @@ from ..buffers.Buffer import Buffer
 
 class BufferUtils:
         
-    DATA_TYPE = "data_type"
-    CAPACITY = "capacity"
-    DESCRIPTION = "description"
-    UNIT = "unit"
-    INITIAL_VALUES = "initial_values"
-    
-    DATA = "data"
-    META = "meta"
-    
-    VALUES = "values"
-    TIMESTAMPS = "timestamps"    
-    
-    INIFINITY_CAPACITY = -1
-        
     @staticmethod    
     def to_dict(buffer : Buffer):
         d = {}

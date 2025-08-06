@@ -1,7 +1,7 @@
 import copy
 import time
 
-from ..utils.BufferUtils import BufferUtils
+from .Buffer import Buffer
 from .ListBuffer import ListBuffer
 
 
@@ -22,7 +22,7 @@ class TimedBuffer(ListBuffer):
                 self.__push_timestamp(elements, ts)
             if hasattr(elements, "__len__"):
                 # check for infinity capacity
-                if self.capacity != BufferUtils.INIFINITY_CAPACITY:
+                if self.capacity != Buffer.INIFINITY_CAPACITY:
                     too_many =  len(elements) + self.size() - self.capacity
                 else:
                     too_many = 0
@@ -50,7 +50,7 @@ class TimedBuffer(ListBuffer):
                 
             if hasattr(elements, "__len__"):
                 # check for infinity capacity
-                if self.capacity != BufferUtils.INIFINITY_CAPACITY:
+                if self.capacity != Buffer.INIFINITY_CAPACITY:
                     too_many =  len(elements) + self.size() - self.capacity
                 else:
                     too_many = 0
@@ -98,8 +98,8 @@ class TimedBuffer(ListBuffer):
             
     def data_with_meta(self, n = 0, persistent = True) -> dict:        
         d = {}
-        d[BufferUtils.DATA] = self.data(n, persistent)
-        d[BufferUtils.META] = self.config_options()
+        d[Buffer.DATA] = self.data(n, persistent)
+        d[Buffer.META] = self.config_options()
         return d
                 
     def __push_timestamp(self, element : any, timestamp : int):
@@ -111,7 +111,7 @@ class TimedBuffer(ListBuffer):
         """
         with self.lock:
             # check for infinity capacity
-            if self.capacity != BufferUtils.INIFINITY_CAPACITY:
+            if self.capacity != Buffer.INIFINITY_CAPACITY:
                 if self.size() == self.capacity:
                     self.timestamps.pop(0)
                     self.elements.pop(0)
