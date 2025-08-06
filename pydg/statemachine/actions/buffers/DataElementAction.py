@@ -13,6 +13,9 @@ class DataElementAction(BufferNode, Action):
     persistent : bool = field(default=False, metadata={"description": "if true, data will persist in parents' buffers after retrieval"})
     
     MAX_DEFAULT_CAPACITY = 1e6
+        
+    def __init__(self):
+        super().__init__()
            
     def install(self, grabber : Grabber = None):
         if self.buffer is None:
