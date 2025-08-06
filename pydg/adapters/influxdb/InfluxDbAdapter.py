@@ -11,9 +11,15 @@ from ...buffers.ListBuffer import ListBuffer
 from ...buffers.TimedBuffer import TimedBuffer
 from ...utils.AdapterUtils import AdapterUtils
 
+BUCKET = "b"
+MEASUREMENT = "m"
+FIELD = "f"
+
 @dataclass
 class InfluxDbAdapter(ReadAdapter, WriteAdapter):
     """`Adapter` thats reads or writes to InfluxDB.
+    Address Schema:
+    address = "b=<bucket>;m=<measurement>;f=<field>"
     """
     
     endpoint : str = field(default="http://localhost:8086", metadata={"description": "The endpoint URL for the InfluxDB instance."})
@@ -39,7 +45,7 @@ class InfluxDbAdapter(ReadAdapter, WriteAdapter):
             for buffer in buffers.values():
                 address = addresses[a]
                 d_address = AdapterUtils.address_to_dict(address)
-                if "b" in d_address and "m" in d_address and "f" in d_address:
+                if BUCKET in d_address and MEASUREMENT in d_address and FIELD in d_address:
                     b = d_address["b"]
                     m = d_address["m"]
                     f = d_address["f"]
@@ -67,8 +73,7 @@ class InfluxDbAdapter(ReadAdapter, WriteAdapter):
                 a += 1
         else:
             raise AdapterException("The number of buffers and addresses must match.")
-            
-
+    
     def write_to_sink(self, buffers : dict[str, Buffer], addresses : list[str], n : int, persistent : bool):
         if len(buffers) == len(addresses):
             a = 0

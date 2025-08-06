@@ -8,7 +8,7 @@ from ..grabbers import Grabber
 class DictBuffer(Buffer):
     """buffer that stores its values in a dictionary in a table like fashion, where every key contains a list of data
     """
-    
+        
     def __init__(self):
         super().__init__()
         self.elements : dict[list] = dict()
@@ -33,7 +33,7 @@ class DictBuffer(Buffer):
                         else:
                             self.elements[k].append(elements[k])
                         # check for infinity capacity
-                        if self.capacity != -1:                            
+                        if self.capacity != Buffer.INIFINITY_CAPACITY:                            
                             if len(self.elements[k]) > self.capacity:
                                 self.elements[k].pop(0)                        
                     else:
