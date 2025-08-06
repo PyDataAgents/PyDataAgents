@@ -24,6 +24,20 @@ class GrabberElement(ABC):
     
     LOGGER = logger
     
+    # Keyword Collection   
+    GRABBER = "grabber"
+    BUFFER = "buffer"
+    BUFFERS = "buffers"
+    ADAPTER = "adapter"
+    ADAPTERS = "adapters"
+    MAPPING = "mapping"
+    MAPPINGS = "mappings"
+    SERVICE = "service"
+    SERVICES = "services"
+    
+    TYPE = "type"
+    ID = "id"
+        
     def __init__(self, id : str = None):
         """
         Initialize the grabber element and assign a unique ID.
