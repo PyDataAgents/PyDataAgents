@@ -17,8 +17,6 @@ class Buffer(GrabberElement):
     unit : any = field(default=None, metadata={"description": "unit of element values in this buffer, can be string or list of strings"})
     description : str = field(default=None, metadata={"description": "buffer description"})
 
-    INIFINITY_CAPACITY = -1
-
     def __init__(self):
         super().__init__()
         self.elements = any

@@ -9,26 +9,7 @@ class GrabberConfig:
     """
     Configuration class for the Grabber application.
     """
-    
-    GRABBER = "grabber"
-    BUFFER = "buffer"
-    BUFFERS = "buffers"
-    ADAPTER = "adapter"
-    ADAPTERS = "adapters"
-    MAPPING = "mapping"
-    MAPPINGS = "mappings"
-    SERVICE = "service"
-    SERVICES = "services"
-    
-    TYPE = "type"
-    ID = "id"
-    
-    DATA_TYPE = "data_type"
-    CAPACITY = "capacity"
-    DESCRIPTION = "description"
-    UNIT = "unit"
-    INITIAL_VALUES = "initial_values"
-        
+            
 
     def __init__(self, grabber : Grabber = None):
         self.grabber_config = dict()

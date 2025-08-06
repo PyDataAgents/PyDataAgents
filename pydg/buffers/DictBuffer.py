@@ -2,6 +2,8 @@ from __future__ import annotations
 import copy
 import threading
 from typing import Union
+
+from ..utils.BufferUtils import BufferUtils
 from .Buffer import Buffer
 from ..grabbers import Grabber
 
@@ -33,7 +35,7 @@ class DictBuffer(Buffer):
                         else:
                             self.elements[k].append(elements[k])
                         # check for infinity capacity
-                        if self.capacity != Buffer.INIFINITY_CAPACITY:                            
+                        if self.capacity != BufferUtils.INIFINITY_CAPACITY:                            
                             if len(self.elements[k]) > self.capacity:
                                 self.elements[k].pop(0)                        
                     else:
@@ -67,8 +69,8 @@ class DictBuffer(Buffer):
             
     def data_with_meta(self, n = 0, persistent = True) -> dict:        
         d = {}
-        d["data"] = self.data(n, persistent)
-        d["meta"] = self.config_options()
+        d[BufferUtils.DATA] = self.data(n, persistent)
+        d[BufferUtils.META] = self.config_options()
         return d
 
     def size(self) -> int:
