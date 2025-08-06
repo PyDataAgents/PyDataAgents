@@ -10,14 +10,14 @@ from ..Action import Action
 @dataclass
 class MailAction(Action):
     
-    smtp_server : str = field(default=None, metadata={"description": "host of the mail server to use"})
-    port : int = field(default=None, metadata={"description": "port of the smtp server"})
-    mail_account : str = field(default=None, metadata={"description": "mail account to use for login"})
-    pw : str = field(default=None, metadata={"description": "password of the mail server"})
-    recipient : str = field(default=None, metadata={"description": "mail address of the recipient"})
-    subject : str = field(default=None,  metadata={"description": "subject of the mail"})
-    body : str = field(default=None,  metadata={"description": "body of the mail"})
-    tls : bool = field(default=True, metadata={"description": "use TLS for the connection"})
+    smtp_server : str = field(init=True, default=None, metadata={"description": "host of the mail server to use"})
+    port : int = field(init=True, default=None, metadata={"description": "port of the smtp server"})
+    mail_account : str = field(init=True, default=None, metadata={"description": "mail account to use for login"})
+    pw : str = field(init=True, default=None, metadata={"description": "password of the mail server"})
+    recipient : str = field(init=True, default=None, metadata={"description": "mail address of the recipient"})
+    subject : str = field(init=True, default=None,  metadata={"description": "subject of the mail"})
+    body : str = field(init=True, default=None,  metadata={"description": "body of the mail"})
+    tls : bool = field(init=True, default=True, metadata={"description": "use TLS for the connection"})
     
     def __init__(self):
         super().__init__()

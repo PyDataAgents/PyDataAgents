@@ -9,7 +9,7 @@ class SleepAction(Action):
     An action that sleeps for a specified number of seconds.
     """
     
-    sleep_time : int = field(default=0, metadata={"description" : "number of seconds to sleep for"})
+    sleep_time : int = field(init=True, default=0, metadata={"description" : "number of seconds to sleep for"})
 
     def __init__(self):
         super().__init__()

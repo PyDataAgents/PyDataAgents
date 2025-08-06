@@ -19,11 +19,11 @@ if TYPE_CHECKING:
 @dataclass
 class StatemachineService(Service):
     
-    retry_error_nodes : bool = field(default=False, metadata={"description" : "Statemachine object containing actions and transitions to go through to represent a state machine program flow"})    
-    start_node_id : str = field(default=None, metadata={"description": "ID of the start node in the statemachine service"})
-    nodes : dict[str, Node] = field(default_factory=dict[str, Node](), metadata={"description": "dictionary of nodes in the statemachine service"})
-    thread_type : str = field(default=ThreadType.INSTANT.value, metadata={"description": ""})
-    sampling_period : int = field(default=0, metadata={"description": "sampling period that specifies the interval the observer thread should run for"})
+    retry_error_nodes : bool = field(init=True, default=False, metadata={"description" : "Statemachine object containing actions and transitions to go through to represent a state machine program flow"})    
+    start_node_id : str = field(init=True, default=None, metadata={"description": "ID of the start node in the statemachine service"})
+    nodes : dict[str, Node] = field(init=True, default_factory=dict[str, Node](), metadata={"description": "dictionary of nodes in the statemachine service"})
+    thread_type : str = field(init=True, default=ThreadType.INSTANT.value, metadata={"description": ""})
+    sampling_period : int = field(init=True, default=0, metadata={"description": "sampling period that specifies the interval the observer thread should run for"})
     
     def __init__(self):
         super().__init__()

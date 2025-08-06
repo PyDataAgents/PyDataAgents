@@ -19,9 +19,9 @@ class ConfigureElementAction(GrabberNode, BufferNode):
         StatemachineException: if an error occurs during execute
     """
     
-    option : str = field(default=None, metadata={"description": "option to configure with new value"})
-    element_id : str = field(default=None, metadata={"description": "id of the element to change the option for"})
-    n : int = field(default=1, metadata={"description": "specifies the number of samples to remove from buffer"})
+    option : str = field(init=True, default=None, metadata={"description": "option to configure with new value"})
+    element_id : str = field(init=True, default=None, metadata={"description": "id of the element to change the option for"})
+    n : int = field(init=True, default=1, metadata={"description": "specifies the number of samples to remove from buffer"})
         
     def __init__(self):
         super().__init__()

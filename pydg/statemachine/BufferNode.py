@@ -7,7 +7,7 @@ from .StatemachineException import StatemachineException
 @dataclass
 class BufferNode(Node):
     
-    buffer_id : str = field(default=None, metadata={"description": "unique ID of the buffer"})
+    buffer_id : str = field(init=True, default=None, metadata={"description": "unique ID of the buffer"})
     
     def __init__(self):
         super().__init__()
