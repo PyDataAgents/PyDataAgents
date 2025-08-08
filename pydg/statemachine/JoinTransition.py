@@ -11,4 +11,5 @@ class JoinTransition(Transition):
         for node in self.parents:
             if not node.id in self.visited_from_parents:
                 return False
+        self.visited_from_parents.clear()
         return True
