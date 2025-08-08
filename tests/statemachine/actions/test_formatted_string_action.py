@@ -1,6 +1,6 @@
 from pydg.buffers.DictBuffer import DictBuffer
 from pydg.statemachine.actions.buffers.FormattedStringAction import FormattedStringAction
-from pydg.statemachine.actions.buffers.InputBufferAction import InputBufferAction
+from pydg.statemachine.actions.buffers.LinkBufferAction import LinkBufferAction
 
 
 def test_000():
@@ -19,13 +19,13 @@ def test_010():
     buf.push({"name": "Joe", "town": "Berlin"})
     buf.push({"name": "John", "town": "Amsterdam"})
     
-    iba = InputBufferAction()
-    iba.buffer = buf
+    lba = LinkBufferAction()
+    lba.buffer = buf
     
     fsa = FormattedStringAction()
     fsa.data_keys = ["name", "town"]
     fsa.template = "Hi {}, are you from {}"
-    fsa.parents = [iba]
+    fsa.add_parent(lba)
     
     fsa.install()
     
