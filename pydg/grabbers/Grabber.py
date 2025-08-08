@@ -4,8 +4,8 @@ from dataclasses import dataclass
 import time
 from loguru import logger
 
-from ..statemachine.Node import Node
 from ..statemachine.StatemachineService import StatemachineService
+from ..statemachine.Node import Node
 from .GrabberElement import GrabberElement
 from ..mappings.MappingThread import MappingThread
 

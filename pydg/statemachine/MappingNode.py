@@ -8,7 +8,7 @@ from .StatemachineException import StatemachineException
 @dataclass
 class MappingNode(Node):
     
-    mapping_id: str = field(default=None, metadata={"description": "ID of the mapping"})    
+    mapping_id: str = field(init=True, default=None, metadata={"description": "ID of the mapping"})    
     
     def __init__(self):
         super().__init__()

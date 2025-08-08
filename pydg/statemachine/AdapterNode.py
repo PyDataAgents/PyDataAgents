@@ -11,7 +11,7 @@ class AdapterNode(BufferNode):
     It inherits from BufferNode to manage buffers and provides methods to interact with the adapter.
     """
     
-    adapter_id: str = field(default=None, metadata={"description": "ID of the adapter"})
+    adapter_id: str = field(init=True, default=None, metadata={"description": "ID of the adapter"})
 
     def __init__(self):
         super().__init__()

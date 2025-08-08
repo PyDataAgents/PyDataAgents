@@ -12,7 +12,7 @@ class ServiceNode(Node):
     Inherits from Node and adds functionality specific to service nodes.
     """
     
-    service_id: str = field(default=None, metadata={"description": "ID of the service"})
+    service_id: str = field(init=True, default=None, metadata={"description": "ID of the service"})
 
     def __init__(self):
         """

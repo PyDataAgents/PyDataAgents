@@ -9,6 +9,7 @@ class GrabberConfig:
     """
     Configuration class for the Grabber application.
     """
+            
 
     def __init__(self, grabber : Grabber = None):
         self.grabber_config = dict()

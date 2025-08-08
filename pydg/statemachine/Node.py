@@ -6,7 +6,7 @@ from .State import State
 @dataclass
 class Node(GrabberElement):
     
-    child_ids : list[str] = field(default_factory=list(), metadata={"description" : "List of child node IDs"})
+    child_ids : list[str] = field(init=True, default_factory=list, metadata={"description" : "List of child node IDs"})
     
     def __init__(self):
         super().__init__()
