@@ -14,8 +14,8 @@ class AdsAdapter(ReadAdapter, WriteAdapter):
     ams_net_id : str = field(default=None, metadata = {"description": "AMS Net Id to connect to for ADS Connection"})
     twincat : int = field(default=3, metadata = {"description": "Twincat version to use, e.g. 2 or 3 for TwinCAT 2/3"})
     
-    def __init__(self):
-        super().__init__()
+    def __post_init__(self):
+        super().__post_init__()
         self.ads_client : pyads.Connection = None
     
     def connect(self) -> bool:

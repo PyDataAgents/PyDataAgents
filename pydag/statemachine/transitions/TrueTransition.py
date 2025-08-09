@@ -7,8 +7,5 @@ class TrueTransition(Transition):
     This is used to test the statemachine without any conditions.
     """
 
-    def __init__(self):
-        super().__init__()
-
     def check(self) -> bool:
         return True  # Always returns True

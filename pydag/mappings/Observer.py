@@ -3,10 +3,7 @@ from ..agents.AgentElement import AgentElement
 
 
 class Observer(AgentElement):
-    
-    def __init__(self):
-        super().__init__()
-                
+                    
     @abstractmethod
     def observe(self):
         pass

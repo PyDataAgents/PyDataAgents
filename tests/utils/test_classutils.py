@@ -1,3 +1,4 @@
+from pydag.adapters.csv.CsvReadAdapter import CsvReadAdapter
 from pydag.agents.AgentElement import AgentElement
 from pydag.utils.ClassUtils import ClassUtils
 
@@ -14,3 +15,6 @@ def test_010():
     ClassUtils.set_property(ge, "id", "test_id")
     
     print(ge)
+    
+def test_020():
+    print(ClassUtils.get_superclasses(CsvReadAdapter))

@@ -109,3 +109,10 @@ def test_021():
             i = i + 1
     else:
         assert False, "adapter did not connect"
+        
+        
+def test_030():
+    
+    a1 = CsvReadAdapter(has_header=False)
+    
+    print(a1.config_options())

@@ -18,8 +18,8 @@ if TYPE_CHECKING:
 @dataclass
 class Agent(AgentElement):
         
-    def __init__(self):
-        super().__init__()
+    def __post_init__(self):
+        super().__post_init__()
         self.buffer_store : dict[str, Buffer] = dict()
         self.adapter_store : dict[str, Adapter] = dict()
         self.mapping_store : dict[str, MappingThread] = dict()

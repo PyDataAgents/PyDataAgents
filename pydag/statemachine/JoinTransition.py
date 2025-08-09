@@ -3,8 +3,8 @@ from .Transition import Transition
 
 class JoinTransition(Transition):
     
-    def __init__(self):
-        super().__init__()
+    def __post_init__(self):
+        super().__post_init__()
         self.visited_from_parents : dict[str, str] = dict()
         
     def check(self) -> bool:

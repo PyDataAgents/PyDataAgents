@@ -9,8 +9,8 @@ class ListBuffer(Buffer):
     """buffer that stores its values in a capacity limited list
     """
 
-    def __init__(self):
-        super().__init__()        
+    def __post_init__(self):
+        super().__post_init__()        
         self.elements = list()
         self.lock = threading.RLock()
 

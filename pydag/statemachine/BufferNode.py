@@ -9,8 +9,8 @@ class BufferNode(Node):
     
     buffer_id : str = field(init=True, default=None, metadata={"description": "unique ID of the buffer"})
     
-    def __init__(self):
-        super().__init__()
+    def __post_init__(self):
+        super().__post_init__()
         self.buffer : Buffer = None  # Placeholder for the buffer instance
         
     def install(self, agent : Agent = None):

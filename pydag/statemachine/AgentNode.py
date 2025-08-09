@@ -5,8 +5,8 @@ from .Node import Node
 @dataclass
 class AgentNode(Node):
     
-    def __init__(self):
-        super().__init__()
+    def __post_init__(self):
+        super().__post_init__()
         self.agent : Agent = None  # Placeholder for the agent instance
         
     def install(self, agent : Agent = None):

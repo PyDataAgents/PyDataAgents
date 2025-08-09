@@ -17,8 +17,8 @@ class S7Adapter(ReadAdapter, WriteAdapter):
     rack : int = field(default=0, metadata={"description": "The rack number of the S7 PLC."})
     slot : int = field(default=1, metadata={"description": "The slot number of the S7 PLC."})
         
-    def __init__(self):
-        super().__init__()
+    def __post_init__(self):
+        super().__post_init__()
         self.client : snap7.client.Client = None  # Placeholder for S7 client initialization
 
     def connect(self) -> bool:

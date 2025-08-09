@@ -17,8 +17,8 @@ class FileWatchdogService(Service):
     recursive : bool = field(default=True, metadata={"description" : "specifies whether to watch subdirectories as well"})
     buffer_id : str = field(default=None, metadata={"description": "Buffer ID of the buffer to store the file events into, the id specified must exist amongst buffers"})
         
-    def __init__(self):
-        super().__init__()
+    def __post_init__(self):
+        super().__post_init__()
         self.observers : list[Observer] = list()
         self.file_event_buffer : DictBuffer = None
     

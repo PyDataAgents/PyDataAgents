@@ -16,8 +16,8 @@ class SQLAdapter(ReadAdapter, WriteAdapter):
 
     connection_str : str = field(default=None, metadata={"description": "connection string for the specific SQL database"})
 
-    def __init__(self):
-        super().__init__()
+    def __post_init__(self):
+        super().__post_init__()
         self.connection = None
         self.cursor = None
         self.LOGGER.debug(pyodbc.drivers())

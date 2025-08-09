@@ -71,3 +71,7 @@ class ClassUtils:
             if f.default is not MISSING or f.default_factory is not MISSING
         ]
         return dataclass_fields
+    
+    @staticmethod
+    def get_superclasses(clazz) -> list:
+        return [class_.__name__ for class_ in clazz.__mro__]

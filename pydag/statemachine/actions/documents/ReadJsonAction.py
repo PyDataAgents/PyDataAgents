@@ -12,9 +12,6 @@ class ReadJsonAction(BufferNode, Action):
     file_path : str = field(default=None, metadata={"description" : "path to the json file to read the data from"})
     json_path : str = field()
     
-    def __init__(self):
-        super().__init__()
-        
     def execute(self):
         with open(self.file_path) as json_data:
             d = json.loads(json_data)

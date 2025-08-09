@@ -11,10 +11,7 @@ class ObjectTransformation(AgentElement):
     """
     
     datatype : str = field(default=DataType.FLOAT.value, metadata={"description": "type of data expected for the transform"})
-    
-    def __init__(self):
-        super().__init__()
-        
+            
     def install(self, agent : Agent = None):
         pass
     

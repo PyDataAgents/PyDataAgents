@@ -13,12 +13,6 @@ class AddBufferAction(AgentNode, Action):
     
     config : dict = field(default=None, metadata={"description": "Configuration for the buffer to be added."})
 
-    def __init__(self):
-        """
-        Initialize the AddBufferAction with a agent node and buffer name.
-        """
-        super().__init__()
-
     def execute(self):
         """
         Execute the action to add a buffer to the agent node.

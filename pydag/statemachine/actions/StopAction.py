@@ -5,10 +5,7 @@ class StopAction(Action):
     """
     An action that stops the state machine.
     """
-
-    def __init__(self):
-        super().__init__()
-
+    
     def execute(self):
         """
         Execute the stop action.

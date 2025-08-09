@@ -10,9 +10,6 @@ class TransformsBuffer(ListBuffer):
     """
     
     transformations : list[ObjectTransformation] = field(default=[], metadata = {"description": "List of transformations to apply to the data"})
-
-    def __init__(self):
-        super().__init__()
         
     def push(self, elements : list):
         transformed_elements = elements

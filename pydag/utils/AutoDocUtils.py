@@ -20,6 +20,7 @@ class_hierarchy: Dict[str, List[str]] = {}
 class_defs: Dict[str, ast.ClassDef] = {}
 class_modules: Dict[str, Path] = {}
 class_filepaths: Dict[str, str] = {}
+classes_fully_qualified : Dict[str, str] = {}
 
 def get_full_name(node):
     """Extract the name from ast.Name or ast.Attribute nodes."""
@@ -41,6 +42,8 @@ def extract_class_info(file_path: Path, base_dir : Path):
             class_defs[class_name] = item
             class_modules[class_name] = file_path.relative_to(base_dir)
             class_filepaths[class_name] = str(file_path)
+            fully_qualified_class = str(file_path).replace("\\", ".").replace("/", ".").replace(".py", "")
+            classes_fully_qualified[class_name] = fully_qualified_class
 
 def inherits_from_type(cls_name: str, type : str, seen: Set[str] = None) -> bool:
     """Recursively check if a class inherits from type."""
@@ -57,6 +60,17 @@ def inherits_from_type(cls_name: str, type : str, seen: Set[str] = None) -> bool
         if base in class_hierarchy:
             if inherits_from_type(base, type, seen):
                 return True
+            
+    # check via classes_fully_qualified
+    if cls_name in classes_fully_qualified:
+        full_class_name = classes_fully_qualified[cls_name]
+        #print(full_class_name)
+        clazz = ClassUtils.create_class(full_class_name)
+        superclasses = ClassUtils.get_superclasses(clazz)
+        if type in superclasses:
+            return True
+        #print(superclasses)            
+
     return False
 
 def inherits_from_types(class_name: str, types: List[str], seen: Set[str] = None) -> bool:

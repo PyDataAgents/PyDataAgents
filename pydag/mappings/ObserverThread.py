@@ -10,11 +10,9 @@ class ObserverThread(AgentElement):
     SAFETY_DIFF_TIME_UNITS : int = 1
     SLEEP_WITH_HOLD_FACTOR : float = 0.9
      
-    def __init__(self, id, thread_type : ThreadType, sampling_period : int):
-        super().__init__(id)
+    def __post_init__(self):
+        super().__post_init__()
         self.thread : threading.Thread = None
-        self.thread_type = thread_type
-        self.sampling_period = sampling_period
         self.observers : list[Observer] = list()
         self.is_running = False
         

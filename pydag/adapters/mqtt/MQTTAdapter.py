@@ -21,8 +21,8 @@ class MQTTAdapter(SubscribeAdapter, WriteAdapter):
     retain : bool = field(default=False, metadata={"description": "specifies whether messages should be retained on publishing"})
     qos : int = field(default=0, metadata={"description": "quality of service parameter of mqtt publish"})
     
-    def __init__(self):
-        super().__init__()
+    def __post_init__(self):
+        super().__post_init__()
         self.client : mqtt.Client = None
     
     def connect(self) -> bool:

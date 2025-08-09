@@ -14,9 +14,6 @@ class AdapterWriteAction(AdapterNode, Action):
     n : int = field(default=1, metadata={"description": "The number of samples to read."})
     persistent : bool = field(default=False, metadata={"description": "If True, the data will be stored in a persistent buffer."})
     
-    def __init__(self):
-        super().__init__()
-
     def execute(self):
         """
         Execute the read action on the adapter.

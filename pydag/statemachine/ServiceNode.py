@@ -14,14 +14,14 @@ class ServiceNode(Node):
     
     service_id: str = field(init=True, default=None, metadata={"description": "ID of the service"})
 
-    def __init__(self):
+    def __post_init__(self):
         """
         Initializes the ServiceNode with a name and a service.
 
         :param name: The name of the service node.
         :param service: The service associated with this node.
         """
-        super().__init__()
+        super().__post_init__()
         self.service = None
         
     def install(self, agent : Agent = None):

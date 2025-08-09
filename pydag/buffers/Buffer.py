@@ -31,8 +31,8 @@ class Buffer(AgentElement):
     unit : any = field(default=None, metadata={"description": "unit of element values in this buffer, can be string or list of strings"})
     description : str = field(default=None, metadata={"description": "buffer description"})
 
-    def __init__(self):
-        super().__init__()
+    def __post_init__(self):
+        super().__post_init__()
         self.elements = any
 
     @abstractmethod

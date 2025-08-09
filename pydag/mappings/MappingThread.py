@@ -14,13 +14,13 @@ if TYPE_CHECKING:
 
 class MappingThread(AgentElement):
     
-    def __init__(self, mapping : Mapping):
-        super().__init__()
+    def __post_init__(self, mapping : Mapping):
+        super().__post_init__()
         self.mapping : Mapping = mapping
         self.observer_thread : ObserverThread = None
         
     def start(self, agent : Agent):
-        self.observer_thread = ObserverThread(ObserverThread.unique_id(), self.mapping.thread_type, self.mapping.sampling_period)
+        self.observer_thread = ObserverThread(id=ObserverThread.unique_id(), thread_type=self.mapping.thread_type, sampling_period=self.mapping.sampling_period)
         # assemble adapters and buffers from agent
         if self.mapping.adapter is None and len(self.mapping.buffers) == 0:
             for buffer_id in self.mapping.buffer_ids:

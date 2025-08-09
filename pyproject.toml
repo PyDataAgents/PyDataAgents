@@ -34,7 +34,6 @@ dependencies = [
     "APScheduler",
     "websocket-client",
     "selenium",
-    "requests_ntlm",
     "openpyxl",
     "pyodbc",
     "pypdf",

@@ -21,8 +21,8 @@ class CsvWriteAdapter(WriteAdapter):
     delimiter : str = field(default=";", metadata={"description": "delimiter to use for column separation"})
     decimal_precision : int = field(default=3, metadata={"description": "maximum decimal precision of numeric values"})
     
-    def __init__(self):
-        super().__init__()
+    def __post_init__(self):
+        super().__post_init__()
         self.csv_file = None
         self.csv_writer = None
         self.rows : int = 0

@@ -25,8 +25,8 @@ class StatemachineService(Service):
     thread_type : str = field(init=True, default=ThreadType.INSTANT.value, metadata={"description": ""})
     sampling_period : int = field(init=True, default=0, metadata={"description": "sampling period that specifies the interval the observer thread should run for"})
     
-    def __init__(self):
-        super().__init__()
+    def __post_init__(self):
+        super().__post_init__()
         self.observer_thread : ObserverThread = None
         self.nodes : dict[str, Node] = dict()
         self.actions : dict[str, Action] = dict()

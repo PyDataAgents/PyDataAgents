@@ -15,7 +15,8 @@ class WebSocketAdapter(WriteAdapter, SubscribeAdapter):
     
     url : str = field(default=None, metadata={"description":"socket url, e.g. wss://localhost:10001"})
     
-    def __init__(self):
+    def __post_init__(self):
+        super().__post_init__
         self.socket : websocket.WebSocketApp = None
         self.thread : threading.Thread = None
         

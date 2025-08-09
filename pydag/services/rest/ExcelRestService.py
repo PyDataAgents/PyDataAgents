@@ -20,8 +20,8 @@ class ExcelRestService(RestService):
     
     excel_file : str = field(default=None, metadata={"description" : "path of the excel file to open for tables"})
            
-    def __init__(self):
-        super().__init__()
+    def __post_init__(self):
+        super().__post_init__()
         self.named_tables : dict[str, DictBuffer] = dict()
         
     def install(self, agent : Agent = None):

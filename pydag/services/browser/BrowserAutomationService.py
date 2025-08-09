@@ -7,8 +7,8 @@ class BrowserAutomationService(Service):
     
     browser_type : str = field(default="EDGE", metadata={"description": "type of browser, EDGE | FIREFOX | CHROME"})
     
-    def __init__(self):
-        super().__init__()
+    def __post_init__(self):
+        super().__post_init__()
         self.driver : webdriver.Edge = None
         
     def start(self):

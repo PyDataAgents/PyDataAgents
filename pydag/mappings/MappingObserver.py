@@ -11,8 +11,8 @@ class MappingObserver(Observer):
     """abstract base class for mapping observers
     """
     
-    def __init__(self, mapping : Mapping):
-        super().__init__()
+    def __post_init__(self, mapping : Mapping):
+        super().__post_init__()
         self.mapping : Mapping = mapping
         self.check_mapping()
     

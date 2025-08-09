@@ -25,8 +25,8 @@ class CsvReadAdapter(ReadAdapter):
     auto_detect : bool = field(default=False, metadata={"description": "specifies whether to use the csv sniffing option"})
     force_numeric : bool = field(default=True, metadata={"description": "forces numeric parsing of data"})
     
-    def __init__(self):
-        super().__init__()
+    def __post_init__(self):
+        super().__post_init__()
         self.csv_file = None
         self.csv_reader = None
         self.headers = list()

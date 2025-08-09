@@ -15,8 +15,8 @@ class StatemachineObserver(Observer):
     This observer is be used to start the statemachine in a separate thread
     """
         
-    def __init__(self, statemachine: StatemachineService):
-        super().__init__()
+    def __post_init__(self, statemachine: StatemachineService):
+        super().__post_init__()
         self.statemachine = statemachine
 
     def observe(self):

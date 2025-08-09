@@ -22,13 +22,13 @@ class DocumentTextAdapter(ReadAdapter):
     
     """
     
-    file_path : str = field(default=None, metadata={"the path to a file or a folder, that shall be screened for document texts"})
+    file_path : str = field(default=None, metadata={"description": "the path to a file or a folder, that shall be screened for document texts"})
+            
+    def connect(self) -> bool:        
+        return FileUtils.exists_file(self.file_path)
     
-    def __init__(self):
-        super().__init__()
-        
-    def connect(self) -> bool:
-        pass
+    def disconnect(self) -> bool:
+        return True
     
     def read_from_source(self, buffers : dict[str, Buffer], addresses : list[str], n : int = 0):
         if len(buffers) == 1 and addresses is None and self.file_path is not None:

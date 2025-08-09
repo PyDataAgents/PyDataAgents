@@ -10,8 +10,8 @@ class DictBuffer(Buffer):
     """buffer that stores its values in a dictionary in a table like fashion, where every key contains a list of data
     """
         
-    def __init__(self):
-        super().__init__()
+    def __post_init__(self):
+        super().__post_init__()
         self.elements : dict[list] = dict()
         self.lock = threading.RLock()
 

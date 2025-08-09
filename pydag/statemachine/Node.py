@@ -8,8 +8,8 @@ class Node(AgentElement):
     
     child_ids : list[str] = field(init=True, default_factory=list, metadata={"description" : "List of child node IDs"})
     
-    def __init__(self):
-        super().__init__()
+    def __post_init__(self):
+        super().__post_init__()
         self.parents : list[Node] = list()
         self.children : list[Node] = list()
         self.state : State = State.INACTIVE

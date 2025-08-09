@@ -10,8 +10,8 @@ class MappingNode(Node):
     
     mapping_id: str = field(init=True, default=None, metadata={"description": "ID of the mapping"})    
     
-    def __init__(self):
-        super().__init__()
+    def __post_init__(self):
+        super().__post_init__()
         self.mapping_thread : MappingThread = None
         
     def install(self, agent : Agent = None):

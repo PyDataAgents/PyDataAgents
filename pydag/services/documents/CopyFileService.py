@@ -21,8 +21,8 @@ class CopyFileService(Service):
     older_than_milliseconds : int = field(default=None, metadata={"description": "If set, only files older than this time will be copied or moved."})
     interval : int = field(default=60*60*24, metadata={"description": "Interval in seconds to check for new files."})
     
-    def __init__(self):
-        super().__init__()
+    def __post_init__(self):
+        super().__post_init__()
         self.service_thread = None
         
     def start(self):

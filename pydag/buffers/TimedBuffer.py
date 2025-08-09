@@ -11,8 +11,8 @@ class TimedBuffer(ListBuffer):
     Inherits from ListBuffer.
     """
     
-    def __init__(self):
-        super().__init__()
+    def __post_init__(self):
+        super().__post_init__()
         self.timestamps = []  # List to store timestamps corresponding to the data
    
     def push(self, elements : list):

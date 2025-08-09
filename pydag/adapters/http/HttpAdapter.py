@@ -17,8 +17,8 @@ class HttpAdapter(ReadAdapter, WriteAdapter):
     headers : dict[str] = field(default=None, metadata={"description": "headers to be used in the HTTP requests, e.g. {'Content-Type': 'application/json', 'Authorization' : 'Bearer token'}"})
     json_path : bool = field(default=False, metadata={"description": "if True, the response data is expected to be in JSON format and will be parsed accordingly to specification in address"})
     
-    def __init__(self):
-        super().__init__()
+    def __post_init__(self):
+        super().__post_init__()
         self.http : urllib3.PoolManager = None
         
     def connect(self) -> bool:

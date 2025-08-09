@@ -13,10 +13,7 @@ class ListFilesAction(BufferNode, Action):
     extension : str = field(default=None, metadata={"description": "extension to include"})
     newer_than_seconds : int = field(default=None, metadata={"description": "specifies how old in seconds a file can be to be included"})
     recursive : bool = field(default=False, metadata={"description": "specifies whether to search subdirectories aswell"})
-    
-    def __init__(self):
-        super().__init__()
-        
+            
     def execute(self):
         if FileUtils.exists_folder(self.folder):
             if isinstance(self.buffer, ListBuffer):

@@ -6,9 +6,6 @@ from .BrowserAutomationAction import BrowserAutomationAction
 class BrowserUrlNavigateAction(BrowserAutomationAction):
     
     url : str = field(default=None, metadata={"description" : "url to navigate to in browser"})
-    
-    def __init__(self):
-        super().__init__()
-           
+               
     def execute(self):
         self.service.driver.get(self.url)

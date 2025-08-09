@@ -38,15 +38,13 @@ class AgentElement(ABC):
     TYPE = "type"
     ID = "id"
         
-    def __init__(self, id : str = None):
+    def __post_init__(self):
         """
         Initialize the agent element and assign a unique ID.
         """
-        self.type = self.__module__
-        if id is None:            
-            self.id = self.unique_id()
-        else:
-            self.id = id       
+        self.type = self.__module__                   
+        if self.id is None: 
+            self.id = self.unique_id()       
         
     def name(self) -> str:
         s = self.__class__.__name__ + "[" + self.id + "]"

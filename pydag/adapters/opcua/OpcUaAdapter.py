@@ -12,8 +12,8 @@ class OpcUaAdapter(ReadAdapter, WriteAdapter):
     
     endpoint : str = field(default=None, metadata={"description" : "endpoint of the opc ua server, e.g. opc.tcp://localhost:48010"})
     
-    def __init__(self):
-        super().__init__()
+    def __post_init__(self):
+        super().__post_init__()
         self.opc_client : Client = None
     
     def connect(self) -> bool:

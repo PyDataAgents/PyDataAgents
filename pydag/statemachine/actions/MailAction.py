@@ -19,9 +19,6 @@ class MailAction(Action):
     body : str = field(init=True, default=None,  metadata={"description": "body of the mail"})
     tls : bool = field(init=True, default=True, metadata={"description": "use TLS for the connection"})
     
-    def __init__(self):
-        super().__init__()
-        
     def execute(self):
         # Create message
         message = MIMEMultipart("alternative")

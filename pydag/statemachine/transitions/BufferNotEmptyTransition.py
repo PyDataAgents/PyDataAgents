@@ -10,9 +10,6 @@ class BufferNotEmptyTransition(BufferNode, Transition):
     If the buffer is not empty, the transition is successful.
     """
     
-    def __init__(self):
-        super().__init__()
-    
     def check(self) -> bool:
         if len(self.buffer) > 0:
             return True

@@ -13,8 +13,8 @@ class AudioAdapter(SubscribeAdapter):
     sample_rate : int = field(default=44_100, metadata={"description": "sample rate of audio channel, usually 44100 Hz"})
     device : int = field(default=None, metadata={"description": "device number to use as input stream, if nothing is specified the default device is used"})
 
-    def __init__(self):
-        super().__init__()
+    def __post_init__(self):
+        super().__post_init__()
         self.subscribing = False
 
     def connect(self) -> bool:

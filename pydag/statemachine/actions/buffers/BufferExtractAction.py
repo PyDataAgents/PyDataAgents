@@ -14,10 +14,7 @@ class BufferExtractAction(BufferNode, Action):
     """
     
     extract_keys : list[str] = field(default_factory=list, metadata={"description": "keys to search for in the parent buffers and extract their values into this element's buffer"})
-    
-    def __init__(self):
-        super().__init__()
-        
+            
     def execute(self):
         for parent in self.parents:
             if not isinstance(parent, BufferNode):

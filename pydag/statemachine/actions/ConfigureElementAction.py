@@ -23,9 +23,6 @@ class ConfigureElementAction(AgentNode, BufferNode):
     element_id : str = field(init=True, default=None, metadata={"description": "id of the element to change the option for"})
     n : int = field(init=True, default=1, metadata={"description": "specifies the number of samples to remove from buffer"})
         
-    def __init__(self):
-        super().__init__()
-    
     def install(self, agent : Agent = None):
         AgentNode.install(self, agent)
         BufferNode.install(self, agent)

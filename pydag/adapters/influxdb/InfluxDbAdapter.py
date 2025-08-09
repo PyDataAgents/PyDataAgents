@@ -26,8 +26,8 @@ class InfluxDbAdapter(ReadAdapter, WriteAdapter):
     token : str = field(default=None, metadata={"description": "The authentication token for InfluxDB."})
     org : str = field(default="my-org", metadata={"description": "The organization name in InfluxDB."})
 
-    def __init__(self):
-        super().__init__()
+    def __post_init__(self):
+        super().__post_init__()
         self.client : influxdb_client.InfluxDBClient = None  # Placeholder for InfluxDB client initialization
 
     def connect(self) -> bool:

@@ -19,10 +19,7 @@ class FormattedStringAction(BufferNode, Action):
     
     data_keys : list[str] = field(default_factory=list, metadata={"description": "list of keys to use to compose the formatted string"})
     template : str = field(default=None, metadata={"description": "string template to insert the data from the parent buffer into, e.g. 'Hi {}, are you from {}'"})
-    
-    def __init__(self):
-        super().__init__()
-        
+            
     def install(self, agent : Agent = None):
         if self.buffer is None:
             if agent is not None:

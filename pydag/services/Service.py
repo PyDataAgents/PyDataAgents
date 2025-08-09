@@ -11,8 +11,8 @@ class Service(AgentElement):
     """abstract base class for agent Services
     """
     
-    def __init__(self):
-        super().__init__()
+    def __post_init__(self):
+        super().__post_init__()
         self.is_running : bool = False
         self.agent : Agent = None
     

@@ -20,6 +20,6 @@ class Mapping(AgentElement):
     auto_start : bool = field(default=True, metadata={"description": "specifies whether to start the mapping with agent start"})
     
     def __post_init__(self):
-        super().__init__()
+        super().__post_init__()
         self.buffers : dict[str, Buffer] = dict()
         self.adapter : Adapter = None        

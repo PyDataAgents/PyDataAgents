@@ -9,10 +9,7 @@ from ....utils.FileUtils import FileUtils
 class CopyFilesAction(BufferNode, Action):
     
     target_folder : str = field(default=None, metadata={"description": "target folder to copy all the files to in Buffer"})
-    
-    def __init__(self):
-        super().__init__()        
-        
+           
     def execute(self):
         if FileUtils.exists_folder(self.target_folder):
             if isinstance(self.buffer, ListBuffer):

@@ -10,9 +10,6 @@ class MoveFilesAction(BufferNode, Action):
     
     target_folder : str = field(default=None, metadata={"description": "target folder to move all the files to in Buffer"})
     
-    def __init__(self):
-        super().__init__()        
-        
     def execute(self):
         if FileUtils.exists_folder(self.target_folder):
             if isinstance(self.buffer, ListBuffer):

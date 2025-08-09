@@ -17,8 +17,8 @@ class RestService(Service):
     
     port : int = field(default=8001, metadata={"description": "port of the REST API endpoint"})
             
-    def __init__(self):
-        super().__init__()
+    def __post_init__(self):
+        super().__post_init__()
         self.app : FastAPI = None
         self.service_thread : threading.Thread = None
         

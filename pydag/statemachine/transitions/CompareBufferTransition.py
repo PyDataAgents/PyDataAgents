@@ -14,10 +14,6 @@ class CompareBufferTransition(BufferNode, Transition):
     comparator : str = field(default=None, metadata={"description": "The comparison operator to use."})
     value : any = field(default=None, metadata={"description": "The value to compare against the buffer."})
 
-    def __init__(self, target_value):
-        super().__init__()
-        self.target_value = target_value
-
     def check(self):
         data = self.buffer.data(1, True)
         match self.comparator:

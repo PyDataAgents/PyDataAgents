@@ -19,8 +19,8 @@ class SignalBuffer(TimedBuffer):
     signal : Signal = field(default=None, metadata={"description": "a signal object to simulate data"})
     sampling_period : int = field(default=100, metadata={"description": "interval in milliseconds for update"})
 
-    def __init__(self):
-        super().__init__()
+    def __post_init__(self):
+        super().__post_init__()
         self.scheduler : BackgroundScheduler = None        
 
     def install(self, agent : Agent = None):

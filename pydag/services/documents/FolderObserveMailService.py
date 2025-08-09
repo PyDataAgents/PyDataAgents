@@ -37,8 +37,8 @@ class FolderObserveMailService(Service):
     
     MAX_FILES : int = 50  # Maximum number of files to list in the mail body
         
-    def __init__(self):
-        super().__init__()
+    def __post_init__(self):
+        super().__post_init__()
         self.file_history_buffer : DictBuffer = None
         self.service_thread : ObserverThread = None
         

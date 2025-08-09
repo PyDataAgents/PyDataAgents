@@ -13,9 +13,6 @@ class ReadCsvAction(BufferNode, Action):
     file_path : str = field(default=None, metadata={"description" : "path to the csv file to read the data from"})
     delimiter : str = field(default=";", metadata={"description" : "delimiter character(s) for this csv file"})
     
-    def __init__(self):
-        super().__init__()
-             
     def execute(self):
         with open(self.file_path, 'r') as csv_file:
             csv_sample = csv_file.read(1024)

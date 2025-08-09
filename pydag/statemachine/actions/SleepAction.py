@@ -11,9 +11,6 @@ class SleepAction(Action):
     
     sleep_time : int = field(init=True, default=0, metadata={"description" : "number of seconds to sleep for"})
 
-    def __init__(self):
-        super().__init__()
-
     def execute(self):
         print(f"Sleeping for {self.sleep_time} seconds")
         time.sleep(self.sleep_time)

@@ -4,8 +4,8 @@ from .Service import Service
 
 class PlotService(Service):
     
-    def __init__(self):
-        super().__init__()
+    def __post_init__(self):
+        super().__post_init__()
         self.app : dash.Dash = None
     
     def start(self):

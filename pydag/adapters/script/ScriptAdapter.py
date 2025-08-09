@@ -13,10 +13,7 @@ class ScriptAdapter(ReadAdapter):
     """
     
     script_path : str = field(default=None, metadata={"description" : "path to the script to load and execute"})
-    
-    def __init__(self):
-        super().__init__()
-        
+            
     def connect(self) -> bool:
         return FileUtils.exists_file(self.script_path)
     
