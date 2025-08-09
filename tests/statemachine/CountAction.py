@@ -1,4 +1,4 @@
-from pydg.statemachine.Action import Action
+from pydag.statemachine.Action import Action
 
 
 class CountAction(Action):

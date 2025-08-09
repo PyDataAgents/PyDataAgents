@@ -1,0 +1,6 @@
+grabber:
+  adapters:
+    -
+      type: pydag.adapters.opcua.OpcUaAdapter
+      id: OPC1
+      endpoint: opc.tcp://jh:48010

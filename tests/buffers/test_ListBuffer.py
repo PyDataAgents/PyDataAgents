@@ -1,4 +1,4 @@
-from pydg.buffers.ListBuffer import ListBuffer
+from pydag.buffers.ListBuffer import ListBuffer
 
 def test_000():
     buf1 = ListBuffer()

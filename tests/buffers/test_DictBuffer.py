@@ -1,4 +1,4 @@
-from pydg.buffers.DictBuffer import DictBuffer
+from pydag.buffers.DictBuffer import DictBuffer
 
 def test_000():
     buf = DictBuffer()

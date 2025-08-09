@@ -1,4 +1,4 @@
-from pydg.mappings.Mapping import Mapping
+from pydag.mappings.Mapping import Mapping
 
 
 def test_000():

@@ -1,11 +1,11 @@
 import configparser
 import time
 
-from pydg.adapters.influxdb.InfluxDbAdapter import InfluxDbAdapter
-from pydg.buffers.SignalBuffer import SignalBuffer
-from pydg.buffers.signals.Sine import Sine
-from pydg.utils.AdapterUtils import AdapterUtils
-from pydg.utils.BufferUtils import BufferUtils
+from pydag.adapters.influxdb.InfluxDbAdapter import InfluxDbAdapter
+from pydag.buffers.SignalBuffer import SignalBuffer
+from pydag.buffers.signals.Sine import Sine
+from pydag.utils.AdapterUtils import AdapterUtils
+from pydag.utils.BufferUtils import BufferUtils
     
 def test_000():
     

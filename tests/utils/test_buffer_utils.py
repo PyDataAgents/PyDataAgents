@@ -1,6 +1,6 @@
 import os
-from pydg.buffers.DictBuffer import DictBuffer
-from pydg.utils.BufferUtils import BufferUtils
+from pydag.buffers.DictBuffer import DictBuffer
+from pydag.utils.BufferUtils import BufferUtils
 
 
 def test_000():

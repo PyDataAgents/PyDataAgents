@@ -1,5 +1,5 @@
 import configparser
-from pydg.statemachine.actions.MailAction import MailAction
+from pydag.statemachine.actions.MailAction import MailAction
 
 
 def test_000():

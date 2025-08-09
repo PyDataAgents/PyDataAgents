@@ -1,11 +1,11 @@
 from pathlib import Path
 import time
-from pydg.buffers.DataType import DataType
-from pydg.buffers.ListBuffer import ListBuffer
-from pydg.statemachine.StatemachineService import StatemachineService
-from pydg.statemachine.actions.documents.ListFilesAction import ListFilesAction
-from pydg.statemachine.actions.documents.MoveFilesAction import MoveFilesAction
-from pydg.statemachine.actions.SleepAction import SleepAction
+from pydag.buffers.DataType import DataType
+from pydag.buffers.ListBuffer import ListBuffer
+from pydag.statemachine.StatemachineService import StatemachineService
+from pydag.statemachine.actions.documents.ListFilesAction import ListFilesAction
+from pydag.statemachine.actions.documents.MoveFilesAction import MoveFilesAction
+from pydag.statemachine.actions.SleepAction import SleepAction
 
 
 def test000():

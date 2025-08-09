@@ -1,4 +1,4 @@
-from pydg.statemachine.Transition import Transition
+from pydag.statemachine.Transition import Transition
 from tests.statemachine.CountAction import CountAction
 
 

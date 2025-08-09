@@ -1,8 +1,8 @@
 import time
-from pydg.adapters.mqtt.MQTTAdapter import MQTTAdapter
-from pydg.buffers.ListBuffer import ListBuffer
-from pydg.utils.AdapterUtils import AdapterUtils
-from pydg.utils.BufferUtils import BufferUtils
+from pydag.adapters.mqtt.MQTTAdapter import MQTTAdapter
+from pydag.buffers.ListBuffer import ListBuffer
+from pydag.utils.AdapterUtils import AdapterUtils
+from pydag.utils.BufferUtils import BufferUtils
 
 
 def test_000():

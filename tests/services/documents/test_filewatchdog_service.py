@@ -1,6 +1,6 @@
 from pathlib import Path
 import time
-from pydg.services.documents.FileWatchdogService import FileWatchdogService
+from pydag.services.documents.FileWatchdogService import FileWatchdogService
 
 
 def test_000():

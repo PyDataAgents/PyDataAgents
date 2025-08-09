@@ -1,7 +1,7 @@
 import time
-from pydg.adapters.opcua.OpcUaAdapter import OpcUaAdapter
-from pydg.buffers.ListBuffer import ListBuffer
-from pydg.utils.BufferUtils import BufferUtils
+from pydag.adapters.opcua.OpcUaAdapter import OpcUaAdapter
+from pydag.buffers.ListBuffer import ListBuffer
+from pydag.utils.BufferUtils import BufferUtils
 
 def test000():
     """

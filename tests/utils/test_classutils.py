@@ -1,15 +1,15 @@
-from pydg.grabbers.GrabberElement import GrabberElement
-from pydg.utils.ClassUtils import ClassUtils
+from pydag.agents.AgentElement import AgentElement
+from pydag.utils.ClassUtils import ClassUtils
 
 
 def test_000():
     #ge = GrabberElement()
     
-    fields = ClassUtils.get_dataclass_fields(GrabberElement)
+    fields = ClassUtils.get_dataclass_fields(AgentElement)
     print(fields)
     
 def test_010():
-    ge = GrabberElement()
+    ge = AgentElement()
     
     ClassUtils.set_property(ge, "id", "test_id")
     

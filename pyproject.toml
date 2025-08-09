@@ -37,14 +37,6 @@ dependencies = [
     "requests_ntlm",
     "openpyxl",
     "pyodbc",
-    "langchain",
-    "langchain-community",
-    "langchain-chroma",
-    "langchain-huggingface",
-    "langchain-unstructured",
-    "langchain-openai",
-    "langchain-ollama",
-    "sentence-transformers",
     "pypdf",
     "unstructured[all-docs]",
     "watchdog"
@@ -56,6 +48,6 @@ include = ["pydg*"]
 exclude = ["tests"]
 
 [project.urls]
-Documentation = "https://github.com/jhillenbrand/PyDataGrabber"
-Issues = "https://github.com/jhillenbrand/PyDataGrabber"
-Source = "https://github.com/jhillenbrand/PyDataGrabber"
+Documentation = "https://github.com/jhillenbrand/PyDataAgents"
+Issues = "https://github.com/jhillenbrand/PyDataAgents"
+Source = "https://github.com/jhillenbrand/PyDataAgents"

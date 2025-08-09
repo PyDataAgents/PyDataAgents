@@ -1,6 +1,6 @@
-from pydg.buffers.DictBuffer import DictBuffer
-from pydg.statemachine.actions.buffers.FormattedStringAction import FormattedStringAction
-from pydg.statemachine.actions.buffers.LinkBufferAction import LinkBufferAction
+from pydag.buffers.DictBuffer import DictBuffer
+from pydag.statemachine.actions.buffers.FormattedStringAction import FormattedStringAction
+from pydag.statemachine.actions.buffers.LinkBufferAction import LinkBufferAction
 
 
 def test_000():

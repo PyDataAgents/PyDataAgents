@@ -1,4 +1,4 @@
-from pydg.adapters.ads.AdsAdapter import AdsAdapter
+from pydag.adapters.ads.AdsAdapter import AdsAdapter
 
 
 def test000():

@@ -3,9 +3,16 @@ import os
 from pathlib import Path
 from typing import List, Dict, Set
 
-from pydg.grabbers.GrabberElement import GrabberElement
-from pydg.utils.ClassUtils import ClassUtils
-from pydg.utils.TimeUtils import TimeUtils
+from pydag.adapters.Adapter import Adapter
+from pydag.agents.Agent import Agent
+from pydag.agents.AgentElement import AgentElement
+from pydag.buffers.Buffer import Buffer
+from pydag.mappings.Mapping import Mapping
+from pydag.services.Service import Service
+from pydag.statemachine.Action import Action
+from pydag.statemachine.Transition import Transition
+from pydag.utils.ClassUtils import ClassUtils
+from pydag.utils.TimeUtils import TimeUtils
 
 
 # Stores class inheritance and definitions across the codebase
@@ -100,7 +107,7 @@ def extract_fields(class_def: ast.ClassDef) -> List[Dict]:
     fields = []
     
     # always retrieve GrabberElement fields
-    ge_fields = ClassUtils.get_dataclass_fields(GrabberElement)
+    ge_fields = ClassUtils.get_dataclass_fields(AgentElement)
     for ge_field in ge_fields:
         fields.append({
             "name": ge_field.name,
@@ -153,7 +160,7 @@ def scan_repository(base_dir: Path, type : str):
     for py_file in base_dir.rglob("*.py"):
         extract_class_info(py_file, base_dir)
 
-    # Second pass: identify grabber classes
+    # Second pass: identify agent classes
     summary = []
     for class_name, class_def in class_defs.items():
         if inherits_from_type(class_name, type):
@@ -280,22 +287,22 @@ def generate_docs_for_type(name : str, type : str, src_folder : Path, docu_folde
 # Run the whole process
 if __name__ == "__main__":
     
-    # find all grabbers
-    generate_docs_for_type("Grabbers", GrabberElement.cname(), Path("pydg\\grabbers"), Path("docs\\"))
+    # find all agents
+    generate_docs_for_type(Agent.cname() + "s", AgentElement.cname(), Path("pydag\\agents"), Path("docs\\"))
     
     # find all adapters
-    generate_docs_for_type("Adapters", GrabberElement.cname(), Path("pydg\\adapters"), Path("docs\\"))
+    generate_docs_for_type(Adapter.cname() + "s", AgentElement.cname(), Path("pydag\\adapters"), Path("docs\\"))
 
     # find all buffers
-    generate_docs_for_type("Buffers", GrabberElement.cname(), Path("pydg\\buffers"), Path("docs\\"))
+    generate_docs_for_type(Buffer.cname() + "s", AgentElement.cname(), Path("pydag\\buffers"), Path("docs\\"))
 
     # find all mappings
-    generate_docs_for_type("Mappings", GrabberElement.cname(), Path("pydg\\mappings"), Path("docs\\"))
+    generate_docs_for_type(Mapping.cname() + "s", AgentElement.cname(), Path("pydag\\mappings"), Path("docs\\"))
 
     # find all services
-    generate_docs_for_type("Services", GrabberElement.cname(), Path("pydg\\services"), Path("docs\\"))
+    generate_docs_for_type(Service.cname() + "s", AgentElement.cname(), Path("pydag\\services"), Path("docs\\"))
     
     # find Statemachine Nodes
-    generate_docs_for_type("Actions and Transitions", GrabberElement.cname(), Path("pydg\\statemachine"), Path("docs\\"))
+    generate_docs_for_type(Action.cname() + "s and " + Transition.cname() +  "s", AgentElement.cname(), Path("pydag\\statemachine"), Path("docs\\"))
 
 

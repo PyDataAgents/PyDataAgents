@@ -1,4 +1,4 @@
-from pydg.statemachine.actions.StartAction import StartAction
+from pydag.statemachine.actions.StartAction import StartAction
 
 
 def test_000():

@@ -1,4 +1,4 @@
-from pydg.utils.StringUtils import StringUtils
+from pydag.utils.StringUtils import StringUtils
 
 
 def test_000():

@@ -1,5 +1,5 @@
 from pathlib import Path
-from pydg.utils.FileUtils import FileUtils
+from pydag.utils.FileUtils import FileUtils
 
 
 def test_000():    

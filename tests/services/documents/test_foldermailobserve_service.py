@@ -1,11 +1,11 @@
 import configparser
 import time
 from pathlib import Path
-from pydg.grabbers.Grabber import Grabber
-from pydg.grabbers.GrabberConfig import GrabberConfig
-from pydg.grabbers.YAMLConfig import YAMLConfig
-from pydg.services.documents.FolderObserveMailService import FolderObserveMailService
-from pydg.statemachine.actions.MailAction import MailAction
+from pydag.agents.Agent import Agent
+from pydag.agents.AgentConfig import AgentConfig
+from pydag.agents.YAMLConfig import YAMLConfig
+from pydag.services.documents.FolderObserveMailService import FolderObserveMailService
+from pydag.statemachine.actions.MailAction import MailAction
 
 
 def test_000():
@@ -43,7 +43,7 @@ def test_010():
     config = configparser.ConfigParser()
     config.read("config.ini")
     
-    grabber = Grabber()
+    grabber = Agent()
         
     mail_action = MailAction()
     mail_action.id = "TestMailAction"
@@ -65,7 +65,7 @@ def test_010():
     
     grabber.add_service(folder_service)
         
-    gc = GrabberConfig(grabber)
+    gc = AgentConfig(grabber)
     yc = YAMLConfig(str(Path.home() / "Downloads" / "t" / "folder_observe_config.yaml"))
     yc.save(gc)    
     
@@ -76,7 +76,7 @@ def test_020():
     config = configparser.ConfigParser()
     config.read("config.ini")
     
-    grabber = Grabber()
+    grabber = Agent()
     
     mail_action = MailAction()
     mail_action.id = "TestMailAction"
@@ -98,7 +98,7 @@ def test_020():
     
     grabber.add_service(folder_service)
         
-    gc = GrabberConfig(grabber)
+    gc = AgentConfig(grabber)
     yc = YAMLConfig(str(Path.home() / "Downloads" / "t" / "folder_observe_config.yaml"))
     yc.save(gc)    
     

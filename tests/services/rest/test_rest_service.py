@@ -1,12 +1,12 @@
 import time
-from pydg.buffers.DataType import DataType
-from pydg.buffers.SignalBuffer import SignalBuffer
-from pydg.buffers.signals.Sine import Sine
-from pydg.grabbers.Grabber import Grabber
-from pydg.services.rest.RestService import RestService
+from pydag.buffers.DataType import DataType
+from pydag.buffers.SignalBuffer import SignalBuffer
+from pydag.buffers.signals.Sine import Sine
+from pydag.agents.Agent import Agent
+from pydag.services.rest.RestService import RestService
 
 def test_000():
-    grabber = Grabber()
+    grabber = Agent()
     grabber.id = "G1"
     
     s = Sine()
@@ -28,7 +28,7 @@ def test_000():
     grabber.start_blocking()
     
 def test_010():
-    grabber = Grabber()
+    grabber = Agent()
     grabber.id = "G1"
     
     s = Sine()

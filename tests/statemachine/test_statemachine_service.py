@@ -1,13 +1,13 @@
 import os
-from pydg.grabbers.Grabber import Grabber
-from pydg.grabbers.GrabberConfig import GrabberConfig
-from pydg.grabbers.YAMLConfig import YAMLConfig
-from pydg.statemachine.JoinTransition import JoinTransition
-from pydg.statemachine.StatemachineService import StatemachineService
-from pydg.statemachine.actions.SleepAction import SleepAction
-from pydg.statemachine.actions.StartAction import StartAction
-from pydg.statemachine.actions.StopAction import StopAction
-from pydg.statemachine.transitions.TrueTransition import TrueTransition
+from pydag.agents.Agent import Agent
+from pydag.agents.AgentConfig import AgentConfig
+from pydag.agents.YAMLConfig import YAMLConfig
+from pydag.statemachine.JoinTransition import JoinTransition
+from pydag.statemachine.StatemachineService import StatemachineService
+from pydag.statemachine.actions.SleepAction import SleepAction
+from pydag.statemachine.actions.StartAction import StartAction
+from pydag.statemachine.actions.StopAction import StopAction
+from pydag.statemachine.transitions.TrueTransition import TrueTransition
 from tests.statemachine.CountAction import CountAction
 from tests.statemachine.CountTransition import CountTransition
 from tests.statemachine.PrintAction import PrintAction
@@ -15,7 +15,7 @@ from tests.statemachine.PrintAction import PrintAction
 
 def test_000():
     
-    g = Grabber()
+    g = Agent()
     
     n1 = StartAction()
     
@@ -28,17 +28,17 @@ def test_000():
     
     g.add_service(sms)
     
-    gc = GrabberConfig(g)
+    gc = AgentConfig(g)
     
-    yc = YAMLConfig(os.path.dirname(__file__) + "\\grabber_statemachine_config1.yaml")
+    yc = YAMLConfig(os.path.dirname(__file__) + "\\agent_statemachine_config1.yaml")
     
     yc.save(gc)
     
     
 def test_001():
     
-    yc = YAMLConfig(os.path.dirname(__file__) + "\\grabber_statemachine_config1.yaml")
-    gc : GrabberConfig = yc.load()
+    yc = YAMLConfig(os.path.dirname(__file__) + "\\agent_statemachine_config1.yaml")
+    gc : AgentConfig = yc.load()
     
     g = gc.create()
     

@@ -1,5 +1,5 @@
 import os
-from pydg.services.rest.ExcelRestService import ExcelRestService
+from pydag.services.rest.ExcelRestService import ExcelRestService
 
 
 def test_000():

@@ -1,11 +1,11 @@
 import csv
 import os
 import time
-from pydg.adapters.csv.CsvReadAdapter import CSVReadMode, CsvReadAdapter
-from pydg.buffers.Buffer import Buffer
-from pydg.buffers.DataType import DataType
-from pydg.buffers.DictBuffer import DictBuffer
-from pydg.utils.BufferUtils import BufferUtils
+from pydag.adapters.csv.CsvReadAdapter import CSVReadMode, CsvReadAdapter
+from pydag.buffers.Buffer import Buffer
+from pydag.buffers.DataType import DataType
+from pydag.buffers.DictBuffer import DictBuffer
+from pydag.utils.BufferUtils import BufferUtils
 
 def test_000():
     script_path = os.getcwd()

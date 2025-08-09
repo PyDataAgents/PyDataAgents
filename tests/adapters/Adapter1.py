@@ -1,4 +1,4 @@
-from pydg.adapters.Adapter import Adapter
+from pydag.adapters.Adapter import Adapter
 
 class Adapter1(Adapter):
     """_summary_
