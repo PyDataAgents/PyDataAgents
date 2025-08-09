@@ -8,17 +8,17 @@ if TYPE_CHECKING:
     from ..agents.Agent import Agent
 
 class Service(AgentElement):
-    """abstract base class for Grabber Services
+    """abstract base class for agent Services
     """
     
     def __init__(self):
         super().__init__()
         self.is_running : bool = False
-        self.grabber : Agent = None
+        self.agent : Agent = None
     
-    def install(self, grabber : Agent = None):
-        super().install(grabber)
-        self.grabber = grabber
+    def install(self, agent : Agent = None):
+        super().install(agent)
+        self.agent = agent
         
     @abstractmethod
     def start(self):

@@ -40,7 +40,7 @@ class AgentElement(ABC):
         
     def __init__(self, id : str = None):
         """
-        Initialize the grabber element and assign a unique ID.
+        Initialize the agent element and assign a unique ID.
         """
         self.type = self.__module__
         if id is None:            
@@ -94,23 +94,23 @@ class AgentElement(ABC):
     @classmethod
     def unique_id(cls):
         """
-        Generate a unique ID for the grabber element class
+        Generate a unique ID for the agent element class
         
         Returns:
-            str: A unique identifier for the grabber element class
+            str: A unique identifier for the agent element class
         """
         return f"{cls.__name__} [{uuid.uuid4()}]"
     
-    def install(self, grabber : Agent = None):
+    def install(self, agent : Agent = None):
         """initializes the element with respect to startup functionality or initial internal object creation,
-           if grabber is not None, it can be used to reference or create other grabber elements
+           if agent is not None, it can be used to reference or create other agent elements
            the method should always be used in child classes with super().install()
         """
         if self.load_on_install:
             self.load()
 
         
-    def deinstall(self, grabber : Agent = None):
+    def deinstall(self, agent : Agent = None):
         """resets the element, this method can be used to stop internal element logic or reset objects that were initialized on creation
         """
         return

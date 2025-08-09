@@ -1,4 +1,4 @@
-grabber:
+agent:
   type: pydag.agents.Agent
   id: AG1
 adapters:

@@ -2,7 +2,7 @@ from dataclasses import dataclass, field
 
 from ...services.Service import Service
 from ...statemachine.StatemachineException import StatemachineException
-from ...grabbers.Grabber import Grabber
+from ...grabbers.agent import agent
 from ...services.browser.BrowserAutomationService import BrowserAutomationService
 from ..Action import Action
 from ..ServiceNode import ServiceNode
@@ -16,15 +16,15 @@ class BrowserAutomationAction(ServiceNode, Action):
     def __init__(self):
         self.service : BrowserAutomationService = None
     
-    def install(self, grabber : Grabber = None):
+    def install(self, agent : agent = None):
         if self.service is None:
-            if self.service_id in grabber.service_store:
-                if isinstance(grabber.service_store[self.service_id], BrowserAutomationService):
-                    self.service = grabber.service_store[self.service_id]
+            if self.service_id in agent.service_store:
+                if isinstance(agent.service_store[self.service_id], BrowserAutomationService):
+                    self.service = agent.service_store[self.service_id]
                 else:
                     raise StatemachineException("the specified " + Service.cname() + " is not of instance " +  BrowserAutomationService.cname())
             else:
-                raise StatemachineException("The specified service_id=" + self.service_id + " could not be found in " + Grabber.cname())
+                raise StatemachineException("The specified service_id=" + self.service_id + " could not be found in " + agent.cname())
     
-    def deinstall(self, grabber = None):
+    def deinstall(self, agent = None):
         self.service = None

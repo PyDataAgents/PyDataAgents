@@ -15,10 +15,10 @@ class ObjectTransformation(AgentElement):
     def __init__(self):
         super().__init__()
         
-    def install(self, grabber : Agent = None):
+    def install(self, agent : Agent = None):
         pass
     
-    def deinstall(self, grabber : Agent = None):
+    def deinstall(self, agent : Agent = None):
         pass
        
     @abstractmethod 

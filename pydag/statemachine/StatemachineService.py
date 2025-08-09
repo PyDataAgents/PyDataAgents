@@ -34,8 +34,8 @@ class StatemachineService(Service):
         self.start_action : Action = None
         self.is_running = False
 
-    def install(self, grabber : Agent = None):
-        super().install(grabber)
+    def install(self, agent : Agent = None):
+        super().install(agent)
         if self.start_action is None:
             if self.start_node_id is None:
                 raise StatemachineException("No start action can be found!")
@@ -45,7 +45,7 @@ class StatemachineService(Service):
                 else:
                     raise StatemachineException("the specified start node id cannot be found among nodes")            
         for node in self.nodes.values():
-            node.install(grabber)
+            node.install(agent)
         self.connect_nodes()
     
     def assemble(self, node : Node):

@@ -1,4 +1,4 @@
-grabber:
+agent:
   adapters:
     -
       type: pydag.adapters.opcua.OpcUaAdapter

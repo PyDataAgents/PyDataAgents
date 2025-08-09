@@ -11,7 +11,7 @@ ROOT_URL : str = "/api/v1/buffers"
  
 class BufferDefinition(BaseModel):
     type : str = Field(default=ListBuffer.__module__, title="type of the buffer to create")
-    id : str = Field(default=ListBuffer().unique_id(), title="unique identifer throughout Grabber application")
+    id : str = Field(default=ListBuffer().unique_id(), title="unique identifer throughout agent application")
     capacity : int = Field(default=1, title="number of elements that can be stored in buffer before being discarded in FiFo fashion")
     data_type : str = Field(default=DataType.FLOAT.value, title="datatype to expect from buffer elements, can be DataType enum or list of enums")
     initial_values : Any = Field(default=None, title="initial values in buffer")
@@ -28,7 +28,7 @@ class BufferRESTAPI:
     """
    
     @staticmethod
-    def get_api_router(grabber : Agent) -> APIRouter:
+    def get_api_router(agent : Agent) -> APIRouter:
         
         router = APIRouter(prefix=ROOT_URL, tags=["Buffers"],)
         
@@ -37,7 +37,7 @@ class BufferRESTAPI:
             """
             Returns a list of all available buffer IDs.
             """
-            return list(grabber.buffer_store.keys())
+            return list(agent.buffer_store.keys())
         
         @router.get("/config")
         def buffer_config(with_sizes : bool = Query(False, description="specifies whether to return the current size on top of configurations")) -> list:
@@ -45,7 +45,7 @@ class BufferRESTAPI:
             Returns a list of all buffer configurations.
             """
             li = list()
-            for buffer in grabber.buffer_store.values():
+            for buffer in agent.buffer_store.values():
                 d = buffer.config_options()
                 if with_sizes:
                     d["size"] = buffer.size()
@@ -54,7 +54,7 @@ class BufferRESTAPI:
                 
         @router.get("/{id}")
         def buffer(id : str = Path(..., description="unique ID of the buffer")) -> dict:
-            buffer : Buffer = grabber.get_buffer(id)
+            buffer : Buffer = agent.get_buffer(id)
             if buffer is None:
                 return {"error": "Buffer not found"}
             return buffer.config_options()
@@ -64,7 +64,7 @@ class BufferRESTAPI:
             """
             Returns the size of the specified buffer.
             """
-            buffer : Buffer = grabber.get_buffer(id)
+            buffer : Buffer = agent.get_buffer(id)
             if buffer is None:
                 return {"error": "Buffer not found"}
             return buffer.size()
@@ -74,7 +74,7 @@ class BufferRESTAPI:
             """
             Returns the data stored in the specified buffer.
             """
-            buffer : Buffer = grabber.get_buffer(id)
+            buffer : Buffer = agent.get_buffer(id)
             if buffer is None:
                 return {"error": "Buffer not found"}
             if with_meta:
@@ -92,14 +92,14 @@ class BufferRESTAPI:
             buffer.initial_values = buffer_def.initial_values
             buffer.unit = buffer_def.unit
             buffer.description = buffer_def.description
-            grabber.add_buffer(buffer)
+            agent.add_buffer(buffer)
             return buffer_def.id
         
         @router.put("/{id}")
         def add_data(id : str = Path(description="unique ID of the buffer"), data : BufferData = None)-> bool:
-            if id not in grabber.buffer_store:
+            if id not in agent.buffer_store:
                 return {"error" : "Buffer with " + id + " not found"}
-            grabber.buffer_store[id].push(data.data)
+            agent.buffer_store[id].push(data.data)
             return True
                
         return router

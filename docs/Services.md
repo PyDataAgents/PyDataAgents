@@ -5,7 +5,7 @@
 | Class | Description |
 |-------|-------------|
 | [`PlotService`](#plotservice-in-pydagservicesplotservicepy) |  |
-| [`Service`](#service-in-pydagservicesservicepy) | abstract base class for Grabber Services     |
+| [`Service`](#service-in-pydagservicesservicepy) | abstract base class for agent Services     |
 | [`BrowserAutomationService`](#browserautomationservice-in-pydagservicesbrowserbrowserautomationservicepy) |  |
 | [`CopyFileService`](#copyfileservice-in-pydagservicesdocumentscopyfileservicepy) | `Service`to copy files from one location to another |
 | [`DeleteFileService`](#deletefileservice-in-pydagservicesdocumentsdeletefileservicepy) | `Service` to delete files from folders |
@@ -38,7 +38,7 @@ obj.load_on_install=False
 [Go to Summary](#summary)
 ## `Service` (in `pydag\services\Service.py`)
 
-abstract base class for Grabber Services
+abstract base class for agent Services
     
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|

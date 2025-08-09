@@ -11,13 +11,13 @@ if __name__ == "__main__":
         yc = YAMLConfig(config_file)
         gc : AgentConfig = yc.load()
         print(gc)
-        grabber = gc.create()
+        agent = gc.create()
     else:        
-        grabber = Agent()
-        grabber.id = "G1"
+        agent = Agent()
+        agent.id = "G1"
         service = RestService()
         service.id = "S1"
         service.port = 8001
-        grabber.add_service(service)
+        agent.add_service(service)
 
-    grabber.start_blocking()
+    agent.start_blocking()

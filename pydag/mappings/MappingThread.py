@@ -19,19 +19,19 @@ class MappingThread(AgentElement):
         self.mapping : Mapping = mapping
         self.observer_thread : ObserverThread = None
         
-    def start(self, grabber : Agent):
+    def start(self, agent : Agent):
         self.observer_thread = ObserverThread(ObserverThread.unique_id(), self.mapping.thread_type, self.mapping.sampling_period)
-        # assemble adapters and buffers from Grabber
+        # assemble adapters and buffers from agent
         if self.mapping.adapter is None and len(self.mapping.buffers) == 0:
             for buffer_id in self.mapping.buffer_ids:
-                if buffer_id in grabber.buffer_store:
-                    self.mapping[buffer_id] = grabber.buffer_store[buffer_id]
+                if buffer_id in agent.buffer_store:
+                    self.mapping[buffer_id] = agent.buffer_store[buffer_id]
                 else:
-                    self.LOGGER.error("Buffer " + buffer_id + " not found in Grabber")
-            if self.mapping.adapter_id in grabber.adapter_store:
-                self.mapping.adapter = grabber.adapter_store[self.mapping.adapter_id]
+                    self.LOGGER.error("Buffer " + buffer_id + " not found in agent")
+            if self.mapping.adapter_id in agent.adapter_store:
+                self.mapping.adapter = agent.adapter_store[self.mapping.adapter_id]
             else:
-                self.LOGGER.error("Adapter " + self.mapping.adapter_id + " not found in Grabber")        
+                self.LOGGER.error("Adapter " + self.mapping.adapter_id + " not found in agent")        
         # add observer to observer thread
         match self.mapping.mapping_type:
             case MappingType.READ:

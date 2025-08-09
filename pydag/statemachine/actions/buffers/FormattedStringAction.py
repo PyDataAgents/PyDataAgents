@@ -23,11 +23,11 @@ class FormattedStringAction(BufferNode, Action):
     def __init__(self):
         super().__init__()
         
-    def install(self, grabber : Agent = None):
+    def install(self, agent : Agent = None):
         if self.buffer is None:
-            if grabber is not None:
-                if self.buffer_id in grabber.buffer_store:
-                    self.buffer = grabber.buffer_store[self.buffer_id]
+            if agent is not None:
+                if self.buffer_id in agent.buffer_store:
+                    self.buffer = agent.buffer_store[self.buffer_id]
             else:
                 self.buffer = ListBuffer()
                 self.buffer.capacity = -1

@@ -43,7 +43,7 @@ def test_010():
     config = configparser.ConfigParser()
     config.read("config.ini")
     
-    grabber = Agent()
+    agent = Agent()
         
     mail_action = MailAction()
     mail_action.id = "TestMailAction"
@@ -63,20 +63,20 @@ def test_010():
     folder_service.html_report = True
     folder_service.mail_action = mail_action
     
-    grabber.add_service(folder_service)
+    agent.add_service(folder_service)
         
-    gc = AgentConfig(grabber)
+    gc = AgentConfig(agent)
     yc = YAMLConfig(str(Path.home() / "Downloads" / "t" / "folder_observe_config.yaml"))
     yc.save(gc)    
     
-    grabber.start_blocking()
+    agent.start_blocking()
     
     
 def test_020():
     config = configparser.ConfigParser()
     config.read("config.ini")
     
-    grabber = Agent()
+    agent = Agent()
     
     mail_action = MailAction()
     mail_action.id = "TestMailAction"
@@ -96,11 +96,11 @@ def test_020():
     folder_service.html_report = True
     folder_service.mail_action = mail_action    
     
-    grabber.add_service(folder_service)
+    agent.add_service(folder_service)
         
-    gc = AgentConfig(grabber)
+    gc = AgentConfig(agent)
     yc = YAMLConfig(str(Path.home() / "Downloads" / "t" / "folder_observe_config.yaml"))
     yc.save(gc)    
     
-    grabber.start_blocking()
+    agent.start_blocking()
         

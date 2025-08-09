@@ -26,10 +26,10 @@ class Agent(AgentElement):
         self.service_store : dict[str, Service] = dict()
         self.is_running = False
     
-    def install(self, grabber : Agent = None):        
+    def install(self, agent : Agent = None):        
         self.install_elements()
         
-    def deinstall(self, grabber : Agent = None):
+    def deinstall(self, agent : Agent = None):
         self.deinstall_elements()
     
     def install_elements(self):

@@ -17,14 +17,14 @@ class AdapterNode(BufferNode):
         super().__init__()
         self.adapter : Adapter = None
         
-    def install(self, grabber : Agent = None):
-        super().install(grabber)
+    def install(self, agent : Agent = None):
+        super().install(agent)
         if self.adapter is None:
-            if self.adapter_id in grabber.adapter_store:
-                self.adapter = grabber.adapter_store[self.adapter_id]
+            if self.adapter_id in agent.adapter_store:
+                self.adapter = agent.adapter_store[self.adapter_id]
             else:
-                raise StatemachineException("No " + Adapter.cname() + " with id=" + self.adapter_id + " was found in " + grabber.cname())
+                raise StatemachineException("No " + Adapter.cname() + " with id=" + self.adapter_id + " was found in " + agent.cname())
     
-    def deinstall(self, grabber : Agent = None):
-        super().deinstall(grabber)
+    def deinstall(self, agent : Agent = None):
+        super().deinstall(agent)
         self.adapter = None

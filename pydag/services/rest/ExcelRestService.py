@@ -24,15 +24,15 @@ class ExcelRestService(RestService):
         super().__init__()
         self.named_tables : dict[str, DictBuffer] = dict()
         
-    def install(self, grabber : Agent = None):
+    def install(self, agent : Agent = None):
         super(Service, self).install()
         self.app = FastAPI(title="DataGrabber ExcelRestService", docs_url="/docs")
         self.add_cors()
         self.app.include_router(ExcelRestAPI.get_api_router(self))
         self.__init_tables()
         
-    def deinstall(self, grabber : Agent = None):
-        super().deinstall(grabber)
+    def deinstall(self, agent : Agent = None):
+        super().deinstall(agent)
         self.app = None
         
     def __init_tables(self):

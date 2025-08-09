@@ -23,10 +23,10 @@
 | [`BrowserAutomationAction`](#browserautomationaction-in-pydagstatemachineactionsbrowserbrowserautomationactionpy) |  |
 | [`BrowserSetElementAction`](#browsersetelementaction-in-pydagstatemachineactionsbrowserbrowsersetelementactionpy) |  |
 | [`BrowserUrlNavigateAction`](#browserurlnavigateaction-in-pydagstatemachineactionsbrowserbrowserurlnavigateactionpy) |  |
-| [`AddBufferAction`](#addbufferaction-in-pydagstatemachineactionsbuffersaddbufferactionpy) | Action to add a buffer to the grabber node. |
+| [`AddBufferAction`](#addbufferaction-in-pydagstatemachineactionsbuffersaddbufferactionpy) | Action to add a buffer to the agent node. |
 | [`BufferExtractAction`](#bufferextractaction-in-pydagstatemachineactionsbuffersbufferextractactionpy) | `Action` for extracting data from the parents' buffers to store into this buffer.This `Action` can only be applied on if the parents' buffers is of type `DictBuffer`. |
 | [`FormattedStringAction`](#formattedstringaction-in-pydagstatemachineactionsbuffersformattedstringactionpy) | `Action` to compose a formatted string and store it in this `Action`'s bufferusing its parent's buffer to create the new string |
-| [`LinkBufferAction`](#linkbufferaction-in-pydagstatemachineactionsbufferslinkbufferactionpy) | `Action` that's only function is to link a buffer from grabber to the statemachinetherefore an empty execute method is provided |
+| [`LinkBufferAction`](#linkbufferaction-in-pydagstatemachineactionsbufferslinkbufferactionpy) | `Action` that's only function is to link a buffer from agent to the statemachinetherefore an empty execute method is provided |
 | [`CopyFilesAction`](#copyfilesaction-in-pydagstatemachineactionsdocumentscopyfilesactionpy) |  |
 | [`ListFilesAction`](#listfilesaction-in-pydagstatemachineactionsdocumentslistfilesactionpy) |  |
 | [`MoveFilesAction`](#movefilesaction-in-pydagstatemachineactionsdocumentsmovefilesactionpy) |  |
@@ -507,7 +507,7 @@ obj.url="https://example.com"
 [Go to Summary](#summary)
 ## `AddBufferAction` (in `pydag\statemachine\actions\buffers\AddBufferAction.py`)
 
-Action to add a buffer to the grabber node.
+Action to add a buffer to the agent node.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
@@ -584,7 +584,7 @@ obj.template="<string>"
 [Go to Summary](#summary)
 ## `LinkBufferAction` (in `pydag\statemachine\actions\buffers\LinkBufferAction.py`)
 
-`Action` that's only function is to link a buffer from grabber to the statemachine
+`Action` that's only function is to link a buffer from agent to the statemachine
 therefore an empty execute method is provided
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|

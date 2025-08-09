@@ -1,6 +1,6 @@
-grabber:
-  type: pydatagrabber.grabbers.Grabber
-  id: Grabber [5dbad1ca-517c-4a56-9ee7-68c7f685096d]
+agent:
+  type: pydatagrabber.grabbers.agent
+  id: agent [5dbad1ca-517c-4a56-9ee7-68c7f685096d]
 adapters: []
 buffers: []
 mappings: []

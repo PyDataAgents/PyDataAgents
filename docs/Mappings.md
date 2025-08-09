@@ -31,7 +31,7 @@
 | `n` | `int` | `1` | number of samples to insert or remove from buffers |
 | `sampling_period` | `int` | `100` | sampling period to apply in this Mapping |
 | `persistent` | `bool` | `True` | specifies whether to remove or keep the values of the buffers when writing or publishing to a data sink |
-| `auto_start` | `bool` | `True` | specifies whether to start the mapping with grabber start |
+| `auto_start` | `bool` | `True` | specifies whether to start the mapping with agent start |
 
 
 ```python

@@ -42,7 +42,7 @@ class FolderObserveMailService(Service):
         self.file_history_buffer : DictBuffer = None
         self.service_thread : ObserverThread = None
         
-    def install(self, grabber : Agent = None):
+    def install(self, agent : Agent = None):
         super().install()
         # instatiate buffer for file history
         self.file_history_buffer = DictBuffer()

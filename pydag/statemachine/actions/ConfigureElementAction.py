@@ -2,12 +2,12 @@ from dataclasses import dataclass, field
 from ...agents.Agent import Agent
 from ...agents.AgentElement import AgentElement
 from ..BufferNode import BufferNode
-from ..GrabberNode import GrabberNode
+from ..AgentNode import AgentNode
 from ..StatemachineException import StatemachineException
 from ...utils.ClassUtils import ClassUtils
 
 @dataclass
-class ConfigureElementAction(GrabberNode, BufferNode):
+class ConfigureElementAction(AgentNode, BufferNode):
     """this `Action` configures a `GrabberElement` property by the provided `element_id` and name of the `option`, which is the class' property
     <br>the new property value is derived from the `Node`'s `buffer`
 
@@ -26,17 +26,17 @@ class ConfigureElementAction(GrabberNode, BufferNode):
     def __init__(self):
         super().__init__()
     
-    def install(self, grabber : Agent = None):
-        GrabberNode.install(self, grabber)
-        BufferNode.install(self, grabber)
+    def install(self, agent : Agent = None):
+        AgentNode.install(self, agent)
+        BufferNode.install(self, agent)
         
-    def deinstall(self, grabber : Agent = None):
-        GrabberNode.deinstall(self, grabber)
-        BufferNode.deinstall(self, grabber)
+    def deinstall(self, agent : Agent = None):
+        AgentNode.deinstall(self, agent)
+        BufferNode.deinstall(self, agent)
         
     def execute(self):
         val = self.buffer.data(n = self.n, persistent = False)
-        element = self.grabber.get_element(self.element_id)
+        element = self.agent.get_element(self.element_id)
         if element is not None:
             ClassUtils.set_property(element, self.option, val)
         else:

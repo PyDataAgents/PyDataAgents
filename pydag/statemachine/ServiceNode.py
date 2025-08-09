@@ -24,14 +24,14 @@ class ServiceNode(Node):
         super().__init__()
         self.service = None
         
-    def install(self, grabber : Agent = None):
+    def install(self, agent : Agent = None):
         super().install()
         if self.service is None:
-            if self.service_id in grabber.mapping_store:
-                self.service = grabber.service_store[self.service_id]
+            if self.service_id in agent.mapping_store:
+                self.service = agent.service_store[self.service_id]
             else:
                 raise StatemachineException("No " + Service.cname() + " with id=" + self.service_id + " was found")
             
-    def deinstall(self, grabber : Agent = None):
+    def deinstall(self, agent : Agent = None):
         super().deinstall()
         self.service : Service = None

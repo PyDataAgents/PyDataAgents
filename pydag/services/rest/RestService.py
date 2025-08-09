@@ -22,12 +22,12 @@ class RestService(Service):
         self.app : FastAPI = None
         self.service_thread : threading.Thread = None
         
-    def install(self, grabber : Agent = None):
-        super().install(grabber)
+    def install(self, agent : Agent = None):
+        super().install(agent)
         self.app = FastAPI(title="DataGrabber", docs_url="/docs")
         self.add_cors()
-        self.app.include_router(AgentRESTAPI.get_api_router(self.grabber))
-        self.app.include_router(BufferRESTAPI.get_api_router(self.grabber))
+        self.app.include_router(AgentRESTAPI.get_api_router(self.agent))
+        self.app.include_router(BufferRESTAPI.get_api_router(self.agent))
     
     def add_cors(self):
         """Add CORS middleware to the FastAPI app.
@@ -41,8 +41,8 @@ class RestService(Service):
             allow_headers=["*"],  # Allows all headers
         )
         
-    def deinstall(self, grabber : Agent = None):
-        super().deinstall(grabber)
+    def deinstall(self, agent : Agent = None):
+        super().deinstall(agent)
         self.app = None
         
     def add_router(self, router : APIRouter):

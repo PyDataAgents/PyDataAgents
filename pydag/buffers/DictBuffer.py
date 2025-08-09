@@ -15,13 +15,13 @@ class DictBuffer(Buffer):
         self.elements : dict[list] = dict()
         self.lock = threading.RLock()
 
-    def install(self, grabber : Agent = None):
-        super().install(grabber)
+    def install(self, agent : Agent = None):
+        super().install(agent)
         if self.initial_values is not None:
             self.elements = self.initial_values
         
-    def deinstall(self, grabber : Agent = None):
-        super().deinstall(grabber)
+    def deinstall(self, agent : Agent = None):
+        super().deinstall(agent)
         self.elements = {}        
     
     def push(self, elements : Union[list, dict]):

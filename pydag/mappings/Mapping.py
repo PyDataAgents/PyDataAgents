@@ -17,7 +17,7 @@ class Mapping(AgentElement):
     n : int = field(default=1, metadata={"description": "number of samples to insert or remove from buffers"})
     sampling_period : int = field(default=100, metadata={"description": "sampling period to apply in this Mapping"})
     persistent : bool = field(default=True, metadata={"description": "specifies whether to remove or keep the values of the buffers when writing or publishing to a data sink"})
-    auto_start : bool = field(default=True, metadata={"description": "specifies whether to start the mapping with grabber start"})
+    auto_start : bool = field(default=True, metadata={"description": "specifies whether to start the mapping with agent start"})
     
     def __post_init__(self):
         super().__init__()

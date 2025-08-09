@@ -6,8 +6,8 @@ from pydag.agents.Agent import Agent
 from pydag.services.rest.RestService import RestService
 
 def test_000():
-    grabber = Agent()
-    grabber.id = "G1"
+    agent = Agent()
+    agent.id = "G1"
     
     s = Sine()
     b = SignalBuffer()
@@ -18,18 +18,18 @@ def test_000():
     b.unit = "V"
     b.data_type = DataType.FLOAT.value
 
-    grabber.add_buffer(b)
+    agent.add_buffer(b)
 
     service = RestService()
     service.id = "S1"
     
-    grabber.add_service(service)
+    agent.add_service(service)
 
-    grabber.start_blocking()
+    agent.start_blocking()
     
 def test_010():
-    grabber = Agent()
-    grabber.id = "G1"
+    agent = Agent()
+    agent.id = "G1"
     
     s = Sine()
     b = SignalBuffer()
@@ -40,11 +40,11 @@ def test_010():
     b.unit = "V"
     b.data_type = DataType.FLOAT.value
 
-    grabber.add_buffer(b)
+    agent.add_buffer(b)
 
     service = RestService()
     service.id = "S1"
-    service.install(grabber)
+    service.install(agent)
     
     service.start()
     

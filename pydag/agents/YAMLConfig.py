@@ -19,7 +19,7 @@ class YAMLConfig(FileConfig):
         d = yaml.safe_load(yaml_file)
         yaml_file.close()
         grabber_config = AgentConfig()
-        grabber_config.grabber_config = d["grabber"]
+        grabber_config.grabber_config = d["agent"]
         grabber_config.adapter_configs = d["adapters"]
         grabber_config.buffer_configs = d["buffers"]
         grabber_config.mapping_configs = d["mappings"]
@@ -28,7 +28,7 @@ class YAMLConfig(FileConfig):
     
     def save(self, grabber_config: AgentConfig):
         d = dict()
-        d["grabber"] = grabber_config.grabber_config
+        d["agent"] = grabber_config.grabber_config
         d["adapters"] = grabber_config.adapter_configs
         d["buffers"] = grabber_config.buffer_configs
         d["mappings"] = grabber_config.mapping_configs

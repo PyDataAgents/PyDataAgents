@@ -13,23 +13,23 @@ class BufferNode(Node):
         super().__init__()
         self.buffer : Buffer = None  # Placeholder for the buffer instance
         
-    def install(self, grabber : Agent = None):
-        """this `install` method connects a `Buffer` instance from specified `grabber` based on given `buffer_id`
+    def install(self, agent : Agent = None):
+        """this `install` method connects a `Buffer` instance from specified `agent` based on given `buffer_id`
 
         Args:
-            grabber (Grabber, optional): grabber instance. Defaults to None.
+            agent (agent, optional): agent instance. Defaults to None.
 
         Raises:
-            StatemachineException: throws an `Exception` if no `buffer` with the specified `buffer_id` can be found in `grabber`
+            StatemachineException: throws an `Exception` if no `buffer` with the specified `buffer_id` can be found in `agent`
         """
-        super().install(grabber)
+        super().install(agent)
         if self.buffer is None:
-            if self.buffer_id in grabber.buffer_store:
-                self.buffer = grabber.buffer_store[self.buffer_id]
+            if self.buffer_id in agent.buffer_store:
+                self.buffer = agent.buffer_store[self.buffer_id]
             else:
                 raise StatemachineException("No " + Buffer.cname() + " with id=" + self.buffer_id + " exists in " + Agent.cname())
         
-    def deinstall(self, grabber : Agent = None):
-        super().deinstall(grabber)
+    def deinstall(self, agent : Agent = None):
+        super().deinstall(agent)
         self.buffer : Buffer = None
             

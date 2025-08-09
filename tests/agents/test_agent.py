@@ -11,8 +11,8 @@ from pydag.utils.BufferUtils import BufferUtils
 
 
 def test_000():
-    grabber = Agent()
-    grabber.id = "G1"
+    agent = Agent()
+    agent.id = "G1"
     
     buf = ListBuffer()
     buf.id = "T1"
@@ -20,13 +20,13 @@ def test_000():
     buf.data_type = DataType.FLOAT
     buf.unit = "°C"
     
-    grabber.add_buffer(buf)
+    agent.add_buffer(buf)
     
     opcua = OpcUaAdapter()
     opcua.id = "A1"
     opcua.endpoint = "opc.tcp://jh:48010"
     
-    grabber.add_adapter(opcua)
+    agent.add_adapter(opcua)
     
     mapping = Mapping()
     mapping.id = "M1"
@@ -38,27 +38,27 @@ def test_000():
     mapping.sampling_period = 1000
     mapping.thread_type = ThreadType.MILLI_SECOND
     
-    grabber.add_mapping(mapping)
+    agent.add_mapping(mapping)
     
-    grabber.start()
+    agent.start()
     
     time.sleep(2)
     
     i = 0
     while i < 10:
-        print(grabber.get_buffer("T1").json(n = 1, persistent = False))
+        print(agent.get_buffer("T1").json(n = 1, persistent = False))
         time.sleep(1)
         i = i + 1
     
-    grabber.stop()
+    agent.stop()
     
 def test_010():
     """
     this test requires the installation of Prosys OPC UA Simulation Server
     https://prosysopc.com/products/opc-ua-simulation-server/evaluate/
     """
-    grabber = Agent()
-    grabber.id = "AG1"
+    agent = Agent()
+    agent.id = "AG1"
     
     buf = ListBuffer()
     buf.id = "T1"
@@ -66,13 +66,13 @@ def test_010():
     buf.data_type = DataType.FLOAT
     buf.unit = "°C"
     
-    grabber.add_buffer(buf)
+    agent.add_buffer(buf)
     
     opcua = OpcUaAdapter()
     opcua.id = "A1"
     opcua.endpoint = "opc.tcp://jh:48010"
     
-    grabber.add_adapter(opcua)
+    agent.add_adapter(opcua)
     
     mapping = Mapping()
     mapping.id = "M1"
@@ -84,7 +84,7 @@ def test_010():
     mapping.sampling_period = 1000
     mapping.thread_type = ThreadType.MILLI_SECOND
     
-    grabber.add_mapping(mapping)
+    agent.add_mapping(mapping)
     
-    grabber.get_element("N1")
+    agent.get_element("N1")
     

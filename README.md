@@ -11,7 +11,7 @@ Examples:<br>
 ![pydataagents_sources_and_sinks.png](docs/pydataagents_sources_and_sinks.png)
 ## architecture
 the core element of the framework is a [(data)agent](pydag/agents/Agents.py)
-<br>a grabber can consists of one or more of the following [GrabberElements](pydag/agents/AgentElement.py):
+<br>an agent can consists of one or more of the following [AgentElements](pydag/agents/AgentElement.py):
 - adapters
 - buffers
 - mappings
@@ -38,7 +38,7 @@ agent.add_mapping(...) # add an mapping
 
 agent.add_service(...) # add a service
 
-agent.start_blocking() # starts a grabber application and blocks until finished (runs forever)
+agent.start_blocking() # starts a agent application and blocks until finished (runs forever)
 # alterantive
 # agent.start()
 

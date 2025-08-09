@@ -3,7 +3,7 @@ from pydag.statemachine.Action import Action
 from pydag.statemachine.BufferNode import BufferNode
 
 class LinkBufferAction(BufferNode, Action):
-    """`Action` that's only function is to link a buffer from grabber to the statemachine
+    """`Action` that's only function is to link a buffer from agent to the statemachine
     therefore an empty execute method is provided
     """
     
