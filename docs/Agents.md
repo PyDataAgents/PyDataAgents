@@ -1,14 +1,14 @@
-# Grabbers Documentation
+# Agents Documentation
 
 ## Summary
 
 | Class | Description |
 |-------|-------------|
-| [`Grabber`](#grabber-in-pydggrabbersgrabberpy) |  |
+| [`Agent`](#agent-in-pydagagentsagentpy) |  |
 
 
 
-## `Grabber` (in `pydg\grabbers\Grabber.py`)
+## `Agent` (in `pydag\agents\Agent.py`)
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
@@ -18,10 +18,10 @@
 
 
 ```python
-# Example usage of `Grabber`
-from pydg.grabbers.Grabber import Grabber  # Adjust import if needed
+# Example usage of `Agent`
+from pydag.agents.Agent import Agent  # Adjust import if needed
 
-obj = Grabber()
+obj = Agent()
 obj.type="<string>"
 obj.id="<string>"
 obj.load_on_install=False
