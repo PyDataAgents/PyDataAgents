@@ -18,8 +18,8 @@ FIELD = "f"
 @dataclass
 class InfluxDbAdapter(ReadAdapter, WriteAdapter):
     """`Adapter` thats reads or writes to InfluxDB.
-    Address Schema:
-    address = "b=<bucket>;m=<measurement>;f=<field>"
+    <br>Address Schema:
+    <br>address = "b=[bucket];m=[measurement];f=[field]"
     """
     
     endpoint : str = field(default="http://localhost:8086", metadata={"description": "The endpoint URL for the InfluxDB instance."})
