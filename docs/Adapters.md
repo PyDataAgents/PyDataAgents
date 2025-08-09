@@ -15,7 +15,7 @@
 | [`CsvWriteAdapter`](#csvwriteadapter-in-pydagadapterscsvcsvwriteadapterpy) | `Adapter` for writing data to CSV files.     |
 | [`DocumentTextAdapter`](#documenttextadapter-in-pydagadaptersdocumentsdocumenttextadapterpy) | `Adapter` that retrieves text content from specified files         |
 | [`HttpAdapter`](#httpadapter-in-pydagadaptershttphttpadapterpy) | `Adapter` for reading and writing data from/to http endpoints     |
-| [`InfluxDbAdapter`](#influxdbadapter-in-pydagadaptersinfluxdbinfluxdbadapterpy) | `Adapter` thats reads or writes to InfluxDB.Address Schema:address = "b=<bucket>;m=<measurement>;f=<field>" |
+| [`InfluxDbAdapter`](#influxdbadapter-in-pydagadaptersinfluxdbinfluxdbadapterpy) | `Adapter` thats reads or writes to InfluxDB.<br>Address Schema:<br>address = "b=[bucket];m=[measurement];f=[field]" |
 | [`MQTTAdapter`](#mqttadapter-in-pydagadaptersmqttmqttadapterpy) | `Adapter` for subscribing or writing data from/to MQTT topics.     |
 | [`OpcUaAdapter`](#opcuaadapter-in-pydagadaptersopcuaopcuaadapterpy) | `Adapter` for reading and writing data from/to OPC UA servers.     |
 | [`S7Adapter`](#s7adapter-in-pydagadapterss7s7adapterpy) | `Adapter`reading from and writing to S7 PLCs.     |
@@ -291,8 +291,8 @@ obj.json_path=False
 ## `InfluxDbAdapter` (in `pydag\adapters\influxdb\InfluxDbAdapter.py`)
 
 `Adapter` thats reads or writes to InfluxDB.
-Address Schema:
-address = "b=<bucket>;m=<measurement>;f=<field>"
+<br>Address Schema:
+<br>address = "b=[bucket];m=[measurement];f=[field]"
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `id` | `str` | `` | unique identifier of element in DataGrabber application |

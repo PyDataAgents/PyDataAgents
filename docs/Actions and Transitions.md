@@ -6,8 +6,8 @@
 |-------|-------------|
 | [`Action`](#action-in-pydagstatemachineactionpy) |  |
 | [`AdapterNode`](#adapternode-in-pydagstatemachineadapternodepy) | AdapterNode is a specialized BufferNode that integrates an adapter for data processing.It inherits from BufferNode to manage buffers and provides methods to interact with the adapter. |
+| [`AgentNode`](#agentnode-in-pydagstatemachineagentnodepy) |  |
 | [`BufferNode`](#buffernode-in-pydagstatemachinebuffernodepy) |  |
-| [`GrabberNode`](#grabbernode-in-pydagstatemachinegrabbernodepy) |  |
 | [`JoinTransition`](#jointransition-in-pydagstatemachinejointransitionpy) |  |
 | [`MappingNode`](#mappingnode-in-pydagstatemachinemappingnodepy) |  |
 | [`Node`](#node-in-pydagstatemachinenodepy) |  |
@@ -87,6 +87,26 @@ obj.adapter_id="<string>"
 ```
 
 [Go to Summary](#summary)
+## `AgentNode` (in `pydag\statemachine\AgentNode.py`)
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
+| `id` | `str` | `` | unique identifier of element in DataGrabber application |
+| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+
+
+```python
+# Example usage of `AgentNode`
+from pydag.statemachine.AgentNode import AgentNode  # Adjust import if needed
+
+obj = AgentNode()
+obj.child_ids='list()'
+obj.id="<string>"
+obj.load_on_install=False
+```
+
+[Go to Summary](#summary)
 ## `BufferNode` (in `pydag\statemachine\BufferNode.py`)
 
 | Field | Type | Default | Description |
@@ -106,26 +126,6 @@ obj.child_ids='list()'
 obj.id="<string>"
 obj.load_on_install=False
 obj.buffer_id="<string>"
-```
-
-[Go to Summary](#summary)
-## `GrabberNode` (in `pydag\statemachine\GrabberNode.py`)
-
-| Field | Type | Default | Description |
-|-------|------|---------|-------------|
-| `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
-| `id` | `str` | `` | unique identifier of element in DataGrabber application |
-| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
-
-
-```python
-# Example usage of `GrabberNode`
-from pydag.statemachine.GrabberNode import GrabberNode  # Adjust import if needed
-
-obj = GrabberNode()
-obj.child_ids='list()'
-obj.id="<string>"
-obj.load_on_install=False
 ```
 
 [Go to Summary](#summary)
