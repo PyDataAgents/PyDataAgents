@@ -21,7 +21,8 @@ class Buffer(AgentElement):
     META = "meta"
     
     VALUES = "values"
-    TIMESTAMPS = "timestamps"    
+    TIMESTAMPS = "timestamps"
+    FEATURES = "features"
     
     INFINITE_CAPACITY = -1
 

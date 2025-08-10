@@ -37,7 +37,7 @@ class AgentElement(ABC):
     
     TYPE = "type"
     ID = "id"
-        
+    
     def __post_init__(self):
         """
         Initialize the agent element and assign a unique ID.
