@@ -9,7 +9,7 @@ class Adapter(AgentElement):
     
     ADDRESS = "address"
     ADDRESSES = "addresses"
-    __post_init__
+    
     @abstractmethod
     def connect(self) -> bool:
         """

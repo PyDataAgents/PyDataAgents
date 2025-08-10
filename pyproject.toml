@@ -26,6 +26,7 @@ dependencies = [
     "PyYAML",
     "sounddevice",
     "numpy",
+    "pandas",
     "paho-mqtt",
     "urllib3",
     "jsonpath-ng",

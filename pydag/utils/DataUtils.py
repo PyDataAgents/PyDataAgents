@@ -1,3 +1,8 @@
+import numpy as np
+import pandas as pd
+from typing import Union
+
+
 class DataUtils:
     
     @staticmethod
@@ -17,3 +22,59 @@ class DataUtils:
                 return float(value)
             except ValueError:
                 return value  # Keep as string if not numeric
+            
+    @staticmethod        
+    def dict_to_ndarray(data: dict) -> np.ndarray:
+        """
+        Converts a dictionary to a NumPy ndarray.
+        
+        Args:
+            data (dict): The input dictionary.
+            
+        Returns:
+            np.ndarray: The converted NumPy ndarray.
+        """
+        return np.array(list(data.values()))
+
+    @staticmethod
+    def ndarray_to_dict(data: np.ndarray) -> dict:
+        """
+        Converts a NumPy ndarray to a dictionary.
+        
+        Args:
+            data (np.ndarray): The input NumPy ndarray.
+            
+        Returns:
+            dict: The converted dictionary.
+        """
+        if data.ndim == 1:
+            return {"f0": data.tolist()}
+        else:
+            return {f"f{i}": data[i, :].tolist() for i in range(data.ndim)}
+        
+    @staticmethod
+    def dataframe_to_dict(df : pd.DataFrame, by_row : bool = False) -> dict:
+        if by_row:
+            return df.to_dict(orient="records")  
+        else:
+            return df.to_dict(orient="list")
+        
+    @staticmethod
+    def dict_to_dataframe(data : Union[list|dict], by_row : bool = False) -> pd.DataFrame:
+        """converts list or dictionary data to a Pandas DataFrame
+
+        Args:
+            data (Union[list | dict]): list of dictionaries or dictionary
+            by_row (bool, optional): specifies the form of the dictionary data, whether its row or column based. Defaults to False.
+
+        Returns:
+            pd.DataFrame: pd.DataFrame
+        """
+        if isinstance(data, list):
+            df = df = pd.DataFrame.from_dict(data)
+        else:
+            if by_row:
+                df = pd.DataFrame.from_dict(data, orient="index")
+            else:
+                df = pd.DataFrame.from_dict(data)
+        return df
