@@ -53,6 +53,44 @@ class DataUtils:
             return {f"f{i}": data[i, :].tolist() for i in range(data.ndim)}
         
     @staticmethod
+    def ndarray_to_list(data: np.ndarray, by_row : bool = False) -> list:
+        """
+        Converts a NumPy ndarray to a list.
+        
+        Args:
+            data (np.ndarray): The input NumPy ndarray.
+            
+        Returns:
+            list: The converted list.
+        """
+        if data.ndim > 1:            
+            if data.ndim == 2:
+                if by_row == False:
+                    if data.shape[1] == 1:
+                        return data.flatten().tolist()
+            else:
+                # TODO
+                pass
+        else:
+            if by_row:
+                # TODO
+                pass
+            else:        
+                return data.tolist()
+    
+    @staticmethod    
+    def list_to_ndarray(data : list) -> np.ndarray:
+        """converts a list to a Numpy ndarray
+
+        Args:
+            data (list): list to convert
+
+        Returns:
+            np.ndarray: numpy array
+        """
+        return np.ndarray(data)
+        
+    @staticmethod
     def dataframe_to_dict(df : pd.DataFrame, by_row : bool = False) -> dict:
         if by_row:
             return df.to_dict(orient="records")  

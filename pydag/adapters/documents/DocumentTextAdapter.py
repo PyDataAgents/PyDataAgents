@@ -31,7 +31,7 @@ class DocumentTextAdapter(ReadAdapter):
         return True
     
     def read_from_source(self, buffers : dict[str, Buffer], addresses : list[str], n : int = 0):
-        if len(buffers) == 1 and addresses is None and self.file_path is not None:
+        if len(buffers) == 1 and len(addresses) == 0 and self.file_path is not None:
             buffer : Buffer = next(iter(buffers.values()))
             if isinstance(buffer, ListBuffer):
                 if os.path.isfile(self.file_path):
@@ -42,7 +42,7 @@ class DocumentTextAdapter(ReadAdapter):
             else:
                 raise AdapterException("Only " + ListBuffer.cname() + "s are supported for this input combination of buffers and addresses")    
         elif len(buffers) == len(addresses):
-            pass
+            raise AdapterException("Unsupported input combination with buffers and addresses")
         else:
             raise AdapterException("Unsupported input combination with buffers and addresses")
         

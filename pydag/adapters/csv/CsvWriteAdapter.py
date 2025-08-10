@@ -72,8 +72,8 @@ class CsvWriteAdapter(WriteAdapter):
             else:
                 raise AdapterException("specified buffer must be of type " + DictBuffer.__class__.__name__)            
         else:
-            if addresses != None:
-                pass
+            if len(addresses) > 0:
+                raise AdapterException("this combination of buffers and addresses is not implemented")
             else:
                 if self.rows == 0:
                     if self.with_timestamp:
