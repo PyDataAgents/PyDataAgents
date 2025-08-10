@@ -34,7 +34,7 @@ class DictBuffer(Buffer):
                         else:
                             self.elements[k].append(elements[k])
                         # check for infinity capacity
-                        if self.capacity != Buffer.INIFINITE_CAPACITY:                            
+                        if self.capacity != Buffer.INFINITE_CAPACITY:                            
                             if len(self.elements[k]) > self.capacity:
                                 self.elements[k].pop(0)                        
                     else:
