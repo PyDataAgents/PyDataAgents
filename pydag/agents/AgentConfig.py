@@ -9,7 +9,32 @@ class AgentConfig:
     """
     Configuration class for the agent application.
     """
-            
+          
+    # Agent Keywords   
+    AGENT = "agent"
+    BUFFER = "buffer"
+    BUFFERS = "buffers"
+    ADAPTER = "adapter"
+    ADAPTERS = "adapters"
+    MAPPING = "mapping"
+    MAPPINGS = "mappings"
+    SERVICE = "service"
+    SERVICES = "services"
+    
+    TYPE = "type"
+    ID = "id"
+    DESCRIPTION = "description"
+
+    # Buffer Keywords    
+    DATA_TYPE = "data_type"
+    CAPACITY = "capacity"
+    UNIT = "unit"
+    INITIAL_VALUES = "initial_values"    
+    DATA = "data"
+    META = "meta"    
+    VALUES = "values"
+    TIMESTAMPS = "timestamps"    
+    INFINITE_CAPACITY = -1
 
     def __init__(self, agent : Agent = None):
         self.grabber_config = dict()
@@ -39,26 +64,26 @@ class AgentConfig:
         Create a agent instance from the configuration.
         """
         if len(self.grabber_config) > 0:
-            agent : Agent = ClassUtils.create_instance(self.grabber_config["type"])            
+            agent : Agent = ClassUtils.create_instance(self.grabber_config[AgentConfig.TYPE])            
             ClassUtils.set_properties(agent, self.grabber_config)
             if len(self.buffer_configs) > 0:
                 for buffer_config in self.buffer_configs:
-                    buffer : Buffer = ClassUtils.create_instance(buffer_config["type"])
+                    buffer : Buffer = ClassUtils.create_instance(buffer_config[AgentConfig.TYPE])
                     ClassUtils.set_properties(buffer, buffer_config)
                     agent.add_buffer(buffer)
             if len(self.adapter_configs) > 0:
                 for adapter_config in self.adapter_configs:
-                    adapter = ClassUtils.create_instance(adapter_config["type"])
+                    adapter = ClassUtils.create_instance(adapter_config[AgentConfig.TYPE])
                     ClassUtils.set_properties(adapter, adapter_config)
                     agent.add_adapter(adapter)
             if len(self.mapping_configs) > 0:
                 for mapping_config in self.mapping_configs:
-                    mapping = ClassUtils.create_instance(mapping_config["type"])
+                    mapping = ClassUtils.create_instance(mapping_config[AgentConfig.TYPE])
                     ClassUtils.set_properties(mapping, mapping_config)
                     agent.add_mapping(mapping)
             if len(self.service_configs) > 0:
                 for service_config in self.service_configs:
-                    service = ClassUtils.create_instance(service_config["type"])
+                    service = ClassUtils.create_instance(service_config[AgentConfig.TYPE])
                     ClassUtils.set_properties(service, service_config)
                     agent.add_service(service)
             return agent
@@ -70,11 +95,11 @@ class AgentConfig:
         Convert the configuration to a JSON string.
         """
         d = dict()
-        d["agent"] = self.grabber_config
-        d["adapters"] = self.adapter_configs
-        d["buffers"] = self.buffer_configs
-        d["mappings"] = self.mapping_configs
-        d["services"] = self.service_configs    
+        d[AgentConfig.AGENT] = self.grabber_config
+        d[AgentConfig.ADAPTERS] = self.adapter_configs
+        d[AgentConfig.BUFFERS] = self.buffer_configs
+        d[AgentConfig.MAPPINGS] = self.mapping_configs
+        d[AgentConfig.SERVICES] = self.service_configs    
         return d
      
     def to_json(self) -> str:

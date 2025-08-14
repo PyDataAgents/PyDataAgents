@@ -2,6 +2,7 @@ from __future__ import annotations
 import copy
 import threading
 
+from ..agents.AgentConfig import AgentConfig
 from .Buffer import Buffer
 from ..agents.Agent import Agent
 
@@ -29,7 +30,7 @@ class ListBuffer(Buffer):
                 self.__push1(elements)
             elif hasattr(elements, "__len__"):
                 # check for infinity capacity
-                if self.capacity != Buffer.INFINITE_CAPACITY:
+                if self.capacity != AgentConfig.INFINITE_CAPACITY:
                     too_many =  len(elements) + self.size() - self.capacity
                 else:
                     too_many = 0
@@ -69,10 +70,10 @@ class ListBuffer(Buffer):
             
     def data_with_meta(self, n = 0, persistent = True) -> dict:        
         data = {}
-        data[Buffer.VALUES] = self.data(n, persistent)
+        data[AgentConfig.VALUES] = self.data(n, persistent)
         d = {}
-        d[Buffer.DATA] = data
-        d[Buffer.META] = self.config_options()
+        d[AgentConfig.DATA] = data
+        d[AgentConfig.META] = self.config_options()
         return d
                     
     def size(self) -> int:
@@ -86,7 +87,7 @@ class ListBuffer(Buffer):
         """
         with self.lock:
             # check for infinity capacity
-            if self.capacity != Buffer.INFINITE_CAPACITY:
+            if self.capacity != AgentConfig.INFINITE_CAPACITY:
                 if self.size() == self.capacity:
                     self.elements.pop(0)            
             self.elements.append(element)

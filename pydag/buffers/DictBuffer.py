@@ -3,6 +3,7 @@ import copy
 import threading
 from typing import Union
 
+from ..agents.AgentConfig import AgentConfig
 from .Buffer import Buffer
 from ..agents import Agent
 
@@ -34,7 +35,7 @@ class DictBuffer(Buffer):
                         else:
                             self.elements[k].append(elements[k])
                         # check for infinity capacity
-                        if self.capacity != Buffer.INFINITE_CAPACITY:                            
+                        if self.capacity != AgentConfig.INFINITE_CAPACITY:                            
                             if len(self.elements[k]) > self.capacity:
                                 self.elements[k].pop(0)                        
                     else:
@@ -68,8 +69,8 @@ class DictBuffer(Buffer):
             
     def data_with_meta(self, n = 0, persistent = True) -> dict:        
         d = {}
-        d[Buffer.DATA] = self.data(n, persistent)
-        d[Buffer.META] = self.config_options()
+        d[AgentConfig.DATA] = self.data(n, persistent)
+        d[AgentConfig.META] = self.config_options()
         return d
 
     def size(self) -> int:

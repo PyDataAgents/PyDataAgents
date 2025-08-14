@@ -23,21 +23,7 @@ class AgentElement(ABC):
     load_on_install : bool = field(default=False, metadata = {"description": "specifies whether the GrabberElement should try to load from local json config file on install"})
     
     LOGGER = logger
-    
-    # Keyword Collection   
-    AGENT = "agent"
-    BUFFER = "buffer"
-    BUFFERS = "buffers"
-    ADAPTER = "adapter"
-    ADAPTERS = "adapters"
-    MAPPING = "mapping"
-    MAPPINGS = "mappings"
-    SERVICE = "service"
-    SERVICES = "services"
-    
-    TYPE = "type"
-    ID = "id"
-    
+        
     def __post_init__(self):
         """
         Initialize the agent element and assign a unique ID.

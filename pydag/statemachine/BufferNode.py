@@ -1,5 +1,6 @@
 from dataclasses import dataclass, field
 
+from ..agents.AgentConfig import AgentConfig
 from ..buffers.DictBuffer import DictBuffer
 from ..buffers.Buffer import Buffer
 from ..agents.Agent import Agent
@@ -29,10 +30,10 @@ class BufferNode(Node):
                 if self.buffer_id in agent.buffer_store:
                     self.buffer = agent.buffer_store[self.buffer_id]
                 else:
-                    self.buffer = DictBuffer(id=self.id + "-BUFFER", capacity=Buffer.INFINITE_CAPACITY)
+                    self.buffer = DictBuffer(id=self.id + "-BUFFER", capacity=AgentConfig.INFINITE_CAPACITY)
                     agent.add_buffer(self.buffer)
             else:
-                self.buffer = DictBuffer(id=self.id + "-BUFFER", capacity=Buffer.INFINITE_CAPACITY)
+                self.buffer = DictBuffer(id=self.id + "-BUFFER", capacity=AgentConfig.INFINITE_CAPACITY)
         
     def deinstall(self, agent : Agent = None):
         super().deinstall(agent)
