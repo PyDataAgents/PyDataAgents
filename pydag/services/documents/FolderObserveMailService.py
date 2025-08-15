@@ -25,7 +25,7 @@ class FolderObserveMailService(Service):
     max_entries : int = field(default=5, metadata={"description": "Maximum number of entries to keep as history."})
     list_files : bool = field(default=True, metadata={"description": "If True, the service will list files in the mail body."})
     html_report : bool = field(default=True, metadata={"description": "If True, the mail will be sent as HTML."})
-    mail_action : MailAction = field(default_factory=None, metadata={"description": "MailAction object to send a mail with file infos."})
+    mail_action : MailAction = field(default=None, metadata={"description": "MailAction object to send a mail with file infos."})
 
     # Constants for the mail content
     COL_DATE : str = "Datetime"

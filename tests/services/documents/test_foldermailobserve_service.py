@@ -50,7 +50,7 @@ def test_010():
     mail_action.smtp_server = config["AST"]["SMTP_HOST"]
     mail_action.port = int(config["AST"]["SMTP_PORT"])
     mail_action.mail_account = config["AST"]["SMTP_ACCOUNT"]
-    mail_action.recipient = config["AST"]["MY_MAIL"]
+    mail_action.recipients = [config["AST"]["MY_MAIL"]]
     mail_action.tls = False
     
     folder_service = FolderObserveMailService()
@@ -84,7 +84,7 @@ def test_020():
     mail_action.port = int(config["GMX"]["smtp_port"])
     mail_action.mail_account = config["GMX"]["watchdog_mail"]
     mail_action.pw = config["GMX"]["watchdog_pw"]
-    mail_action.recipient = config["GMX"]["test_mail"]
+    mail_action.recipients = [config["GMX"]["test_mail"]]
     
     folder_service = FolderObserveMailService()
     folder_service.id = "TestFolderObserveMailService"
