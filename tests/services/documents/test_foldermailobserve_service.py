@@ -133,8 +133,8 @@ def test_021():
     agent.start_blocking()
     
 def test_030():
-    
-    yc : YAMLConfig = YAMLConfig("tests\\services\\documents\\folder_observe_config.yaml") 
+    yc : YAMLConfig = YAMLConfig("C:\\Users\\jhillenb\\Downloads\\t\\pdm_folder_mail_service.yaml") 
+    #yc : YAMLConfig = YAMLConfig("tests\\services\\documents\\folder_observe_config.yaml") 
     ac : AgentConfig = yc.load()    
     ag : Agent = ac.create() 
     
