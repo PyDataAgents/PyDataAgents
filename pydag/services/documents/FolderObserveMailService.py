@@ -53,7 +53,7 @@ class FolderObserveMailService(Service):
     def start(self):
         super().start()
         # create new thread for update interval of folder observation
-        self.service_thread = ObserverThread(self.unique_id() + "-Thread", ThreadType.MILLI_SECOND, self.interval * 1000)
+        self.service_thread = ObserverThread(self.unique_id() + "-Thread", ThreadType.SECOND, self.interval)
         observer = FolderMailObserver(self)
         self.service_thread.add_observer(observer)
         self.service_thread.start()     

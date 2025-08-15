@@ -1,4 +1,6 @@
 import yaml
+
+from ..utils.FileUtils import FileUtils
 from .FileConfig import FileConfig
 from .AgentConfig import AgentConfig
 
@@ -33,6 +35,8 @@ class YAMLConfig(FileConfig):
         d["buffers"] = grabber_config.buffer_configs
         d["mappings"] = grabber_config.mapping_configs
         d["services"] = grabber_config.service_configs
+        # make sure the directory exists        
+        FileUtils.create_dir(FileUtils.parent_folder(self.file_path))
         yaml_file = open(self.file_path, "w")
         yaml.dump(d, yaml_file, sort_keys=False)
         yaml_file.close()
