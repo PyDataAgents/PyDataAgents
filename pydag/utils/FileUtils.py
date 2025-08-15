@@ -154,3 +154,25 @@ class FileUtils:
             str: parent folder of the specified file path
         """
         return os.path.dirname(file_path)
+    
+    @staticmethod
+    def file_name(file_path : str, with_ext : bool = True) -> str:
+        """returns only the filename from `file_path`
+        <br>if `with_ext` is true, then also the file extension is returned
+        <br>Example:
+        ```python
+        file_name('C:\\fake\\path\\t.txt', True)
+        >>t.txt
+        ```
+
+        Args:
+            file_path (str): absolute file path
+            with_ext (bool, optional): specifies whether to include or exclude file extension. Defaults to True.
+
+        Returns:
+            str: file name
+        """
+        if with_ext:
+            return os.path.basename(file_path)
+        else:
+            return os.path.splitext(os.path.basename(file_path))[0]

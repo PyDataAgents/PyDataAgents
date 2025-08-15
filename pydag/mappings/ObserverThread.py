@@ -12,7 +12,7 @@ class ObserverThread(AgentElement):
     sampling_period : int = field(default=0, metadata={"description": "sampling period between observer notifies"})
     thread_type : str = field(default=ThreadType.MILLI_SECOND.value, metadata={"description": "type of thread -> MILLI_SECOND | MICRO_SECOND | NANO_SECOND | SECOND | ONLY_ONCE | INSTANT | TRIGGERED"})
     
-    SAFETY_DIFF_TIME_UNITS : int = 1
+    SAFETY_DIFF_TIME_UNITS : float = 1.0
     SLEEP_WITH_HOLD_FACTOR : float = 0.9
      
     def __post_init__(self):

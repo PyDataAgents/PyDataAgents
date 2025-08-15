@@ -103,4 +103,32 @@ def test_020():
     yc.save(gc)    
     
     agent.start_blocking()
+    
+    
+def test_021():
+    config = configparser.ConfigParser()
+    config.read("config.ini")
+    
+    agent = Agent()
+    
+    mail_action = MailAction()
+    mail_action.id = "TestMailAction"
+    mail_action.smtp_server = config["GMX"]["smtp_server"]
+    mail_action.port = int(config["GMX"]["smtp_port"])
+    mail_action.mail_account = config["GMX"]["watchdog_mail"]
+    mail_action.pw = config["GMX"]["watchdog_pw"]
+    mail_action.recipients = [config["GMX"]["test_mail"]]
+    
+    folder_service = FolderObserveMailService()
+    folder_service.id = "TestFolderObserveMailService"
+    folder_service.folder = str(Path.home() / "Downloads")
+    folder_service.interval = 20 # Check every x seconds
+    folder_service.skip_weekends = True
+    folder_service.max_entries = 5
+    folder_service.list_files = True
+    folder_service.html_report = True
+    folder_service.mail_action = mail_action    
+    
+    agent.add_service(folder_service)
+    agent.start_blocking()
         
