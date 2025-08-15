@@ -8,10 +8,14 @@
 | [`Service`](#service-in-pydagservicesservicepy) | abstract base class for agent Services     |
 | [`BrowserAutomationService`](#browserautomationservice-in-pydagservicesbrowserbrowserautomationservicepy) |  |
 | [`CopyFileService`](#copyfileservice-in-pydagservicesdocumentscopyfileservicepy) | `Service`to copy files from one location to another |
+| [`CopyFileObserver`](#copyfileobserver-in-pydagservicesdocumentscopyfileservicepy) |  |
 | [`DeleteFileService`](#deletefileservice-in-pydagservicesdocumentsdeletefileservicepy) | `Service` to delete files from folders |
+| [`DeleteFileObserver`](#deletefileobserver-in-pydagservicesdocumentsdeletefileservicepy) |  |
 | [`FileTextSearchService`](#filetextsearchservice-in-pydagservicesdocumentsfiletextsearchservicepy) |  |
 | [`FileWatchdogService`](#filewatchdogservice-in-pydagservicesdocumentsfilewatchdogservicepy) |  |
+| [`WatchdogHandler`](#watchdoghandler-in-pydagservicesdocumentsfilewatchdogservicepy) |  |
 | [`FolderObserveMailService`](#folderobservemailservice-in-pydagservicesdocumentsfolderobservemailservicepy) | `Service` to observe a folder for new files and alert by mail on events. |
+| [`FolderMailObserver`](#foldermailobserver-in-pydagservicesdocumentsfolderobservemailservicepy) | Observer to handle the folder observation events. |
 | [`MSGraphService`](#msgraphservice-in-pydagservicesofficemsgraphservicepy) |  |
 | [`ExcelRestService`](#excelrestservice-in-pydagservicesrestexcelrestservicepy) | Service for creating a REST API for accessing named Tables in Excel     |
 | [`RestService`](#restservice-in-pydagservicesrestrestservicepy) | Service for creating a REST API for DataGrabber using FastAPI     |
@@ -105,6 +109,24 @@ obj.interval='60 * 60 * 24'
 ```
 
 [Go to Summary](#summary)
+## `CopyFileObserver` (in `pydag\services\documents\CopyFileService.py`)
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `id` | `str` | `` | unique identifier of element in DataGrabber application |
+| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+
+
+```python
+# Example usage of `CopyFileObserver`
+from pydag.services.documents.CopyFileService import CopyFileObserver  # Adjust import if needed
+
+obj = CopyFileObserver()
+obj.id="<string>"
+obj.load_on_install=False
+```
+
+[Go to Summary](#summary)
 ## `DeleteFileService` (in `pydag\services\documents\DeleteFileService.py`)
 
 `Service` to delete files from folders
@@ -127,6 +149,24 @@ obj.load_on_install=False
 obj.folders='list()'
 obj.older_than_milliseconds=1
 obj.interval='60 * 60 * 24'
+```
+
+[Go to Summary](#summary)
+## `DeleteFileObserver` (in `pydag\services\documents\DeleteFileService.py`)
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `id` | `str` | `` | unique identifier of element in DataGrabber application |
+| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+
+
+```python
+# Example usage of `DeleteFileObserver`
+from pydag.services.documents.DeleteFileService import DeleteFileObserver  # Adjust import if needed
+
+obj = DeleteFileObserver()
+obj.id="<string>"
+obj.load_on_install=False
 ```
 
 [Go to Summary](#summary)
@@ -169,6 +209,24 @@ obj.load_on_install=False
 obj.folders='list()'
 obj.recursive=True
 obj.buffer_id="<string>"
+```
+
+[Go to Summary](#summary)
+## `WatchdogHandler` (in `pydag\services\documents\FileWatchdogService.py`)
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `id` | `str` | `` | unique identifier of element in DataGrabber application |
+| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+
+
+```python
+# Example usage of `WatchdogHandler`
+from pydag.services.documents.FileWatchdogService import WatchdogHandler  # Adjust import if needed
+
+obj = WatchdogHandler()
+obj.id="<string>"
+obj.load_on_install=False
 ```
 
 [Go to Summary](#summary)
@@ -216,6 +274,25 @@ obj.COL_FILE_EXTENSIONS="path/to/file.txt"
 obj.COL_FILENAME="path/to/file.txt"
 obj.COL_LINK="<string>"
 obj.MAX_FILES=1
+```
+
+[Go to Summary](#summary)
+## `FolderMailObserver` (in `pydag\services\documents\FolderObserveMailService.py`)
+
+Observer to handle the folder observation events.
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `id` | `str` | `` | unique identifier of element in DataGrabber application |
+| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+
+
+```python
+# Example usage of `FolderMailObserver`
+from pydag.services.documents.FolderObserveMailService import FolderMailObserver  # Adjust import if needed
+
+obj = FolderMailObserver()
+obj.id="<string>"
+obj.load_on_install=False
 ```
 
 [Go to Summary](#summary)

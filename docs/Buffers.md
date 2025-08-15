@@ -5,9 +5,11 @@
 | Class | Description |
 |-------|-------------|
 | [`Buffer`](#buffer-in-pydagbuffersbufferpy) | Abstract base class for buffers. |
+| [`BufferObserver`](#bufferobserver-in-pydagbuffersbufferobserverpy) |  |
 | [`DictBuffer`](#dictbuffer-in-pydagbuffersdictbufferpy) | buffer that stores its values in a dictionary in a table like fashion, where every key contains a list of data     |
 | [`ListBuffer`](#listbuffer-in-pydagbufferslistbufferpy) | buffer that stores its values in a capacity limited list     |
 | [`ObjectTransformation`](#objecttransformation-in-pydagbuffersobjecttransformationpy) | Abstract base class for object transformations for buffers |
+| [`ObservedListBuffer`](#observedlistbuffer-in-pydagbuffersobservedlistbufferpy) |  |
 | [`SampledBuffer`](#sampledbuffer-in-pydagbufferssampledbufferpy) | A buffer that samples a signal at a specified interval. |
 | [`SignalBuffer`](#signalbuffer-in-pydagbufferssignalbufferpy) | A buffer that holds signals with a specific start time and elapsed time.Attributes:    start_time (int): The start time of the signal in milliseconds.    elapsed_time (float): The elapsed time since the start in seconds. |
 | [`TimedBuffer`](#timedbuffer-in-pydagbufferstimedbufferpy) | A buffer that stores data with timestamps.Inherits from ListBuffer. |
@@ -48,6 +50,26 @@ obj.data_type='DataType.FLOAT.value'
 obj.initial_values="<value>"
 obj.unit="<value>"
 obj.description="<string>"
+```
+
+[Go to Summary](#summary)
+## `BufferObserver` (in `pydag\buffers\BufferObserver.py`)
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `id` | `str` | `` | unique identifier of element in DataGrabber application |
+| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+| `buffer_id` | `str` | `` | id of the buffer to observe |
+
+
+```python
+# Example usage of `BufferObserver`
+from pydag.buffers.BufferObserver import BufferObserver  # Adjust import if needed
+
+obj = BufferObserver()
+obj.id="<string>"
+obj.load_on_install=False
+obj.buffer_id="<string>"
 ```
 
 [Go to Summary](#summary)
@@ -129,6 +151,38 @@ obj = ObjectTransformation()
 obj.id="<string>"
 obj.load_on_install=False
 obj.datatype='DataType.FLOAT.value'
+```
+
+[Go to Summary](#summary)
+## `ObservedListBuffer` (in `pydag\buffers\ObservedListBuffer.py`)
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `capacity` | `int` | `1` | Number of elements that can be stored in buffer before being discarded in FiFo fashion. If set to -1, then there is no capacity for this buffer. |
+| `data_type` | `str` | `'DataType.FLOAT.value'` | datatype to expect from buffer elements, can be DataType enum or list of enums |
+| `initial_values` | `any` | `` | initial values in buffer |
+| `unit` | `any` | `` | unit of element values in this buffer, can be string or list of strings |
+| `description` | `str` | `` | buffer description |
+| `id` | `str` | `` | unique identifier of element in DataGrabber application |
+| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+| `input_observers` | `list[BufferObserver]` | `'list()'` | list of observers that observe new input to the buffer inside the push method |
+| `output_observers` | `list[BufferObserver]` | `'list()'` | list of observers that observe output of the buffer inside the data method |
+
+
+```python
+# Example usage of `ObservedListBuffer`
+from pydag.buffers.ObservedListBuffer import ObservedListBuffer  # Adjust import if needed
+
+obj = ObservedListBuffer()
+obj.capacity=1
+obj.data_type='DataType.FLOAT.value'
+obj.initial_values="<value>"
+obj.unit="<value>"
+obj.description="<string>"
+obj.id="<string>"
+obj.load_on_install=False
+obj.input_observers='list()'
+obj.output_observers='list()'
 ```
 
 [Go to Summary](#summary)

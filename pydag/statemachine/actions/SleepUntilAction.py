@@ -7,10 +7,10 @@ from ..Action import Action
 @dataclass
 class SleepUntilAction(Action):
     """
-    An action that sleeps for a specified number of seconds.
+    An action that sleeps until the specified daytime.
     """
     
-    daytime : str = field(init=True, default=None, metadata={"description" : "day time when the sleep should end"})
+    daytime : str = field(init=True, default=None, metadata={"description" : "day time when the sleep should end, format hh:mm:ss"})
 
     def execute(self):
         seconds = TimeUtils.seconds_till_daytime(self.daytime)
