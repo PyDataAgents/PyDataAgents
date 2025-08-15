@@ -14,7 +14,7 @@ class MailAction(Action):
     port : int = field(init=True, default=None, metadata={"description": "port of the smtp server"})
     mail_account : str = field(init=True, default=None, metadata={"description": "mail account to use for login"})
     pw : str = field(init=True, default=None, metadata={"description": "password of the mail server"})
-    recipient : str = field(init=True, default=None, metadata={"description": "mail address of the recipient"})
+    recipients : list[str] = field(init=True, default_factory=list[str], metadata={"description": "mail address of the recipient"})
     subject : str = field(init=True, default=None,  metadata={"description": "subject of the mail"})
     body : str = field(init=True, default=None,  metadata={"description": "body of the mail"})
     tls : bool = field(init=True, default=True, metadata={"description": "use TLS for the connection"})
@@ -24,7 +24,7 @@ class MailAction(Action):
         message = MIMEMultipart("alternative")
         message["Subject"] = self.subject if self.subject else "Do Not Reply - Mail from " + self.cname()
         message["From"] = self.mail_account
-        message["To"] = self.recipient
+        message["To"] = ", ".join(self.recipients)
         
         mt = MIMEText(self.body, "html")
         
@@ -37,7 +37,7 @@ class MailAction(Action):
                     server.starttls()  # Secure the connection
                 if self.pw is not None:
                     server.login(self.mail_account, self.pw)
-                server.sendmail(self.mail_account, self.recipient, message.as_string())
+                server.sendmail(self.mail_account, self.recipients, message.as_string())
                 #print("✅ Email sent successfully.")
         except Exception as e:
             raise StatemachineException("could not send mail from " + self.cname()) from e
