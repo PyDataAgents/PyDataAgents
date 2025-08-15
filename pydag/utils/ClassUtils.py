@@ -4,6 +4,7 @@ import importlib
 
 from ..agents.AgentException import AgentException
 
+    
 class ClassUtils:
     
     @staticmethod
@@ -30,25 +31,23 @@ class ClassUtils:
         Set a property of an object.
         """
         if hasattr(obj, property_name):
-            attr = getattr(obj, property_name)
-            if attr is not None:
-                from ..agents.AgentElement import AgentElement
-                if isinstance(attr, AgentElement):
-                    if isinstance(value, dict):
-                        # If the value is a dictionary, set properties of the AgentElement
-                        if "type" in value:
-                            # If the dictionary contains a type, create an instance of that type
-                            sub_obj = ClassUtils.create_instance(value["type"])
-                            ClassUtils.set_properties(sub_obj, value)
-                            setattr(obj, property_name, sub_obj)
-                        else:
-                            raise AgentException(f"Expected a dictionary with 'type' for property '{property_name}' of {obj}, but got {value}.")
+            attr = getattr(obj, property_name)            
+            #print(type(attr))
+            from ..agents.AgentElement import AgentElement
+            if isinstance(attr, AgentElement):
+                if isinstance(value, dict):
+                    # If the value is a dictionary, set properties of the AgentElement
+                    if "type" in value:
+                        # If the dictionary contains a type, create an instance of that type
+                        sub_obj = ClassUtils.create_instance(value["type"])
+                        ClassUtils.set_properties(sub_obj, value)
+                        setattr(obj, property_name, sub_obj)
                     else:
-                        raise AgentException(f"Expected a dictionary for property '{property_name}' of {obj}, but got {type(value).__name__}.")
+                        raise AgentException(f"Expected a dictionary with 'type' for property '{property_name}' of {obj}, but got {value}.")
                 else:
-                    setattr(obj, property_name, value)
+                    raise AgentException(f"Expected a dictionary for property '{property_name}' of {obj}, but got {type(value).__name__}.")
             else:
-                raise AgentException("Error occured when accessing attribute " + property_name + " of " + str(obj) + ". Attribute is None.")
+                setattr(obj, property_name, value)
         else:
             raise AgentException(f"Object {obj} has no attribute {property_name}")
         

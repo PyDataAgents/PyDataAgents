@@ -99,7 +99,7 @@ def test_020():
     agent.add_service(folder_service)
         
     gc = AgentConfig(agent)
-    yc = YAMLConfig(str(Path.home() / "Downloads" / "t" / "folder_observe_config.yaml"))
+    yc = YAMLConfig("tests\\services\\documents\\folder_observe_config.yaml")
     yc.save(gc)    
     
     agent.start_blocking()
@@ -131,4 +131,13 @@ def test_021():
     
     agent.add_service(folder_service)
     agent.start_blocking()
-        
+    
+def test_030():
+    
+    yc : YAMLConfig = YAMLConfig("tests\\services\\documents\\folder_observe_config.yaml") 
+    ac : AgentConfig = yc.load()    
+    ag : Agent = ac.create() 
+    
+    ag.start_blocking() 
+    
+     
