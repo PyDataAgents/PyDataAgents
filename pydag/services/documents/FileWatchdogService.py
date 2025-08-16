@@ -2,6 +2,7 @@ from dataclasses import dataclass, field
 
 from watchdog.events import FileSystemEventHandler
 from watchdog.observers import Observer
+from loguru import logger
 
 from ...services.ServiceException import ServiceException
 from ...buffers.Buffer import Buffer
@@ -56,16 +57,16 @@ class WatchdogHandler(FileSystemEventHandler):
         self.service = service
     
     def on_created(self, event):
-        self.service.LOGGER.debug(f"File created: {event.src_path}")
+        logger.debug(f"File created: {event.src_path}")
         self.service.file_event_buffer.push(event.src_path)
 
     def on_modified(self, event):
-        self.service.LOGGER.debug(f"File modified: {event.dest_path}")
+        logger.debug(f"File modified: {event.dest_path}")
 
     def on_deleted(self, event):
-        self.service.LOGGER.debug(f"File deleted: {event.src_path}")
+        logger.debug(f"File deleted: {event.src_path}")
         self.service.file_event_buffer.push(event.src_path)
         
     def on_moved(self, event):
-        self.service.LOGGER.debug(f"File moved: {event.dest_path}")
+        logger.debug(f"File moved: {event.dest_path}")
         self.service.file_event_buffer.push(event.src_path)

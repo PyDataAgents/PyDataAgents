@@ -1,6 +1,8 @@
 from dataclasses import dataclass, field
 import threading
 import time
+from loguru import logger
+
 from ..agents.AgentElement import AgentElement
 from .Observer import Observer
 from .ThreadType import ThreadType
@@ -59,12 +61,12 @@ class ObserverThread(AgentElement):
                 if self.thread_type is not ThreadType.TRIGGERED.value:
                     self.thread.start()
             else:
-                ObserverThread.LOGGER.error("could not start " +  self.__class__.__name__ + ", because it is running already")
+                logger.error("could not start " +  self.__class__.__name__ + ", because it is running already")
         else:
-            ObserverThread.LOGGER.error("no " + Observer.__class__.__name__ + " s were added to this " + self.__class__.__name__)
+            logger.error("no " + Observer.__class__.__name__ + " s were added to this " + self.__class__.__name__)
     
     def stop(self):
-        ObserverThread.LOGGER.info(self.__class__.__name__ + "[" + self.id + "] is being stopped")
+        logger.info(self.__class__.__name__ + "[" + self.id + "] is being stopped")
         self.is_running = False
         self.denotify_observers()
     
@@ -90,7 +92,7 @@ class ObserverThread(AgentElement):
                 # do nothing and sleep a little
                 diff = self.sampling_period - ObserverThread.SAFETY_DIFF_TIME_UNITS - (current_time - last_time)
                 time.sleep(diff / 1000.0 * ObserverThread.SLEEP_WITH_HOLD_FACTOR)        
-        ObserverThread.LOGGER.info(self.__class__.__name__ + "[" + self.id + "] has stopped")         
+        logger.info(self.__class__.__name__ + "[" + self.id + "] has stopped")         
     
     def runMicrosecondThread(self):
         last_time = 0
@@ -106,7 +108,7 @@ class ObserverThread(AgentElement):
                 # do nothing and sleep a little
                 diff = self.sampling_period - ObserverThread.SAFETY_DIFF_TIME_UNITS - (current_time - last_time)
                 time.sleep(diff / 1000000.0 * ObserverThread.SLEEP_WITH_HOLD_FACTOR)        
-        ObserverThread.LOGGER.info(self.__class__.__name__ + "[" + self.id + "] has stopped")
+        logger.info(self.__class__.__name__ + "[" + self.id + "] has stopped")
     
     def runNanosecondThread(self):
         last_time = 0
@@ -122,7 +124,7 @@ class ObserverThread(AgentElement):
                 # do nothing and sleep a little
                 diff = self.sampling_period - ObserverThread.SAFETY_DIFF_TIME_UNITS - (current_time - last_time)
                 time.sleep(diff / 1000000000.0 * ObserverThread.SLEEP_WITH_HOLD_FACTOR)        
-        ObserverThread.LOGGER.info(self.__class__.__name__ + "[" + self.id + "] has stopped")
+        logger.info(self.__class__.__name__ + "[" + self.id + "] has stopped")
         
     def runSecondThread(self):
         last_time = 0
@@ -138,14 +140,14 @@ class ObserverThread(AgentElement):
                 # do nothing and sleep a little
                 diff = self.sampling_period - ObserverThread.SAFETY_DIFF_TIME_UNITS - (current_time - last_time)
                 time.sleep(diff * ObserverThread.SLEEP_WITH_HOLD_FACTOR)        
-        ObserverThread.LOGGER.info(self.__class__.__name__ + "[" + self.id + "] has stopped")
+        logger.info(self.__class__.__name__ + "[" + self.id + "] has stopped")
     
     def runInstantThread(self):
         last_time = round(time.time() * 1000000.0)
         while self.is_running:
             self.notify_observers()
             last_time = round(time.time() * 1000000.0)       
-        ObserverThread.LOGGER.info(self.__class__.__name__ + "[" + self.id + "] has stopped")
+        logger.info(self.__class__.__name__ + "[" + self.id + "] has stopped")
     
     def runOnlyOnceThread(self):
         self.notify_observers()

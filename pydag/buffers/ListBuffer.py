@@ -1,6 +1,7 @@
 from __future__ import annotations
 import copy
 import threading
+from loguru import logger
 
 from ..agents.AgentConfig import AgentConfig
 from .Buffer import Buffer
@@ -52,7 +53,7 @@ class ListBuffer(Buffer):
             if self.size() > 0:
                 if n > 0:
                     if n > self.size():
-                        ListBuffer.LOGGER.warning("buffer only contains " + str(self.size()) + " elements")
+                        logger.warning("buffer only contains " + str(self.size()) + " elements")
                         n = self.size()
                     d = self.elements[0:n]
                     if not persistent:
@@ -65,7 +66,7 @@ class ListBuffer(Buffer):
                         self.elements.clear()
                     return d
             else:
-                ListBuffer.LOGGER.warning("buffer is empty")
+                logger.warning("buffer is empty")
                 return []
             
     def data_with_meta(self, n = 0, persistent = True) -> dict:        

@@ -1,5 +1,6 @@
 from dataclasses import dataclass, field
 from datetime import datetime
+from loguru import logger
 
 from ...utils.BufferUtils import BufferUtils
 from ...utils.FileUtils import FileUtils
@@ -80,7 +81,7 @@ class FolderMailObserver(Observer):
         ts : str = TimeUtils.now_iso8601()
         files = FileUtils.list_files(self.service.folder)
         if len(files) == 0:
-            self.LOGGER.warning(f"No files found in folder {self.service.folder} at {ts}.")
+            logger.warning(f"No files found in folder {self.service.folder} at {ts}.")
             return
 
         nf = len(files)

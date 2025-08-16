@@ -1,4 +1,6 @@
 from dataclasses import dataclass, field
+from loguru import logger
+
 from ...buffers.Comparator import Comparator
 from ..BufferNode import BufferNode
 from ..Transition import Transition
@@ -34,14 +36,14 @@ class CompareBufferTransition(BufferNode, Transition):
                     if data in self.value:
                         return True
                 else:
-                    self.LOGGER.warning(f"Comparator {self.comparator} is not applicable for data type {type(data)}.")                    
+                    logger.warning(f"Comparator {self.comparator} is not applicable for data type {type(data)}.")                    
                     return False
             case Comparator.NOT_LIKE.value:
                 if isinstance(data, str):
                     if data not in self.value:
                         return True
                 else:
-                    self.LOGGER.warning(f"Comparator {self.comparator} is not applicable for data type {type(data)}.")                    
+                    logger.warning(f"Comparator {self.comparator} is not applicable for data type {type(data)}.")                    
                     return False
             case Comparator.NOT_NULL.value:
                 if data is not None:
@@ -49,6 +51,6 @@ class CompareBufferTransition(BufferNode, Transition):
                 else:
                     return False
             case _:
-                self.LOGGER.error(f"Unknown comparator: {self.comparator}.")
+                logger.error(f"Unknown comparator: {self.comparator}.")
                 return False
         

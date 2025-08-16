@@ -7,5 +7,5 @@ class LinkBufferAction(BufferNode, Action):
     therefore an empty execute method is provided
     """
     
-    def execute():
+    def execute(self):
         return

@@ -1,5 +1,6 @@
 import copy
 import time
+from loguru import logger
 
 from ..agents.AgentConfig import AgentConfig
 from .ListBuffer import ListBuffer
@@ -74,7 +75,7 @@ class TimedBuffer(ListBuffer):
             if self.size() > 0:
                 if n > 0:
                     if n > self.size():
-                        ListBuffer.LOGGER.warning("buffer only contains " + str(self.size()) + " elements")
+                        logger.warning("buffer only contains " + str(self.size()) + " elements")
                         n = self.size()
                     v = self.elements[0:n]
                     t = self.timestamps[0:n]
@@ -93,7 +94,7 @@ class TimedBuffer(ListBuffer):
                         self.timestamps.clear()
                     return d
             else:
-                ListBuffer.LOGGER.warning("buffer is empty")
+                logger.warning("buffer is empty")
                 return {}
             
     def data_with_meta(self, n = 0, persistent = True) -> dict:        
