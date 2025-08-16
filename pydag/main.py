@@ -3,7 +3,6 @@ from pydag.agents.Agent import Agent
 from pydag.agents.AgentConfig import AgentConfig
 from pydag.agents.YAMLConfig import YAMLConfig
 from pydag.services.rest.RestService import RestService
-
 if __name__ == "__main__":
     
     if len(sys.argv) > 1:

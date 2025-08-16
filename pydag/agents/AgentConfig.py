@@ -37,7 +37,7 @@ class AgentConfig:
     INFINITE_CAPACITY = -1
 
     def __init__(self, agent : Agent = None):
-        self.grabber_config = dict()
+        self.agent_config = dict()
         self.adapter_configs = []
         self.buffer_configs = []
         self.mapping_configs = []
@@ -45,7 +45,7 @@ class AgentConfig:
         
         if agent is not None:
             # create agent config
-            self.grabber_config = agent.config_options()
+            self.agent_config = agent.config_options()
             # create adapter configs
             for adapter in agent.adapter_store.values():
                 self.adapter_configs.append(adapter.config_options())       
@@ -63,9 +63,9 @@ class AgentConfig:
         """
         Create a agent instance from the configuration.
         """
-        if len(self.grabber_config) > 0:
-            agent : Agent = ClassUtils.create_instance(self.grabber_config[AgentConfig.TYPE])            
-            ClassUtils.set_properties(agent, self.grabber_config)
+        if len(self.agent_config) > 0:
+            agent : Agent = ClassUtils.create_instance(self.agent_config[AgentConfig.TYPE])            
+            ClassUtils.set_properties(agent, self.agent_config)
             if len(self.buffer_configs) > 0:
                 for buffer_config in self.buffer_configs:
                     buffer : Buffer = ClassUtils.create_instance(buffer_config[AgentConfig.TYPE])
@@ -95,7 +95,7 @@ class AgentConfig:
         Convert the configuration to a JSON string.
         """
         d = dict()
-        d[AgentConfig.AGENT] = self.grabber_config
+        d[AgentConfig.AGENT] = self.agent_config
         d[AgentConfig.ADAPTERS] = self.adapter_configs
         d[AgentConfig.BUFFERS] = self.buffer_configs
         d[AgentConfig.MAPPINGS] = self.mapping_configs

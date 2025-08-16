@@ -130,3 +130,49 @@ class FileUtils:
         else:
             logger.error("File " + file_path + " does not exist")
             return 0
+    
+    @staticmethod    
+    def create_dir(dir : str):
+        """
+        recursively creates all missing parent directories of `dir`
+        """
+        os.makedirs(dir, exist_ok=True)
+        
+    @staticmethod
+    def parent_folder(file_path : str) -> str:
+        """ returns the parent folder of the specified filepath
+            <br>Example:
+            ```python 
+            >>parent_folder("C:\\fake\\path\\file.txt")
+            C:\\fake\\path
+            ```          
+        
+            Args:
+            file_path (str): file path
+
+        Returns:
+            str: parent folder of the specified file path
+        """
+        return os.path.dirname(file_path)
+    
+    @staticmethod
+    def file_name(file_path : str, with_ext : bool = True) -> str:
+        """returns only the filename from `file_path`
+        <br>if `with_ext` is true, then also the file extension is returned
+        <br>Example:
+        ```python
+        file_name('C:\\fake\\path\\t.txt', True)
+        >>t.txt
+        ```
+
+        Args:
+            file_path (str): absolute file path
+            with_ext (bool, optional): specifies whether to include or exclude file extension. Defaults to True.
+
+        Returns:
+            str: file name
+        """
+        if with_ext:
+            return os.path.basename(file_path)
+        else:
+            return os.path.splitext(os.path.basename(file_path))[0]

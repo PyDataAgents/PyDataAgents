@@ -25,7 +25,7 @@ class FolderObserveMailService(Service):
     max_entries : int = field(default=5, metadata={"description": "Maximum number of entries to keep as history."})
     list_files : bool = field(default=True, metadata={"description": "If True, the service will list files in the mail body."})
     html_report : bool = field(default=True, metadata={"description": "If True, the mail will be sent as HTML."})
-    mail_action : MailAction = field(default_factory=None, metadata={"description": "MailAction object to send a mail with file infos."})
+    mail_action : MailAction = field(default_factory=MailAction, metadata={"description": "MailAction object to send a mail with file infos."})
 
     # Constants for the mail content
     COL_DATE : str = "Datetime"
@@ -53,7 +53,7 @@ class FolderObserveMailService(Service):
     def start(self):
         super().start()
         # create new thread for update interval of folder observation
-        self.service_thread = ObserverThread(self.unique_id() + "-Thread", ThreadType.MILLI_SECOND, self.interval * 1000)
+        self.service_thread = ObserverThread(id=self.unique_id() + "-Thread", thread_type=ThreadType.SECOND, sampling_period=self.interval)
         observer = FolderMailObserver(self)
         self.service_thread.add_observer(observer)
         self.service_thread.start()     
@@ -107,8 +107,8 @@ class FolderMailObserver(Observer):
             file_buf.capacity = self.service.MAX_FILES
             for f in files:
                 file_row = {
-                    self.service.COL_FILENAME: f,
-                    self.service.COL_LINK: f"<a href='file://{f}'>LINK</a>"
+                    self.service.COL_FILENAME: FileUtils.file_name(f),
+                    self.service.COL_LINK: f"<a href='file://{f}'>{f}</a>"
                 }
                 file_buf.push(file_row)
                         
