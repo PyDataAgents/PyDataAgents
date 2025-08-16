@@ -1,12 +1,12 @@
-import dash
-from .Service import Service
+#import dash
+from ..Service import Service
 
 
-class PlotService(Service):
+class DashPlotService(Service):
     
     def __post_init__(self):
         super().__post_init__()
-        self.app : dash.Dash = None
+        #self.app : dash.Dash = None
     
     def start(self):
         pass

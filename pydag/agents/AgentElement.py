@@ -22,7 +22,6 @@ class AgentElement(ABC):
     id : str = field(default=None, metadata = {"description": "unique identifier of element in DataGrabber application"})
     load_on_install : bool = field(default=False, metadata = {"description": "specifies whether the GrabberElement should try to load from local json config file on install"})
     
-    LOGGER = logger
         
     def __post_init__(self):
         """
@@ -106,7 +105,7 @@ class AgentElement(ABC):
                 d = json.load(json_file)
                 ClassUtils.set_properties(self, d)
         else:
-            self.LOGGER.warning("no configuration file " + self.id + ".json to load from was found")
+            logger.warning("no configuration file " + self.id + ".json to load from was found")
     
     def save(self):
         # Write config options to JSON file
