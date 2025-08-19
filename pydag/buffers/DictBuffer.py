@@ -25,7 +25,7 @@ class DictBuffer(Buffer):
         super().deinstall(agent)
         self.elements = {}        
     
-    def push(self, elements : Union[list, dict]):
+    def push(self, elements : list | dict):
         with self.lock:
             if isinstance(elements, dict):
                 for k in elements:
