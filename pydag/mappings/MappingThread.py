@@ -1,5 +1,7 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
+from loguru import logger
+
 from ..agents.AgentElement import AgentElement
 from .Mapping import Mapping
 from .MappingType import MappingType
@@ -27,11 +29,11 @@ class MappingThread(AgentElement):
                 if buffer_id in agent.buffer_store:
                     self.mapping[buffer_id] = agent.buffer_store[buffer_id]
                 else:
-                    self.LOGGER.error("Buffer " + buffer_id + " not found in agent")
+                    logger.error("Buffer " + buffer_id + " not found in agent")
             if self.mapping.adapter_id in agent.adapter_store:
                 self.mapping.adapter = agent.adapter_store[self.mapping.adapter_id]
             else:
-                self.LOGGER.error("Adapter " + self.mapping.adapter_id + " not found in agent")        
+                logger.error("Adapter " + self.mapping.adapter_id + " not found in agent")        
         # add observer to observer thread
         match self.mapping.mapping_type:
             case MappingType.READ:

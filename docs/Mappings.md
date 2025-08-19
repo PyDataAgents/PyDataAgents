@@ -25,7 +25,7 @@
 | `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
 | `buffer_ids` | `list[str]` | `` | list of buffer ids to map from |
 | `adapter_id` | `str` | `` | id of the Adapter used for this Mapping |
-| `addresses` | `list[str]` | `` | list of addresses to read/subscribe from or write/publish to |
+| `addresses` | `list[str]` | `'list()'` | list of addresses to read/subscribe from or write/publish to |
 | `thread_type` | `str` | `'ThreadType.MILLI_SECOND.value'` | type of thread, e.g. MILLI_SECONDS, MICRO_SECONDS, INSTANT, ONLY_ONCE, ... |
 | `mapping_type` | `str` | `` | type of mapping, e.g. READ, WRITE, SUB or PUB |
 | `n` | `int` | `1` | number of samples to insert or remove from buffers |
@@ -43,7 +43,7 @@ obj.id="<string>"
 obj.load_on_install=False
 obj.buffer_ids="<string>"
 obj.adapter_id="<string>"
-obj.addresses="<string>"
+obj.addresses='list()'
 obj.thread_type='ThreadType.MILLI_SECOND.value'
 obj.mapping_type="<string>"
 obj.n=1
@@ -115,6 +115,8 @@ obj.load_on_install=False
 |-------|------|---------|-------------|
 | `id` | `str` | `` | unique identifier of element in DataGrabber application |
 | `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+| `sampling_period` | `int` | `0` | sampling period between observer notifies |
+| `thread_type` | `str` | `'ThreadType.MILLI_SECOND.value'` | type of thread -> MILLI_SECOND | MICRO_SECOND | NANO_SECOND | SECOND | ONLY_ONCE | INSTANT | TRIGGERED |
 | `SAFETY_DIFF_TIME_UNITS` | `int` | `` |  |
 | `SLEEP_WITH_HOLD_FACTOR` | `float` | `` |  |
 
@@ -126,6 +128,8 @@ from pydag.mappings.ObserverThread import ObserverThread  # Adjust import if nee
 obj = ObserverThread()
 obj.id="<string>"
 obj.load_on_install=False
+obj.sampling_period=0
+obj.thread_type='ThreadType.MILLI_SECOND.value'
 obj.SAFETY_DIFF_TIME_UNITS=1
 obj.SLEEP_WITH_HOLD_FACTOR=3.14
 ```

@@ -12,10 +12,13 @@
 | [`MappingNode`](#mappingnode-in-pydagstatemachinemappingnodepy) |  |
 | [`Node`](#node-in-pydagstatemachinenodepy) |  |
 | [`ServiceNode`](#servicenode-in-pydagstatemachineservicenodepy) | A class representing a service node in a state machine.Inherits from Node and adds functionality specific to service nodes. |
+| [`StatemachineObserver`](#statemachineobserver-in-pydagstatemachinestatemachineobserverpy) | Observer for the StatemachineService.This observer is be used to start the statemachine in a separate thread |
+| [`StatemachineService`](#statemachineservice-in-pydagstatemachinestatemachineservicepy) |  |
 | [`Transition`](#transition-in-pydagstatemachinetransitionpy) |  |
 | [`ConfigureElementAction`](#configureelementaction-in-pydagstatemachineactionsconfigureelementactionpy) | this `Action` configures a `GrabberElement` property by the provided `element_id` and name of the `option`, which is the class' property<br>the new property value is derived from the `Node`'s `buffer`Args:    GrabberNode (_type_): inherits from class GrabberNode    BufferNode (_type_): inherits from class BufferNodeRaises:    StatemachineException: if an error occurs during execute |
 | [`MailAction`](#mailaction-in-pydagstatemachineactionsmailactionpy) |  |
 | [`SleepAction`](#sleepaction-in-pydagstatemachineactionssleepactionpy) | An action that sleeps for a specified number of seconds. |
+| [`SleepUntilAction`](#sleepuntilaction-in-pydagstatemachineactionssleepuntilactionpy) | An action that sleeps until the specified daytime. |
 | [`StartAction`](#startaction-in-pydagstatemachineactionsstartactionpy) | An action that starts the state machine. |
 | [`StopAction`](#stopaction-in-pydagstatemachineactionsstopactionpy) | An action that stops the state machine. |
 | [`AdapterReadAction`](#adapterreadaction-in-pydagstatemachineactionsadaptersadapterreadactionpy) | Action to read data from an adapter. |
@@ -24,14 +27,16 @@
 | [`BrowserSetElementAction`](#browsersetelementaction-in-pydagstatemachineactionsbrowserbrowsersetelementactionpy) |  |
 | [`BrowserUrlNavigateAction`](#browserurlnavigateaction-in-pydagstatemachineactionsbrowserbrowserurlnavigateactionpy) |  |
 | [`AddBufferAction`](#addbufferaction-in-pydagstatemachineactionsbuffersaddbufferactionpy) | Action to add a buffer to the agent node. |
-| [`BufferExtractAction`](#bufferextractaction-in-pydagstatemachineactionsbuffersbufferextractactionpy) | `Action` for extracting data from the parents' buffers to store into this buffer.This `Action` can only be applied on if the parents' buffers is of type `DictBuffer`. |
+| [`BufferExtractAction`](#bufferextractaction-in-pydagstatemachineactionsbuffersbufferextractactionpy) | `Action` for extracting data from a specified buffer and to store the extracted data into this buffer.This `Action` can only be applied on if the specified buffer is of type `DictBuffer`. |
 | [`FormattedStringAction`](#formattedstringaction-in-pydagstatemachineactionsbuffersformattedstringactionpy) | `Action` to compose a formatted string and store it in this `Action`'s bufferusing its parent's buffer to create the new string |
 | [`LinkBufferAction`](#linkbufferaction-in-pydagstatemachineactionsbufferslinkbufferactionpy) | `Action` that's only function is to link a buffer from agent to the statemachinetherefore an empty execute method is provided |
+| [`ParentBufferExtractAction`](#parentbufferextractaction-in-pydagstatemachineactionsbuffersparentbufferextractactionpy) | `Action` for extracting data from the parents' buffers to store into this buffer.This `Action` can only be applied on if the parents' buffers is of type `DictBuffer`. |
 | [`CopyFilesAction`](#copyfilesaction-in-pydagstatemachineactionsdocumentscopyfilesactionpy) |  |
 | [`ListFilesAction`](#listfilesaction-in-pydagstatemachineactionsdocumentslistfilesactionpy) |  |
 | [`MoveFilesAction`](#movefilesaction-in-pydagstatemachineactionsdocumentsmovefilesactionpy) |  |
 | [`ReadCsvAction`](#readcsvaction-in-pydagstatemachineactionsdocumentsreadcsvactionpy) |  |
 | [`ReadJsonAction`](#readjsonaction-in-pydagstatemachineactionsdocumentsreadjsonactionpy) |  |
+| [`ReadNpzAction`](#readnpzaction-in-pydagstatemachineactionsdocumentsreadnpzactionpy) |  |
 | [`BufferEmptyTransition`](#bufferemptytransition-in-pydagstatemachinetransitionsbufferemptytransitionpy) | A transition that checks if specified buffer is empty.If the buffer is empty, the transition is successful. |
 | [`BufferInRangeTransition`](#bufferinrangetransition-in-pydagstatemachinetransitionsbufferinrangetransitionpy) | A transition that compares the current buffer with a target value.If the buffer matches the target, the transition is successful. |
 | [`BufferNotEmptyTransition`](#buffernotemptytransition-in-pydagstatemachinetransitionsbuffernotemptytransitionpy) | A transition that checks if specified buffer is not empty.If the buffer is not empty, the transition is successful. |
@@ -215,6 +220,54 @@ obj.service_id="<string>"
 ```
 
 [Go to Summary](#summary)
+## `StatemachineObserver` (in `pydag\statemachine\StatemachineObserver.py`)
+
+Observer for the StatemachineService.
+This observer is be used to start the statemachine in a separate thread
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `id` | `str` | `` | unique identifier of element in DataGrabber application |
+| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+
+
+```python
+# Example usage of `StatemachineObserver`
+from pydag.statemachine.StatemachineObserver import StatemachineObserver  # Adjust import if needed
+
+obj = StatemachineObserver()
+obj.id="<string>"
+obj.load_on_install=False
+```
+
+[Go to Summary](#summary)
+## `StatemachineService` (in `pydag\statemachine\StatemachineService.py`)
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `id` | `str` | `` | unique identifier of element in DataGrabber application |
+| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+| `retry_error_nodes` | `bool` | `False` | Statemachine object containing actions and transitions to go through to represent a state machine program flow |
+| `start_node_id` | `str` | `` | ID of the start node in the statemachine service |
+| `nodes` | `dict[str, Node]` | `'dict[str, Node]()()'` | dictionary of nodes in the statemachine service |
+| `thread_type` | `str` | `'ThreadType.INSTANT.value'` |  |
+| `sampling_period` | `int` | `0` | sampling period that specifies the interval the observer thread should run for |
+
+
+```python
+# Example usage of `StatemachineService`
+from pydag.statemachine.StatemachineService import StatemachineService  # Adjust import if needed
+
+obj = StatemachineService()
+obj.id="<string>"
+obj.load_on_install=False
+obj.retry_error_nodes=False
+obj.start_node_id="<string>"
+obj.nodes='dict[str, Node]()()'
+obj.thread_type='ThreadType.INSTANT.value'
+obj.sampling_period=0
+```
+
+[Go to Summary](#summary)
 ## `Transition` (in `pydag\statemachine\Transition.py`)
 
 | Field | Type | Default | Description |
@@ -328,6 +381,29 @@ obj.child_ids='list()'
 obj.id="<string>"
 obj.load_on_install=False
 obj.sleep_time=0
+```
+
+[Go to Summary](#summary)
+## `SleepUntilAction` (in `pydag\statemachine\actions\SleepUntilAction.py`)
+
+An action that sleeps until the specified daytime.
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
+| `id` | `str` | `` | unique identifier of element in DataGrabber application |
+| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+| `daytime` | `str` | `` | day time when the sleep should end, format hh:mm:ss |
+
+
+```python
+# Example usage of `SleepUntilAction`
+from pydag.statemachine.actions.SleepUntilAction import SleepUntilAction  # Adjust import if needed
+
+obj = SleepUntilAction()
+obj.child_ids='list()'
+obj.id="<string>"
+obj.load_on_install=False
+obj.daytime="<string>"
 ```
 
 [Go to Summary](#summary)
@@ -530,15 +606,18 @@ obj.config={}
 [Go to Summary](#summary)
 ## `BufferExtractAction` (in `pydag\statemachine\actions\buffers\BufferExtractAction.py`)
 
-`Action` for extracting data from the parents' buffers to store into this buffer.
-This `Action` can only be applied on if the parents' buffers is of type `DictBuffer`.
+`Action` for extracting data from a specified buffer and to store the extracted data into this buffer.
+This `Action` can only be applied on if the specified buffer is of type `DictBuffer`.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
 | `buffer_id` | `str` | `` | unique ID of the buffer |
 | `id` | `str` | `` | unique identifier of element in DataGrabber application |
 | `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
-| `extract_keys` | `list[str]` | `'list()'` | keys to search for in the parent buffers and extract their values into this element's buffer |
+| `extract_buffer_id` | `str` | `` | id of the buffer to extract data from |
+| `extract_keys` | `list[str]` | `'list()'` | keys to search for in the specified buffer and extract their values into this element's buffer |
+| `persistent` | `bool` | `True` | specifies whether to keep the extracted data in origin buffer |
+| `n` | `int` | `0` | number of samples to extract from buffer, default 0 extracts all |
 
 
 ```python
@@ -550,7 +629,10 @@ obj.child_ids='list()'
 obj.buffer_id="<string>"
 obj.id="<string>"
 obj.load_on_install=False
+obj.extract_buffer_id="<string>"
 obj.extract_keys='list()'
+obj.persistent=True
+obj.n=0
 ```
 
 [Go to Summary](#summary)
@@ -603,6 +685,36 @@ obj.child_ids='list()'
 obj.buffer_id="<string>"
 obj.id="<string>"
 obj.load_on_install=False
+```
+
+[Go to Summary](#summary)
+## `ParentBufferExtractAction` (in `pydag\statemachine\actions\buffers\ParentBufferExtractAction.py`)
+
+`Action` for extracting data from the parents' buffers to store into this buffer.
+This `Action` can only be applied on if the parents' buffers is of type `DictBuffer`.
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
+| `buffer_id` | `str` | `` | unique ID of the buffer |
+| `id` | `str` | `` | unique identifier of element in DataGrabber application |
+| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+| `extract_keys` | `list[str]` | `'list()'` | keys to search for in the parent buffers and extract their values into this element's buffer |
+| `persistent` | `bool` | `True` | specifies whether to keep the extracted data in origin buffer |
+| `n` | `int` | `0` | number of samples to extract from buffer, default 0 extracts all |
+
+
+```python
+# Example usage of `ParentBufferExtractAction`
+from pydag.statemachine.actions.buffers.ParentBufferExtractAction import ParentBufferExtractAction  # Adjust import if needed
+
+obj = ParentBufferExtractAction()
+obj.child_ids='list()'
+obj.buffer_id="<string>"
+obj.id="<string>"
+obj.load_on_install=False
+obj.extract_keys='list()'
+obj.persistent=True
+obj.n=0
 ```
 
 [Go to Summary](#summary)
@@ -738,6 +850,30 @@ obj.json_path="<string>"
 ```
 
 [Go to Summary](#summary)
+## `ReadNpzAction` (in `pydag\statemachine\actions\documents\ReadNpzAction.py`)
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
+| `buffer_id` | `str` | `` | unique ID of the buffer |
+| `id` | `str` | `` | unique identifier of element in DataGrabber application |
+| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+| `file_path` | `str` | `` | path to the *.npz file to read the data from |
+
+
+```python
+# Example usage of `ReadNpzAction`
+from pydag.statemachine.actions.documents.ReadNpzAction import ReadNpzAction  # Adjust import if needed
+
+obj = ReadNpzAction()
+obj.child_ids='list()'
+obj.buffer_id="<string>"
+obj.id="<string>"
+obj.load_on_install=False
+obj.file_path="path/to/file.txt"
+```
+
+[Go to Summary](#summary)
 ## `BufferEmptyTransition` (in `pydag\statemachine\transitions\BufferEmptyTransition.py`)
 
 A transition that checks if specified buffer is empty.
@@ -772,8 +908,9 @@ If the buffer matches the target, the transition is successful.
 | `buffer_id` | `str` | `` | unique ID of the buffer |
 | `id` | `str` | `` | unique identifier of element in DataGrabber application |
 | `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
-| `comparator` | `str` | `` | The comparison operator to use. |
-| `value` | `any` | `` | The value to compare against the buffer. |
+| `comparator` | `str` | `` | the comparison operator to use |
+| `upper_limit` | `any` | `` | the upper limit of the range |
+| `lower_limit` | `any` | `` | the lower limit of the range |
 
 
 ```python
@@ -786,7 +923,8 @@ obj.buffer_id="<string>"
 obj.id="<string>"
 obj.load_on_install=False
 obj.comparator="<string>"
-obj.value="<value>"
+obj.upper_limit="<value>"
+obj.lower_limit="<value>"
 ```
 
 [Go to Summary](#summary)

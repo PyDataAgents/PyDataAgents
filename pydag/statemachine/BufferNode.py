@@ -1,8 +1,10 @@
 from dataclasses import dataclass, field
+
+from ..agents.AgentConfig import AgentConfig
+from ..buffers.DictBuffer import DictBuffer
 from ..buffers.Buffer import Buffer
 from ..agents.Agent import Agent
 from .Node import Node
-from .StatemachineException import StatemachineException
 
 @dataclass
 class BufferNode(Node):
@@ -24,10 +26,14 @@ class BufferNode(Node):
         """
         super().install(agent)
         if self.buffer is None:
-            if self.buffer_id in agent.buffer_store:
-                self.buffer = agent.buffer_store[self.buffer_id]
+            if agent is not None:
+                if self.buffer_id in agent.buffer_store:
+                    self.buffer = agent.buffer_store[self.buffer_id]
+                else:
+                    self.buffer = DictBuffer(id=self.id + "-BUFFER", capacity=AgentConfig.INFINITE_CAPACITY)
+                    agent.add_buffer(self.buffer)
             else:
-                raise StatemachineException("No " + Buffer.cname() + " with id=" + self.buffer_id + " exists in " + Agent.cname())
+                self.buffer = DictBuffer(id=self.id + "-BUFFER", capacity=AgentConfig.INFINITE_CAPACITY)
         
     def deinstall(self, agent : Agent = None):
         super().deinstall(agent)

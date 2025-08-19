@@ -34,6 +34,10 @@ def test_050():
     print(file_extensions)
     
 def test_060():
-    file = str(Path.home() / "Downloads" / "slides.pptx")
-    s = FileUtils.extract_text(file)
-    print(s)
+    folder = Path.home() / "Downloads" / "testfolder"
+    FileUtils.create_dir(str(folder))
+    
+def test_061():
+    file_path = Path.home() / "Downloads" / "testfolder2" / "test.txt"
+    FileUtils.create_dir(str(file_path))
+    

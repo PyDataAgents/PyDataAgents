@@ -4,7 +4,6 @@ from fastapi import FastAPI
 from openpyxl import load_workbook
 
 from ...services.ServiceException import ServiceException
-
 from ...utils.FileUtils import FileUtils
 from .ExcelRestAPI import ExcelRestAPI
 from ...buffers.DictBuffer import DictBuffer
@@ -15,7 +14,7 @@ from ...agents.Agent import Agent
 
 @dataclass
 class ExcelRestService(RestService):
-    """Service for creating a REST API for accessing named Tables in Excel
+    """`Service` for creating a REST API for accessing named Tables in Excel
     """
     
     excel_file : str = field(default=None, metadata={"description" : "path of the excel file to open for tables"})
@@ -61,8 +60,7 @@ class ExcelRestService(RestService):
                                 d[headers[h]] = cell.value
                                 h = h + 1
                             dbuf.push(d)
-                        r = r + 1                       
-                         
+                        r = r + 1
                     self.named_tables[table_name] = dbuf
         else:
             raise ServiceException("the file " + self.excel_file + " could not be found")

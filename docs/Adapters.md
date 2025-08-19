@@ -11,9 +11,11 @@
 | [`WriteAdapter`](#writeadapter-in-pydagadapterswriteadapterpy) | abstract class for Adapter Interface for writing to data sinks<br>new `Adapters` that allow for writing to a sink via one-shot polling must inherit this class next to `Adapter`. |
 | [`AdsAdapter`](#adsadapter-in-pydagadaptersadsadsadapterpy) | `Adapter` for reading and writing data from/to Beckhoff TwinCAT PLCs via ADS (Automation Device Specification).     |
 | [`AudioAdapter`](#audioadapter-in-pydagadaptersaudioaudioadapterpy) | `Adapter` for subscribing to a system's audio input channels (e.g. from a USB microphone) using the `sounddevice` library.     |
+| [`CSVReadMode`](#csvreadmode-in-pydagadapterscsvcsvreadadapterpy) |  |
 | [`CsvReadAdapter`](#csvreadadapter-in-pydagadapterscsvcsvreadadapterpy) | `Adapter` for reading data from CSV files.     |
 | [`CsvWriteAdapter`](#csvwriteadapter-in-pydagadapterscsvcsvwriteadapterpy) | `Adapter` for writing data to CSV files.     |
 | [`DocumentTextAdapter`](#documenttextadapter-in-pydagadaptersdocumentsdocumenttextadapterpy) | `Adapter` that retrieves text content from specified files         |
+| [`NpzAdapter`](#npzadapter-in-pydagadaptersdocumentsnpzadapterpy) | `Adapter` that retrieves data from a *.npz numpy file         |
 | [`HttpAdapter`](#httpadapter-in-pydagadaptershttphttpadapterpy) | `Adapter` for reading and writing data from/to http endpoints     |
 | [`InfluxDbAdapter`](#influxdbadapter-in-pydagadaptersinfluxdbinfluxdbadapterpy) | `Adapter` thats reads or writes to InfluxDB.<br>Address Schema:<br>address = "b=[bucket];m=[measurement];f=[field]" |
 | [`MQTTAdapter`](#mqttadapter-in-pydagadaptersmqttmqttadapterpy) | `Adapter` for subscribing or writing data from/to MQTT topics.     |
@@ -21,6 +23,7 @@
 | [`S7Adapter`](#s7adapter-in-pydagadapterss7s7adapterpy) | `Adapter`reading from and writing to S7 PLCs.     |
 | [`ScriptAdapter`](#scriptadapter-in-pydagadaptersscriptscriptadapterpy) | An `Adapter` that reads data from specified `Buffer`s using computations / transformations defined in a script file<br>new results are written back to specified output `Buffer`s |
 | [`ByteStreamAdapter`](#bytestreamadapter-in-pydagadapterssocketbytestreamadapterpy) |  |
+| [`TCPClientAdapter`](#tcpclientadapter-in-pydagadapterssockettcpclientadapterpy) |  |
 | [`WebSocketAdapter`](#websocketadapter-in-pydagadapterssocketwebsocketadapterpy) | `Adapter` for subscribing and writing data from/to WebSocket endpoints.     |
 | [`SQLAdapter`](#sqladapter-in-pydagadapterssqlsqladapterpy) | `Adapter` for reading and writing data from/to SQL databases using pyodbc.<br>Required ODBC driver must be installed for the specific SQL database (e.g. MySQL, PostgreSQL, SQLite, etc.) and sytem |
 
@@ -173,6 +176,24 @@ obj.device=1
 ```
 
 [Go to Summary](#summary)
+## `CSVReadMode` (in `pydag\adapters\csv\CsvReadAdapter.py`)
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `id` | `str` | `` | unique identifier of element in DataGrabber application |
+| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+
+
+```python
+# Example usage of `CSVReadMode`
+from pydag.adapters.csv.CsvReadAdapter import CSVReadMode  # Adjust import if needed
+
+obj = CSVReadMode()
+obj.id="<string>"
+obj.load_on_install=False
+```
+
+[Go to Summary](#summary)
 ## `CsvReadAdapter` (in `pydag\adapters\csv\CsvReadAdapter.py`)
 
 `Adapter` for reading data from CSV files.
@@ -248,7 +269,7 @@ obj.decimal_precision=3
 |-------|------|---------|-------------|
 | `id` | `str` | `` | unique identifier of element in DataGrabber application |
 | `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
-| `file_path` | `str` | `` |  |
+| `file_path` | `str` | `` | the path to a file or a folder, that shall be screened for document texts |
 
 
 ```python
@@ -256,6 +277,29 @@ obj.decimal_precision=3
 from pydag.adapters.documents.DocumentTextAdapter import DocumentTextAdapter  # Adjust import if needed
 
 obj = DocumentTextAdapter()
+obj.id="<string>"
+obj.load_on_install=False
+obj.file_path="path/to/file.txt"
+```
+
+[Go to Summary](#summary)
+## `NpzAdapter` (in `pydag\adapters\documents\NpzAdapter.py`)
+
+`Adapter` that retrieves data from a *.npz numpy file
+    
+    
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `id` | `str` | `` | unique identifier of element in DataGrabber application |
+| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+| `file_path` | `str` | `` | the path to a file or a folder, that shall be screened for document texts |
+
+
+```python
+# Example usage of `NpzAdapter`
+from pydag.adapters.documents.NpzAdapter import NpzAdapter  # Adjust import if needed
+
+obj = NpzAdapter()
 obj.id="<string>"
 obj.load_on_install=False
 obj.file_path="path/to/file.txt"
@@ -423,6 +467,16 @@ obj.script_path="<string>"
 |-------|------|---------|-------------|
 | `id` | `str` | `` | unique identifier of element in DataGrabber application |
 | `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+| `host` | `str` | `` | name of the host to connect to, e.g. IP address or COM-Port |
+| `port` | `int` | `` | port of the host to connect to |
+| `connect_byteschema` | `list[Tuple[DataType, int]]` | `'None()'` |  |
+| `connect_bytes` | `bytes` | `` | bytes to send after each connection |
+| `disconnect_byteschema` | `list[Tuple[DataType, int]]` | `'None()'` |  |
+| `disconnect_bytes` | `bytes` | `` | bytes to send before each disconnection |
+| `send_byteschema` | `list[Tuple[DataType, int]]` | `'None()'` |  |
+| `send_bytes` | `bytes` | `` | bytes to send before each send |
+| `receive_byteschema` | `list[Tuple[DataType, int]]` | `'None()'` |  |
+| `receive_bytes` | `bytes` | `` | bytes to send after each receive |
 
 
 ```python
@@ -430,6 +484,34 @@ obj.script_path="<string>"
 from pydag.adapters.socket.ByteStreamAdapter import ByteStreamAdapter  # Adjust import if needed
 
 obj = ByteStreamAdapter()
+obj.id="<string>"
+obj.load_on_install=False
+obj.host="<string>"
+obj.port=1
+obj.connect_byteschema='None()'
+obj.connect_bytes="<value>"
+obj.disconnect_byteschema='None()'
+obj.disconnect_bytes="<value>"
+obj.send_byteschema='None()'
+obj.send_bytes="<value>"
+obj.receive_byteschema='None()'
+obj.receive_bytes="<value>"
+```
+
+[Go to Summary](#summary)
+## `TCPClientAdapter` (in `pydag\adapters\socket\TCPClientAdapter.py`)
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `id` | `str` | `` | unique identifier of element in DataGrabber application |
+| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+
+
+```python
+# Example usage of `TCPClientAdapter`
+from pydag.adapters.socket.TCPClientAdapter import TCPClientAdapter  # Adjust import if needed
+
+obj = TCPClientAdapter()
 obj.id="<string>"
 obj.load_on_install=False
 ```

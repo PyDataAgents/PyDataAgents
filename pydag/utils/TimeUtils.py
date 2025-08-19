@@ -1,3 +1,4 @@
+from datetime import datetime, timedelta
 import time
 
 
@@ -20,3 +21,26 @@ class TimeUtils:
         Returns the current time in ISO 8601 format.
         """
         return time.strftime("%Y-%m-%dT%H:%M:%S", time.gmtime()) + "Z"
+    
+    @staticmethod
+    def seconds_till_daytime(daytime : str = "09:00:00"):
+        """ computes the number of seconds from now till the specified daytime
+        <br>if the specified daytime has already passed today, it is computed for the next day from now
+
+        Args:
+            daytime (str, optional): daytime schema hh:mm:ss. Defaults to "09:00:00".
+
+        Returns:
+            int: seconds
+        """
+        # Parse the target time
+        target_time = datetime.strptime(daytime, "%H:%M:%S").time()
+        now = datetime.now()
+        today_target = datetime.combine(now.date(), target_time)
+
+        # If the target time has already passed today, move it to tomorrow
+        if today_target <= now:
+            today_target += timedelta(days=1)
+        
+        # Compute the difference in seconds
+        return int((today_target - now).total_seconds())
