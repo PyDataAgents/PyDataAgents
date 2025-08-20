@@ -6,6 +6,7 @@ from typing import Union
 from ..agents.AgentConfig import AgentConfig
 from .Buffer import Buffer
 from ..agents import Agent
+import numpy as np
 
 class DictBuffer(Buffer):
     """buffer that stores its values in a dictionary in a table like fashion, where every key contains a list of data
@@ -25,13 +26,15 @@ class DictBuffer(Buffer):
         super().deinstall(agent)
         self.elements = {}        
     
-    def push(self, elements : Union[list, dict]):
+    def push(self, elements : list | dict):
         with self.lock:
             if isinstance(elements, dict):
                 for k in elements:
                     if k in self.elements.keys():
                         if isinstance(elements[k], list):
                             self.elements[k].extend(elements[k])
+                        elif isinstance(elements[k], np.ndarray):
+                            self.elements[k].extend(elements[k].tolist())
                         else:
                             self.elements[k].append(elements[k])
                         # check for infinity capacity
