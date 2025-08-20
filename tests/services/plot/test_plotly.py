@@ -71,4 +71,17 @@ def test_030():
     pdoc = PlotlyDocument(p)
     pdoc.to_file("tests" + os.sep + "services" + os.sep + "plot" + os.sep + "plotly_test_030.html")
     
+def test_031():    
+    x, y = MathUtils.circle()
+    p = Plotly()
+    t = Trace()
+    t.set_x(x)
+    t.set_y(y)
+    t.set_type(PlotType.SCATTER)
+    t.set_mode(Mode.LINES_MARKERS)
+    p.get_traces().append(t)
+    p.get_layout().equal_axis()
+    pdoc = PlotlyDocument(p)
+    pdoc.to_file("tests" + os.sep + "services" + os.sep + "plot" + os.sep + "plotly_test_030.html")
+    
     
