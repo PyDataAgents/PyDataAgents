@@ -19,8 +19,9 @@ class SampledSine(SampledSignal):
     p : float = field(default=0.0, metadata={"description": "phase angle of sine wave in °"})
     n : float = field(default=0.0, metadata={"description": "noise level of sine wave in respect to ampltidue [0..1]"})
     
-    def __init__(self):
-        super().__init__()
+
+    def __post_init__(self):
+        super().__post_init__()
         
     def sample(self) -> tuple[float, float]:
         """
