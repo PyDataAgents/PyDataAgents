@@ -80,8 +80,33 @@ def test_031():
     t.set_type(PlotType.SCATTER)
     t.set_mode(Mode.LINES_MARKERS)
     p.get_traces().append(t)
+    
+    x2, y2 = MathUtils.circle(1.2, 0.1, 0.1)
+    t2 = Trace()
+    t2.set_x(x2)
+    t2.set_y(y2)
+    t2.set_type(PlotType.SCATTER)
+    t2.set_mode(Mode.LINES_MARKERS)
+    p.get_traces().append(t2)
+    
     p.get_layout().equal_axis()
     pdoc = PlotlyDocument(p)
-    pdoc.to_file("tests" + os.sep + "services" + os.sep + "plot" + os.sep + "plotly_test_030.html")
+    pdoc.to_file("tests" + os.sep + "services" + os.sep + "plot" + os.sep + "plotly_test_031.html")
     
+def test_040():
+    p = Plotly()
+    t1 = Trace()
+    t1.x = [1.0, 2.0, 3.0, 4.0]
+    t1.y = [1.0, 1.1, 1.2, 1.3]
     
+    t2 = Trace()
+    t2.x = [1.0, 2.0, 3.0, 4.0]
+    t2.y = [1.0, 2.1, 0.2, 1.3]
+    
+    p.get_traces().append(t1)
+    p.get_traces().append(t2)
+    
+    p.get_layout().get_grid().set_rows(1).set_columns(2).set_pattern("independent")
+    p.subplots()
+    pdoc = PlotlyDocument(p)
+    pdoc.to_file("tests" + os.sep + "services" + os.sep + "plot" + os.sep + "plotly_test_040.html")
