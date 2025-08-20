@@ -12,6 +12,7 @@ license = "MIT"
 keywords = ["IIoT", "Industrial Datalogging", "software robots", "data agents"]
 authors = [
   { name = "Jonas Hillenbrand", email = "hillenbrandjonas@hotmail.com" },
+  { name = "2Obe", email = "twoobe.mail@gmail.com" }
 ]
 classifiers = [
   "Development Status :: 2 - Experimental",
@@ -40,7 +41,8 @@ dependencies = [
     "pypdf",
     "unstructured[all-docs]",
     "watchdog",
-    "bs4"
+    "bs4",
+    "pytest"
 ]
 
 [tool.setuptools.packages.find]
@@ -49,6 +51,6 @@ include = ["pydag*"]
 exclude = ["tests"]
 
 [project.urls]
-Documentation = "https://github.com/jhillenbrand/PyDataAgents"
-Issues = "https://github.com/jhillenbrand/PyDataAgents"
-Source = "https://github.com/jhillenbrand/PyDataAgents"
+Documentation = "https://github.com/PyDataAgents/PyDataAgents.git"
+Issues = "https://github.com/PyDataAgents/PyDataAgents.git"
+Source = "https://github.com/PyDataAgents/PyDataAgents.git"

@@ -258,19 +258,35 @@ s1.stop()
 
 ```
 
+### Actions and Transitions
+With a special `Service`, called `StatemachineService`, a number of predefined `Action`s and `Transition`s can be executed.
+<br>The `StatemachineService` is a `Service` container to define workflows with various small, compact and closed tasks.
+<br>Each task, the so called `Action`s are `execute`d based on their graph-based connection (children and parents).
+<br>Whether and how often an `Action` is executed, can be controlled via `Transition`s and the connection of the `Action` and `Transition` `Node`s. Hte execution logic for these `Node`s is based on the Sequential Function Chart logic for PLC's [Wikipedia](https://en.wikipedia.org/wiki/Sequential_function_chart).
+<br>an overview of all `Action`s and `Transition`s is given [here](docs/Actions%20and%20Transitions.md)
+<br>All `Action`s implement the same interface:
+- execute()
+This method's purpose is to execute the single task, that this `Action`was dedicated to. Within the `execute()` implementation, other `AgentElement`s can be accessed, e.g. `Buffer`s, `Adapter`s, etc. This way `Action`s can retrieve data from previous `Action`s or `Buffer`s or generate data and store it in `Buffer`s as well.
+<br>All `Transition`s implement the same interface:
+- check() -> bool
+
+```python
+
+
+```
 
 ## Installation and Usage
 In order to install `pydag` - pyd(ata)ag(ents) use pip:
 ```python
-pip install git+https://github.com/jhillenbrand/PyDataAgents.git
+pip install git+https://github.com/PyDataAgents/PyDataAgents.git
 
 # this will install the default branch, for a specific branch use
 
-pip install git+https://github.com/jhillenbrand/PyDataAgents.git@<branch>
+pip install git+https://github.com/PyDataAgents/PyDataAgents.git@<branch>
 
 # if the repo was installed already, use an uninstall before installing again
 
-pip uninstall pydag -y; pip install git+https://github.com/jhillenbrand/PyDataAgents.git
+pip uninstall pydag -y; pip install git+https://github.com/PyDataAgents/PyDataAgents.git
 ```
 
 Project Dependencies can be found in [pyproject.toml](pyproject.toml)
