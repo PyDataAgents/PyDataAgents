@@ -1,6 +1,8 @@
 import os
 from pathlib import Path
+import platform
 import shutil
+import subprocess
 import time
 from loguru import logger
 
@@ -176,3 +178,20 @@ class FileUtils:
             return os.path.basename(file_path)
         else:
             return os.path.splitext(os.path.basename(file_path))[0]
+        
+    @staticmethod
+    def open_file(file_path):
+        """ opens the file with the OS' standard program
+
+        Args:
+            file_path (str): path to the file to open or start
+        """
+        path = Path(file_path).resolve()
+        system = platform.system()
+        
+        if system == "Windows":
+            os.startfile(path)
+        elif system == "Darwin":  # macOS
+            subprocess.run(["open", path])
+        else:  # Linux and other
+            subprocess.run(["xdg-open", path])

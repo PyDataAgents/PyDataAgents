@@ -39,7 +39,8 @@ dependencies = [
     "pyodbc",
     "pypdf",
     "unstructured[all-docs]",
-    "watchdog"
+    "watchdog",
+    "bs4"
 ]
 
 [tool.setuptools.packages.find]

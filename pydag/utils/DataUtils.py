@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-from typing import Union
+from typing import Any, Union
 
 
 class DataUtils:
@@ -116,3 +116,30 @@ class DataUtils:
             else:
                 df = pd.DataFrame.from_dict(data)
         return df
+    
+    @staticmethod
+    def obj_to_dict(obj : Any, ignore_none : bool = True) -> dict:
+        """ method recursively returns a nested dict structure of the entire obj
+
+        Args:
+            obj (Any): _description_    
+            ignore_none (bool): if set to True, then properties / objects with 'None' value are ignored
+                            
+        Returns:
+            dict: returns a dictionary
+        """
+        if isinstance(obj, dict):
+            return {k: DataUtils.obj_to_dict(v) for k, v in obj.items()}
+        elif isinstance(obj, list):
+            return [DataUtils.obj_to_dict(item) for item in obj]
+        elif hasattr(obj, "__dict__"):
+            if ignore_none:
+                return {k: DataUtils.obj_to_dict(v) for k, v in obj.__dict__.items() if not k.startswith("_") and not v is None}
+            else:
+                return {k: DataUtils.obj_to_dict(v) for k, v in obj.__dict__.items() if not k.startswith("_")}
+        else:
+            if ignore_none:
+                if obj is not None:
+                    return obj
+                else:
+                    return
