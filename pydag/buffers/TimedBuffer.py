@@ -77,11 +77,11 @@ class TimedBuffer(ListBuffer):
                     if n > self.size():
                         logger.warning("buffer only contains " + str(self.size()) + " elements")
                         n = self.size()
-                    v = self.elements[0:n]
-                    t = self.timestamps[0:n]
+                    v = self.elements[-n:]
+                    t = self.timestamps[-n:]
                     if not persistent:
-                        del self.elements[0:n]
-                        del self.timestamps[0:n]
+                        del self.elements[-n:]
+                        del self.timestamps[-n:]
                     d = {"values": v, "timestamps": t}
                     return d
                 else:

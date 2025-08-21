@@ -55,9 +55,9 @@ class ListBuffer(Buffer):
                     if n > self.size():
                         logger.warning("buffer only contains " + str(self.size()) + " elements")
                         n = self.size()
-                    d = self.elements[0:n]
+                    d = self.elements[-n:]
                     if not persistent:
-                        del self.elements[0:n]
+                        del self.elements[-n:]
                     return d
                 else:
                     # always make a deep copy, otherwise a reference will be maintained
