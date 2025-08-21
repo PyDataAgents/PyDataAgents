@@ -1,10 +1,10 @@
 from abc import abstractmethod
 from dataclasses import dataclass, field
 from typing import Tuple
-from ...statemachine.Node import Node
+from ...agents.AgentElement import AgentElement
 
 @dataclass
-class SampledSignal(Node):
+class SampledSignal(AgentElement):
     """
     A class representing a sampled signal for continuously sampled data
     """
