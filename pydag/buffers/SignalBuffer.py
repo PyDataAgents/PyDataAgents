@@ -1,5 +1,4 @@
 from dataclasses import dataclass, field
-from time import time
 from apscheduler.schedulers.background import BackgroundScheduler
 from .BufferException import BufferException
 from .TimedBuffer import TimedBuffer
@@ -9,11 +8,7 @@ from ..agents.Agent import Agent
 @dataclass
 class SignalBuffer(TimedBuffer):
     """
-    A buffer that holds signals with a specific start time and elapsed time.
-    
-    Attributes:
-        start_time (int): The start time of the signal in milliseconds.
-        elapsed_time (float): The elapsed time since the start in seconds.
+    `Buffer` that holds signals with a specific start time and elapsed time and is defined by the referenced `signal`'s values.    
     """
     
     signal : Signal = field(default=None, metadata={"description": "a signal object to simulate data"})
