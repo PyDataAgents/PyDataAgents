@@ -12,8 +12,8 @@ class TimedSignal(Signal):
     times : list[float] = field(default_factory=list, metadata={"description": "list of times in seconds when the signal should emit a value"})
     values : list[float] = field(default_factory=list, metadata={"description": "list of values to emit at the specified times"})
     
-    def __init__(self):
-        super().__init__()
+    def __post_init__(self):
+        super().__post_init__()
         self.count = 0
     
     def value(self, t : int = None) -> tuple[int, float]:
