@@ -1,12 +1,11 @@
 from __future__ import annotations
 import copy
 import threading
-from typing import Union
+import numpy as np
 
 from ..agents.AgentConfig import AgentConfig
 from .Buffer import Buffer
 from ..agents import Agent
-import numpy as np
 
 class DictBuffer(Buffer):
     """buffer that stores its values in a dictionary in a table like fashion, where every key contains a list of data
