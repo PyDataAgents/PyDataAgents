@@ -1,20 +1,18 @@
 from abc import abstractmethod
 from dataclasses import dataclass, field
 from typing import Tuple
-
-from ...agents.AgentElement import AgentElement
+from ...statemachine.Node import Node
 
 @dataclass
-class SampledSignal(AgentElement):
+class SampledSignal(Node):
     """
     A class representing a sampled signal for continuously sampled data
     """
     sample_rate : float = field(default=1.0, metadata={"description": "sample rate of the signal in Hz"})
+    sample_count : int = field(default=0, metadata={"description": "number of samples taken"})
         
-    def __init__(self):
-        """
-        """
-        self.sample_count : int = 0
+    def __post_init__(self):
+        super().__post_init__()
 
     @abstractmethod
     def sample(self) -> Tuple[float, float]:
