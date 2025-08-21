@@ -66,9 +66,9 @@ class DictBuffer(Buffer):
             for k in self.elements.keys():
                 if len(self.elements[k]) < n:
                     n = len(self.elements[k])
-                d[k] = self.elements[k][0:n]
+                d[k] = self.elements[k][-n:]
                 if not persistent:
-                    del self.elements[k][0:n]
+                    del self.elements[k][-n:]
             return d
         else:
             # always make a deep copy, otherwise a reference will be maintained
