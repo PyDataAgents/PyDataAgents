@@ -1,9 +1,11 @@
 from abc import abstractmethod
 from typing import Tuple
+from dataclasses import dataclass, field
 
 from ...agents.AgentElement import AgentElement
 from ...utils.TimeUtils import TimeUtils
 
+@dataclass
 class Signal(AgentElement):
     """
     Abstract base class for signals.
