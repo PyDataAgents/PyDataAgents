@@ -12,7 +12,10 @@ class Sine(Signal):
     a : float = field(default=1.0, metadata={"description": "amplitude of sine wave"})
     p : float = field(default=0.0, metadata={"description": "phase angle of sine wave in °"})
     n : float = field(default=0.0, metadata={"description": "noise level of sine wave in respect to ampltidue [0..1]"})
-        
+
+    def __post_init__(self):
+        super().__post_init__()
+
     def value(self, t: int = None) -> tuple[int, float]:
         """
         Returns the current value of the sine wave signal for the specified timestamp [ms].
