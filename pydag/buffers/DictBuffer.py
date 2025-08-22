@@ -50,7 +50,7 @@ class DictBuffer(Buffer):
                         self.elements[k].append(v)
 
                     # enforce capacity
-                    if self.capacity != Buffer.INFINITE_CAPACITY:
+                    if self.capacity != AgentConfig.INFINITE_CAPACITY:
                         while len(self.elements[k]) > self.capacity:
                             self.elements[k].pop(0)
 
