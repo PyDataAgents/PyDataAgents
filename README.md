@@ -12,10 +12,12 @@ Examples:<br>
 ## architecture
 the core element of the framework is a [(data)agent](pydag/agents/Agents.py)
 <br>an agent can consists of one or more of the following [AgentElements](pydag/agents/AgentElement.py):
-- adapters
 - buffers
+- adapters
 - mappings
 - services
+- actions and transitions
+<br>
 ![pydataagents_framework.png](docs/pydataagents_framework.png)
 <br>each [AgentElement](pydag/agents/AgentElement.py) is dedicated for a special task within the data agents framework
 <br>these tasks are highlighted below
@@ -108,6 +110,7 @@ buffer.data_with_meta(n = 0, persistent = True): # returns the buffer data and a
 
 ### Adapter
 an overview of all available adapters and their usage is given [here](docs/Adapters.md)
+<br>An `Adapter` is a specialized connector for a single (data)source or (data)sink. It connects an `agent` with the respective source/sink and retrieves data from a source or transfers data to a sink using the `Buffer`s. You can view `Adapter`s as universal USB-Plugs for all different kind of source/sink systems. Here a (data)source describes a system, that data is being acquired from and a (data)sink a system, that data is being transfered to.
 <br>All `Adapter`'s adhere to the same composition of interfaces and their methods.
 Every `Adapter` is initialized, installed, connected/disconnected and then depending on source or sink interaction: reads/subscribes from sources or writes/publishes to sinks. Therefor an Adapter can inherit from the following interfaces (abstract super classes):
 - ReadAdapter
@@ -211,8 +214,8 @@ adapter.deinstall()
 
 ### Mapping
 an overview of all available mappings and their usage is given [here](docs/Mappings.md).
-<br>In general a `Mapping` defines the interaction between an `Adapter` and one or more `Buffer`s in term of how often, how many samples and which data/information (`addresses`) in the source or sink are being accessed.
-<br>The mapping defines this interaction and is used as data model to instantiate a background thread that runs for every specified `Mapping` and acquires or transfers the data from `Buffer`s to or from source or sinks. 
+<br>In general a `Mapping` defines the interaction between an `Adapter` and one or more `Buffer`s in terms of how often, how many samples and which data/information (`addresses`) in the source or sink are being accessed.
+<br>The mapping defines this interaction and is used as data model to instantiate a background thread that runs for every specified `Mapping` and acquires or transfers the data from `Buffer`s to or from source or sinks using their respective `Adapter`s. You can view a `Mapping` as the receipe of a specific data connection to or from a system.
 
 ```python
 from pydag.mappings.Mapping from Mapping
@@ -231,7 +234,7 @@ m1.persistent = False
 
 ### Service
 an overview of all available services and their usage is given [here](docs/Services.md)
-<br>In general `Service`s are standalone micro applications (services) within the Data `Agent`. Their tasks include observation of resources (like filesystem, an agent itself, ...),  background daemon services (copy files from one folder to another, ...) or the provision of REST API endpoints to monitor or maniplate the `Agent` application.
+<br>In general `Service`s are standalone micro applications (services) within the `Agent`. Their tasks include observation of resources (like filesystem, an agent itself, ...),  background daemon services (copy files from one folder to another, ...) or the provision of REST API endpoints to monitor or maniplate the `Agent` application. `Service`s usually have no interaction with other parts of the `Agent`, but rather run closed loop. An exception form `RESTService`s, they provide useful REST API functionality to external applications, that need to interface with the `agent`s. The provided `service` capabilities can be picked up by other `AgentElement`s, for example `Action`s (see [Actions and Transitions](#actions-and-transitions)), then the `service` is used by other `AgentElement`s, but usually they are self contained and need no external trigger or control.
 <br>Each `Service` must adhere to a very simple interface:
 - service.start()
 - service.stop()
@@ -262,7 +265,7 @@ s1.stop()
 With a special `Service`, called `StatemachineService`, a number of predefined `Action`s and `Transition`s can be executed.
 <br>The `StatemachineService` is a `Service` container to define workflows with various small, compact and closed tasks.
 <br>Each task, the so called `Action`s are `execute`d based on their graph-based connection (children and parents).
-<br>Whether and how often an `Action` is executed, can be controlled via `Transition`s and the connection of the `Action` and `Transition` `Node`s. Hte execution logic for these `Node`s is based on the Sequential Function Chart logic for PLC's [Wikipedia](https://en.wikipedia.org/wiki/Sequential_function_chart).
+<br>Whether and how often an `Action` is executed, can be controlled via `Transition`s and the connection of the `Action` and `Transition` `Node`s. Hte execution logic for these `Node`s is based on the Sequential Function Chart logic for PLC's [Wikipedia](https://en.wikipedia.org/wiki/Sequential_function_chart). These `Node`s can be used to define statemachines, workflows, signal processing pipelines (see [PyDataAgents-DataElements](https://github.com/PyDataAgents/PyDataAgents-DataElements))
 <br>an overview of all `Action`s and `Transition`s is given [here](docs/Actions%20and%20Transitions.md)
 <br>All `Action`s implement the same interface:
 - execute()
