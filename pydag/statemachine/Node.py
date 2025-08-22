@@ -21,5 +21,5 @@ class Node(AgentElement):
         
     def add_parent(self, parent : Node):
         self.parents.append(parent)
-        parent.children.append(self)     
+        parent.children.append(self)
     

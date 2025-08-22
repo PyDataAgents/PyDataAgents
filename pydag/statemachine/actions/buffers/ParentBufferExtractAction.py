@@ -1,6 +1,5 @@
 from dataclasses import dataclass, field
 
-from ....buffers.DictBuffer import DictBuffer
 from ...StatemachineException import StatemachineException
 from ...Action import Action
 from ...BufferNode import BufferNode
@@ -20,10 +19,7 @@ class ParentBufferExtractAction(BufferNode, Action):
     def execute(self):
         for parent in self.parents:
             if not isinstance(parent, BufferNode):
-                raise StatemachineException("parents must be of type " + BufferNode.cname())
-            else:
-                if not isinstance(parent.buffer, DictBuffer):
-                    raise StatemachineException("parents' buffers must be of type " + DictBuffer.cname())
+                raise StatemachineException("parents must be of type " + BufferNode.cname())            
             d = {}
             for key in self.extract_keys:
                 bd = parent.buffer.data(n=self.n, persistent=self.persistent)

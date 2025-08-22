@@ -34,6 +34,7 @@ class Buffer(AgentElement):
         the return type depends on the buffer implementation
         """
 
+
     @abstractmethod
     def size(self) -> int:
         """returns the size of the buffer
