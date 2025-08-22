@@ -21,7 +21,7 @@ class SampledSignal(AgentElement):
         self.sample_count += 1
         return t, t
     
-    def samples(self, n : int = 1) -> dict:
+    def samples(self, n : int = 1) -> Tuple[list[float], list[float]]:
         for i in range(n):
             t, v = self.sample()
             if i == 0:
@@ -30,7 +30,7 @@ class SampledSignal(AgentElement):
             else:
                 times.append(t)
                 values.append(v)
-        return {"times": times, "values": values}
+        return times, values
     
     def reset(self):
         """

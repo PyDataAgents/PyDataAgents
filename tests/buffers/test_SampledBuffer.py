@@ -5,9 +5,10 @@ from pydag.buffers.signals.SampledSine import SampledSine
 
 def test_000():
     
-    ss = SampledSine()
+    ss = SampledSine()    
     ss.f = 100
     ss.sample_rate = 1000
+    ss.install()
     
     sb = SampledBuffer(capacity=400)
     sb.signal = ss
