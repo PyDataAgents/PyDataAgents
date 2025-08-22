@@ -25,23 +25,10 @@ class DictBuffer(Buffer):
         super().deinstall(agent)
         self.elements = {}        
     
-    def push(self, elements: list | dict):
-        
-        def _flatten_dict(d: dict, parent_key=""):
-            """Recursively flatten dict with dot-separated keys."""
-            flat = {}
-            for k, v in d.items():
-                new_key = f"{parent_key}.{k}" if parent_key else k
-                if isinstance(v, dict):
-                    flat.update(_flatten_dict(v, new_key))
-                else:
-                    flat[new_key] = v
-            return flat
-
+    def push(self, elements: list | dict):        
         with self.lock:
             if isinstance(elements, dict):
-                flat_elements = _flatten_dict(elements)
-                for k, v in flat_elements.items():
+                for k, v in elements.items():
                     if k not in self.elements or not isinstance(self.elements[k], list):
                         self.elements[k] = []
                     if isinstance(v, list):
