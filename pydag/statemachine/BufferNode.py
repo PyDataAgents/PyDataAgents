@@ -31,9 +31,11 @@ class BufferNode(Node):
                     self.buffer = agent.buffer_store[self.buffer_id]
                 else:
                     self.buffer = DictBuffer(id=self.id + "-BUFFER", capacity=AgentConfig.INFINITE_CAPACITY)
+                    self.buffer_id = self.buffer.id
                     agent.add_buffer(self.buffer)
             else:
                 self.buffer = DictBuffer(id=self.id + "-BUFFER", capacity=AgentConfig.INFINITE_CAPACITY)
+                self.buffer_id = self.buffer.id
         
     def deinstall(self, agent : Agent = None):
         super().deinstall(agent)

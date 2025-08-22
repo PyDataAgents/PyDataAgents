@@ -12,6 +12,7 @@ class Signal(AgentElement):
     """
 
     def __post_init__(self):
+        super().__post_init__()
         self.start_time = TimeUtils.utc_ms()
         self.elapsed_time = 0.0
     
