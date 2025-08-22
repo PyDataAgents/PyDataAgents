@@ -1,10 +1,10 @@
 from abc import abstractmethod
 from dataclasses import dataclass, field
 from typing import Tuple
-from ...statemachine.Node import Node
+from ...agents.AgentElement import AgentElement
 
 @dataclass
-class SampledSignal(Node):
+class SampledSignal(AgentElement):
     """
     A class representing a sampled signal for continuously sampled data
     """
@@ -20,7 +20,7 @@ class SampledSignal(Node):
         self.sample_count += 1
         return t, t
     
-    def samples(self, n : int = 1) -> Tuple[list[float], list[float]]:
+    def samples(self, n : int = 1) -> dict:
         for i in range(n):
             t, v = self.sample()
             if i == 0:
@@ -29,7 +29,7 @@ class SampledSignal(Node):
             else:
                 times.append(t)
                 values.append(v)
-        return times, values
+        return {"times": times, "values": values}
     
     def reset(self):
         """

@@ -1,15 +1,17 @@
 from abc import abstractmethod
 from typing import Tuple
+from dataclasses import dataclass, field
 
 from ...agents.AgentElement import AgentElement
 from ...utils.TimeUtils import TimeUtils
 
+@dataclass
 class Signal(AgentElement):
     """
     Abstract base class for signals.
     """
 
-    def __init__(self):
+    def __post_init__(self):
         self.start_time = TimeUtils.utc_ms()
         self.elapsed_time = 0.0
     

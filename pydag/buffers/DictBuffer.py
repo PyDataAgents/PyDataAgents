@@ -26,30 +26,38 @@ class DictBuffer(Buffer):
         super().deinstall(agent)
         self.elements = {}        
     
-    def push(self, elements : list | dict):
+    def push(self, elements: list | dict):
+        
+        def _flatten_dict(d: dict, parent_key=""):
+            """Recursively flatten dict with dot-separated keys."""
+            flat = {}
+            for k, v in d.items():
+                new_key = f"{parent_key}.{k}" if parent_key else k
+                if isinstance(v, dict):
+                    flat.update(_flatten_dict(v, new_key))
+                else:
+                    flat[new_key] = v
+            return flat
+
         with self.lock:
             if isinstance(elements, dict):
-                for k in elements:
-                    if k in self.elements.keys():
-                        if isinstance(elements[k], list):
-                            self.elements[k].extend(elements[k])
-                        elif isinstance(elements[k], np.ndarray):
-                            self.elements[k].extend(elements[k].tolist())
-                        else:
-                            self.elements[k].append(elements[k])
-                        # check for infinity capacity
-                        if self.capacity != AgentConfig.INFINITE_CAPACITY:                            
-                            if len(self.elements[k]) > self.capacity:
-                                self.elements[k].pop(0)                        
+                flat_elements = _flatten_dict(elements)
+                for k, v in flat_elements.items():
+                    if k not in self.elements or not isinstance(self.elements[k], list):
+                        self.elements[k] = []
+                    if isinstance(v, list):
+                        self.elements[k].extend(v)
                     else:
-                        self.elements[k] = list()
-                        if isinstance(elements[k], list):
-                            self.elements[k].extend(elements[k])
-                        else:
-                            self.elements[k].append(elements[k])                        
-            elif isinstance(elements, list) and all(isinstance(element, dict) for element in elements):
-                for element in elements:
-                    self.push(element)
+                        self.elements[k].append(v)
+
+                    # enforce capacity
+                    if self.capacity != Buffer.INFINITE_CAPACITY:
+                        while len(self.elements[k]) > self.capacity:
+                            self.elements[k].pop(0)
+
+            elif isinstance(elements, list) and all(isinstance(el, dict) for el in elements):
+                for el in elements:
+                    self.push(el)
         
 
     def data(self, n=0, persistent=True) -> dict:
