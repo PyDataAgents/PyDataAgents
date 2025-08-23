@@ -13,7 +13,7 @@ def test_000():
     sb = SampledBuffer(capacity=400)
     sb.signal = ss
     sb.sampling_period = 100
-    sb.n = 10
+    sb.n = 1
     sb.install()
     
     w = 0
