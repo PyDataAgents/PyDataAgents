@@ -2,6 +2,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from fastapi import FastAPI
 from openpyxl import load_workbook
+import pandas as pd
 
 from ...services.ServiceException import ServiceException
 from ...utils.FileUtils import FileUtils
@@ -64,3 +65,14 @@ class ExcelRestService(RestService):
                     self.named_tables[table_name] = dbuf
         else:
             raise ServiceException("the file " + self.excel_file + " could not be found")
+        
+    def to_dataframes(self) -> dict[str, pd.DataFrame]:
+        """Returns a dictionary of pandas DataFrames for each named table in the excel file
+
+        Returns:
+            dict[str, pd.DataFrame]: dictionary of DataFrames
+        """
+        dfs : dict[str, pd.DataFrame] = dict()
+        for name, dbuf in self.named_tables.items():
+            dfs[name] = pd.DataFrame(dbuf.data())
+        return dfs
