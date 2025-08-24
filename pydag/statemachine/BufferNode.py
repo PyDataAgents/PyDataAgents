@@ -32,10 +32,12 @@ class BufferNode(Node):
                 else:
                     self.buffer = DictBuffer(id=self.id + "-BUFFER", capacity=AgentConfig.INFINITE_CAPACITY)
                     self.buffer_id = self.buffer.id
+                    self.buffer.install(agent)
                     agent.add_buffer(self.buffer)
             else:
                 self.buffer = DictBuffer(id=self.id + "-BUFFER", capacity=AgentConfig.INFINITE_CAPACITY)
                 self.buffer_id = self.buffer.id
+                self.buffer.install(agent)
         
     def deinstall(self, agent : Agent = None):
         super().deinstall(agent)
