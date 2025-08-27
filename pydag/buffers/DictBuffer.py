@@ -75,3 +75,6 @@ class DictBuffer(Buffer):
             return 0
         else:
             return len(next(iter(self.elements.values())))
+        
+    def clear(self):
+        self.elements.clear()

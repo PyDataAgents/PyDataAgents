@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from enum import Enum
 import json
 import os
@@ -15,15 +16,18 @@ class AngleRef(str, Enum):
     PREVIOUS = "previous"
     UP = "up"
     
+@dataclass
 class Frame:
-    def __init__(self,
-                 x: Union[List[object], float],
-                 y: Union[List[object], float],
-                 z: Union[List[object], float]):
+    
+    x: Union[List[object], float]
+    y: Union[List[object], float]
+    z: Union[List[object], float]
+                
+    def __post_init__(self):
         # Normalize inputs: wrap scalars into lists
-        self.x = self._to_list(x)
-        self.y = self._to_list(y)
-        self.z = self._to_list(z)
+        self.x = self._to_list(self.x)
+        self.y = self._to_list(self.y)
+        self.z = self._to_list(self.z)
 
     def _to_list(self, value: Union[List[object], float]) -> List[object]:
         if isinstance(value, list):
@@ -38,12 +42,13 @@ class AspectMode(str, Enum):
     INDEPENDENT = "independent"
     DATA = "data"
     CUBE = "cube"
-    
+
+@dataclass    
 class AspectRatio:
-    def __init__(self):
-        self.x = 1.0
-        self.y = 1.0
-        self.z = 1.0
+    
+    x : float = 1.0
+    y : float = 1.0
+    z : float = 1.0
 
     # Fluent setters
     def set_x(self, value):
@@ -70,21 +75,22 @@ class AspectRatio:
 
     def __repr__(self):
         return f"AspectRatio(x={self.x}, y={self.y}, z={self.z})"
-    
+
+@dataclass    
 class Axis:
-    def __init__(self):
-        self.range: Optional[List[float]] = None
-        self.title: Optional[str] = None
-        self.scaleanchor: Optional[str] = None
-        self.scaleratio: int = 0
-        self.autotick: bool = True
-        self.zeroline: bool = True
-        self.showline: bool = False
-        self.showgrid: bool = True
-        self.gridcolor: Optional[str] = None
-        self.showticklabels: bool = True
-        self.mirror: Optional[str] = None
-        self.linecolor: Optional[str] = None
+    
+    range: Optional[List[float]] = None
+    title: Optional[str] = None
+    scaleanchor: Optional[str] = None
+    scaleratio: int = 0
+    autotick: bool = True
+    zeroline: bool = True
+    showline: bool = False
+    showgrid: bool = True
+    gridcolor: Optional[str] = None
+    showticklabels: bool = True
+    mirror: Optional[str] = None
+    linecolor: Optional[str] = None
 
     # -------- Builder-style setters ----------
     def set_range(self, range_vals: List[float]) -> "Axis":
@@ -134,7 +140,7 @@ class Axis:
     def set_scaleratio(self, scaleratio: int) -> "Axis":
         self.scaleratio = scaleratio
         return self
-    
+   
 class Animation:
     def __init__(self, plot_id: str, trace_num: int):
         self.frames: List[Frame] = []
@@ -151,9 +157,15 @@ class Animation:
         sb.append(f"var traceNum = {self.trace_num};\n")
         sb.append(f"var animationData = {frames_str};\n")
         return "".join(sb)
-    
+
+@dataclass    
 class Color:
-    def __init__(self, r: int = 0, g: int = 0, b: int = 0, hex_color: str = None):
+    
+    r: int = 0
+    g: int = 0
+    b: int = 0
+        
+    def set_color(self, r : int = 0, g : int = 0, b : int = 0, hex_color : str = None):
         if hex_color is not None:
             hex_color = hex_color.lstrip("#")
             if len(hex_color) != 6:
@@ -165,13 +177,7 @@ class Color:
             self.r = r
             self.g = g
             self.b = b
-
-    def __str__(self):
-        return f"rgb({self.r}, {self.g}, {self.b})"
-
-    def __repr__(self):
-        return f"Color(r={self.r}, g={self.g}, b={self.b})"
-
+        return self
 
 # Predefined constants (class attributes)
 Color.RED = Color(255, 0, 0)
@@ -183,15 +189,23 @@ Color.WHITE = Color(255, 255, 255)
 Color.GRAY = Color(128, 128, 128)
 Color.ORANGE = Color(255, 150, 0)
 
+@dataclass
 class ColorBar:
-    def __init__(self, x: int = 0, xanchor: str = None, side: str = None):
-        self.x = x
-        self.xanchor = xanchor
-        self.side = side
-
+    
+    x: int = 0
+    xanchor: str = None
+    side: str = None
+    
     def set_x(self, x: int):
-        """Fluent setter like in Java."""
         self.x = x
+        return self
+    
+    def set_xanchor(self, xanchor : str) -> "ColorBar":
+        self.xanchor = xanchor
+        return self
+    
+    def set_side(self, side : str) -> "ColorBar":
+        self.side = side
         return self
 
     def __repr__(self):
@@ -205,11 +219,12 @@ class DashType(str, Enum):
 
     def __str__(self):
         return self.value
-    
+
+@dataclass    
 class Domain:
-    def __init__(self, x: Optional[List[float]] = None, y: Optional[List[float]] = None):
-        self.x = x
-        self.y = y
+    
+    x: Optional[List[float]] = None
+    y: Optional[List[float]] = None
 
     # Optional: fluent setter methods
     def set_x(self, x: List[float]):
@@ -222,13 +237,14 @@ class Domain:
 
     def __repr__(self):
         return f"Domain(x={self.x}, y={self.y})"
-    
-class Grid:
-    def __init__(self, rows: int = 1, columns: int = 1, pattern: str = "coupled"):
-        self.rows = rows
-        self.columns = columns
-        self.pattern = pattern
 
+@dataclass    
+class Grid:
+    
+    rows: int = 1
+    columns: int = 1
+    pattern: str = "coupled"
+    
     # Fluent setters
     def set_rows(self, rows: int):
         self.rows = rows
@@ -255,40 +271,47 @@ class Grid:
     def __repr__(self):
         return f"Grid(rows={self.rows}, columns={self.columns}, pattern='{self.pattern}')"
 
+@dataclass
 class TextFont:
-    def __init__(self, family: str = None, size: int = 12, color: str = None):
-        self.family = family
-        self.size = size
-        self.color = color
-
-    # Getters
+    
+    family: str = None
+    size: int = 12
+    color: str = None
+        
     def get_family(self):
         return self.family
 
-    def get_size(self):
-        return self.size
-
-    def get_color(self):
-        return self.color
-
-    # Setters
     def set_family(self, family: str):
         self.family = family
 
+    def get_size(self):
+        return self.size
+    
     def set_size(self, size: int):
         self.size = size
 
+    def get_color(self):
+        return self.color
+    
     def set_color(self, color: str):
         self.color = color
 
     def __repr__(self):
         return f"TextFont(family={self.family}, size={self.size}, color={self.color})"
 
+@dataclass
 class Legend:
-    def __init__(self):
-        self.y = 0.0
-        self.yref = None
-        self.font = None
+    
+    x : float = 1.0
+    y : float = 1.0
+    xanchor : str = 'right'
+    font : TextFont = None
+
+    def get_x(self):
+        return self.x
+
+    def set_x(self, x : float):
+        self.x = x
 
     def get_y(self):
         return self.y
@@ -296,18 +319,18 @@ class Legend:
     def set_y(self, y):
         self.y = y
 
-    def get_yref(self):
-        return self.yref
+    def get_xanchor(self):
+        return self.xanchor
 
-    def set_yref(self, yref):
-        self.yref = yref
+    def set_xanchor(self, xanchor : str):
+        self.xanchor = xanchor
 
     def get_font(self):
         if self.font is None:
             self.font = TextFont()
         return self.font
 
-    def set_font(self, font):
+    def set_font(self, font : TextFont):
         self.font = font
 
 class LineShape(str, Enum):
@@ -320,13 +343,14 @@ class LineShape(str, Enum):
 
     def __str__(self):
         return self.value
-        
+    
+@dataclass    
 class Line:
-    def __init__(self):
-        self.dash = None
-        self.width = 3
-        self.shape = None
-        self.color = None
+    
+    dash = None
+    width = 3
+    shape = None
+    color = None
 
     def get_dash(self):
         return self.dash
@@ -359,14 +383,15 @@ class Line:
         self.color = str(color)
         return self
     
+@dataclass
 class Scene:
-    def __init__(self):
-        self.xaxis = None
-        self.yaxis = None
-        self.zaxis = None
-        self.aspectmode = None
-        self.aspectratio = None
-        self.domain = None
+    
+    xaxis : Axis = None
+    yaxis : Axis = None
+    zaxis : Axis = None
+    aspectmode : str = None
+    aspectratio : AspectRatio = None
+    domain : Domain = None
 
     # X Axis
     def get_xaxis(self):
@@ -423,16 +448,11 @@ class Scene:
     def set_domain(self, domain):
         self.domain = domain
         return self
-
-    def __repr__(self):
-        return (
-            f"Scene(xaxis={self.xaxis}, yaxis={self.yaxis}, zaxis={self.zaxis}, "
-            f"aspectmode={self.aspectmode}, aspectratio={self.aspectratio}, domain={self.domain})"
-        )
-        
+    
+@dataclass    
 class Title:
-    def __init__(self):
-        self.text = "Plotly"
+    
+    text = "Plotly"
 
     # Getter
     def get_text(self):
@@ -442,17 +462,15 @@ class Title:
     def set_text(self, text):
         self.text = text
         return self  # optional, for fluent chaining
-
-    def __repr__(self):
-        return f"Title(text={self.text})"
     
+@dataclass
 class Margin:
-    def __init__(self):
-        self.l = 50
-        self.r = 50
-        self.b = 100
-        self.t = 100
-        self.pad = 4
+    
+    l = 50
+    r = 50
+    b = 100
+    t = 100
+    pad = 4
 
     def get_l(self):
         return self.l
@@ -483,9 +501,6 @@ class Margin:
 
     def set_pad(self, pad):
         self.pad = pad
-
-    def __repr__(self):
-        return f"Margin(l={self.l}, r={self.r}, b={self.b}, t={self.t}, pad={self.pad})"
 
 class Symbol(str, Enum):
     X = "x"
@@ -518,16 +533,15 @@ class Symbol(str, Enum):
     def __str__(self) -> str:
         return self.value
 
+@dataclass
 class Marker:
-    def __init__(self, size: int = 12, color: Union[str, List[float], None] = None, 
-                 symbol: Optional[str] = None, angleref: AngleRef = None, 
-                 line: Optional["Line"] = None):
-        self.size = size
-        self.color = color
-        self.symbol = symbol
-        self.angleref = str(angleref)
-        self.line = line
-
+    
+    size: int = 12
+    color: Union[str, List[float], None] = None
+    symbol: Optional[str] = None
+    angleref: str = None
+    line: Optional[Line] = None
+    
     def get_size(self) -> int:
         return self.size
 
@@ -611,38 +625,38 @@ class TextPosition(str, Enum):
     def __str__(self) -> str:
         return self.value
 
-class Trace:
+@dataclass
+class Trace:   
+
+    x: Union[list[object], list[float], list[int], np.ndarray] = None
+    y: Union[list[object], list[float], list[int], np.ndarray] = None
+    z: Union[list[object], list[float], list[int], np.ndarray] = None
+    mode: Optional[str] = None
+    type: Optional[str] = None
+    name: str = None
+    line: Optional[Line] = None
+    text: Optional[List[str]] = None
+    font: Optional[TextFont] = None
+    textposition: Optional[str] = None
+    marker: Optional[Marker] = None
+    opacity: float = 1.0
+    # cone-specific
+    u: Union[list[object], list[float], list[int], np.ndarray] = None
+    v: Union[list[object], list[float], list[int], np.ndarray] = None
+    w: Union[list[object], list[float], list[int], np.ndarray] = None
+    showscale: bool = False
+    colorscale: Optional[List[object]] = None
+    # subplot axes
+    xaxis: Optional[str] = None
+    yaxis: Optional[str] = None
+    zaxis: Optional[str] = None
     
     _TRACE_NUM = 0
-
-    def __init__(self):
+    
+    def __post_init__(self):
         Trace._TRACE_NUM += 1
-        self.x: Union[list[object], list[float], list[int], np.ndarray] = None
-        self.y: Union[list[object], list[float], list[int], np.ndarray] = None
-        self.z: Union[list[object], list[float], list[int], np.ndarray] = None
-
-        self.mode: Optional[str] = None
-        self.type: Optional[str] = None
-        self.name: str = f"trace{Trace._TRACE_NUM}"
-        self.line: Optional[Line] = None
-        self.text: Optional[List[str]] = None
-        self.font: Optional[TextFont] = None
-        self.textposition: Optional[str] = None
-        self.marker: Optional[Marker] = None
-        self.opacity: float = 1.0
-
-        # cone-specific
-        self.u: Union[list[object], list[float], list[int], np.ndarray] = None
-        self.v: Union[list[object], list[float], list[int], np.ndarray] = None
-        self.w: Union[list[object], list[float], list[int], np.ndarray] = None
-        self.showscale: bool = False
-        self.colorscale: Optional[List[object]] = None
-
-        # subplot axes
-        self.xaxis: Optional[str] = None
-        self.yaxis: Optional[str] = None
-        self.zaxis: Optional[str] = None
-
+        self.name = f"trace{Trace._TRACE_NUM}"
+        
     # ---------------- DATA ----------------
 
     def set_x(self, x: Union[list[object], list[float], list[int], np.ndarray]):
@@ -759,23 +773,27 @@ class Trace:
     def to_dict(self) -> dict:
         return DataUtils.obj_to_dict(self, True)
     
+    @staticmethod
+    def from_dict(d : dict) -> "Trace":
+        return DataUtils.dict_to_obj(Trace, d)
+
+@dataclass    
 class Layout:
     
-    def __init__(self):
-        self.scene : Scene = None
-        self.xaxis : Axis = None
-        self.yaxis : Axis = None
-        self.zaxis : Axis = None
-        self.height : int = 0
-        self.width : int = 0
-        self.legend = None
-        self.showlegend = False
-        self.title : Title = None
-        self.grid : Grid = None
-        self.margin : Margin = None
-        self.autosize : bool = True
-        self.plot_bgcolor = None
-        self.paper_bgcolor = None
+    scene : Scene = None
+    xaxis : Axis = None
+    yaxis : Axis = None
+    zaxis : Axis = None
+    height : int = 0
+    width : int = 0
+    legend = None
+    showlegend = False
+    title : Title = None
+    grid : Grid = None
+    margin : Margin = None
+    autosize : bool = True
+    plot_bgcolor = None
+    paper_bgcolor = None
 
     def equal_axis(self):
         if self.yaxis is None:
@@ -790,7 +808,7 @@ class Layout:
         self.scene.set_aspect_mode(AspectMode.DATA)
         return self
 
-    def x_axis(self):
+    def get_x_axis(self):
         if self.xaxis is None:
             self.xaxis = Axis()
         return self.xaxis
@@ -908,21 +926,27 @@ class Layout:
 
     def to_dict(self) -> dict:
        return DataUtils.obj_to_dict(self, True)
+   
+    @staticmethod
+    def from_dict(d : dict) -> "Layout":
+        return DataUtils.dict_to_obj(Layout, d)
     
+@dataclass
 class Plotly:
     """
     Wrapper class for Plotly.js
     https://plotly.com/javascript/
     """
+    
+    data: List[Trace] = None
+    layout: Optional[Layout] = None
 
     _PLOTLY_NUM = 0
 
-    def __init__(self, plot_id: Optional[str] = None):
+    def __post_init__(self, plot_id: Optional[str] = None):
         Plotly._PLOTLY_NUM += 1
         self.plot_id = plot_id if plot_id else f"plot{Plotly._PLOTLY_NUM}"
-        self.data: List[Trace] = []
-        self.layout: Optional[Layout] = None
-
+    
     def to_script(self) -> str:
         """
         Returns a <script> block text to insert this Plotly figure into an HTML document.
@@ -963,6 +987,8 @@ class Plotly:
         Returns the Trace with given name.
         If none exists, creates a new one.
         """
+        if self.data is None:
+            self.data = []
         for t in self.data:
             if t.name == name:
                 return t
@@ -974,6 +1000,8 @@ class Plotly:
         """
         Adds or replaces a trace with the given name.
         """
+        if self.data is None:
+            self.data = []
         for i, tr in enumerate(self.data):
             if tr.name == name:
                 self.data[i] = trace.set_name(name)
@@ -1021,6 +1049,13 @@ class Plotly:
     
     def to_dict(self) -> dict:
         return DataUtils.obj_to_dict(self, True)
+    
+    @staticmethod
+    def from_dict(data : list[dict], layout : dict) -> "Plotly":
+        p = Plotly()
+        p.data = [Trace.from_dict(item) for item in data]
+        p.layout = Layout.from_dict(layout)
+        return p
     
 class PlotlyDocument:
     

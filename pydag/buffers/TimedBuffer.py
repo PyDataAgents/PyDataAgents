@@ -102,6 +102,10 @@ class TimedBuffer(ListBuffer):
         d[AgentConfig.DATA] = self.data(n, persistent)
         d[AgentConfig.META] = self.config_options()
         return d
+    
+    def clear(self):
+        super().clear()
+        self.timestamps.clear()
                 
     def __push_timestamp(self, element : any, timestamp : int):
         """private function for inserting a timestamp

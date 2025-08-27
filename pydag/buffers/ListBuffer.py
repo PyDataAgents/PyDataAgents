@@ -69,8 +69,6 @@ class ListBuffer(Buffer):
                 logger.warning("buffer is empty")
                 return []
 
-    
-    
     def data_with_meta(self, n = 0, persistent = True) -> dict:        
         data = {}
         data[AgentConfig.VALUES] = self.data(n, persistent)
@@ -81,6 +79,9 @@ class ListBuffer(Buffer):
                     
     def size(self) -> int:
         return len(self.elements)
+    
+    def clear(self):
+        self.elements.clear()
         
     def __push1(self, element : any):
         """private function for inserting and removing an object if necessary

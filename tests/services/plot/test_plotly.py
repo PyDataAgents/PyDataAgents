@@ -110,3 +110,56 @@ def test_040():
     p.subplots()
     pdoc = PlotlyDocument(p)
     pdoc.to_file("tests" + os.sep + "services" + os.sep + "plot" + os.sep + "plotly_test_040.html")
+    
+def test_050():
+    
+    lt = {
+        "title": {
+            "text": "test title"
+        },
+        "xaxis" : {
+            "title": "x-axis",
+            "autotick": False
+        }
+    }
+    
+    layout = Layout.from_dict(lt)
+    print(layout.to_dict())
+    
+def test_051():
+    
+    tr = {
+        "x": [1.0, 2.0],
+        "y": [1.1, 1.2],
+        "type": PlotType.SCATTER.value,
+        "mode": Mode.LINES_MARKERS.value
+    }
+    
+    trace = Trace.from_dict(tr)
+    print(trace.to_dict())
+    
+def test_052():
+
+    tr = {
+        "x": [1.0, 2.0],
+        "y": [1.1, 1.2],
+        "type": PlotType.SCATTER.value,
+        "mode": Mode.LINES_MARKERS.value
+    }
+    
+    d = [tr]
+     
+    lt = {
+        "title": {
+            "text": "test title"
+        },
+        "xaxis" : {
+            "title": "x-axis",
+            "autotick": False
+        }
+    }
+    
+    p = Plotly.from_dict(d, lt)
+    pdoc = PlotlyDocument(p)
+    pdoc.to_file("tests" + os.sep + "services" + os.sep + "plot" + os.sep + "plotly_test_052.html")
+    

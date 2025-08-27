@@ -1,6 +1,7 @@
+from dataclasses import fields, is_dataclass
 import numpy as np
 import pandas as pd
-from typing import Any, Union
+from typing import Any, Union, get_args, get_origin
 
 
 class DataUtils:
@@ -143,3 +144,49 @@ class DataUtils:
                     return obj
                 else:
                     return
+    
+    @staticmethod            
+    def dict_to_obj(cls, data : dict) -> object:
+        """ generate an object from dictionary, also attempting to recreate nested object hierarchies
+
+        Args:
+            cls (Any): class to create
+            data (dict): serialized object data as dictionary
+
+        Returns:
+            object: object of cls
+        """
+        if not is_dataclass(cls):
+            raise TypeError(f"{cls} is not a dataclass")
+
+        kwargs = {}
+        for field in fields(cls):
+            value = data.get(field.name)
+            if value is None:
+                kwargs[field.name] = None
+                continue
+
+            field_type = field.type
+            origin = get_origin(field_type)
+
+            # Handle Optional
+            if origin is Union:
+                args = get_args(field_type)
+                non_none = [arg for arg in args if arg is not type(None)]
+                field_type = non_none[0]
+                origin = get_origin(field_type)
+
+            # Handle list of nested dataclasses
+            if origin == list:
+                inner_type = get_args(field_type)[0]
+                kwargs[field.name] = [DataUtils.dict_to_obj(inner_type, item) if isinstance(item, dict) else item for item in value]
+
+            # Nested dataclass
+            elif is_dataclass(field_type) and isinstance(value, dict):
+                kwargs[field.name] = DataUtils.dict_to_obj(field_type, value)
+
+            else:
+                kwargs[field.name] = value
+
+        return cls(**kwargs)
+        
