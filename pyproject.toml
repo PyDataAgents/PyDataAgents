@@ -42,7 +42,8 @@ dependencies = [
     "unstructured[all-docs]",
     "watchdog",
     "bs4",
-    "pytest"
+    "pytest",
+    "ics"
 ]
 
 [tool.setuptools.packages.find]
