@@ -1,4 +1,5 @@
 import ast
+import inspect
 from pathlib import Path
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING
@@ -68,6 +69,8 @@ class DataModelService(Service):
         self.lookup_store : dict[str, pd.DataFrame] = None
         self.methods : dict = None
         self.method_input_vars : dict[str, list[str]] = None
+        self.method_output_vars : dict[str, list[str]] = None
+        self.method_arguments : dict[str, int] = None
         
     def install(self, agent : Agent = None):
         super().install(agent)
@@ -81,7 +84,7 @@ class DataModelService(Service):
         self.data_model : DataModel = ClassUtils.load_instance(self.model_path, self.model_name)
         self.data_model.observer = observer
         self.__find_methods()
-        self.__find_method_input_vars()
+        self.__find_method_vars()
 
     def start(self):
         super().start()
@@ -92,38 +95,53 @@ class DataModelService(Service):
     def update(self, property_name, value):
         self.data_model.set_data(property_name, value)
 
-    def run_model(self):
+    def run_model(self, blocked_vars : list[str] = None):
         """ 
         runs all methods over and over again until there is no more updates based on current available model values
         """
         last_success_methods = 0
-        success_methods = self.__run_methods()
+        success_methods = self.__run_methods(blocked_vars)
          # run as long as the number of methods being run successful increases or all methods were run
         while success_methods > last_success_methods and success_methods is not len(self.methods):
             last_success_methods = success_methods
-            success_methods = self.__run_methods()
+            success_methods = self.__run_methods(blocked_vars)
 
-    def __run_methods(self) -> int:
+    def __run_methods(self, blocked_vars : str = None) -> int:
         """ runs all methods once and returns how many were executed based on data model values availability
         """
         m : int = 0
         for name, method in self.methods.items():
             input_vars = self.method_input_vars[name]
             method_ready : bool = True
+            # check if method is ready based on set inputs
             for input_var in input_vars:
                 if not self.data_model.has_value(input_var):
                     method_ready = False
                     break
             if method_ready:
-                
-                method(self.data_model)
-                m = m + 1
+                # check if the method has output variables that are blocked
+                for blocked_var in blocked_vars:
+                    if not blocked_var in self.method_output_vars[name]:
+                        # check whether to pass only model or lookup as well
+                        if self.method_arguments[name] > 1:
+                            method(self.data_model, self.lookup_store)
+                        else:                 
+                            method(self.data_model)
+                        m = m + 1
         return m                
                 
     def __find_methods(self):
         self.methods = ClassUtils.load_methods(self.script_path)
+        for name, method in self.methods.items():
+            sig = inspect.signature(method)
+            params = sig.parameters
+            num_args = len([
+                p for p in params.values()
+                if p.kind in (p.POSITIONAL_ONLY, p.POSITIONAL_OR_KEYWORD) and p.default == p.empty
+            ])
+            self.method_arguments[name] = num_args
     
-    def __find_method_input_vars(self):
+    def __find_method_vars(self):
         script_path = Path(self.script_path).resolve()
         source_code = script_path.read_text(encoding="utf-8")
         # Parse file into AST
@@ -145,6 +163,7 @@ class DataModelService(Service):
                         rv.remove(v)
                 read_vars[key] = rv
         self.method_input_vars = read_vars
+        self.method_output_vars = write_vars
         # validate if method properties exist in model properties
         self.__validate_properties(all_vars)
         
@@ -158,8 +177,8 @@ class DataModelObserver():
     def __init__(self, model_service : DataModelService):
         self.model_service = model_service
 
-    def observe(self):
-        self.model_service.run_model()
+    def observe(self, blocked_vars : list[str]= None):
+        self.model_service.run_model(blocked_vars)
 
 
 class DataModelReadAccessVisitor(ast.NodeVisitor):

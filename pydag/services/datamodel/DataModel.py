@@ -13,7 +13,7 @@ class DataModel(ABC):
     def set_data(self, property_name : str, value : Any):
         if self.has_property(property_name):
             setattr(self, property_name, value)
-            self.observer.observe()
+            self.observer.observe([property_name])
         else:
             logger.error(f"no property '{property_name}' in {self.__class__}")
     
