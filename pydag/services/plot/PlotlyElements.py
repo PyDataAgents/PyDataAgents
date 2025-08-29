@@ -75,71 +75,6 @@ class AspectRatio:
 
     def __repr__(self):
         return f"AspectRatio(x={self.x}, y={self.y}, z={self.z})"
-
-@dataclass    
-class Axis:
-    
-    range: Optional[List[float]] = None
-    title: Optional[str] = None
-    scaleanchor: Optional[str] = None
-    scaleratio: int = 0
-    autotick: bool = True
-    zeroline: bool = True
-    showline: bool = False
-    showgrid: bool = True
-    gridcolor: Optional[str] = None
-    showticklabels: bool = True
-    mirror: Optional[str] = None
-    linecolor: Optional[str] = None
-
-    # -------- Builder-style setters ----------
-    def set_range(self, range_vals: List[float]) -> "Axis":
-        self.range = range_vals
-        return self
-
-    def set_title(self, title: str) -> "Axis":
-        self.title = title
-        return self
-
-    def set_autotick(self, autotick: bool) -> "Axis":
-        self.autotick = autotick
-        return self
-
-    def set_zeroline(self, zeroline: bool) -> "Axis":
-        self.zeroline = zeroline
-        return self
-
-    def set_showline(self, showline: bool) -> "Axis":
-        self.showline = showline
-        return self
-
-    def set_showgrid(self, showgrid: bool) -> "Axis":
-        self.showgrid = showgrid
-        return self
-
-    def set_gridcolor(self, gridcolor: str) -> "Axis":
-        self.gridcolor = gridcolor
-        return self
-
-    def set_showticklabels(self, showticklabels: bool) -> "Axis":
-        self.showticklabels = showticklabels
-        return self
-
-    def set_mirror(self, mirror: str) -> "Axis":
-        self.mirror = mirror
-        return self
-
-    def set_linecolor(self, linecolor: str) -> "Axis":
-        self.linecolor = linecolor
-        return self
-
-    def set_scaleanchor(self, scaleanchor: str) -> "Axis":
-        self.scaleanchor = scaleanchor
-        return self
-
-    def set_scaleratio(self, scaleratio: int) -> "Axis":
-        self.scaleratio = scaleratio
-        return self
    
 class Animation:
     def __init__(self, plot_id: str, trace_num: int):
@@ -382,6 +317,87 @@ class Line:
         # expects color to be an object with __str__ defined or a string
         self.color = str(color)
         return self
+
+@dataclass    
+class Title:
+    
+    text : str = "Plotly"
+
+    # Getter
+    def get_text(self):
+        return self.text
+
+    # Setter
+    def set_text(self, text):
+        self.text = text
+        return self  # optional, for fluent chaining
+
+@dataclass    
+class Axis:
+    
+    range : Optional[List[float]] = None
+    title : Title = None
+    scaleanchor : Optional[str] = None
+    scaleratio : int = 0
+    autotick : bool = True
+    zeroline : bool = True
+    showline : bool = False
+    showgrid : bool = True
+    gridcolor : Optional[str] = None
+    showticklabels : bool = True
+    mirror : Optional[str] = None
+    linecolor : Optional[str] = None
+
+    # -------- Builder-style setters ----------
+    def set_range(self, range_vals: List[float]) -> "Axis":
+        self.range = range_vals
+        return self
+
+    def set_title(self, title: str) -> "Axis":
+        if self.title is None:
+            self.title = Title()
+        self.title.text = title
+        return self
+
+    def set_autotick(self, autotick: bool) -> "Axis":
+        self.autotick = autotick
+        return self
+
+    def set_zeroline(self, zeroline: bool) -> "Axis":
+        self.zeroline = zeroline
+        return self
+
+    def set_showline(self, showline: bool) -> "Axis":
+        self.showline = showline
+        return self
+
+    def set_showgrid(self, showgrid: bool) -> "Axis":
+        self.showgrid = showgrid
+        return self
+
+    def set_gridcolor(self, gridcolor: str) -> "Axis":
+        self.gridcolor = gridcolor
+        return self
+
+    def set_showticklabels(self, showticklabels: bool) -> "Axis":
+        self.showticklabels = showticklabels
+        return self
+
+    def set_mirror(self, mirror: str) -> "Axis":
+        self.mirror = mirror
+        return self
+
+    def set_linecolor(self, linecolor: str) -> "Axis":
+        self.linecolor = linecolor
+        return self
+
+    def set_scaleanchor(self, scaleanchor: str) -> "Axis":
+        self.scaleanchor = scaleanchor
+        return self
+
+    def set_scaleratio(self, scaleratio: int) -> "Axis":
+        self.scaleratio = scaleratio
+        return self
     
 @dataclass
 class Scene:
@@ -448,21 +464,7 @@ class Scene:
     def set_domain(self, domain):
         self.domain = domain
         return self
-    
-@dataclass    
-class Title:
-    
-    text = "Plotly"
-
-    # Getter
-    def get_text(self):
-        return self.text
-
-    # Setter
-    def set_text(self, text):
-        self.text = text
-        return self  # optional, for fluent chaining
-    
+   
 @dataclass
 class Margin:
     
