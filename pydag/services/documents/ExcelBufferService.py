@@ -4,17 +4,15 @@ from fastapi import FastAPI
 from openpyxl import load_workbook
 import pandas as pd
 
-from ...services.ServiceException import ServiceException
+from ..ServiceException import ServiceException
 from ...utils.FileUtils import FileUtils
-from .ExcelRestAPI import ExcelRestAPI
 from ...buffers.DictBuffer import DictBuffer
 from ..Service import Service
-from ..rest.RestService import RestService
 from ...agents.Agent import Agent
 
 
 @dataclass
-class ExcelRestService(RestService):
+class ExcelBufferService(Service):
     """`Service` for creating a REST API for accessing named Tables in Excel
     """
     
@@ -22,20 +20,12 @@ class ExcelRestService(RestService):
            
     def __post_init__(self):
         super().__post_init__()
-        self.named_tables : dict[str, DictBuffer] = dict()
+        self.named_tables : list[str] = []
         
-    def install(self, agent : Agent = None):
-        super(Service, self).install()
-        self.app = FastAPI(title="DataGrabber ExcelRestService", docs_url="/docs")
-        self.add_cors()
-        self.app.include_router(ExcelRestAPI.get_api_router(self))
-        self.__init_tables()
-        
-    def deinstall(self, agent : Agent = None):
-        super().deinstall(agent)
-        self.app = None
-        
-    def __init_tables(self):
+    def start(self):
+        super().start()
+        if self.agent is None:
+            raise ServiceException("No " + Agent.cname() + " was specified, make sure to install the " + self.cname() + " before starting!")
         if FileUtils.exists_file(self.excel_file):
             # Load the workbook
             wb = load_workbook(self.excel_file, data_only=True)
@@ -44,10 +34,9 @@ class ExcelRestService(RestService):
                     #print("🧾 Table name:", table_name)
                     #print("📐 Range:", table_range)
                     # Access the cells inside the table range
+                    #print(type(table_range))
                     cells = ws[table_range]
-                    dbuf = DictBuffer()
-                    dbuf.id = table_name
-                    dbuf.capacity = len(cells)
+                    dbuf = DictBuffer(id=table_name, capacity=len(cells))
                     r = 0
                     headers = []
                     for row in cells:
@@ -62,9 +51,14 @@ class ExcelRestService(RestService):
                                 h = h + 1
                             dbuf.push(d)
                         r = r + 1
-                    self.named_tables[table_name] = dbuf
+                    self.agent.add_buffer(dbuf)
+                    self.named_tables.append(dbuf.id)
         else:
             raise ServiceException("the file " + self.excel_file + " could not be found")
+    
+    def stop(self):
+        super().stop()
+        self.named_tables = []
         
     def to_dataframes(self) -> dict[str, pd.DataFrame]:
         """Returns a dictionary of pandas DataFrames for each named table in the excel file
@@ -73,6 +67,7 @@ class ExcelRestService(RestService):
             dict[str, pd.DataFrame]: dictionary of DataFrames
         """
         dfs : dict[str, pd.DataFrame] = dict()
-        for name, dbuf in self.named_tables.items():
-            dfs[name] = pd.DataFrame(dbuf.data())
+        for name in self.named_tables:
+            buf = self.agent.get_buffer(name)
+            dfs[name] = pd.DataFrame(buf.data())
         return dfs

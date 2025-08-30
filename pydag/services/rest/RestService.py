@@ -26,8 +26,8 @@ class RestService(Service):
         super().install(agent)
         self.app = FastAPI(title="DataGrabber", docs_url="/docs")
         self.add_cors()
-        self.app.include_router(AgentRESTAPI.get_api_router(self.agent))
-        self.app.include_router(BufferRESTAPI.get_api_router(self.agent))
+        self.add_router(AgentRESTAPI.get_api_router(self.agent))
+        self.add_router(BufferRESTAPI.get_api_router(self.agent))
     
     def add_cors(self):
         """Add CORS middleware to the FastAPI app.

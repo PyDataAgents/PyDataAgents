@@ -20,7 +20,7 @@ class DataModelService(Service):
     <br>Model execution / model handler
     this file aggregates a chain of method calls, depending on the dependencies of the methods on dataclass variables.
     This means that only those methods are executed whose variables have changed.
-    The model handler also registers variable inputs (from outside) and then initiates the execution of methods accordingly.
+    The model handler also registers variable inputs (from outside) and method outputs and then initiates the execution of methods accordingly.
     <br>
     <br>Example of a model file:
     ```python
@@ -34,8 +34,8 @@ class DataModelService(Service):
     def method2(dm : DataModel):
         dm.t = f"Hello World {dm.c}"
        
-    def method3(dm: DataModel, lookup_store : dict[str, pd.DataFrame]):
-        df = lookup_store['NAME_OF_TABLE']
+    def method3(dm: DataModel, dms : DataModelService):
+        df = dms.lookup_table('NAME_OF_TABLE')
         values = df.query(f"COL1 > 30 and COL2 <= {dm.a}")
         dm.value = values["COL1"].to_list()[0]    
     
@@ -53,8 +53,8 @@ class DataModelService(Service):
         c : float = field(default=None, metadata={"description": "variable 3", "hidden": True})
         t : str = field(default=None, metadata={"description": "text variable 1", "hidden": True})
     ```
-    <br>the script files always have to introduce the `DataModel` `dm` variable as first argument to each method
-    <br>as an additional argument a lookup_store with Pandas Dataframes can be provided in order to lookup values based on model variables, the lookupstore is passed as second argument
+    <br>The script files always have to introduce the `DataModel` `dm` variable as first argument to each method, make sure to type the argument `dm` according to your specific `DataModel`. This way you receive the correct pylinting
+    <br>As an additional argument the `DataModelService` `dms` itself can be passed, which allows acces to the lookup-tables via dms.lookup_store([Name of the table]) with Pandas Dataframes can be provided in order to lookup values based on model variables
     """
     
     model_path : str = field(default=None, metadata={"description": "path of the model.py file"})
@@ -106,6 +106,13 @@ class DataModelService(Service):
             last_success_methods = success_methods
             success_methods = self.__run_methods(blocked_vars)
 
+    def lookup_table(self, table_name) -> pd.DataFrame:
+        if table_name in self.agent.buffer_store:
+            df = pd.DataFrame(self.agent.get_buffer(table_name))
+            return df    
+        else:
+            return None
+
     def __run_methods(self, blocked_vars : str = None) -> int:
         """ runs all methods once and returns how many were executed based on data model values availability
         """
@@ -124,7 +131,7 @@ class DataModelService(Service):
                     if not blocked_var in self.method_output_vars[name]:
                         # check whether to pass only model or lookup as well
                         if self.method_arguments[name] > 1:
-                            method(self.data_model, self.lookup_store)
+                            method(self.data_model, self)
                         else:                 
                             method(self.data_model)
                         m = m + 1

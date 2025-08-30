@@ -18,7 +18,8 @@ class Service(AgentElement):
     
     def install(self, agent : Agent = None):
         super().install(agent)
-        self.agent = agent
+        if self.agent is None:
+            self.agent = agent
         
     @abstractmethod
     def start(self):
