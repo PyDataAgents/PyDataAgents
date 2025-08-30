@@ -66,11 +66,10 @@ class DataModelService(Service):
     def __post_init__(self):
         super().__post_init__()
         self.data_model : DataModel = None
-        self.lookup_store : dict[str, pd.DataFrame] = None
         self.methods : dict = None
         self.method_input_vars : dict[str, list[str]] = None
         self.method_output_vars : dict[str, list[str]] = None
-        self.method_arguments : dict[str, int] = None
+        self.method_arguments : dict[str, int] = {}
         
     def install(self, agent : Agent = None):
         super().install(agent)
@@ -106,7 +105,7 @@ class DataModelService(Service):
             last_success_methods = success_methods
             success_methods = self.__run_methods(blocked_vars)
 
-    def lookup_table(self, table_name) -> pd.DataFrame:
+    def lookup_table(self, table_name : str) -> pd.DataFrame:
         if table_name in self.agent.buffer_store:
             df = pd.DataFrame(self.agent.get_buffer(table_name))
             return df    
@@ -201,7 +200,7 @@ class DataModelReadAccessVisitor(ast.NodeVisitor):
         self.current_func = None
 
     def visit_Attribute(self, node):
-        # check for "data_model.something"
+        # check for "dm.something"
         if isinstance(node.value, ast.Name) and node.value.id == DataModelService.DATA_MODEL_KEY:
             # Are we inside a store (= assignment target) or a read?
             if not isinstance(getattr(node, "ctx", None), ast.Store):
@@ -221,7 +220,7 @@ class DataModelWriteAccessVisitor(ast.NodeVisitor):
         self.current_func = None
 
     def visit_Attribute(self, node):
-        # check for "data_model.something"
+        # check for "dm.something"
         if isinstance(node.value, ast.Name) and node.value.id == DataModelService.DATA_MODEL_KEY:
             # Are we inside a store (= assignment target) or a read?
             if isinstance(getattr(node, "ctx", None), ast.Store):
