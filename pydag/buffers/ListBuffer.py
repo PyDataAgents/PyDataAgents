@@ -48,7 +48,7 @@ class ListBuffer(Buffer):
             else:
                 self.__push1(elements)
 
-    def data(self, n : int = 0, persistent : bool = True) -> list:
+    def data(self, n : int = 0, persistent : bool = True) -> dict:
         with self.lock:
             if self.size() > 0:
                 if n > 0:
@@ -58,16 +58,20 @@ class ListBuffer(Buffer):
                     d = self.elements[0:n]
                     if not persistent:
                         del self.elements[0:n]
-                    return d
+                    dic : dict = {}
+                    dic[AgentConfig.VALUES] = d
+                    return dic
                 else:
                     # always make a deep copy, otherwise a reference will be maintained
                     d = copy.deepcopy(self.elements)
                     if not persistent:
                         self.elements.clear()
-                    return d
+                    dic : dict = {}
+                    dic[AgentConfig.VALUES] = d
+                    return dic
             else:
                 logger.warning("buffer is empty")
-                return []
+                return {}
 
     def data_with_meta(self, n = 0, persistent = True) -> dict:        
         data = {}

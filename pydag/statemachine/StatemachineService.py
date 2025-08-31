@@ -19,11 +19,11 @@ if TYPE_CHECKING:
 @dataclass
 class StatemachineService(Service):
     
-    retry_error_nodes : bool = field(init=True, default=False, metadata={"description" : "Statemachine object containing actions and transitions to go through to represent a state machine program flow"})    
-    start_node_id : str = field(init=True, default=None, metadata={"description": "ID of the start node in the statemachine service"})
-    nodes : dict[str, Node] = field(init=True, default_factory=dict[str, Node](), metadata={"description": "dictionary of nodes in the statemachine service"})
-    thread_type : str = field(init=True, default=ThreadType.INSTANT.value, metadata={"description": ""})
-    sampling_period : int = field(init=True, default=0, metadata={"description": "sampling period that specifies the interval the observer thread should run for"})
+    retry_error_nodes : bool = field(default=False, metadata={"description" : "Statemachine object containing actions and transitions to go through to represent a state machine program flow"})    
+    start_node_id : str = field(default=None, metadata={"description": "ID of the start node in the statemachine service"})
+    nodes : dict[str, Node] = field(default_factory=dict[str, Node], metadata={"description": "dictionary of nodes in the statemachine service"})
+    thread_type : str = field(default=ThreadType.INSTANT.value, metadata={"description": ""})
+    sampling_period : int = field(default=0, metadata={"description": "sampling period that specifies the interval the observer thread should run for"})
     
     def __post_init__(self):
         super().__post_init__()
@@ -69,7 +69,7 @@ class StatemachineService(Service):
         if not isinstance(self.nodes[self.start_action.id], Action):
             raise ServiceException(f"Node with ID {self.start_node_id} is not a valid Action Node instance.")        
         self.assemble(self.start_action)
-        self.observer_thread = ObserverThread(ObserverThread.unique_id(), ThreadType[self.thread_type], 0)
+        self.observer_thread = ObserverThread(id=ObserverThread.unique_id(), thread_type=ThreadType[self.thread_type])
         observer = StatemachineObserver(self)
         self.observer_thread.add_observer(observer)
         self.observer_thread.start()

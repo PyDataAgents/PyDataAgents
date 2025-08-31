@@ -24,7 +24,7 @@ class RestService(Service):
         
     def install(self, agent : Agent = None):
         super().install(agent)
-        self.app = FastAPI(title="DataGrabber", docs_url="/docs")
+        self.app = FastAPI(title=Agent.cname() + " - " + RestService.cname(), docs_url="/docs")
         self.add_cors()
         self.add_router(AgentRESTAPI.get_api_router(self.agent))
         self.add_router(BufferRESTAPI.get_api_router(self.agent))

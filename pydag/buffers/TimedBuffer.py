@@ -82,13 +82,13 @@ class TimedBuffer(ListBuffer):
                     if not persistent:
                         del self.elements[0:n]
                         del self.timestamps[0:n]
-                    d = {"values": v, "timestamps": t}
+                    d = {AgentConfig.TIMESTAMPS: t, AgentConfig.VALUES: v}
                     return d
                 else:
                     # always make a deep copy, otherwise a reference will be maintained
                     v = copy.deepcopy(self.elements)
                     t = copy.deepcopy(self.timestamps)
-                    d = {"values": v, "timestamps": t}
+                    d = {AgentConfig.TIMESTAMPS: t, AgentConfig.VALUES: v}
                     if not persistent:
                         self.elements.clear()
                         self.timestamps.clear()

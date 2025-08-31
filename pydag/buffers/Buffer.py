@@ -28,10 +28,10 @@ class Buffer(AgentElement):
         """
 
     @abstractmethod
-    def data(self, n=0, persistent=True) -> any:
+    def data(self, n=0, persistent=True) -> dict:
         """
         get the buffers data, or n samples, with persistent True/False you specify whether to keep the elements in buffer
-        the return type depends on the buffer implementation
+        the return type should always be a dictionary
         """
 
     @abstractmethod

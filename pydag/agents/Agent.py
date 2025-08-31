@@ -115,35 +115,35 @@ class Agent(AgentElement):
         if id in self.adapter_store:
             return self.adapter_store[id]    
         else:
-            logger.error("No " + Adapter.__class__.__name__ + " with id=" + id + " was found")
+            logger.error("No " + Adapter.cname() + " with id=" + id + " was found")
             return None
     
     def get_buffer(self, id : str) -> Buffer:
         if id in self.buffer_store:
             return self.buffer_store[id]    
         else:
-            logger.error("No " + Buffer.__class__.__name__ + " with id=" + id + " was found")
+            logger.error("No " + Buffer.cname() + " with id=" + id + " was found")
             return None
     
     def get_mapping_thread(self, id : str) -> MappingThread:
         if id in self.mapping_store:
             return self.mapping_store[id]    
         else:
-            logger.error("No " + MappingThread.__class__.__name__ + " with id=" + id + " was found")
+            logger.error("No " + MappingThread.cname() + " with id=" + id + " was found")
             return None
         
     def get_mapping(self, id : str) -> Mapping:
         if id in self.mapping_store:
             return self.mapping_store[id].mapping    
         else:
-            logger.error("No " + Mapping.__class__.__name__ + " with id=" + id + " was found")
+            logger.error("No " + Mapping.cname() + " with id=" + id + " was found")
             return None
         
     def get_service(self, id : str) -> Service:
         if id in self.service_store:
             return self.service_store[id]    
         else:
-            logger.error("No " + Service.__class__.__name__ + " with id=" + id + " was found")
+            logger.error("No " + Service.cname() + " with id=" + id + " was found")
             return None
         
     def get_services(self, type : Type) -> list[Service]:

@@ -16,7 +16,7 @@ def test_000():
     sb.install()
     
     i = 0
-    while i < 400:
+    while i < 200:
         time.sleep(0.1)
         print(sb.data())
         i = i + 1
