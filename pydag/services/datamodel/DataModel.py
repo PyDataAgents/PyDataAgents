@@ -38,13 +38,14 @@ class DataModel(ABC):
             return False
             
     def to_dict(self, with_hidden : bool = False) -> dict:
-        """ returns the data model as dictionary    
+        """
+        returns the data model as dictionary, None values are ignored    
 
         Args:
             with_hidden (bool, optional): ignores the hidden fields. Defaults to False.
 
         Returns:
-            dict: _descreturns a dictionary
+            dict: returns a dictionary
         """
         result = {}
         for f in fields(self):
@@ -52,5 +53,7 @@ class DataModel(ABC):
             is_hidden = f.metadata.get("hidden", False)
             if not with_hidden and is_hidden:
                 continue
-            result[f.name] = getattr(self, f.name)
+            v = getattr(self, f.name)
+            if v is not None:
+                result[f.name] = v
         return result
