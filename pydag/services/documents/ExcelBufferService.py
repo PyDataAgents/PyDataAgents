@@ -13,7 +13,8 @@ from ...agents.Agent import Agent
 
 @dataclass
 class ExcelBufferService(Service):
-    """`Service` for creating a REST API for accessing named Tables in Excel
+    """
+    `Service` for creating `Buffer`s in `Agent` for each named table found in specified Excel file
     """
     
     excel_file : str = field(default=None, metadata={"description" : "path of the excel file to open for tables"})
