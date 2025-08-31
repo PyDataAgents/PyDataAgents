@@ -99,7 +99,7 @@ class DataModelService(Service):
 
     def lookup_table(self, table_name : str) -> pd.DataFrame:
         if table_name in self.agent.buffer_store:
-            df = pd.DataFrame(self.agent.get_buffer(table_name))
+            df = pd.DataFrame(self.agent.get_buffer(table_name).data())
             return df    
         else:
             return None
