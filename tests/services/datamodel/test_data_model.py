@@ -8,7 +8,6 @@ def test_000():
     dms = DataModelService()
     dms.model_name = "SimpleDataModel"
     dms.model_path = os.getcwd() + os.sep + "tests" + os.sep + "services" + os.sep + "datamodel" + os.sep + "SimpleDataModel.py"
-    dms.script_path = os.getcwd() + os.sep + "tests" + os.sep + "services" + os.sep + "datamodel" + os.sep + "SimpleModelScript.py"
     
     dms.install()
     

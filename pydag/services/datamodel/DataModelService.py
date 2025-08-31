@@ -27,24 +27,6 @@ class DataModelService(Service):
     import pandas as pd
     from pydag.services.datamodel.DataModel import DataModel
     
-    def method1(dm : DataModel):
-        dm.b = dm.a * 2 + 10.0
-        dm.c = dm.a + dm.c
-    
-    def method2(dm : DataModel):
-        dm.t = f"Hello World {dm.c}"
-       
-    def method3(dm: DataModel, dms : DataModelService):
-        df = dms.lookup_table('NAME_OF_TABLE')
-        values = df.query(f"COL1 > 30 and COL2 <= {dm.a}")
-        dm.value = values["COL1"].to_list()[0]    
-    
-    ```
-    <br>Example of a script file
-    ```python
-    from dataclasses import dataclass, field
-    from pydag.services.datamodel.DataModel import DataModel
-
     @dataclass
     class SimpleDataModel(DataModel):
     
@@ -52,17 +34,29 @@ class DataModelService(Service):
         b : float = field(default=None, metadata={"description": "variable 2"})
         c : float = field(default=None, metadata={"description": "variable 3", "hidden": True})
         t : str = field(default=None, metadata={"description": "text variable 1", "hidden": True})
+    
+        def method1(self):
+            self.b = self.a * 2 + 10.0
+            self.c = self.a + self.c
+        
+        def method2(self):
+            self.t = f"Hello World {self.c}"
+        
+        def method3(self, dms : DataModelService):
+            df = dms.lookup_table('NAME_OF_TABLE')
+            values = df.query(f"COL1 > 30 and COL2 <= {self.a}")
+            self.value = values["COL1"].to_list()[0]    
+    
     ```
-    <br>The script files always have to introduce the `DataModel` `dm` variable as first argument to each method, make sure to type the argument `dm` according to your specific `DataModel`. This way you receive the correct pylinting
-    <br>As an additional argument the `DataModelService` `dms` itself can be passed, which allows acces to the lookup-tables via dms.lookup_store([Name of the table]) with Pandas Dataframes can be provided in order to lookup values based on model variables
+    
+    <br>The model files always have to inherit from `DataModel`, they are `dataclasses` and all properties should be introduced as `fields`.
+    <br>
+    <br>As an additional argument to `DataModel` methods the argument `dms` of type `DataModelService` can be passed, which allows acces to the lookup-tables via dms.lookup_store([Name of the table]) with Pandas Dataframes can be provided in order to lookup values based on model variables
     """
     
     model_path : str = field(default=None, metadata={"description": "path of the model.py file"})
     model_name : str = field(default=None, metadata={"description": "name of the class to load from the model.py file"})
-    script_path : str = field(default=None, metadata={"description": "path of the script.py file"})
-    
-    DATA_MODEL_KEY = "dm"
-    
+        
     def __post_init__(self):
         super().__post_init__()
         self.data_model : DataModel = None
@@ -77,8 +71,6 @@ class DataModelService(Service):
             raise ServiceException(f"No model file was found for '{self.model_path}'")
         if self.model_name is None:
             raise ServiceException("No model name was specified")
-        if not FileUtils.exists_file(self.script_path):
-            raise ServiceException(f"No script file was found for '{self.script_path}'")
         observer = DataModelObserver(self)
         self.data_model : DataModel = ClassUtils.load_instance(self.model_path, self.model_name)
         self.data_model.observer = observer
@@ -137,7 +129,7 @@ class DataModelService(Service):
         return m                
                 
     def __find_methods(self):
-        self.methods = ClassUtils.load_methods(self.script_path)
+        self.methods = ClassUtils.load_methods(self.model_path)
         for name, method in self.methods.items():
             sig = inspect.signature(method)
             params = sig.parameters
@@ -148,7 +140,7 @@ class DataModelService(Service):
             self.method_arguments[name] = num_args
     
     def __find_method_vars(self):
-        script_path = Path(self.script_path).resolve()
+        script_path = Path(self.model_path).resolve()
         source_code = script_path.read_text(encoding="utf-8")
         # Parse file into AST
         tree = ast.parse(source_code)
@@ -191,38 +183,63 @@ class DataModelReadAccessVisitor(ast.NodeVisitor):
     def __init__(self):
         self.read_accesses = {}   # function_name -> set of property names
         self.current_func = None
+        self.current_class = None
+
+    def visit_ClassDef(self, node):
+        # Enter the class
+        previous_class = self.current_class
+        self.current_class = node.name
+        self.generic_visit(node)
+        self.current_class = previous_class  # restore previous class after leaving
 
     def visit_FunctionDef(self, node):
+         # Only track methods inside a class
+        if self.current_class is None:
+            return
         # track which function we are in
-        self.current_func = node.name
-        self.read_accesses[self.current_func] = set()
+        qualified_name = f"{self.current_class}.{node.name}"
+        self.current_func = qualified_name
+        self.read_accesses[qualified_name] = set()
         self.generic_visit(node)
         self.current_func = None
 
     def visit_Attribute(self, node):
         # check for "dm.something"
-        if isinstance(node.value, ast.Name) and node.value.id == DataModelService.DATA_MODEL_KEY:
+        if isinstance(node.value, ast.Name) and node.value.id == "self":
             # Are we inside a store (= assignment target) or a read?
             if not isinstance(getattr(node, "ctx", None), ast.Store):
-                self.read_accesses[self.current_func].add(node.attr)
+                if self.current_func:
+                    self.read_accesses[self.current_func].add(node.attr)
         self.generic_visit(node)
 
 class DataModelWriteAccessVisitor(ast.NodeVisitor):
     def __init__(self):
         self.write_accesses = {}   # function_name -> set of property names
         self.current_func = None
+        self.current_class = None
+    
+    def visit_ClassDef(self, node):
+        # Enter the class
+        previous_class = self.current_class
+        self.current_class = node.name
+        self.generic_visit(node)
+        self.current_class = previous_class  # restore previous class after leaving 
 
     def visit_FunctionDef(self, node):
-        # track which function we are in
-        self.current_func = node.name
-        self.write_accesses[self.current_func] = set()
+        if self.current_class is None:
+            return
+        # Track the current function (with class)
+        qualified_name = f"{self.current_class}.{node.name}"
+        self.current_func = qualified_name
+        self.write_accesses[qualified_name] = set()
         self.generic_visit(node)
         self.current_func = None
 
     def visit_Attribute(self, node):
         # check for "dm.something"
-        if isinstance(node.value, ast.Name) and node.value.id == DataModelService.DATA_MODEL_KEY:
+        if isinstance(node.value, ast.Name) and node.value.id == "self":
             # Are we inside a store (= assignment target) or a read?
             if isinstance(getattr(node, "ctx", None), ast.Store):
-                self.write_accesses[self.current_func].add(node.attr)
+                if self.current_func:
+                    self.write_accesses[self.current_func].add(node.attr)
         self.generic_visit(node)

@@ -4,6 +4,7 @@ import importlib.util
 from pathlib import Path
 import sys
 import inspect
+from types import FunctionType
 
 from ..agents.AgentException import AgentException
 
@@ -110,8 +111,32 @@ class ClassUtils:
         rules_module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(rules_module)
         # Collect all top-level callables (functions) in the module
-        methods = {
-            name: func
-            for name, func in inspect.getmembers(rules_module, inspect.isfunction)
-        }
+        methods = {}
+        
+        for name, func in inspect.getmembers(rules_module, inspect.isfunction):
+            if name == "dataclass" or name == "field":
+                continue  # ignore dataclass methods
+            else:
+                methods[name] = func        
+        
+        # Step 2: Find classes and extract their methods
+        for _, cls in inspect.getmembers(rules_module, inspect.isclass):
+            if cls.__module__ != rules_module.__name__:
+                continue  # skip imported classes
+
+            # cls.__dict__ contains only what's defined in the class itself
+            for attr_name, attr_value in cls.__dict__.items():
+                if attr_name.startswith("__"):
+                    continue  # ignore dunder methods like __init__, __repr__, etc.
+                if attr_name == "dataclass" or attr_name == "field":
+                    continue  # ignore dataclass methods
+                if isinstance(attr_value, (FunctionType, classmethod, staticmethod)):
+                    # Unwrap staticmethod/classmethod if needed
+                    if isinstance(attr_value, (classmethod, staticmethod)):
+                        func = attr_value.__func__
+                    else:
+                        func = attr_value
+                    qualified_name = f"{cls.__name__}.{attr_name}"
+                    methods[qualified_name] = func
+        
         return methods
