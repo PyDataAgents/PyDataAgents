@@ -88,8 +88,52 @@ class PlotlifyService(Service):
         return pdoc
         
     @staticmethod
-    def lines():
-        pass
+    def lines(x : Union[list[list[object]], list[list[float]], list[list[int]], list[np.ndarray]] = None,
+             y : Union[list[list[object]], list[list[float]], list[list[int]], list[np.ndarray]] = None, 
+             z : Union[list[list[object]], list[list[float]], list[list[int]], list[np.ndarray]] = None,
+             names : list[str] = None, title : str = "Plotly", x_label : str = "x", y_label : str = "y", z_label : str = None) -> PlotlyDocument:
+        """ creates a line plot of multiple lines as `PlotlyDocument`
+
+        Args:
+            x (Union[list[list[object]], list[list[float]], list[list[int]], list[np.ndarray]], optional): _description_. Defaults to None.
+            y (Union[list[list[object]], list[list[float]], list[list[int]], list[np.ndarray]], optional): _description_. Defaults to None.
+            z (Union[list[list[object]], list[list[float]], list[list[int]], list[np.ndarray]], optional): _description_. Defaults to None.
+            name (str, optional): _description_. Defaults to "trace1".
+            title (str, optional): _description_. Defaults to "Plotly".
+            x_label (str, optional): _description_. Defaults to "x".
+            y_label (str, optional): _description_. Defaults to "y".
+            z_label (str, optional): _description_. Defaults to "z".
+
+        Returns:
+            PlotlyDocument: _description_
+        """
+        if y is None:
+            logger.error("No y data was specified, at least y data must be specified")
+            return
+        p : Plotly = Plotly()
+        p.get_layout().get_title().set_text(title)
+        p.get_layout().get_scene().get_xaxis().set_title(x_label)
+        p.get_layout().get_scene().get_yaxis().set_title(y_label)
+        p.get_layout().get_scene().get_zaxis().set_title(z_label)
+        
+        for i in range(len(y)):
+            t = Trace()
+            t.set_mode(Mode.LINES)
+            if x is not None:
+                t.set_x(x[i])
+            t.set_y(y[i])
+            if z is not None:
+                t.set_z(z[i])
+            if names is not None:
+                t.set_name(names[i])
+            if z is not None:
+                t.set_type(PlotType.SCATTER3D)
+            else:
+                t.set_type(PlotType.SCATTER)
+            p.get_traces().append(t)
+                
+        pdoc = PlotlyDocument(p)
+        return pdoc
     
     @staticmethod
     def scatter(x : Union[list[object], list[float], list[int], np.ndarray] = None,
