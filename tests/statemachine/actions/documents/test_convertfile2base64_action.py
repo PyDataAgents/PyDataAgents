@@ -12,12 +12,9 @@ def test_000():
     
     file_paths = [os.path.dirname(__file__) + os.sep + "This is a Test PDF.pdf"]
     
-    cf2b64a = ConvertFile2Base64Action(file_paths=file_paths)
-    
-    cf2b64a.install()
-    
-    cf2b64a.execute()
-    
+    cf2b64a = ConvertFile2Base64Action(file_paths=file_paths)    
+    cf2b64a.install()    
+    cf2b64a.execute()    
     print(cf2b64a.buffer.data())
     
 def test_010():

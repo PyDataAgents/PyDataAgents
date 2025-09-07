@@ -1,4 +1,5 @@
 from dataclasses import dataclass, field
+import re
 
 from ....buffers.DataType import DataType
 from ....buffers.ListBuffer import ListBuffer
@@ -32,7 +33,10 @@ class FormattedStringAction(BufferNode, Action):
         
     def execute(self):
         # check if template and data keys match
-        if len(self.data_keys) == self.template.count("{}"):            
+        # Match with either the occurences of a number inside {}, or empty {}
+        empty_brackets = self.template.count("{}")
+        number_brackets = re.findall(r'\{\d+\}', self.template)
+        if len(self.data_keys) == empty_brackets or len(self.data_keys) == number_brackets:            
             for parent in self.parents:
                 if not isinstance(parent, BufferNode):
                     raise StatemachineException("parents must be of type " + BufferNode.cname())
@@ -50,3 +54,4 @@ class FormattedStringAction(BufferNode, Action):
                     self.buffer.push(s)
         else:
             raise StatemachineException(f"number of data_keys({len(self.data_keys)}) and placeholders ({self.template.count('{}')}) in template do not match")
+        
