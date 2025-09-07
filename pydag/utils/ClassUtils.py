@@ -5,6 +5,7 @@ from pathlib import Path
 import sys
 import inspect
 from types import FunctionType
+from typing import get_type_hints
 
 from ..agents.AgentException import AgentException
 
@@ -62,6 +63,30 @@ class ClassUtils:
         """
         for property_name, value in properties.items():
             ClassUtils.set_property(obj, property_name, value)
+    
+    @staticmethod
+    def is_property_list(obj, property) -> bool:
+        hints = get_type_hints(obj)
+        t = hints.get(property)
+        if not t:
+            return False
+        origin = getattr(t, '__origin__', t)
+        if origin == list:
+            return True
+        else:
+            return False
+    
+    @staticmethod
+    def is_property_dict(obj, property) -> bool:
+        hints = get_type_hints(obj)
+        t = hints.get(property)
+        if not t:
+            return False
+        origin = getattr(t, '__origin__', t)
+        if origin == dict:
+            return True
+        else:
+            return False    
     
     @staticmethod        
     def get_dataclass_fields(clazz : type):
