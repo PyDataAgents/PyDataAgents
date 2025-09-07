@@ -35,7 +35,7 @@ class FormattedStringAction(BufferNode, Action):
         # check if template and data keys match
         # Match with either the occurences of a number inside {}, or empty {}
         empty_brackets = self.template.count("{}")
-        number_brackets = re.findall(r'\{\d+\}', self.template)
+        number_brackets = len(set(re.findall(r'\{\d+\}', self.template)))
         if len(self.data_keys) == empty_brackets or len(self.data_keys) == number_brackets:            
             for parent in self.parents:
                 if not isinstance(parent, BufferNode):
