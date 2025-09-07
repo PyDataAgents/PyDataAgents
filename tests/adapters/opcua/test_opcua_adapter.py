@@ -1,7 +1,6 @@
 import time
 from pydag.adapters.opcua.OpcUaAdapter import OpcUaAdapter
 from pydag.buffers.ListBuffer import ListBuffer
-from pydag.utils.BufferUtils import BufferUtils
 
 def test000():
     """
@@ -14,7 +13,7 @@ def test000():
     buf1 = ListBuffer()
     buf1.id = "BUF1"
     buf1.capacity = 1
-    buf_dict = BufferUtils.to_dict(buf1)
+    buf_dict = buf1.to_dict()
     
     opcua.endpoint("opc.tcp://jh:48010")
     
@@ -42,7 +41,7 @@ def test010():
     buf1 = ListBuffer()
     buf1.id = "T1"
     buf1.capacity = 1
-    buf_dict = BufferUtils.to_dict(buf1)
+    buf_dict = buf1.to_dict()
     
     opcua.endpoint = "opc.tcp://jh:48010"
     

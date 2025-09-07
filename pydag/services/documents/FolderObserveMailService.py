@@ -2,7 +2,6 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from loguru import logger
 
-from ...utils.BufferUtils import BufferUtils
 from ...utils.FileUtils import FileUtils
 from ...utils.TimeUtils import TimeUtils
 from ...mappings.Observer import Observer
@@ -98,7 +97,7 @@ class FolderMailObserver(Observer):
         self.service.file_history_buffer.push(row_data)
         
         # create html table from dictbuffer
-        body = BufferUtils.dict_buffer_to_html(self.service.file_history_buffer)
+        body = self.service.file_history_buffer.to_html()
         body = "<h4>" + FolderObserveMailService.cname() + " - " + self.service.folder + "</h4>\n" + body
         
         # add file infos to body
@@ -113,7 +112,7 @@ class FolderMailObserver(Observer):
                 }
                 file_buf.push(file_row)
                         
-            body += BufferUtils.dict_buffer_to_html(file_buf)
+            body += file_buf.to_html()
             if len(files) > self.service.MAX_FILES:
                 body += f"Note: Only the last {self.service.MAX_FILES} files are listed."
         

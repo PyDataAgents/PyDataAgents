@@ -7,7 +7,6 @@ from pydag.mappings.Mapping import Mapping
 from pydag.mappings.MappingType import MappingType
 from pydag.mappings.ThreadType import ThreadType
 from pydag.utils.AdapterUtils import AdapterUtils
-from pydag.utils.BufferUtils import BufferUtils
 
 
 def test_000():
@@ -30,7 +29,7 @@ def test_000():
     
     mapping = Mapping()
     mapping.id = "M1"
-    mapping.buffers = BufferUtils.to_dict(buf)
+    mapping.buffers = buf.to_dict()
     mapping.addresses = AdapterUtils.address_to_list("ns=4;s=AirConditioner_1.Temperature")
     mapping.adapter = opcua
     mapping.mapping_type = MappingType.READ
@@ -76,7 +75,7 @@ def test_010():
     
     mapping = Mapping()
     mapping.id = "M1"
-    mapping.buffers = BufferUtils.to_dict(buf)
+    mapping.buffers = buf.to_dict()
     mapping.addresses = AdapterUtils.address_to_list("ns=4;s=AirConditioner_1.Temperature")
     mapping.adapter = opcua
     mapping.mapping_type = MappingType.READ

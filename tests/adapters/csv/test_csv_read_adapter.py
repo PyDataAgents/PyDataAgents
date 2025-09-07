@@ -5,7 +5,6 @@ from pydag.adapters.csv.CsvReadAdapter import CSVReadMode, CsvReadAdapter
 from pydag.buffers.Buffer import Buffer
 from pydag.buffers.DataType import DataType
 from pydag.buffers.DictBuffer import DictBuffer
-from pydag.utils.BufferUtils import BufferUtils
 
 def test_000():
     script_path = os.getcwd()
@@ -55,7 +54,7 @@ def test_020():
     a1.file_path = "tests\\data\\csv\\ballscrew_drive_data.csv"
     a1.force_numeric = True
     
-    buffers : dict[str, Buffer] = BufferUtils.to_dict(buf1)
+    buffers : dict[str, Buffer] = buf1.to_dict()
     
     addresses = None
     
@@ -91,7 +90,7 @@ def test_021():
     a1.file_path = os.path.dirname(__file__) + os.sep + "test_data2.csv"
     a1.force_numeric = True
     
-    buffers : dict[str, Buffer] = BufferUtils.to_dict(buf1)
+    buffers : dict[str, Buffer] = buf1.to_dict()
     
     addresses = None
     

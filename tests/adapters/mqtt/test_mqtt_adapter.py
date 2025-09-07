@@ -2,7 +2,6 @@ import time
 from pydag.adapters.mqtt.MQTTAdapter import MQTTAdapter
 from pydag.buffers.ListBuffer import ListBuffer
 from pydag.utils.AdapterUtils import AdapterUtils
-from pydag.utils.BufferUtils import BufferUtils
 
 
 def test_000():
@@ -21,7 +20,7 @@ def test_000():
     address = "topic=" + topic + ";id=" + buf.id
     address_list = AdapterUtils.address_to_list(address)
     
-    buf_dict = BufferUtils.to_dict(buf)
+    buf_dict = buf.to_dict()
     
     mqtt.subscribe(buf_dict, address_list)
     

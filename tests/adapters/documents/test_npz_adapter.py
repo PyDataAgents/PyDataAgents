@@ -3,7 +3,6 @@ from pydag.adapters.documents.NpzAdapter import NpzAdapter
 from pydag.buffers.Buffer import Buffer
 from pydag.buffers.DictBuffer import DictBuffer
 from pydag.buffers.ListBuffer import ListBuffer
-from pydag.utils.BufferUtils import BufferUtils
 from pydag.utils.DataUtils import DataUtils
 
 def test_000():
@@ -23,7 +22,7 @@ def test_010():
     
     npz = NpzAdapter(file_path=file_path)
     
-    buffers = BufferUtils.to_dict(buf)
+    buffers = buf.to_dict()
     
     addresses = []
     
@@ -40,7 +39,7 @@ def test_011():
     
     npz = NpzAdapter(file_path=file_path)
     
-    buffers = BufferUtils.to_dict(buf1)
+    buffers = buf1.to_dict()
     buffers[buf2.id] = buf2
     
     addresses = ["FE", "DE"]

@@ -78,3 +78,26 @@ class DictBuffer(Buffer):
         
     def clear(self):
         self.elements.clear()
+        
+    def to_html(self) -> str:
+        """
+        returns this `Buffer`s data to HTML formatted Table string
+        """        
+        DEFAULT_CELL_STYLE : str = "border: 1px solid black; border-collapse: collapse; padding: 5px";
+        
+        data = self.data()
+        # Transpose the data: get rows from column-based structure
+        rows = zip(*data.values())
+        columns = data.keys()
+        # Start HTML table
+        html = "<table border='1' style='" + DEFAULT_CELL_STYLE + "'>\n"
+
+        # Add header row
+        html += "  <tr>" + "".join(f"<th>{col}</th>" for col in columns) + "</tr>\n"
+
+        # Add data rows
+        for row in rows:
+            html += "  <tr>" + "".join(f"<td>{val}</td>" for val in row) + "</tr>\n"
+
+        html += "</table>"
+        return html

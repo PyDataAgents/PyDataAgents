@@ -1,10 +1,11 @@
 from dataclasses import dataclass, field
 import re
 
+from pydag.utils.DataUtils import DataUtils
+
 from ....buffers.DataType import DataType
 from ....buffers.ListBuffer import ListBuffer
 from ....agents.Agent import Agent
-from ....utils.BufferUtils import BufferUtils
 from ....buffers.DictBuffer import DictBuffer
 from ...StatemachineException import StatemachineException
 from ...Action import Action
@@ -44,7 +45,7 @@ class FormattedStringAction(BufferNode, Action):
                     if not isinstance(parent.buffer, DictBuffer):
                         raise StatemachineException("parents' buffers must be of type " + DictBuffer.cname())
                 d = parent.buffer.data(persistent=False)
-                rows = BufferUtils.dict_to_list(d)
+                rows = DataUtils.dict_to_list(d)
                 for row in rows:
                     td : list = []
                     s : str = ""

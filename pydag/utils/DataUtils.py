@@ -7,6 +7,31 @@ from typing import Any, Union, get_args, get_origin
 class DataUtils:
     
     @staticmethod
+    def dict_to_list(data : dict) -> list[dict]:
+        """
+        turns a column style dictionary data layout into a row style list of dictionaries
+
+        Args:
+            data (dict): dictionary with column style data content
+
+        Returns:
+            list[dict]: list of dictionaries (row-style)
+        """
+        return [dict(zip(data.keys(), values)) for values in zip(*data.values())]
+    
+    @staticmethod
+    def list_to_dict(data : list) -> dict:
+        """
+        turns a row style data layout into a column style dictionary of lists
+        Args:
+            data (list): list of dictionaries
+
+        Returns:
+            dict: _descdictionary of lists
+        """
+        return {key: [d[key] for d in data] for key in data[0].keys()}
+    
+    @staticmethod
     def force_numeric(value):
         """_attempty to convert the given value into an int or float
 

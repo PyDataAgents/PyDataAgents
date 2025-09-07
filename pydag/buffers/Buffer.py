@@ -54,6 +54,16 @@ class Buffer(AgentElement):
 
     def json(self, n=None, persistent=True):
         return json.dumps(self.data_with_meta(n, persistent), ensure_ascii=False)
+    
+    def to_dict(self) -> dict:
+        """ inserts this `Buffer` into a dictionary
+
+        Returns:
+            dict: dictionary with this `Buffer` inside
+        """
+        d = {}
+        d[self.id] = self
+        return d
 
     def __str__(self):
         """string representation

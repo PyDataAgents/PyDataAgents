@@ -5,7 +5,6 @@ from pydag.adapters.influxdb.InfluxDbAdapter import InfluxDbAdapter
 from pydag.buffers.SignalBuffer import SignalBuffer
 from pydag.buffers.signals.Sine import Sine
 from pydag.utils.AdapterUtils import AdapterUtils
-from pydag.utils.BufferUtils import BufferUtils
     
 def test_000():
     
@@ -35,7 +34,7 @@ def test_010():
     sb.capacity=1
     sb.sampling_period=100
     
-    d = BufferUtils.to_dict(sb)
+    d = sb.to_dict()
     address = "b=test2;m=m1;f=sine"
     address_list = AdapterUtils.address_to_list(address)
     
