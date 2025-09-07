@@ -21,7 +21,8 @@ class FormattedStringAction(BufferNode, Action):
     
     data_keys : list[str] = field(default_factory=list, metadata={"description": "list of keys to use to compose the formatted string"})
     template : str = field(default=None, metadata={"description": "string template to insert the data from the parent buffer into, e.g. 'Hi {}, are you from {}'"})
-            
+    persistent : bool = field(default=False, metadata={"description": "specifies whether to remove the data from parent buffers when retrieving the data"})
+                
     def install(self, agent : Agent = None):
         if self.buffer is None:
             if agent is not None:
@@ -44,7 +45,7 @@ class FormattedStringAction(BufferNode, Action):
                 else:
                     if not isinstance(parent.buffer, DictBuffer):
                         raise StatemachineException("parents' buffers must be of type " + DictBuffer.cname())
-                d = parent.buffer.data(persistent=False)
+                d = parent.buffer.data(persistent=self.persistent)
                 rows = DataUtils.dict_to_list(d)
                 for row in rows:
                     td : list = []
