@@ -80,9 +80,9 @@ class PlotlifyService(Service):
         t.set_z(z)
         t.set_name(name).set_mode(Mode.LINES)
         if z is None:
-            t.set_type(PlotType.SCATTER3D)
-        else:
             t.set_type(PlotType.SCATTER)
+        else:
+            t.set_type(PlotType.SCATTER3D)
         
         p.get_traces().append(t)
         
@@ -129,9 +129,9 @@ class PlotlifyService(Service):
             if names is not None:
                 t.set_name(names[i])
             if z is not None:
-                t.set_type(PlotType.SCATTER3D)
-            else:
                 t.set_type(PlotType.SCATTER)
+            else:
+                t.set_type(PlotType.SCATTER3D)
             p.get_traces().append(t)
                 
         pdoc = PlotlyDocument(p)
@@ -160,9 +160,9 @@ class PlotlifyService(Service):
         t.set_z(z)
         t.set_name(name).set_mode(Mode.MARKERS)
         if z is None:
-            t.set_type(PlotType.SCATTER3D)
-        else:
             t.set_type(PlotType.SCATTER)
+        else:
+            t.set_type(PlotType.SCATTER3D)
             
         p.get_traces().append(t)
         
