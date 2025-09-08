@@ -84,6 +84,8 @@ class PlotlifyService(Service):
         else:
             t.set_type(PlotType.SCATTER)
         
+        p.get_traces().append(t)
+        
         pdoc = PlotlyDocument(p)
         return pdoc
         
@@ -117,6 +119,8 @@ class PlotlifyService(Service):
             t.set_type(PlotType.SCATTER3D)
         else:
             t.set_type(PlotType.SCATTER)
+            
+        p.get_traces().append(t)
         
         pdoc = PlotlyDocument(p)
         return pdoc
