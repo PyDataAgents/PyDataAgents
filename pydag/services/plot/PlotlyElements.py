@@ -861,7 +861,7 @@ class Layout:
     def set_title_text(self, text):
         if self.title is None:
             self.title = Title()
-        self.title.text(text)
+        self.title.set_text(text)
         return self
 
     def get_height(self):
@@ -1012,6 +1012,8 @@ class Plotly:
         return self
 
     def get_traces(self) -> List[Trace]:
+        if self.data is None:
+            self.data = []
         return self.data
 
     def set_traces(self, traces: List[Trace]):
