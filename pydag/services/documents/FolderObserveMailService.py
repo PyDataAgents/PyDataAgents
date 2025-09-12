@@ -1,5 +1,6 @@
 from dataclasses import dataclass, field
 from datetime import datetime
+from pathlib import Path
 from loguru import logger
 
 from ...utils.FileUtils import FileUtils
@@ -26,7 +27,8 @@ class FolderObserveMailService(Service):
     list_files : bool = field(default=True, metadata={"description": "If True, the service will list files in the mail body."})
     html_report : bool = field(default=True, metadata={"description": "If True, the mail will be sent as HTML."})
     mail_action : MailAction = field(default_factory=MailAction, metadata={"description": "MailAction object to send a mail with file infos."})
-
+    skip_extensions : list[str] = field(default_factory=list[str], metadata={"description": "specifies the file extensions that should be ignored in listing"})
+    
     # Constants for the mail content
     COL_DATE : str = "Datetime"
     COL_NUM_FILES : str = "Number of Files"
@@ -79,6 +81,13 @@ class FolderMailObserver(Observer):
         
         ts : str = TimeUtils.now_iso8601()
         files = FileUtils.list_files(self.service.folder)
+        # filter for skip_extension
+        if len(self.service.skip_extensions):
+            files = [
+                path for path in files 
+                if Path(path).suffix.lower() not in self.service.skip_extensions
+            ]
+
         if len(files) == 0:
             logger.warning(f"No files found in folder {self.service.folder} at {ts}.")
             return
