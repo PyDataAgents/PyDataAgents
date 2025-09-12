@@ -13,7 +13,7 @@ Examples:<br>
 ## Supported Sources / Sinks
 | Name  | Source | Sink | Action |
 |-------|--------|------|--------|
-| OPCUA | -[x] | -[x] | -[ ] |
+| OPCUA Client | &check; | &check; | &cross; |
 
 ## architecture
 the core element of the framework is a [(data)agent](pydag/agents/Agents.py)
