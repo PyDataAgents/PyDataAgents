@@ -1,6 +1,8 @@
 from dataclasses import dataclass, field
 import pyodbc
 
+from loguru import logger
+
 from ...buffers.ListBuffer import ListBuffer
 from ...adapters.AdapterException import AdapterException
 from ...buffers.Buffer import Buffer
@@ -20,7 +22,7 @@ class SQLAdapter(ReadAdapter, WriteAdapter):
         super().__post_init__()
         self.connection = None
         self.cursor = None
-        self.LOGGER.debug(pyodbc.drivers())
+        logger.debug(pyodbc.drivers())
 
     def connect(self) -> bool:
         self.connection = pyodbc.connect(self.connection_str)
