@@ -22,6 +22,11 @@ the core element of the framework is a [(data)agent](pydag/agents/Agents.py)
 <br>each [AgentElement](pydag/agents/AgentElement.py) is dedicated for a special task within the data agents framework
 <br>these tasks are highlighted below
 
+### Supported Sources / Sinks
+| Name  | Source | Sink | Action |
+|-------|--------|------|--------|
+| OPCUA | 1 | 1 | 0 |
+
 ### Agent
 In order to create a `Agent` application, you create a `Agent` object with one or more of the elements described in the following sections.
 The `Agent` application follows a strict lifecycle, when being initialized and started.
