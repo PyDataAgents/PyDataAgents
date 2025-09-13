@@ -1,6 +1,7 @@
 from dataclasses import dataclass, field
 import multiprocessing
 import threading
+from loguru import logger
 from fastapi import APIRouter, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
@@ -65,5 +66,5 @@ class RestService(Service):
         #)
         #process.terminate()
         #self.service_thread.join()
-        self.LOGGER.warning("FastAPI Server (uvicorn) shutsdown with application only")
+        logger.warning("FastAPI Server (uvicorn) shutsdown with application only")
         return
