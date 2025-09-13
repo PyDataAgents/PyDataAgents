@@ -43,7 +43,8 @@ dependencies = [
     "watchdog",
     "bs4",
     "pytest",
-    "ics"
+    "ics",
+    "msal"
 ]
 
 [tool.setuptools.packages.find]
