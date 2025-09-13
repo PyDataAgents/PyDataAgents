@@ -20,4 +20,4 @@ __pycache__
 /resources/models
 
 # test html files from plotlify
-plotly_*.html
+/tests/**/plotly_*.html

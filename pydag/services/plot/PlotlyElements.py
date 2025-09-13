@@ -1063,8 +1063,8 @@ class Plotly:
     
 class PlotlyDocument:
     
-    PLOTLY_TEMPLATE = "resources" + os.sep + "plotlify" + os.sep + "PLOTLY_TEMPLATE.html"
-    PLOTLY_ANIMATION_TEMPLATE = "resources" + os.sep + "plotlify" + os.sep + "PLOTLY_ANIMATION_TEMPLATE.html"
+    PLOTLY_TEMPLATE = os.path.dirname(__file__) + os.sep + "PLOTLY_TEMPLATE.html"
+    PLOTLY_ANIMATION_TEMPLATE = os.path.dirname(__file__) + os.sep + "PLOTLY_ANIMATION_TEMPLATE.html"
 
     # default: no rounding (-1)
     PRECISION = -1

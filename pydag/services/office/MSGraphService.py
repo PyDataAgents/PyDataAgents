@@ -5,6 +5,7 @@ import webbrowser
 import msal
 import requests
 
+from ...services.documents.HttpHTMLService import HttpHTMLService
 from ...agents.Agent import Agent
 from ...services.ServiceException import ServiceException
 from ...services.Service import Service
@@ -75,13 +76,31 @@ class MSGraphService(Service):
                 result = self.app.acquire_token_interactive(scopes=self.scope)
             case MSGraphType.DEVICE_FLOW.value:
                 flow = self.app.initiate_device_flow(scopes=self.scope)
-                print(flow)
+                #print(flow)
                 # Opens the URL in the default browser
                 webbrowser.open(flow["verification_uri"])
                 
+                html = f"""
+                    <html>
+                        <head>
+                            <title>Device Code</title>
+                        </head>
+                        <body>
+                            <h1>Device Code</h1>
+                            <h2>{flow["user_code"]}</h2>
+                        </body>
+                    </html>    
+                """
+                
+                html_service = HttpHTMLService(port=8099, html=html)
+                html_service.install()
+                html_service.start()                               
+                webbrowser.open(f"http://localhost:{html_service.port}")                
+                html_service.stop()
+                                
                 #print(flow["message"])  # visit URL, enter code
                 result = self.app.acquire_token_by_device_flow(flow)
-                print(result["access_token"])
+                #print(result["access_token"])
 
         if "access_token" in result:
             self.token = result["access_token"]
