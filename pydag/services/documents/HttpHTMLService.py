@@ -6,19 +6,21 @@ from loguru import logger
 
 from ...services.Service import Service
 
-def make_handler(html_bytes):
+def make_handler(html : str):
     class HTMLHandler(http.server.SimpleHTTPRequestHandler):
         def do_GET(self):
             self.send_response(200)
             self.send_header("Content-type", "text/html")
             self.end_headers()
-            self.wfile.write(html_bytes)
+            self.wfile.write(html.encode("utf-8"))
     return HTMLHandler
 
 @dataclass
 class HttpHTMLService(Service):
+    """ `Service` that provides a HTML Server that hosts the specified html content        
+    """
     
-    port : int = field(default=8099, metadata={"description": ""})
+    port : int = field(default=8099, metadata={"description": "port of the http server"})
     html : str = field(default="<h1>Hello World!</h1>", metadata={"description": "html to show on the website"})
     
     def __post_init__(self):
