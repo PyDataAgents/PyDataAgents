@@ -16,12 +16,12 @@
 | [`CsvWriteAdapter`](#csvwriteadapter-in-pydagadapterscsvcsvwriteadapterpy) | `Adapter` for writing data to CSV files.     |
 | [`DocumentTextAdapter`](#documenttextadapter-in-pydagadaptersdocumentsdocumenttextadapterpy) | `Adapter` that retrieves text content from specified files         |
 | [`NpzAdapter`](#npzadapter-in-pydagadaptersdocumentsnpzadapterpy) | `Adapter` that retrieves data from a *.npz numpy file         |
+| [`SolidPDMAdapter`](#solidpdmadapter-in-pydagadaptersdocumentssolidpdmadapterpy) |  |
 | [`HttpAdapter`](#httpadapter-in-pydagadaptershttphttpadapterpy) | `Adapter` for reading and writing data from/to http endpoints     |
 | [`InfluxDbAdapter`](#influxdbadapter-in-pydagadaptersinfluxdbinfluxdbadapterpy) | `Adapter` thats reads or writes to InfluxDB.<br>Address Schema:<br>address = "b=[bucket];m=[measurement];f=[field]" |
 | [`MQTTAdapter`](#mqttadapter-in-pydagadaptersmqttmqttadapterpy) | `Adapter` for subscribing or writing data from/to MQTT topics.     |
 | [`OpcUaAdapter`](#opcuaadapter-in-pydagadaptersopcuaopcuaadapterpy) | `Adapter` for reading and writing data from/to OPC UA servers.     |
 | [`S7Adapter`](#s7adapter-in-pydagadapterss7s7adapterpy) | `Adapter`reading from and writing to S7 PLCs.     |
-| [`ScriptAdapter`](#scriptadapter-in-pydagadaptersscriptscriptadapterpy) | An `Adapter` that reads data from specified `Buffer`s using computations / transformations defined in a script file<br>new results are written back to specified output `Buffer`s |
 | [`ByteStreamAdapter`](#bytestreamadapter-in-pydagadapterssocketbytestreamadapterpy) |  |
 | [`TCPClientAdapter`](#tcpclientadapter-in-pydagadapterssockettcpclientadapterpy) |  |
 | [`WebSocketAdapter`](#websocketadapter-in-pydagadapterssocketwebsocketadapterpy) | `Adapter` for subscribing and writing data from/to WebSocket endpoints.     |
@@ -306,6 +306,24 @@ obj.file_path="path/to/file.txt"
 ```
 
 [Go to Summary](#summary)
+## `SolidPDMAdapter` (in `pydag\adapters\documents\SolidPDMAdapter.py`)
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `id` | `str` | `` | unique identifier of element in DataGrabber application |
+| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+
+
+```python
+# Example usage of `SolidPDMAdapter`
+from pydag.adapters.documents.SolidPDMAdapter import SolidPDMAdapter  # Adjust import if needed
+
+obj = SolidPDMAdapter()
+obj.id="<string>"
+obj.load_on_install=False
+```
+
+[Go to Summary](#summary)
 ## `HttpAdapter` (in `pydag\adapters\http\HttpAdapter.py`)
 
 `Adapter` for reading and writing data from/to http endpoints
@@ -436,28 +454,6 @@ obj.load_on_install=False
 obj.host='127.0.0.1'
 obj.rack=0
 obj.slot=1
-```
-
-[Go to Summary](#summary)
-## `ScriptAdapter` (in `pydag\adapters\script\ScriptAdapter.py`)
-
-An `Adapter` that reads data from specified `Buffer`s using computations / transformations defined in a script file
-<br>new results are written back to specified output `Buffer`s
-| Field | Type | Default | Description |
-|-------|------|---------|-------------|
-| `id` | `str` | `` | unique identifier of element in DataGrabber application |
-| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
-| `script_path` | `str` | `` | path to the script to load and execute |
-
-
-```python
-# Example usage of `ScriptAdapter`
-from pydag.adapters.script.ScriptAdapter import ScriptAdapter  # Adjust import if needed
-
-obj = ScriptAdapter()
-obj.id="<string>"
-obj.load_on_install=False
-obj.script_path="<string>"
 ```
 
 [Go to Summary](#summary)

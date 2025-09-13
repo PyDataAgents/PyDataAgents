@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-import http
+from http.server import SimpleHTTPRequestHandler
 import socketserver
 import threading
 from loguru import logger
@@ -7,8 +7,7 @@ from loguru import logger
 from ...services.Service import Service
 
 
-class CORSRequestHandler(http.server.SimpleHTTPRequestHandler):
-
+class CORSRequestHandler(SimpleHTTPRequestHandler):
     def end_headers(self):
         self.send_header('Access-Control-Allow-Origin', '*')
         super().end_headers()
@@ -29,8 +28,10 @@ class HttpFileService(Service):
         threading.Thread(target=self._start_server, daemon=True).start()       
     
     def _start_server(self):
-        self.httpd = socketserver.TCPServer(("", self.port),  CORSRequestHandler)
-        # Serve files from the target folder (Python 3.7+)
+        handler = lambda *args, **kwargs: CORSRequestHandler(
+            *args, directory=self.folder_path, **kwargs
+        )
+        self.httpd = socketserver.TCPServer(("", self.port),  handler)
         self.httpd.RequestHandlerClass.directory = str(self.folder_path)
         logger.info(f"serving {self.folder_path} at http://localhost:{self.port}")
         self.httpd.serve_forever()

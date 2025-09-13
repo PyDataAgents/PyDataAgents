@@ -117,7 +117,7 @@ obj.load_on_install=False
 | `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
 | `sampling_period` | `int` | `0` | sampling period between observer notifies |
 | `thread_type` | `str` | `'ThreadType.MILLI_SECOND.value'` | type of thread -> MILLI_SECOND | MICRO_SECOND | NANO_SECOND | SECOND | ONLY_ONCE | INSTANT | TRIGGERED |
-| `SAFETY_DIFF_TIME_UNITS` | `int` | `` |  |
+| `SAFETY_DIFF_TIME_UNITS` | `float` | `` |  |
 | `SLEEP_WITH_HOLD_FACTOR` | `float` | `` |  |
 
 
@@ -130,7 +130,7 @@ obj.id="<string>"
 obj.load_on_install=False
 obj.sampling_period=0
 obj.thread_type='ThreadType.MILLI_SECOND.value'
-obj.SAFETY_DIFF_TIME_UNITS=1
+obj.SAFETY_DIFF_TIME_UNITS=3.14
 obj.SLEEP_WITH_HOLD_FACTOR=3.14
 ```
 

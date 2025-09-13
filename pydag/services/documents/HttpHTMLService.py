@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-import http
+from http.server import SimpleHTTPRequestHandler
 import socketserver
 import threading
 from loguru import logger
@@ -7,7 +7,7 @@ from loguru import logger
 from ...services.Service import Service
 
 def make_handler(html : str):
-    class HTMLHandler(http.server.SimpleHTTPRequestHandler):
+    class HTMLHandler(SimpleHTTPRequestHandler):
         def do_GET(self):
             self.send_response(200)
             self.send_header("Content-type", "text/html")

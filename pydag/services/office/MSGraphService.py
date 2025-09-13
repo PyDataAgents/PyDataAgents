@@ -1,5 +1,6 @@
 from dataclasses import dataclass, field
 import enum
+import time
 import webbrowser
 
 import msal
@@ -87,15 +88,18 @@ class MSGraphService(Service):
                         </head>
                         <body>
                             <h1>Device Code</h1>
-                            <h2>{flow["user_code"]}</h2>
+                            <div>Please enter the following devic code in the sign-in window</div>
+                            <h4>{flow["user_code"]}</h4>
                         </body>
                     </html>    
                 """
                 
                 html_service = HttpHTMLService(port=8099, html=html)
                 html_service.install()
-                html_service.start()                               
+                html_service.start()  
+                time.sleep(2)                             
                 webbrowser.open(f"http://localhost:{html_service.port}")                
+                time.sleep(2)
                 html_service.stop()
                                 
                 #print(flow["message"])  # visit URL, enter code

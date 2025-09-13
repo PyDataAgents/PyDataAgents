@@ -10,8 +10,8 @@
 | [`ListBuffer`](#listbuffer-in-pydagbufferslistbufferpy) | buffer that stores its values in a capacity limited list     |
 | [`ObjectTransformation`](#objecttransformation-in-pydagbuffersobjecttransformationpy) | Abstract base class for object transformations for buffers |
 | [`ObservedListBuffer`](#observedlistbuffer-in-pydagbuffersobservedlistbufferpy) |  |
-| [`SampledBuffer`](#sampledbuffer-in-pydagbufferssampledbufferpy) | A buffer that samples a signal at a specified interval. |
-| [`SignalBuffer`](#signalbuffer-in-pydagbufferssignalbufferpy) | A buffer that holds signals with a specific start time and elapsed time.Attributes:    start_time (int): The start time of the signal in milliseconds.    elapsed_time (float): The elapsed time since the start in seconds. |
+| [`SampledBuffer`](#sampledbuffer-in-pydagbufferssampledbufferpy) | `Buffer` that samples a `signal` at a specified interval for `n`samples at a time. |
+| [`SignalBuffer`](#signalbuffer-in-pydagbufferssignalbufferpy) | `Buffer` that holds signals with a specific start time and elapsed time and is defined by the referenced `signal`'s values.     |
 | [`TimedBuffer`](#timedbuffer-in-pydagbufferstimedbufferpy) | A buffer that stores data with timestamps.Inherits from ListBuffer. |
 | [`TransformsBuffer`](#transformsbuffer-in-pydagbufferstransformsbufferpy) | TransformsBuffer is a subclass of ListBuffer that allows for data transformation.It is used to transform data from one format to another. |
 | [`LinearTrend`](#lineartrend-in-pydagbufferssignalslineartrendpy) | A signal that simulates a linear trend |
@@ -188,7 +188,7 @@ obj.output_observers='list()'
 [Go to Summary](#summary)
 ## `SampledBuffer` (in `pydag\buffers\SampledBuffer.py`)
 
-A buffer that samples a signal at a specified interval.
+`Buffer` that samples a `signal` at a specified interval for `n`samples at a time.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `capacity` | `int` | `1` | Number of elements that can be stored in buffer before being discarded in FiFo fashion. If set to -1, then there is no capacity for this buffer. |
@@ -198,6 +198,9 @@ A buffer that samples a signal at a specified interval.
 | `description` | `str` | `` | buffer description |
 | `id` | `str` | `` | unique identifier of element in DataGrabber application |
 | `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+| `signal` | `SampledSignal` | `` | a signal object to simulate data |
+| `sampling_period` | `int` | `100` | interval in milliseconds for update |
+| `n` | `int` | `1` | number of samples to create at once |
 
 
 ```python
@@ -212,16 +215,15 @@ obj.unit="<value>"
 obj.description="<string>"
 obj.id="<string>"
 obj.load_on_install=False
+obj.signal="<value>"
+obj.sampling_period=100
+obj.n=1
 ```
 
 [Go to Summary](#summary)
 ## `SignalBuffer` (in `pydag\buffers\SignalBuffer.py`)
 
-A buffer that holds signals with a specific start time and elapsed time.
-
-Attributes:
-    start_time (int): The start time of the signal in milliseconds.
-    elapsed_time (float): The elapsed time since the start in seconds.
+`Buffer` that holds signals with a specific start time and elapsed time and is defined by the referenced `signal`'s values.    
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `capacity` | `int` | `1` | Number of elements that can be stored in buffer before being discarded in FiFo fashion. If set to -1, then there is no capacity for this buffer. |
