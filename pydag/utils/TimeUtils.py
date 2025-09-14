@@ -55,7 +55,7 @@ class TimeUtils:
         Returns:
             datetime: datetime object
         """
-        dt = datetime.fromtimestamp(utc, tz=timezone.utc)
+        dt = datetime.fromtimestamp(utc / 1000.0, tz=timezone.utc)
         return dt
     
     @staticmethod

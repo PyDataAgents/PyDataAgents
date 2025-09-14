@@ -195,3 +195,8 @@ class FileUtils:
             subprocess.run(["open", path])
         else:  # Linux and other
             subprocess.run(["xdg-open", path])
+        
+    @staticmethod    
+    def user_home() -> str:
+        home_dir = Path.home()
+        return str(home_dir)
