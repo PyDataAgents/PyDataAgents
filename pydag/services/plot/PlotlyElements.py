@@ -282,10 +282,10 @@ class LineShape(str, Enum):
 @dataclass    
 class Line:
     
-    dash = None
-    width = 3
-    shape = None
-    color = None
+    dash : str = None
+    width : int = 3
+    shape : LineShape = None
+    color : Color = None
 
     def get_dash(self):
         return self.dash
@@ -657,7 +657,8 @@ class Trace:
     
     def __post_init__(self):
         Trace._TRACE_NUM += 1
-        self.name = f"trace{Trace._TRACE_NUM}"
+        if self.name is None:
+            self.name = f"trace{Trace._TRACE_NUM}"
         
     # ---------------- DATA ----------------
 
