@@ -52,6 +52,9 @@ where = ["."]
 include = ["pydag*"]
 exclude = ["tests"]
 
+[tool.setuptools.package-data]
+"pydag" = ["**/*.html"]
+
 [project.urls]
 Documentation = "https://github.com/PyDataAgents/PyDataAgents.git"
 Issues = "https://github.com/PyDataAgents/PyDataAgents.git"
