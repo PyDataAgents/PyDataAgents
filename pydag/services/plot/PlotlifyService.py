@@ -128,7 +128,7 @@ class PlotlifyService(Service):
                 t.set_z(z[i])
             if names is not None:
                 t.set_name(names[i])
-            if z is not None:
+            if z is None:
                 t.set_type(PlotType.SCATTER)
             else:
                 t.set_type(PlotType.SCATTER3D)
