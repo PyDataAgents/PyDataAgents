@@ -71,3 +71,39 @@ class TimeUtils:
         """
         s = dt.strftime(dformat)
         return s
+    
+    @staticmethod
+    def dt_minus(dt : datetime, weeks : float = 0, days : float = 0, hours : float = 0, minutes : float = 0, seconds : float = 0) -> datetime:
+        """ returns a new datetime minus the specified timedeltas
+
+        Args:
+            dt (datetime): _description_
+            weeks (int, optional): _description_. Defaults to 0.
+            days (int, optional): _description_. Defaults to 0.
+            hours (int, optional): _description_. Defaults to 0.
+            minutes (int, optional): _description_. Defaults to 0.
+            seconds (int, optional): _description_. Defaults to 0.
+
+        Returns:
+            datetime: _description_
+        """
+        ndt = dt - timedelta(weeks = weeks, days = days, hours = hours, minutes = minutes, seconds = seconds)
+        return ndt
+    
+    @staticmethod
+    def dt_plus(dt : datetime, weeks : float = 0, days : float = 0, hours : float = 0, minutes : float = 0, seconds : float = 0) -> datetime:
+        """ returns a new datetime plus the specified timedeltas
+
+        Args:
+            dt (datetime): _description_
+            weeks (int, optional): _description_. Defaults to 0.
+            days (int, optional): _description_. Defaults to 0.
+            hours (int, optional): _description_. Defaults to 0.
+            minutes (int, optional): _description_. Defaults to 0.
+            seconds (int, optional): _description_. Defaults to 0.
+
+        Returns:
+            datetime: _description_
+        """
+        ndt = dt + timedelta(weeks = weeks, days = days, hours = hours, minutes = minutes, seconds = seconds)
+        return ndt
