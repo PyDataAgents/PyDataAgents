@@ -13,11 +13,11 @@ class ReadJsonAction(BufferNode, Action):
     json_path : str = field()
     
     def execute(self):
-        with open(self.file_path) as json_data:
-            d = json.loads(json_data)
-            json_data.close()
-        jsonpath_expression = jsonpath_ng.parse(d)
-        matches = jsonpath_expression.find(json_data)
+        with open(self.file_path) as f:
+            d = json.loads(f.read())
+            f.close()
+        jsonpath_expression = jsonpath_ng.parse(self.json_path)
+        matches = jsonpath_expression.find(d)
         self.buffer.push(matches)
         
     

@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import time
 
 
@@ -44,3 +44,30 @@ class TimeUtils:
         
         # Compute the difference in seconds
         return int((today_target - now).total_seconds())
+    
+    @staticmethod
+    def utc_to_datetime(utc : float) -> datetime:
+        """ returns the given utc timestamp in datetime
+
+        Args:
+            utc (float): in ms
+
+        Returns:
+            datetime: datetime object
+        """
+        dt = datetime.fromtimestamp(utc, tz=timezone.utc)
+        return dt
+    
+    @staticmethod
+    def datetime_to_str(dt : datetime, dformat : str = "%Y-%m-%d %H:%M:%S %Z") -> str:
+        """ returns a datetime object formatted as string
+        
+        Args:
+            dt (datetime): datetime object
+            dformat (string, optional): string format. Defaults to "%Y-%m-%d %H:%M:%S %Z".
+
+        Returns:
+            str: string output
+        """
+        s = dt.strftime(dformat)
+        return s
