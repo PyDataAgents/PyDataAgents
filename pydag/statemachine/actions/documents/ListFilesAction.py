@@ -1,4 +1,9 @@
 from dataclasses import dataclass, field
+from typing import Union
+
+from pydag.agents.AgentConfig import AgentConfig
+
+from ....agents.Agent import Agent
 from ....buffers.ListBuffer import ListBuffer
 from ...Action import Action
 from ...BufferNode import BufferNode
@@ -13,6 +18,25 @@ class ListFilesAction(BufferNode, Action):
     extension : str = field(default=None, metadata={"description": "extension to include"})
     newer_than_seconds : int = field(default=None, metadata={"description": "specifies how old in seconds a file can be to be included"})
     recursive : bool = field(default=False, metadata={"description": "specifies whether to search subdirectories aswell"})
+    
+    def install(self, agent : Agent = None):
+        """ installs a `ListBuffer` if no buffer is specified
+
+        Args:
+            agent (Agent, optional): agent object. Defaults to None.
+        """
+        if agent is not None:
+            if self.buffer_id in agent.buffer_store:
+                self.buffer = agent.buffer_store[self.buffer_id]
+            else:
+                self.buffer = ListBuffer(id=self.id + "-BUFFER", capacity=AgentConfig.INFINITE_CAPACITY)
+                self.buffer_id = self.buffer.id
+                self.buffer.install(agent)
+                agent.add_buffer(self.buffer)
+        else:
+            self.buffer = ListBuffer(id=self.id + "-BUFFER", capacity=AgentConfig.INFINITE_CAPACITY)
+            self.buffer_id = self.buffer.id
+            self.buffer.install(agent)
             
     def execute(self):
         if FileUtils.exists_folder(self.folder):
