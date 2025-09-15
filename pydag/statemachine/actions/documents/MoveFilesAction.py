@@ -1,10 +1,11 @@
 from dataclasses import dataclass, field
 
-from ....statemachine.NodeException import NodeException
+from ....agents.AgentConfig import AgentConfig
 from ....agents.Agent import Agent
 from ....buffers.ListBuffer import ListBuffer
 from ...Action import Action
 from ...BufferNode import BufferNode
+from ....statemachine.NodeException import NodeException
 from ...StatemachineException import StatemachineException
 from ....utils.FileUtils import FileUtils
 
@@ -20,7 +21,7 @@ class MoveFilesAction(BufferNode, Action):
     target_folder : str = field(default=None, metadata={"description": "target folder to move all the files to in Buffer"})
     
     def install(self, agent : Agent = None):
-        super().install(agent)
+        Action.install(self, agent)
         if agent is not None:
             if self.buffer_id is not None:
                 if self.buffer_id in agent.buffer_store:
@@ -36,14 +37,14 @@ class MoveFilesAction(BufferNode, Action):
                     if isinstance(parent.buffer, ListBuffer):
                         parent_buffer_found = True
                         data = parent.buffer.data(n = 0, persistent = False)
-                        for file in data:
+                        for file in data[AgentConfig.VALUES]:
                             FileUtils.move_file(file, self.target_folder)
                 if not parent_buffer_found:
                     raise StatemachineException("No " + ListBuffer.cname() + "s in parent were found. Only " +ListBuffer.cname()+ " is supported for this " + self.cname())   
             else:
                 if isinstance(self.buffer, ListBuffer):
                     data = self.buffer.data(n = 0, persistent = False)
-                    for file in data:
+                    for file in data[AgentConfig.VALUES]:
                         FileUtils.move_file(file, self.target_folder)
                 else:
                     raise StatemachineException("Only " +ListBuffer.cname()+ " is supported for this " + self.cname())                      
