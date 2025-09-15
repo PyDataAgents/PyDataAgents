@@ -136,8 +136,12 @@ def test_030():
     yc : YAMLConfig = YAMLConfig("C:\\Users\\jhillenb\\Downloads\\t\\pdm_folder_mail_service.yaml") 
     #yc : YAMLConfig = YAMLConfig("tests\\services\\documents\\folder_observe_config.yaml") 
     ac : AgentConfig = yc.load()    
-    ag : Agent = ac.create() 
-    
+    ag : Agent = ac.create()
     ag.start_blocking() 
     
+    
+def test_040():
+    
+    path = __file__    
+    print(Path(path).suffix.lower())
      
