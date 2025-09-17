@@ -20,21 +20,21 @@ class YAMLConfig(FileConfig):
         yaml_file = open(self.file_path, "r")
         d = yaml.safe_load(yaml_file)
         yaml_file.close()
-        grabber_config = AgentConfig()
-        grabber_config.agent_config = d[AgentConfig.AGENT]
-        grabber_config.adapter_configs = d[AgentConfig.ADAPTERS]
-        grabber_config.buffer_configs = d[AgentConfig.BUFFERS]
-        grabber_config.mapping_configs = d[AgentConfig.MAPPINGS]
-        grabber_config.service_configs = d[AgentConfig.SERVICES]
-        return grabber_config
+        agent_config = AgentConfig()
+        agent_config.agent_config = d[AgentConfig.AGENT]
+        agent_config.adapter_configs = d[AgentConfig.ADAPTERS]
+        agent_config.buffer_configs = d[AgentConfig.BUFFERS]
+        agent_config.mapping_configs = d[AgentConfig.MAPPINGS]
+        agent_config.service_configs = d[AgentConfig.SERVICES]
+        return agent_config
     
-    def save(self, grabber_config: AgentConfig):
+    def save(self, agent_config: AgentConfig):
         d = dict()
-        d[AgentConfig.AGENT] = grabber_config.agent_config
-        d[AgentConfig.ADAPTERS] = grabber_config.adapter_configs
-        d[AgentConfig.BUFFERS] = grabber_config.buffer_configs
-        d[AgentConfig.MAPPINGS] = grabber_config.mapping_configs
-        d[AgentConfig.SERVICES] = grabber_config.service_configs
+        d[AgentConfig.AGENT] = agent_config.agent_config
+        d[AgentConfig.ADAPTERS] = agent_config.adapter_configs
+        d[AgentConfig.BUFFERS] = agent_config.buffer_configs
+        d[AgentConfig.MAPPINGS] = agent_config.mapping_configs
+        d[AgentConfig.SERVICES] = agent_config.service_configs
         # make sure the directory exists        
         FileUtils.create_dir(FileUtils.parent_folder(self.file_path))
         yaml_file = open(self.file_path, "w")
