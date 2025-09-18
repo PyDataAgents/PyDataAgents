@@ -42,4 +42,16 @@ class BufferNode(Node):
     def deinstall(self, agent : Agent = None):
         super().deinstall(agent)
         self.buffer : Buffer = None
+        
+    def set_buffer(self, buffer : Buffer):
+        """
+        method to set the buffer and the `Node`'s `buffer_id`
+        <br>this method should always be used in script based `Agent` creation instead of directly assigning a `Buffer` to a `Node`
+        <br>>>node.buffer = buffer # DON'T DO 
+        <br>>>node.set_buffer(buffer) # DO 
+        Args:
+            buffer (Buffer): `Buffer` instance
+        """
+        self.buffer = buffer
+        self.buffer_id = buffer.id
             
