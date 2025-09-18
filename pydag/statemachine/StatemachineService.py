@@ -20,7 +20,7 @@ if TYPE_CHECKING:
 class StatemachineService(Service):
     
     retry_error_nodes : bool = field(default=False, metadata={"description" : "Statemachine object containing actions and transitions to go through to represent a state machine program flow"})    
-    start_node_id : str = field(default=None, metadata={"description": "ID of the start node in the statemachine service"})
+    start_action_id : str = field(default=None, metadata={"description": "ID of the start node in the statemachine service"})
     nodes : dict[str, Node] = field(default_factory=dict[str, Node], metadata={"description": "dictionary of nodes in the statemachine service"})
     thread_type : str = field(default=ThreadType.INSTANT.value, metadata={"description": ""})
     sampling_period : int = field(default=0, metadata={"description": "sampling period that specifies the interval the observer thread should run for"})
@@ -37,11 +37,11 @@ class StatemachineService(Service):
     def install(self, agent : Agent = None):
         super().install(agent)
         if self.start_action is None:
-            if self.start_node_id is None:
+            if self.start_action_id is None:
                 raise StatemachineException("No start action can be found!")
             else:
-                if self.start_node_id in self.nodes:
-                    self.start_action = self.nodes[self.start_node_id]
+                if self.start_action_id in self.nodes:
+                    self.start_action = self.nodes[self.start_action_id]
                 else:
                     raise StatemachineException("the specified start node id cannot be found among nodes")            
         for node in self.nodes.values():
@@ -67,7 +67,7 @@ class StatemachineService(Service):
         if self.start_action is None:
             raise ServiceException("Start node ID must be set before starting the statemachine service.")
         if not isinstance(self.nodes[self.start_action.id], Action):
-            raise ServiceException(f"Node with ID {self.start_node_id} is not a valid Action Node instance.")        
+            raise ServiceException(f"Node with ID {self.start_action_id} is not a valid Action Node instance.")        
         self.assemble(self.start_action)
         self.observer_thread = ObserverThread(id=ObserverThread.unique_id(), thread_type=ThreadType[self.thread_type])
         observer = StatemachineObserver(self)
@@ -92,6 +92,16 @@ class StatemachineService(Service):
                         node.add_child(self.nodes[child_id])
                     else:
                         raise ServiceException(f"Child node with ID {child_id} not found for node {node.id}.")
+       
+    def set_start_action(self, action : Action):
+        """sets the start action and this `Service` `start_action_id` property
+        <br>this method must be used in scripts when building `StatemachineService`s
+        
+        Args:
+            action (Action): `Action` instance
+        """
+        self.start_action = action
+        self.start_node_id = action.id
                     
     def has_active_actions(self) -> bool:
         for action in self.actions.values():
