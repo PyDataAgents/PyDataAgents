@@ -84,7 +84,7 @@ class AgentElement(ABC):
         """
         return f"{cls.__name__} [{uuid.uuid4()}]"
     
-    def install(self, agent : Agent = None):
+    def install(self, agent : 'Agent' = None):
         """initializes the element with respect to startup functionality or initial internal object creation,
            if agent is not None, it can be used to reference or create other agent elements
            the method should always be used in child classes with super().install()
@@ -92,7 +92,7 @@ class AgentElement(ABC):
         if self.load_on_install:
             self.load()
         
-    def deinstall(self, agent : Agent = None):
+    def deinstall(self, agent : 'Agent' = None):
         """resets the element, this method can be used to stop internal element logic or reset objects that were initialized on creation
         """
         return
