@@ -48,21 +48,26 @@ class DictBuffer(Buffer):
 
     def data(self, n=0, persistent=True) -> dict:
         if n > 0:
-            d = dict()
-            for k in self.elements.keys():
-                if len(self.elements[k]) < n:
-                    n = len(self.elements[k])
-                d[k] = self.elements[k][0:n]
-                if not persistent:
-                    del self.elements[k][0:n]
-            return d
+            if len(self.elements.keys) > 0:
+                d = dict()
+                for k in self.elements.keys():
+                    if len(self.elements[k]) < n:
+                        n = len(self.elements[k])
+                    d[k] = self.elements[k][0:n]
+                    if not persistent:
+                        del self.elements[k][0:n]
+                return d
+            return None
         else:
             # always make a deep copy, otherwise a reference will be maintained
-            d = copy.deepcopy(self.elements)
-            if not persistent:
-                for k in self.elements.keys():
-                    self.elements[k].clear()
-            return d
+            if len(self.elements) > 0:
+                d = copy.deepcopy(self.elements)
+                if not persistent:
+                    for k in self.elements.keys():
+                        self.elements[k].clear()
+                return d
+            else:
+                return None
             
     def data_with_meta(self, n = 0, persistent = True) -> dict:        
         d = {}

@@ -37,17 +37,19 @@ class MoveFilesAction(BufferNode, Action):
                     if isinstance(parent.buffer, ListBuffer):
                         parent_buffer_found = True
                         data = parent.buffer.data(n = 0, persistent = False)
-                        for file in data[AgentConfig.VALUES]:
-                            logger.debug(f"Moving {file} to {self.target_folder}")
-                            FileUtils.move_file(file, self.target_folder)
+                        if data is not None:
+                            for file in data[AgentConfig.VALUES]:
+                                logger.debug(f"Moving {file} to {self.target_folder}")
+                                FileUtils.move_file(file, self.target_folder)
                 if not parent_buffer_found:
                     raise StatemachineException("No " + ListBuffer.cname() + "s in parent were found. Only " +ListBuffer.cname()+ " is supported for this " + self.cname())   
             else:
                 if isinstance(self.buffer, ListBuffer):
                     data = self.buffer.data(n = 0, persistent = False)
-                    for file in data[AgentConfig.VALUES]:
-                        logger.debug(f"Moving {file} to {self.target_folder}")
-                        FileUtils.move_file(file, self.target_folder)
+                    if data is not None:
+                        for file in data[AgentConfig.VALUES]:
+                            logger.debug(f"Moving {file} to {self.target_folder}")
+                            FileUtils.move_file(file, self.target_folder)
                 else:
                     raise StatemachineException("Only " +ListBuffer.cname()+ " is supported for this " + self.cname())                      
         else:
