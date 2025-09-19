@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-
+from loguru import logger
 from ....agents.AgentConfig import AgentConfig
 from ....agents.Agent import Agent
 from ....buffers.ListBuffer import ListBuffer
@@ -38,6 +38,7 @@ class MoveFilesAction(BufferNode, Action):
                         parent_buffer_found = True
                         data = parent.buffer.data(n = 0, persistent = False)
                         for file in data[AgentConfig.VALUES]:
+                            logger.debug(f"Moving {file} to {self.target_folder}")
                             FileUtils.move_file(file, self.target_folder)
                 if not parent_buffer_found:
                     raise StatemachineException("No " + ListBuffer.cname() + "s in parent were found. Only " +ListBuffer.cname()+ " is supported for this " + self.cname())   
@@ -45,6 +46,7 @@ class MoveFilesAction(BufferNode, Action):
                 if isinstance(self.buffer, ListBuffer):
                     data = self.buffer.data(n = 0, persistent = False)
                     for file in data[AgentConfig.VALUES]:
+                        logger.debug(f"Moving {file} to {self.target_folder}")
                         FileUtils.move_file(file, self.target_folder)
                 else:
                     raise StatemachineException("Only " +ListBuffer.cname()+ " is supported for this " + self.cname())                      
