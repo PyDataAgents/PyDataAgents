@@ -10,30 +10,54 @@ from .Node import Node
 from .StatemachineException import StatemachineException
 from .Transition import Transition
 from ..mappings.Observer import Observer
+from .Action import Action
 from .JoinTransition import JoinTransition
 from .State import State
-from .Transition import Transition
 
 if TYPE_CHECKING:
     from pydag.agents.Agent import Agent
-    from .StatemachineService import StatemachineService
-    
-class StatemachineObserver(Observer):
+
+class SFCObserver(Observer):
     """
-    Observer for the StatemachineService.
+    Observer for the SFCService.
     This observer is be used to start the statemachine in a separate thread
     """
         
-    def __init__(self, statemachine: StatemachineService):
+    def __init__(self, statemachine: SFCService):
         super().__init__()
         self.statemachine = statemachine
 
     def observe(self):
         self.statemachine.start_action.activate()
         self.statemachine.is_running = True
-        if self.statemachine.is_running:
-            # go through all nodes
-            self._process_node(self.statemachine.start_action)
+        while (self.statemachine.is_running and (self.statemachine.has_active_actions() or self.statemachine.has_active_transitions())):
+            # execute active actions
+            for action in self.statemachine.actions.values():
+                if (action.state == State.ACTIVE or (action.state == State.ERROR and self.statemachine.retry_error_nodes)):
+                    action.execute()
+                    for node in action.children:
+                        if isinstance(node, Transition):
+                            node.state = State.ACTIVE
+                        if isinstance(node, JoinTransition):
+                            node.visited_from_parents[action.id] = action.id
+                            
+            # go through transitions to check               
+            for transition in self.statemachine.transitions.values():
+                if transition.state == State.ACTIVE:
+                    if transition.check():
+                        # deactivate parent actions
+                        for node in transition.parents:
+                            if isinstance(node, Action):
+                                node.deactivate()
+                        # activate child actions and add new transitions
+                        for node in transition.children:
+                            if isinstance(node, Action):
+                                self.statemachine.activate(node)
+                            elif isinstance(node, Transition):
+                                node.state = State.ACTIVE
+                    
+                    # deactivate the transition itself
+                    transition.state = State.INACTIVE
         self.statemachine.is_running = False
     
     def unobserve(self):
@@ -43,20 +67,9 @@ class StatemachineObserver(Observer):
         """
         if self.statemachine.is_running:
             self.statemachine.stop()
-            
-    def _process_node(self, node : Node):
-        if isinstance(node, Action):
-            node.execute()
-            for child in node.children:
-                self._process_node(child)
-        elif isinstance(node, Transition):
-            if node.check():
-                for child in node.children:
-                    self._process_node(child)
-            
 
 @dataclass
-class StatemachineService(Service):
+class SFCService(Service):
     
     retry_error_nodes : bool = field(default=False, metadata={"description" : "Statemachine object containing actions and transitions to go through to represent a state machine program flow"})    
     start_action_id : str = field(default=None, metadata={"description": "ID of the start node in the statemachine service"})
@@ -109,7 +122,7 @@ class StatemachineService(Service):
             raise ServiceException(f"Node with ID {self.start_action_id} is not a valid Action Node instance.")        
         self.assemble(self.start_action)
         self.observer_thread = ObserverThread(id=ObserverThread.unique_id(), thread_type=ThreadType[self.thread_type])
-        observer = StatemachineObserver(self)
+        observer = SFCObserver(self)
         self.observer_thread.add_observer(observer)
         self.observer_thread.start()
 
@@ -141,6 +154,18 @@ class StatemachineService(Service):
         """
         self.start_action = action
         self.start_node_id = action.id
+                    
+    def has_active_actions(self) -> bool:
+        for action in self.actions.values():
+            if action.state == State.ACTIVE:
+                return True
+        return False
+    
+    def has_active_transitions(self) -> bool:
+        for transition in self.transitions.values():
+            if transition.state == State.ACTIVE:
+                return True
+        return False
     
     def node_by_id(self, id) -> Node:
         if id in self.actions:
