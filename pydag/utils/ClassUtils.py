@@ -54,10 +54,9 @@ class ClassUtils:
                     raise AgentException(f"Expected a dictionary for property '{property_name}' of {obj}, but got {type(value).__name__}.")
             elif isinstance(attr, dict):
                 if isinstance(value, dict):
-                    keys = value.keys()
-                    key1 = keys[0]
-                    if isinstance(value[key1], dict):
-                        if AgentConfig.TYPE in value[key1]:
+                    key = next(iter(value))
+                    if isinstance(value[key], dict):
+                        if AgentConfig.TYPE in value[key]:
                             element_dic = {}
                             for k, v in value:
                                 sub_obj = ClassUtils.create_instance(v[AgentConfig.TYPE])
