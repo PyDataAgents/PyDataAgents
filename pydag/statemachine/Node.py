@@ -17,9 +17,13 @@ class Node(AgentElement):
       
     def add_child(self, child : Node):
         self.children.append(child)
+        if child.id not in self.child_ids:
+            self.child_ids.append(child.id)
         child.parents.append(self)
         
     def add_parent(self, parent : Node):
         self.parents.append(parent)
         parent.children.append(self)
+        if self.id not in parent.child_ids:
+            parent.child_ids.append(self.id)
     
