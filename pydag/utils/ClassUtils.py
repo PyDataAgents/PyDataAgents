@@ -58,7 +58,7 @@ class ClassUtils:
                     if isinstance(value[key], dict):
                         if AgentConfig.TYPE in value[key]:
                             element_dic = {}
-                            for k, v in value:
+                            for k, v in value.items():
                                 sub_obj = ClassUtils.create_instance(v[AgentConfig.TYPE])
                                 ClassUtils.set_properties(sub_obj, v)
                                 element_dic[k] = sub_obj
