@@ -7,8 +7,6 @@ import inspect
 from types import FunctionType
 from typing import get_type_hints
 
-from pydag.agents.AgentConfig import AgentConfig
-
 from ..agents.AgentException import AgentException
 
     
@@ -36,7 +34,8 @@ class ClassUtils:
     def set_property(obj, property_name, value):
         """
         Set a property of an object.
-        """
+        """        
+        from pydag.agents.AgentConfig import AgentConfig
         if hasattr(obj, property_name):
             attr = getattr(obj, property_name)            
             #print(type(attr))
