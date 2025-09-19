@@ -58,7 +58,7 @@ class ClassUtils:
                     if isinstance(value[key], dict):
                         if AgentConfig.TYPE in value[key]:
                             element_dic = {}
-                            for k, v in value:
+                            for k, v in value.items():
                                 sub_obj = ClassUtils.create_instance(v[AgentConfig.TYPE])
                                 ClassUtils.set_properties(sub_obj, v)
                                 element_dic[k] = sub_obj
@@ -72,19 +72,20 @@ class ClassUtils:
                     raise AgentException(f"Expected a dictionary for property '{property_name}' of {obj}")
             elif isinstance(attr, list):
                 if isinstance(value, list):
-                    if isinstance(value[0], dict):
-                        if AgentConfig.TYPE in value[0]:
-                            element_list = []
-                            for item in value:
-                                sub_obj = ClassUtils.create_instance(item[AgentConfig.TYPE])
-                                ClassUtils.set_properties(sub_obj, item)
-                                element_list.append(sub_obj)
-                            setattr(obj, property_name, element_list)
+                    if len(value) > 0:
+                        if isinstance(value[0], dict):
+                            if AgentConfig.TYPE in value[0]:
+                                element_list = []
+                                for item in value:
+                                    sub_obj = ClassUtils.create_instance(item[AgentConfig.TYPE])
+                                    ClassUtils.set_properties(sub_obj, item)
+                                    element_list.append(sub_obj)
+                                setattr(obj, property_name, element_list)
+                            else:
+                                raise AgentException(f"No '{AgentConfig.TYPE}' property was specified in list of object properties {value} for property '{property_name}' of {obj}")    
                         else:
-                            raise AgentException(f"No '{AgentConfig.TYPE}' property was specified in list of object properties {value} for property '{property_name}' of {obj}")    
-                    else:
-                        # just set the content of the list, this should only be content, that can be serialized
-                        setattr(obj, property_name, value)
+                            # just set the content of the list, this should only be content, that can be serialized
+                            setattr(obj, property_name, value)
                 else:
                     raise AgentException(f"Expected a list for property '{property_name}' of {obj}")
             else:
