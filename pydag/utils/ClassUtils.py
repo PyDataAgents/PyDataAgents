@@ -7,6 +7,8 @@ import inspect
 from types import FunctionType
 from typing import get_type_hints
 
+from pydag.agents.AgentConfig import AgentConfig
+
 from ..agents.AgentException import AgentException
 
     
@@ -42,15 +44,51 @@ class ClassUtils:
             if isinstance(attr, AgentElement):
                 if isinstance(value, dict):
                     # If the value is a dictionary, set properties of the AgentElement
-                    if "type" in value:
+                    if AgentConfig.TYPE in value:
                         # If the dictionary contains a type, create an instance of that type
-                        sub_obj = ClassUtils.create_instance(value["type"])
+                        sub_obj = ClassUtils.create_instance(value[AgentConfig.TYPE])
                         ClassUtils.set_properties(sub_obj, value)
                         setattr(obj, property_name, sub_obj)
                     else:
-                        raise AgentException(f"Expected a dictionary with 'type' for property '{property_name}' of {obj}, but got {value}.")
+                        raise AgentException(f"Expected a dictionary with '{AgentConfig.TYPE}' for property '{property_name}' of {obj}, but got {value}.")
                 else:
                     raise AgentException(f"Expected a dictionary for property '{property_name}' of {obj}, but got {type(value).__name__}.")
+            elif isinstance(attr, dict):
+                if isinstance(value, dict):
+                    keys = value.keys()
+                    key1 = keys[0]
+                    if isinstance(value[key1], dict):
+                        if AgentConfig.TYPE in value[key1]:
+                            element_dic = {}
+                            for k, v in value:
+                                sub_obj = ClassUtils.create_instance(v[AgentConfig.TYPE])
+                                ClassUtils.set_properties(sub_obj, v)
+                                element_dic[k] = sub_obj
+                            setattr(obj, property_name, element_dic)
+                        else:
+                            raise AgentException(f"No '{AgentConfig.TYPE}' property was specified in dict of object properties {value} for property '{property_name}' of {obj}")
+                    else:
+                        # just set the content of the dictionary, this should only be content, that can be serialized
+                        setattr(obj, property_name, value)
+                else:
+                    raise AgentException(f"Expected a dictionary for property '{property_name}' of {obj}")
+            elif isinstance(attr, list):
+                if isinstance(value, list):
+                    if isinstance(value[0], dict):
+                        if AgentConfig.TYPE in value[0]:
+                            element_list = []
+                            for item in value:
+                                sub_obj = ClassUtils.create_instance(item[AgentConfig.TYPE])
+                                ClassUtils.set_properties(sub_obj, item)
+                                element_list.append(sub_obj)
+                            setattr(obj, property_name, element_list)
+                        else:
+                            raise AgentException(f"No '{AgentConfig.TYPE}' property was specified in list of object properties {value} for property '{property_name}' of {obj}")    
+                    else:
+                        # just set the content of the list, this should only be content, that can be serialized
+                        setattr(obj, property_name, value)
+                else:
+                    raise AgentException(f"Expected a list for property '{property_name}' of {obj}")
             else:
                 setattr(obj, property_name, value)
         else:
