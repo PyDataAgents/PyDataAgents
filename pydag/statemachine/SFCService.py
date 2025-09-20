@@ -43,7 +43,7 @@ class SFCObserver(Observer):
                             
             # go through transitions to check               
             for transition in self.statemachine.transitions.values():
-                if transition.state == State.ACTIVE:
+                if (transition.state == State.ACTIVE or (transition.state == State.ERROR and self.statemachine.retry_error_nodes)):
                     if transition.check():
                         # deactivate parent actions
                         for node in transition.parents:
@@ -74,7 +74,7 @@ class SFCService(Service):
     retry_error_nodes : bool = field(default=False, metadata={"description" : "Statemachine object containing actions and transitions to go through to represent a state machine program flow"})    
     start_action_id : str = field(default=None, metadata={"description": "ID of the start node in the statemachine service"})
     nodes : dict[str, Node] = field(default_factory=dict[str, Node], metadata={"description": "dictionary of nodes in the statemachine service"})
-    thread_type : str = field(default=ThreadType.INSTANT.value, metadata={"description": ""})
+    thread_type : str = field(default=ThreadType.ONLY_ONCE.value, metadata={"description": ""})
     sampling_period : int = field(default=0, metadata={"description": "sampling period that specifies the interval the observer thread should run for"})
     
     def __post_init__(self):
@@ -121,7 +121,7 @@ class SFCService(Service):
         if not isinstance(self.nodes[self.start_action.id], Action):
             raise ServiceException(f"Node with ID {self.start_action_id} is not a valid Action Node instance.")        
         self.assemble(self.start_action)
-        self.observer_thread = ObserverThread(id=ObserverThread.unique_id(), thread_type=ThreadType[self.thread_type])
+        self.observer_thread = ObserverThread(id=ObserverThread.unique_id(), thread_type=ThreadType[self.thread_type], sampling_period=self.sampling_period)
         observer = SFCObserver(self)
         self.observer_thread.add_observer(observer)
         self.observer_thread.start()
