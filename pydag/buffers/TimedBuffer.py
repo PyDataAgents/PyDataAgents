@@ -95,7 +95,7 @@ class TimedBuffer(ListBuffer):
                     return d
             else:
                 logger.warning("buffer is empty")
-                return {}
+                return None
             
     def data_with_meta(self, n = 0, persistent = True) -> dict:        
         d = {}

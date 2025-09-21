@@ -71,7 +71,7 @@ class ListBuffer(Buffer):
                     return dic
             else:
                 logger.warning("buffer is empty")
-                return {}
+                return None
 
     def data_with_meta(self, n = 0, persistent = True) -> dict:        
         data = {}

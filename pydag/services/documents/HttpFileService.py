@@ -15,6 +15,11 @@ class CORSRequestHandler(SimpleHTTPRequestHandler):
 
 @dataclass
 class HttpFileService(Service):
+    """ A `Service` that provides a webserver hosting documents from `folder_path` under localhost:{`port`}
+
+    Args:
+        Service (_type_): _description_
+    """
     
     folder_path : str = field(default=None, metadata={"description": ""})
     port : int = field(default=None, metadata={"description": ""})

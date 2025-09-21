@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 import time
-
+from loguru import logger
 from ..Action import Action
 
 @dataclass
@@ -12,6 +12,6 @@ class SleepAction(Action):
     sleep_time : int = field(init=True, default=0, metadata={"description" : "number of seconds to sleep for"})
 
     def execute(self):
-        print(f"Sleeping for {self.sleep_time} seconds")
+        logger.debug(f"Sleeping for {self.sleep_time} seconds")
         time.sleep(self.sleep_time)
-        print("Sleep action completed")
+        logger.debug("Sleep action completed")

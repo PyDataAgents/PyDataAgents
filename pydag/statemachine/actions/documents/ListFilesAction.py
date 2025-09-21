@@ -1,5 +1,6 @@
 from dataclasses import dataclass, field
 from typing import Union
+from loguru import logger
 
 from pydag.agents.AgentConfig import AgentConfig
 
@@ -42,6 +43,7 @@ class ListFilesAction(BufferNode, Action):
         if FileUtils.exists_folder(self.folder):
             if isinstance(self.buffer, ListBuffer):
                 files = FileUtils.list_files(self.folder, self.pattern, self.extension, self.newer_than_seconds, self.recursive)
+                logger.debug(f"Found files {files} in {self.folder}")
                 self.buffer.push(files)
             else:
                 raise StatemachineException("Only " +ListBuffer.cname()+ " is supported for this " + self.cname())                      
