@@ -26,4 +26,31 @@ class Node(AgentElement):
         parent.children.append(self)
         if self.id not in parent.child_ids:
             parent.child_ids.append(self.id)
+            
+    def has_child(self, id : str) -> bool:
+        """ returns True/False whether this `Node` has a child with `id`
+
+        Args:
+            id (str): unique id
+
+        Returns:
+            bool: True/False
+        """
+        for node in self.children:
+            if node.id == id:
+                return True
+        return False
     
+    def has_parent(self, id : str) -> bool:
+        """ returns True/False whether this `Node` has a parent with `id`
+
+        Args:
+            id (str): unique id
+
+        Returns:
+            bool: True/False
+        """
+        for node in self.parents:
+            if node.id == id:
+                return True
+        return False

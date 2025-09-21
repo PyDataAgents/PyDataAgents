@@ -74,7 +74,7 @@ class SFCService(Service):
     retry_error_nodes : bool = field(default=False, metadata={"description" : "Statemachine object containing actions and transitions to go through to represent a state machine program flow"})    
     start_action_id : str = field(default=None, metadata={"description": "ID of the start node in the statemachine service"})
     nodes : dict[str, Node] = field(default_factory=dict[str, Node], metadata={"description": "dictionary of nodes in the statemachine service"})
-    thread_type : str = field(default=ThreadType.ONLY_ONCE.value, metadata={"description": ""})
+    thread_type : str = field(default=ThreadType.ONLY_ONCE.value, metadata={"description": "the type of ObserverThread to use: ONLY_ONCE | MILLI_SECONDS | SECONDS | INSTANT | TRIGGERED"})
     sampling_period : int = field(default=0, metadata={"description": "sampling period that specifies the interval the observer thread should run for"})
     
     def __post_init__(self):
@@ -138,12 +138,12 @@ class SFCService(Service):
         This method should be called after all nodes have been added to the service.
         """
         for node in self.nodes.values():
-            if len(node.children) == 0 and len(node.parents) == 0:
-                for child_id in node.child_ids:
-                    if child_id in self.nodes:
+            for child_id in node.child_ids:
+                if child_id in self.nodes:
+                    if not node.has_child(child_id):
                         node.add_child(self.nodes[child_id])
-                    else:
-                        raise ServiceException(f"Child node with ID {child_id} not found for node {node.id}.")
+                else:
+                    raise ServiceException(f"Child node with ID {child_id} not found for node {node.id}.")
        
     def set_start_action(self, action : Action):
         """sets the start action and this `Service` `start_action_id` property
