@@ -43,18 +43,35 @@ class ICalAction(BufferNode, Action):
                     else:
                         duration = {self.duration_unit: data[self.duration_key][i]}
                 else:
-                    begin : datetime = datetime.strptime(data[self.start_key][i], self.date_format)
-                    if self.end_key is not None:
-                        end : datetime = datetime.strptime(data[self.end_key][i], self.date_format)
+                    begin_str = data[self.start_key][i]
+                    if begin_str:
+                        if begin_str != "":
+                            begin : datetime = datetime.strptime(begin_str, self.date_format)
+                            if self.end_key is not None:
+                                end : datetime = datetime.strptime(data[self.end_key][i], self.date_format)
+                            else:
+                                duration = {self.duration_unit: data[self.duration_key][i]}
+                        else:
+                            continue
                     else:
-                        duration = {self.duration_unit: data[self.duration_key][i]}                
+                        continue                
                 begin = begin.replace(tzinfo=ZoneInfo(self.time_zone))
                 if end is not None:
                     end = end.replace(tzinfo=ZoneInfo(self.time_zone))                
-                desc = data[self.description_key][i]
-                loc = data[self.location_key][i]
+                if self.description_key:
+                    desc = data[self.description_key][i]
+                else:
+                    desc = None
+                if self.location_key:
+                    loc = data[self.location_key][i]
+                else:
+                    loc = None
                 if self.end_key is not None:
-                    event = Event(name=name, begin=begin, end=end, description=desc, location=loc)
+                    # check for begin = end and make it a whole day event
+                    if begin == end:
+                        event = Event(name=name, begin=begin, duration={"hours": 24}, description=desc, location=loc)
+                    else:
+                        event = Event(name=name, begin=begin, end=end, description=desc, location=loc)
                 else:
                     event = Event(name=name, begin=begin, duration=duration, description=desc, location=loc)
                 calendar.events.add(event)
