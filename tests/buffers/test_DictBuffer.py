@@ -37,9 +37,9 @@ def test_030():
         {"A": 3.0, "B": 4.0}
     ]    
     buf.push(d)    
-    assert 3 == buf.size(), f"expected buffer size to be equal to 2 ({buf.size()})"
+    assert 3 == buf.size(), f"expected buffer size to be equal to 3 ({buf.size()})"
         
-def test_40():
+def test_040():
     buf = DictBuffer()
     buf.capacity = 10
     
@@ -51,3 +51,27 @@ def test_40():
     buf.push(d)
     assert 4 == buf.size(), f"expected buffer size to be equal to 4 ({buf.size()})"
     
+    
+def test_050():
+    
+    buf = DictBuffer(capacity=5)
+    
+    buf.push({"C1": 1, "C2": 2})
+    buf.push({"C1": 2, "C2": 3})
+    buf.push({"C1": 3, "C2": 4})
+    
+    print(buf.data())
+    
+    buf.push({"C1": 4, "C3": -1})
+    
+    print(buf.data())
+    
+def test_051():    
+    buf = DictBuffer(capacity=5)    
+    buf.push({"C1": 1, "C2": 2})
+    buf.push({"C1": 2, "C2": 3})
+    buf.push({"C1": 3, "C2": 4})    
+    print(buf.data())    
+    buf.push({"C1": [4, 5], "C3": [-1, -2]})    
+    print(buf.data())
+       

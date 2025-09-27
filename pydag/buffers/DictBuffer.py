@@ -28,6 +28,41 @@ class DictBuffer(Buffer):
     def push(self, elements: list | dict):        
         with self.lock:
             if isinstance(elements, dict):
+                if len(self.elements) > 0:
+                    # fill non-present keys in input elements with None
+                    # or fill new keys from input elements inside self.elements with None
+                    new_keys = elements.keys()
+                    current_keys = self.elements.keys()
+                    if new_keys == current_keys:
+                        # do nothing
+                        pass
+                    else:
+                        # check length of elements and length of self.elements
+                        if isinstance(next(iter(elements.values())), list):
+                            ne = len(next(iter(elements.values())))
+                        else:
+                            ne = 1
+                        if isinstance(next(iter(self.elements.values())), list):
+                            ce = len(next(iter(self.elements.values())))
+                        else:
+                            ce = 1
+                        
+                        # check for new keys among input elements
+                        missing_new_keys = new_keys - current_keys
+                        if len(missing_new_keys) > 0:
+                            for new_missing_key in missing_new_keys:
+                                if ce == 1:
+                                    self.elements[new_missing_key] = None
+                                else:
+                                    self.elements[new_missing_key] = [None] * ce
+                        # check for missing keys in input elements regarding existing keys in self.elements
+                        missing_current_keys = current_keys - new_keys                        
+                        if len(missing_current_keys) > 0:
+                            for missing_current_key in missing_current_keys:
+                                if ne == 1:
+                                    elements[missing_current_key] = None
+                                else:
+                                    elements[missing_current_key] = [None] * ne              
                 for k, v in elements.items():
                     if k not in self.elements or not isinstance(self.elements[k], list):
                         self.elements[k] = []
