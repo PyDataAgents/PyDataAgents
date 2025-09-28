@@ -5,7 +5,7 @@ from pydag.agents.Agent import Agent
 from pydag.agents.AgentConfig import AgentConfig
 from pydag.agents.YAMLConfig import YAMLConfig
 from pydag.services.documents.FolderObserveMailService import FolderObserveMailService
-from pydag.statemachine.actions.MailAction import MailAction
+from pydag.nodes.utils.MailAction import MailAction
 
 
 def test_000():

@@ -59,6 +59,9 @@ def inherits_from_type(cls_name: str, type : str, seen: Set[str] = None) -> bool
         full_class_name = classes_fully_qualified[cls_name]
         #print(full_class_name)
         clazz = ClassUtils.create_class(full_class_name)
+        if clazz is None:
+            return False
+        # check superclasses as well
         superclasses = ClassUtils.get_superclasses(clazz)
         if type in superclasses:
             return True
