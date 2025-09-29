@@ -11,7 +11,7 @@ from ...mappings.ObserverThread import ObserverThread
 from ...services.Service import Service
 from ...buffers.DictBuffer import DictBuffer
 from ...agents.Agent import Agent
-from ...statemachine.actions.MailAction import MailAction
+from ...nodes.utils.MailAction import MailAction
 
 
 @dataclass

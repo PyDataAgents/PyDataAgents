@@ -4,8 +4,8 @@ from dataclasses import dataclass
 import time
 from loguru import logger
 
-from ..statemachine.StatemachineService import StatemachineService
-from ..statemachine.Node import Node
+from ..services.statemachine.StatemachineService import StatemachineService
+from ..nodes.Node import Node
 from .AgentElement import AgentElement
 from ..mappings.MappingThread import MappingThread
 

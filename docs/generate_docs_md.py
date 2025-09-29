@@ -5,8 +5,8 @@ from pydag.agents.AgentElement import AgentElement
 from pydag.buffers.Buffer import Buffer
 from pydag.mappings.Mapping import Mapping
 from pydag.services.Service import Service
-from pydag.statemachine.Action import Action
-from pydag.statemachine.Transition import Transition
+from pydag.nodes.Action import Action
+from pydag.nodes.Transition import Transition
 from pydag.utils.AutoDocUtils import generate_docs_for_type
 
 
@@ -29,5 +29,5 @@ if __name__ == "__main__":
     generate_docs_for_type(Service.cname() + "s", AgentElement.cname(), Path("pydag\\services"), Path("docs\\"))
     
     # find Statemachine Nodes
-    generate_docs_for_type(Action.cname() + "s and " + Transition.cname() +  "s", AgentElement.cname(), Path("pydag\\statemachine"), Path("docs\\"))
+    generate_docs_for_type(Action.cname() + "s and " + Transition.cname() +  "s", AgentElement.cname(), Path("pydag\\nodes"), Path("docs\\"))
 

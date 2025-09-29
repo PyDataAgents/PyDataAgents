@@ -1,4 +1,7 @@
+from fractions import Fraction
+from functools import reduce
 from math import pi, sin
+import math
 import random
 from typing import Tuple
 
@@ -62,4 +65,25 @@ class MathUtils:
         x = x_0 + radius * np.cos(theta)
         y = y_0 + radius * np.sin(theta)
         return x, y
+
+    @staticmethod
+    def smallest_common_denominator(floats: list) -> float:
+        """ computes the smallest common denominator of a list of floats
+
+        Args:
+            floats (list): _description_
+
+        Returns:
+            int: _description_
+        """
         
+        def lcm(a, b):
+            """
+            Compute the least common multiple of two integers a and b.
+            """
+            return abs(a * b) // math.gcd(a, b)
+        
+        # Convert each float to a fraction and get denominator
+        denominators = [Fraction(x).limit_denominator().denominator for x in floats]
+        # Compute LCM of all denominators
+        return reduce(lcm, denominators)
