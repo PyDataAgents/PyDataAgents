@@ -11,8 +11,7 @@ class AdapterReadAction(AdapterNode, Action):
     """
     
     address : str = field(default=None, metadata={"description": "The address to read from the adapter."})
-    n : int = field(default=1, metadata={"description": "The number of samples to read."})
-
+    
     def execute(self):
         """
         Execute the read action on the adapter.

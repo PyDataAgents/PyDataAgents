@@ -22,9 +22,7 @@ class ScriptAction(BufferNode, Action):
     script_path : str = field(default=None, metadata={"description": "Python code snippet defining a script to process buffer data"})
     input_keys : list[str] = field(default_factory=list, metadata={"description": "keys to search for in parent buffers and inject their values into the script"})
     output_keys : list[str] = field(default_factory=list, metadata={"description": "keys to extract from the script and store their values into this element's buffer"})    
-    persistent : bool = field(default=True, metadata={"description": "specifies whether to keep the extracted data in origin buffer"})
-    n : int = field(default=0, metadata={"description": "number of samples to extract from buffer, default 0 extracts all"})
-        
+       
     def __post_init__(self):
         super().__post_init__()
         self.code : str = None

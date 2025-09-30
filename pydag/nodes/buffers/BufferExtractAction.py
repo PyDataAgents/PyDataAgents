@@ -17,8 +17,6 @@ class BufferExtractAction(BufferNode, Action):
     
     extract_buffer_id : str = field(default=None, metadata={"description": "id of the buffer to extract data from"})    
     extract_keys : list[str] = field(default_factory=list, metadata={"description": "keys to search for in the specified buffer and extract their values into this element's buffer"})
-    persistent : bool = field(default=True, metadata={"description": "specifies whether to keep the extracted data in origin buffer"})
-    n : int = field(default=0, metadata={"description": "number of samples to extract from buffer, default 0 extracts all"})
     
     def __post_init__(self):
         super().__post_init__()

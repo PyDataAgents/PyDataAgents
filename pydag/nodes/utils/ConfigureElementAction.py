@@ -21,8 +21,6 @@ class ConfigureElementAction(AgentNode, BufferNode):
     
     option : str = field(init=True, default=None, metadata={"description": "option to configure with new value"})
     element_id : str = field(init=True, default=None, metadata={"description": "id of the element to change the option for"})
-    n : int = field(init=True, default=1, metadata={"description": "specifies the number of samples to remove from buffer"})
-    persistent : bool = field(default=True, metadata={"specifies whether to keep the data in the buffer after reading"})
     extract_key : str = field(default=None, metadata={"specifies the key to extract from parent buffer, if no key is specified, the value for the new config option is selected based on buffer data"})
         
     def install(self, agent : Agent = None):
