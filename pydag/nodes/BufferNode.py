@@ -10,6 +10,8 @@ from .Node import Node
 class BufferNode(Node):
     
     buffer_id : str = field(init=True, default=None, metadata={"description": "unique ID of the buffer"})
+    persistent : bool = field(default=True, metadata={"description": "specifies whether data is removed (False) from parent or not (True)"})
+    n : int = field(default=0, metadata={"description": "specifies how much data is retrieved from parent buffer. Default 0 -> all data"})
     
     def __post_init__(self):
         super().__post_init__()
