@@ -16,8 +16,6 @@ class HttpPostAction(BufferNode, Action):
     headers : dict[str] = field(default=None, metadata={"description": "headers to be used in the HTTP requests, e.g. {'Content-Type': 'application/json', 'Authorization' : 'Bearer token'}"})    
     timeout : float = field(default=10, metadata={"description": "timeout for requests"})
     json_path : str = field(default=None, metadata={"description": "JSONPath specififcation to parse or access the data in buffer"})
-    persistent : bool = field(default=False, metadata={"description": "specifies whether data is removed from buffer after access"})
-    n : int = field(default=1, metadata={"description": "specifies the number of samples to remove from buffer, n=0 -> all"})
     
     def execute(self):
         data = self.buffer.data(n=self.n, persistent=self.persistent)

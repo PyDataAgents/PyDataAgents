@@ -13,9 +13,7 @@ class ParentBufferExtractAction(BufferNode, Action):
     """
     
     extract_keys : list[str] = field(default_factory=list, metadata={"description": "keys to search for in the parent buffers and extract their values into this element's buffer"})
-    persistent : bool = field(default=True, metadata={"description": "specifies whether to keep the extracted data in origin buffer"})
-    n : int = field(default=0, metadata={"description": "number of samples to extract from buffer, default 0 extracts all"})
-                
+               
     def execute(self):
         for parent in self.parents:
             if not isinstance(parent, BufferNode):

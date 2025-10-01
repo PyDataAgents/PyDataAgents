@@ -12,8 +12,6 @@ class DataFrameFilterAction(BufferNode, Action):
     
     row_filter : str = field(default=None, metadata={"description": "pandas filter command to apply to filter the rows of the buffer converted to dataframe"})
     column_filter : list[str] = field(default_factory=list, metadata={"description": "list of columns to filter for"})        
-    persistent : bool = field(default=True, metadata={"description": "specifies whether data is removed (False) from parent or not (True)"})
-    n : int = field(default=0, metadata={"description": "specifies how much data is retrieved from parent buffer. Default 0 -> all data"})
     
     def execute(self):
         for parent in self.parents:

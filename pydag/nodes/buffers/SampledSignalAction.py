@@ -11,7 +11,6 @@ from pydag.nodes.BufferNode import BufferNode
 class SampledSignalAction(BufferNode, Action):
     
     signal : SampledSignal = field(default=None, metadata={})
-    n : int = field(default=1, metadata={})
     
     def install(self, agent : Agent = None):
         if self.buffer is None:
