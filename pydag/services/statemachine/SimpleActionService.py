@@ -1,9 +1,11 @@
-from dataclasses import dataclass, field
 from __future__ import annotations
+from dataclasses import dataclass, field
 
 from loguru import logger
 
+from ...services.ServiceException import ServiceException
 from ...nodes.NodeException import NodeException
+from ...nodes.Node import Node
 from ...agents.Agent import Agent
 from ...mappings.Observer import Observer
 from ...mappings.ObserverThread import ObserverThread
@@ -13,7 +15,7 @@ from ...services.Service import Service
 
 
 class SimpleActionObserver(Observer):
-    
+
     def __init__(self, service: SimpleActionService):
         super().__init__()
         self.service = service
@@ -42,12 +44,12 @@ class SimpleActionObserver(Observer):
 
 @dataclass
 class SimpleActionService(Service):
-     
+
     nodes : list[Action] = field(default_factory=list[Action], metadata={"description": "list of Action nodes to be executed in the statemachine"})
     retry_error_nodes : bool = field(default=False, metadata={"description" : "Statemachine object containing actions and transitions to go through to represent a state machine program flow"})    
     thread_type : str = field(default=ThreadType.INSTANT.value, metadata={"description": ""})
     sampling_period : int = field(default=0, metadata={"description": "sampling period that specifies the interval the observer thread should run for"})
-    
+
     def __post_init__(self):
         super().__post_init__()
         self.observer_thread : ObserverThread = None
@@ -56,6 +58,19 @@ class SimpleActionService(Service):
         super().install(agent)
         for node in self.nodes:
             node.install(agent)
+    
+    def connect_nodes(self):
+        """
+        Connect nodes in the statemachine service.
+        This method should be called after all nodes have been added to the service.
+        """
+        for node in self.nodes:
+            if len(node.children) == 0 and len(node.parents) == 0:
+                for child_id in node.child_ids:
+                    if child_id in self.nodes:
+                        node.add_child(self.nodes[child_id])
+                    else:
+                        raise ServiceException(f"Child node with ID {child_id} not found for node {node.id}.")
             
     def start(self):
         self.observer_thread = ObserverThread(id=ObserverThread.unique_id(), thread_type=ThreadType[self.thread_type])
@@ -65,3 +80,9 @@ class SimpleActionService(Service):
 
     def stop(self):
         self.is_running = False
+        
+    def add_node(self, node : Node):
+        self.nodes.append(node)
+        
+    def remove_node(self, node_id : str):
+        self.nodes = [node for node in self.nodes if node.id != node_id]    
