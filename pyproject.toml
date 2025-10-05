@@ -22,6 +22,7 @@ classifiers = [
 dependencies = [
     "loguru",
     "opcua",
+    "pyads",
     "fastapi[standard]",
     "PyYAML",
     "sounddevice",
