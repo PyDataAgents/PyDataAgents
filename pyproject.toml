@@ -44,7 +44,27 @@ dependencies = [
     "bs4",
     "pytest",
     "ics",
-    "msal"
+    "msal",
+    "sktime",
+    "numba",
+    "torch",
+    "seaborn",
+    "tirex-ts @ git+https://github.com/NX-AI/tirex",
+    "chronos-forecasting",
+    "langchain",
+    "langchain-community",
+    "langchain-chroma",
+    "langchain-huggingface",
+    "langchain-unstructured",
+    "langchain-openai",
+    "langchain-ollama",
+    "sentence-transformers",
+    "langgraph",
+    "langchain-tavily",
+    "ross-rotordynamics",
+    "cadquery",
+    "cq-editor",
+    "matplotlib"
 ]
 
 [tool.setuptools.packages.find]
