@@ -119,8 +119,39 @@ def test_030():
             #plt.pause(0.1)
 
 
+def test_040():
+    # Test if always 257*5 values are returned for CWRU data and signal is changing when 5 inference samples are used
+    dataset_buffer = DatasetBuffer("CWRU", sort_by_y=True)
+    dataset_buffer.install()
+    lba = LinkBufferAction()
+    lba.buffer = dataset_buffer
+    signal = None
+    PSD = PSDExtractor(sample_length=100, min_inference_samples=5, persistent=False)
+    PSD.install()
+    PSD.add_parent(lba)
+    #plt.ion()
+    for i in range(50):
+        print(i)
+        time.sleep(0.5)
+        PSD.execute()
+        data = PSD.buffer.data(persistent=False)
+        if data and len(data.values()) > 0:
+            assert any([len(data[list(data.keys())[0]]) == 257*5, len(data[list(data.keys())[0]]) == 0]), f"Data length must be 257 or 0, but got: {len(data[list(data.keys())[0]])}"
+            assert len(list(data.keys())) == 2
+            assert all([key in data.keys() for key in ["values-feature-welch-0","y-feature-welch-1"]]), f"Keys must be ['values-feature-welch-0','y-feature-welch-1'], but got: {list(data.keys())}"
+            if len(data[list(data.keys())[0]]) == 257*5:
+                if signal is None:
+                    signal = data[list(data.keys())[0]]
+                else:
+                    assert signal != data[list(data.keys())[0]], "Signal must be different in each iteration, since the data is changing"
+                    signal = data[list(data.keys())[0]]
+            #plt.plot(data[list(data.keys())[0]])
+            #plt.pause(0.1)
+
+
 if __name__ == "__main__":
-    test_000()
-    test_010()
-    test_020()
-    test_030()
+    #test_000()
+    #test_010()
+    #test_020()
+    #test_030()
+    test_040()
