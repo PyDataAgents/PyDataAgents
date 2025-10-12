@@ -15,7 +15,7 @@ class ObjectTransformation(AgentElement):
     def install(self, agent : Agent = None):
         pass
     
-    def deinstall(self, agent : Agent = None):
+    def uninstall(self, agent : Agent = None):
         pass
        
     @abstractmethod 

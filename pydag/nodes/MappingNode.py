@@ -22,6 +22,6 @@ class MappingNode(Node):
             else:
                 raise StatemachineException("No " + MappingThread.cname() + " with id=" + self.mapping_id + " was found")
             
-    def deinstall(self, agent : Agent = None):
-        super().deinstall()
+    def uninstall(self, agent : Agent = None):
+        super().uninstall()
         self.mapping_thread : MappingThread = None

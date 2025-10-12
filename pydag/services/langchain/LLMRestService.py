@@ -19,6 +19,6 @@ class LLMRestService(RestService):
         self.add_cors()
         self.app.include_router(LLMRestAPI.get_api_router(agent))
         
-    def deinstall(self, agent : Agent = None):
-        super().deinstall(agent)
+    def uninstall(self, agent : Agent = None):
+        super().uninstall(agent)
         self.app = None

@@ -37,9 +37,9 @@ class LLMScriptElement(LearningElement, ServiceNode):
         if not isinstance(self.service, LLMService):
             raise DataElementException("referenced service is not an instance of " + LLMService.cname())
         
-    def deinstall(self, agent : Agent = None):
-        LearningElement.deinstall(self, agent)
-        ServiceNode.deinstall(self, agent)          
+    def uninstall(self, agent : Agent = None):
+        LearningElement.uninstall(self, agent)
+        ServiceNode.uninstall(self, agent)          
     
     def learn(self, data : dict, meta : dict = None) -> bool:
         """ method that enables the training or continuous learning of the element.

@@ -21,8 +21,8 @@ class ListBuffer(Buffer):
         if self.initial_values is not None:
             self.elements = self.initial_values
             
-    def deinstall(self, agent : Agent = None):
-        super().deinstall(agent)
+    def uninstall(self, agent : Agent = None):
+        super().uninstall(agent)
         self.elements = []
            
     def push(self, elements : list):

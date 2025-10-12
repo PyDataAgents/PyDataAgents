@@ -29,7 +29,7 @@ class Agent(AgentElement):
     def install(self, agent : Agent = None):        
         self.install_elements()
         
-    def deinstall(self, agent : Agent = None):
+    def uninstall(self, agent : Agent = None):
         self.deinstall_elements()
     
     def install_elements(self):
@@ -44,13 +44,13 @@ class Agent(AgentElement):
     
     def deinstall_elements(self):
         for adapter in self.adapter_store.values():
-            adapter.deinstall(self)
+            adapter.uninstall(self)
         for buffer in self.buffer_store.values():
-            buffer.deinstall(self)
+            buffer.uninstall(self)
         for mapping in self.mapping_store.values():
-            mapping.deinstall(self)
+            mapping.uninstall(self)
         for service in self.service_store.values():
-            service.deinstall(self)
+            service.uninstall(self)
             
     def add_buffer(self, buffer : Buffer):
         self.buffer_store[buffer.id] = buffer

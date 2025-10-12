@@ -37,6 +37,8 @@ def test_010():
     sample_rate = 44100
     block_size = 1024  # number of frames per buffer (about 23ms at 44.1kHz)
 
+    st = int(time.time() * 1000)
+    
     def audio_callback(indata, frames, time, status):
         if status:
             print("Stream status:", status)
@@ -49,17 +51,19 @@ def test_010():
                         channels=1,
                         samplerate=sample_rate,
                         blocksize=block_size):
-        print("Streaming... Press Ctrl+C to stop.")
+        print("Streaming... Press Ctrl+C to stop. Or wait for 10 seconds.")
         try:
             while True:
-                pass  # keep the main thread alive
+                if int(time.time() * 1000) - st > 10_000:
+                    break
         except KeyboardInterrupt:
             print("Stopped.")
             
 def test_011():
     sample_rate = 44100
     block_size = 512  # number of frames per buffer (about 23ms at 44.1kHz)
-
+    st = int(time.time() * 1000)
+    
     buf = ListBuffer()
     buf.id = "AUDIO"
     buf.capacity = 512
@@ -78,11 +82,13 @@ def test_011():
                         channels=1,
                         samplerate=sample_rate,
                         blocksize=block_size):
-        print("Streaming... Press Ctrl+C to stop.")
+        print("Streaming... Press Ctrl+C to stop. Or wait for 10 seconds.")
         try:
             while True:
                 time.sleep(1)
                 print(buf.data())
+                if int(time.time() * 1000) - st > 10_000:
+                    break
                 
         except KeyboardInterrupt:
             print("Stopped.")

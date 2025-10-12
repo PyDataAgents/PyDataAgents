@@ -2,8 +2,12 @@ from dataclasses import dataclass, field
 import time
 import sounddevice as sd
 import numpy as np
+from loguru import logger
+
+
 from ...adapters.SubscribeAdapter import SubscribeAdapter
 from ...buffers.Buffer import Buffer
+
 
 @dataclass
 class AudioAdapter(SubscribeAdapter):
@@ -19,7 +23,7 @@ class AudioAdapter(SubscribeAdapter):
 
     def connect(self) -> bool:
         d = sd.query_devices(None, 'input')
-        self.LOGGER.debug(d)
+        logger.debug(d)
         if len(d) > 0:
             return True
         else:
@@ -34,7 +38,7 @@ class AudioAdapter(SubscribeAdapter):
 
         def audio_callback(indata : np.ndarray, frames, time, status):
             if status:
-                self.LOGGER.error("Audio Stream status: ", status)
+                logger.error("Audio Stream status: ", status)
             buf.push(indata.tolist())
 
         with sd.InputStream(callback=audio_callback,
@@ -43,7 +47,7 @@ class AudioAdapter(SubscribeAdapter):
                             blocksize=n):
             while self.subscribing:
                 time.sleep(1)
-            self.LOGGER.debug(self.name() + " stopped subscribing to audio channel")
+            logger.debug(self.name() + " stopped subscribing to audio channel")
 
     def unsubscribe(self):
         self.subscribing = False

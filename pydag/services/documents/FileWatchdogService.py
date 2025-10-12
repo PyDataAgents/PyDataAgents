@@ -31,8 +31,8 @@ class FileWatchdogService(Service):
             else:
                 raise ServiceException("No " + Buffer.cname() + " with id=" + self.buffer_id + " exists in " + Agent.cname())
 
-    def deinstall(self, agent : Agent):
-        super().deinstall(agent)
+    def uninstall(self, agent : Agent):
+        super().uninstall(agent)
         self.file_event_buffer = None
             
     def start(self):

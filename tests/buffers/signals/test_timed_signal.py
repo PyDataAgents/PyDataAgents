@@ -21,4 +21,4 @@ def test_000():
         print(sb.data())
         i = i + 1
         
-    sb.deinstall()    
+    sb.uninstall()    

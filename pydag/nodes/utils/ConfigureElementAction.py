@@ -27,9 +27,9 @@ class ConfigureElementAction(AgentNode, BufferNode):
         AgentNode.install(self, agent)
         BufferNode.install(self, agent)
         
-    def deinstall(self, agent : Agent = None):
-        AgentNode.deinstall(self, agent)
-        BufferNode.deinstall(self, agent)
+    def uninstall(self, agent : Agent = None):
+        AgentNode.uninstall(self, agent)
+        BufferNode.uninstall(self, agent)
         
     def execute(self):
         val = self.buffer.data(n = self.n, persistent = self.persistent)

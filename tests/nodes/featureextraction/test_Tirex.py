@@ -4,7 +4,6 @@ import matplotlib.pyplot as plt
 
 from pydag.nodes.dataset.DatasetBuffer import DatasetBuffer
 from pydag.nodes.dataset.DatasetNames import DatasetNames
-from pydag.buffers.SampledBuffer import SampledBuffer
 from pydag.nodes.buffers.LinkBufferAction import LinkBufferAction
 from pydag.nodes.featureextraction.TirexExtractor import TirexExtractor
 
@@ -12,12 +11,9 @@ def test_010():
     
     sds = DatasetBuffer(dataset_name=DatasetNames.Wine.value)
     sds.install()
-    
-    sb = SampledBuffer(capacity=100000, signal=sds, sampling_period=100, n=1)
-    sb.install()
-    
+        
     lba = LinkBufferAction()
-    lba.buffer = sb
+    lba.buffer = sds
     lba.install()
 
     rocket = TirexExtractor(min_learning_samples=10, min_inference_samples=10, features_from_parent=["values"], persistent=False)

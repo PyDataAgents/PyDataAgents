@@ -64,7 +64,8 @@ dependencies = [
     "ross-rotordynamics",
     "cadquery",
     "cq-editor",
-    "matplotlib"
+    "matplotlib",
+    "psutil"
 ]
 
 [tool.setuptools.packages.find]

@@ -41,8 +41,8 @@ class BufferNode(Node):
                 self.buffer_id = self.buffer.id
                 self.buffer.install(agent)
         
-    def deinstall(self, agent : Agent = None):
-        super().deinstall(agent)
+    def uninstall(self, agent : Agent = None):
+        super().uninstall(agent)
         self.buffer : Buffer = None
         
     def set_buffer(self, buffer : Buffer):

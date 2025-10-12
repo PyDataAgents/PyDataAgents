@@ -1,7 +1,6 @@
 from __future__ import annotations
 import copy
 import threading
-import numpy as np
 
 from ..agents.AgentConfig import AgentConfig
 from .Buffer import Buffer
@@ -21,8 +20,8 @@ class DictBuffer(Buffer):
         if self.initial_values is not None:
             self.elements = self.initial_values
         
-    def deinstall(self, agent : Agent = None):
-        super().deinstall(agent)
+    def uninstall(self, agent : Agent = None):
+        super().uninstall(agent)
         self.elements = {}        
     
     def push(self, elements: list | dict):        
@@ -83,7 +82,7 @@ class DictBuffer(Buffer):
 
     def data(self, n=0, persistent=True) -> dict:
         if n > 0:
-            if len(self.elements.keys) > 0:
+            if len(self.elements.keys()) > 0:
                 d = dict()
                 for k in self.elements.keys():
                     if len(self.elements[k]) < n:

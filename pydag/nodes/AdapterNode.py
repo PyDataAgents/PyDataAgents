@@ -25,6 +25,6 @@ class AdapterNode(BufferNode):
             else:
                 raise StatemachineException("No " + Adapter.cname() + " with id=" + self.adapter_id + " was found in " + agent.cname())
     
-    def deinstall(self, agent : Agent = None):
-        super().deinstall(agent)
+    def uninstall(self, agent : Agent = None):
+        super().uninstall(agent)
         self.adapter = None

@@ -42,8 +42,8 @@ class RestService(Service):
             allow_headers=["*"],  # Allows all headers
         )
         
-    def deinstall(self, agent : Agent = None):
-        super().deinstall(agent)
+    def uninstall(self, agent : Agent = None):
+        super().uninstall(agent)
         self.app = None
         
     def add_router(self, router : APIRouter):

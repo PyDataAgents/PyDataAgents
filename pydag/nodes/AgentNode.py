@@ -13,6 +13,6 @@ class AgentNode(Node):
         super().install(agent)
         self.agent : Agent = agent
         
-    def deinstall(self, agent : Agent = None):
-        super().deinstall()
+    def uninstall(self, agent : Agent = None):
+        super().uninstall()
         self.agent : Agent = None

@@ -27,8 +27,8 @@ class SampledBuffer(TimedBuffer):
         self.scheduler.add_job(self.signal_task, 'interval', seconds=self.sampling_period / 1000.0)
         self.scheduler.start()
             
-    def deinstall(self, agent : Agent = None):
-        super().deinstall(agent)
+    def uninstall(self, agent : Agent = None):
+        super().uninstall(agent)
         self.scheduler.shutdown()
     
     def signal_task(self):

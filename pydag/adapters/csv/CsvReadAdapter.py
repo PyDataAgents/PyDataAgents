@@ -1,6 +1,8 @@
 import csv
 from dataclasses import dataclass, field
 import enum
+from loguru import logger
+
 from ...adapters.AdapterException import AdapterException
 from ...adapters.ReadAdapter import ReadAdapter
 from ...buffers.Buffer import Buffer
@@ -48,10 +50,10 @@ class CsvReadAdapter(ReadAdapter):
                     row = next(self.csv_reader, None)
                 return True                    
             else:
-                CsvReadAdapter.LOGGER.error("File " + self.file_path + " does not exist")
+                logger.error("File " + self.file_path + " does not exist")
                 return False
         else:
-            CsvReadAdapter.LOGGER.error("No File was specified") 
+            logger.error("No File was specified") 
             return False
         
     def disconnect(self) -> bool:
@@ -62,7 +64,7 @@ class CsvReadAdapter(ReadAdapter):
     def read_from_source(self, buffers : dict[str, Buffer], addresses : list[str], n : int = 1):
         if len(buffers) > 1 and len(buffers) != len(addresses):
             raise AdapterException(Buffer.cname() + "s and addresses must be of same size")            
-        elif len(buffers) == 1 and len(addresses) == 0:
+        elif len(buffers) == 1 and addresses is None:
             buffer = next(iter(buffers.values()))
             if isinstance(buffer, DictBuffer):
                 match self.mode:
@@ -101,7 +103,7 @@ class CsvReadAdapter(ReadAdapter):
                                     c = c + 1
                             buffer.push(d)    
                         elif row is None:
-                            self.LOGGER.warning("end of file " + self.file_path + " was reached, no more data will be added")
+                            logger.warning("end of file " + self.file_path + " was reached, no more data will be added")
                         else:
                             if self.force_numeric:
                                 converted_row = {k: DataUtils.force_numeric(v) for k, v in row.items()}

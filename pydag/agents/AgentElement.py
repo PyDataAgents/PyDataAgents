@@ -92,7 +92,7 @@ class AgentElement(ABC):
         if self.load_on_install:
             self.load()
         
-    def deinstall(self, agent : Agent = None):
+    def uninstall(self, agent : Agent = None):
         """resets the element, this method can be used to stop internal element logic or reset objects that were initialized on creation
         """
         return

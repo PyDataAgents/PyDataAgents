@@ -26,7 +26,7 @@ class NpzAdapter(ReadAdapter):
         return True
     
     def read_from_source(self, buffers : dict[str, Buffer], addresses : list[str], n : int = 0):
-        if len(buffers) == 1 and len(addresses) == 0:
+        if len(buffers) == 1 and addresses is None:
             buffer : Buffer = next(iter(buffers.values()))
             if isinstance(buffer, DictBuffer):
                 data = NpzAdapter.__extract_npz_data(self.file_path)
