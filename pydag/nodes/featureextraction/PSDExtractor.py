@@ -43,6 +43,8 @@ class PSDExtractor(LearningElement):
                                 nperseg = 512,
                                 nfft=512,
                                 return_onesided=True)
+            Pxx = Pxx.reshape(-1) # convert to numpy array and flatten - Stack all inference samples. It is similar to running n samples in sequence and adding them to the buffer.
+            f = f.reshape(-1)
             forecast[key + "-" + DataElementConfig.FEATURE + f"-welch-{i}"] = Pxx.reshape(-1).tolist()  #convert to list
 
         return forecast, None
