@@ -8,6 +8,7 @@ from .TransformElement import TransformElement
 from .transforms.utils.SplitKeyTransform import SplitKeyTransform
 from .transforms.utils.ReshapeTransform import ReshapeTransform
 from .transforms.statistics.ZScore import ZScore
+from .transforms.utils.NanToNumTransform import NanToNumTransform
 
 
 @dataclass
@@ -23,6 +24,7 @@ class LearningElement(TransformElement):
     features_from_parent : list[str] = field(default="all", metadata={"description": "Feature keys from parent buffer to use for learning/inference."})
     sample_length : int = field(default=0, metadata={"description": "Expected length of each sample. If 0, a sample with shape (1, min_learning_samples) is assumed. Otherwise, (1, sample_length) is assumed."})
     normalize : bool = field(default=False, metadata={"description": "Flag to indicate whether to normalize the input data using z-score normalization on the input batch."})
+    nan_to_num : bool = field(default=False, metadata={"description": "If True, replace NaN/Inf values with finite numbers (0.0)."})
 
     def __post_init__(self):
         super().__post_init__()
@@ -54,25 +56,32 @@ class LearningElement(TransformElement):
         # Insert SplitKeyTransform as first transformation if specific features are to be used to the transform list
         if self.features_from_parent != "all":
             self.transforms.insert(0, SplitKeyTransform(split_keys=self.features_from_parent))
-
-        # Insert ReshapeTransform as second transformation if sample_length is specified
+        # Insert NanToNumTransform as second transformation if requested
+        if self.nan_to_num:
+            self.transforms.insert(1, NanToNumTransform())
+        # Insert ReshapeTransform next if sample_length is specified (comes after nan cleaning per request)
         if self.sample_length > 0:
-            self.transforms.insert(1, ReshapeTransform(sample_length=self.sample_length))
-
-        # Normalize data if required
+            # Determine insertion index: after potential nan_to_num (which would be at 1) or split key
+            insert_index = 2 if self.nan_to_num else 1
+            self.transforms.insert(insert_index, ReshapeTransform(sample_length=self.sample_length))
+        # Normalize data if required (after reshape)
         if self.normalize:
-            self.transforms.insert(2, ZScore())
+            # Place after reshape; compute index accordingly
+            base_index = 3 if self.nan_to_num and self.sample_length > 0 else (
+                2 if (self.nan_to_num or self.sample_length > 0) else 0
+            )
+            self.transforms.insert(base_index, ZScore())
 
 
         # Do other transformations
         if self.transforms is None or len(self.transforms) == 0:
-            return data
+            d = data
         
         else:
             d = data
             for transform in self.transforms:
                 d = transform.transform(d)
-            return d
+        return d
         
     def execute(self):
         size = self.get_data_size()              
