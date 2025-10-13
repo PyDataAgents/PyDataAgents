@@ -22,7 +22,20 @@ class LLMRestAPI:
         
         @router.get("/")
         def llm_services():
-            """returns the id's of all LLMservices in this Grabber instance
+            """returns the id's of all LLMservices in this Agent instance
+
+            Returns:
+                list[str]: list of strings
+            """
+            service_ids = list()
+            for service in agent.service_store.values():
+                if isinstance(service, LLMService) and not isinstance(service, RAGService):
+                    service_ids.append(service.id)
+            return service_ids
+        
+        @router.get("/sql")
+        def llm_sql_services():
+            """returns the id's of all LLMSQLServices in this Agent instance
 
             Returns:
                 list[str]: list of strings
@@ -35,7 +48,7 @@ class LLMRestAPI:
         
         @router.get("/rag")
         def rag_services():
-            """returns the id's of all RAGServices in this Grabber instance
+            """returns the id's of all RAGServices in this Agent instance
 
             Returns:
                 list[str]: list of strings
@@ -93,7 +106,7 @@ class LLMRestAPI:
                 return {"error": "No Service with id=" + service_id + " was found"}
         
         @router.get("/sql/{service_id}/chat")
-        def sql_chat(service_id : str = Path(..., description="unique id of the LLMSQLService"), question : str = Query(..., description="question for the SQL LLM engine to answer")) -> str:
+        def sql_chat(service_id : str = Path(..., description="unique id of the LLMSQLService"), question : str = Query(..., description="question for the SQL LLM engine to answer")) -> dict:
             if service_id in agent.service_store:
                 if isinstance(agent.service_store[service_id], LLMSQLService):
                     sql_service : LLMSQLService = agent.service_store[service_id]

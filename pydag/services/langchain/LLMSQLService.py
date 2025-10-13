@@ -57,8 +57,6 @@ class LLMSQLService(LLMService):
 
     system_message : str= field(default = SYS_SQL_EXPERT, metadata={"description":"Default System message to give to the LLM Agent"})    
     sql_connection : str = field(default=None, metadata={"description": "connection string for accessing a SQL database, e.g. SQLite -> sqlite:////path/to/sqlite.db"})
-    buffer_id : str = field(default=None, metadata={"description": "id of the buffer to use for storing the SQL result data, the buffer must be present in Agent to be referenced in this service"})
-    return_state : bool = field(default=False, metadata={"description": "specifies whether all the state variables should be returned as dict object"})
         
     def __post_init__(self):
         super().__post_init__()
@@ -68,28 +66,7 @@ class LLMSQLService(LLMService):
         self.messages = None
         self.workflow : StateGraph = None
         self.graph = None
-        self.buffer : Buffer = None
-        
-    def install(self, agent : Agent = None):
-        super().install(agent)
-        if self.buffer is None:
-            if agent is not None:
-                if self.buffer_id in agent.buffer_store:
-                    self.buffer = agent.buffer_store[self.buffer_id]
-                else:
-                    self.buffer = DictBuffer(id=self.id + "-BUFFER", capacity=AgentConfig.INFINITE_CAPACITY)
-                    self.buffer_id = self.buffer.id
-                    agent.add_buffer(self.buffer)
-                    self.buffer.install(agent)
-            else:
-                self.buffer = DictBuffer(id=self.id + "-BUFFER", capacity=AgentConfig.INFINITE_CAPACITY)
-                self.buffer_id = self.buffer.id
-                self.buffer.install(agent)
-
-    def uninstall(self, agent : Agent = None):
-        super().uninstall(agent)
-        self.buffer : Buffer = None
-    
+            
     def start(self):
         """
         starts the service by creating required models and workflows
@@ -111,7 +88,8 @@ class LLMSQLService(LLMService):
         self.graph = self.workflow.compile()
     
     def _write_query(self, state: State):
-        """Generate SQL query to fetch information."""
+        """Generate SQL query to fetch information."""        
+        #print(self.db.get_context())        
         prompt = self.messages.invoke(
             {
                 "dialect": self.db.dialect,
@@ -142,23 +120,23 @@ class LLMSQLService(LLMService):
         query = state[QUERY]
         result = execute_query_tool.invoke(query)
         parsed_list = ast.literal_eval(result)
-        if self.buffer is not None:
-            column_names : list[str] = LLMSQLService._extract_column_names(query)
-            logger.debug(column_names)
-            nc = len(parsed_list[0])
-            if column_names is None:
+        column_names : list[str] = LLMSQLService._extract_column_names(query)
+        #logger.debug(column_names)
+        nc = len(parsed_list[0])
+        if column_names is None:
+            column_names = [f"COL{i}" for i in range(0, nc)]
+        else:
+            if len(column_names) is not nc:
                 column_names = [f"COL{i}" for i in range(0, nc)]
-            else:
-                if len(column_names) is not nc:
-                    column_names = [f"COL{i}" for i in range(0, nc)]
-            for item in parsed_list:
-                d = {}
-                c : int = 0
-                for val in item:
-                    d[column_names[c]] = val
-                    c = c + 1
-                self.buffer.push(d)
-        return {RESULT: result}
+        d = {}
+        for col in column_names:
+            d[col] = []
+        for item in parsed_list:
+            c : int = 0
+            for val in item:
+                d[column_names[c]].append(val)
+                c = c + 1
+        return {RESULT: d}
     
     def _generate_answer(self, state: State):
         """Answer question using retrieved information as context."""
@@ -170,21 +148,15 @@ class LLMSQLService(LLMService):
             f"SQL Result: {state[RESULT]}"
         )
         response = self.llm.invoke(prompt)
-        if self.return_state:
-            return { QUERY: state[QUERY], RESULT: state[RESULT], ANSWER: response.content}
-        else:
-            return {ANSWER: response.content}
+        return {ANSWER: response.content}   
 
-    def chat(self, question : str) -> Union[str, dict]:
+
+    def chat(self, question : str) -> dict:
         human_msg = HumanMessage(content=question)
-        final_result = None
+        final_result = {}
         for step in self.graph.stream({QUESTION: human_msg.content}):
-            if GENERATE_ANSWER in step:
-                if self.return_state:
-                    final_result = step[GENERATE_ANSWER]
-                else:
-                    final_result = step[GENERATE_ANSWER][ANSWER]               
-            logger.debug(step)
+            step_result = next(iter(step.values()))
+            final_result.update(step_result)
         return final_result
     
     @staticmethod
