@@ -6,10 +6,10 @@ import os
 import sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))))
 
-from ...agents.Agent import Agent
-from ...buffers.DictBuffer import DictBuffer
+from ..agents.Agent import Agent
+from .DictBuffer import DictBuffer
 
-from ..dataset.DatasetNames import DatasetNames
+from ..nodes.dataset.DatasetNames import DatasetNames
 
 
 @dataclass

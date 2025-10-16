@@ -10,7 +10,7 @@ from pydag.nodes.buffers.LinkBufferAction import LinkBufferAction
 from pydag.buffers.signals.Sine import Sine
 from pydag.buffers.SignalBuffer import SignalBuffer
 from pydag.buffers.signals.SampledSignal import SampledSignal
-from pydag.nodes.dataset.DatasetBuffer import DatasetBuffer
+from pydag.buffers.DatasetBuffer import DatasetBuffer
 from pydag.nodes.featureextraction.ChronosExtractor import ChronosExtractor
 from pydag.nodes.featureextraction.ROCKETExtractor import ROCKETExtractor
 from pydag.nodes.clustering.ShiftMonitoring import ShiftMonitoring

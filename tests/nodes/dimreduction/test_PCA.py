@@ -2,7 +2,7 @@ import time
 
 
 from pydag.nodes.dimreduction.PCADimReduction import PCADimReduction
-from pydag.nodes.dataset.DatasetBuffer import DatasetBuffer
+from pydag.buffers.DatasetBuffer import DatasetBuffer
 from pydag.nodes.dataset.DatasetNames import DatasetNames
 from pydag.nodes.buffers.LinkBufferAction import LinkBufferAction
 

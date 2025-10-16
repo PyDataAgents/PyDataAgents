@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 
 
 from pydag.nodes.dimreduction.IsomapDimReduction import IsomapDimReduction
-from pydag.nodes.dataset.DatasetBuffer import DatasetBuffer
+from pydag.buffers.DatasetBuffer import DatasetBuffer
 from pydag.nodes.dataset.DatasetNames import DatasetNames
 from pydag.buffers.SampledBuffer import SampledBuffer
 from pydag.nodes.buffers.LinkBufferAction import LinkBufferAction

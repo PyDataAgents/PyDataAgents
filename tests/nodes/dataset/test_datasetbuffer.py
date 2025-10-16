@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 
 from pydag.buffers.SampledBuffer import SampledBuffer
 from pydag.nodes.buffers.LinkBufferAction import LinkBufferAction
-from pydag.nodes.dataset.DatasetBuffer import DatasetBuffer
+from pydag.buffers.DatasetBuffer import DatasetBuffer
 
 
 def test_000():

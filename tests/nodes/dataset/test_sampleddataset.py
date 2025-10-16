@@ -5,8 +5,8 @@ import matplotlib.pyplot as plt
 
 
 from pydag.buffers.SampledBuffer import SampledBuffer
-from pydag.nodes.dataset.DatasetBuffer import DatasetBuffer
-from pydag.nodes.dataset.DatasetBuffer import DatasetNames
+from pydag.buffers.DatasetBuffer import DatasetBuffer
+from pydag.buffers.DatasetBuffer import DatasetNames
 
 def test_000():
     

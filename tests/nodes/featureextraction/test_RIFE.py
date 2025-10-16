@@ -1,7 +1,7 @@
 import time
 
 from pydag.nodes.featureextraction.RIFEExtractor import RIFEExtractor
-from pydag.nodes.dataset.DatasetBuffer import DatasetBuffer
+from pydag.buffers.DatasetBuffer import DatasetBuffer
 from pydag.nodes.buffers.LinkBufferAction import LinkBufferAction
 from pydag.buffers.signals.Sine import Sine
 from pydag.buffers.SignalBuffer import SignalBuffer
