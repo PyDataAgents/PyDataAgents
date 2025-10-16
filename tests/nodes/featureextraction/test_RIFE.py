@@ -8,6 +8,10 @@ from pydag.buffers.SignalBuffer import SignalBuffer
 import numpy as np
 import matplotlib.pyplot as plt
 from pydag.nodes.dimreduction.PCADimReduction import PCADimReduction
+from pydag.agents.Agent import Agent
+from pydag.services.statemachine.StatemachineService import StatemachineService
+from pydag.services.statemachine.SimpleActionService import SimpleActionService
+from pydag.services.rest.RestService import RestService
 
 # The tests mirror those in test_PSD but adapted for 256 RIFE features and key naming (-feature-rife-<i>)
 
@@ -135,12 +139,55 @@ def test_020():
 
 
 
+def test_030():
+    
+    ag = Agent()
+        
+    signal = DatasetBuffer(id="B1", dataset_name="CWRU", sort_by_y=True)    
+    signal_2 = DatasetBuffer(id="B2", dataset_name="CWRU", sort_by_y=True)
+    
+
+    sm = SimpleActionService() 
+     
+    lba = LinkBufferAction()
+    lba.buffer = signal
+
+    lba_2 = LinkBufferAction()
+    lba_2.buffer = signal_2
+
+    rife = RIFEExtractor(id="R1", sample_length=100, min_inference_samples=5, persistent=False)
+    rife.add_parent(lba)
+
+    rs = RestService(port=8008)
+
+    # Add buffers
+    ag.add_buffer(signal)
+    ag.add_buffer(signal_2) 
+
+
+    # Add Nodes
+    sm.add_node(lba)
+    sm.add_node(lba_2)
+    sm.add_node(rife)
+    
+    # Add Services
+    ag.add_service(sm)
+    ag.add_service(rs)
+    
+    # Start Agent
+    ag.start_blocking()                                                                  
+
+
+
+
+
 if __name__ == "__main__":
     # Uncomment individual tests for manual debugging
-    test_000()
-    test_001()
-    test_002()
-    test_010()
-    test_020()
+    #test_000()
+    #test_001()
+    #test_002()
+    #test_010()
+    #test_020()
+    test_030()
     
 

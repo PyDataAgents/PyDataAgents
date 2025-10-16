@@ -19,5 +19,7 @@ __pycache__
 # exclude llm models
 /resources/models
 
+pydag/resources
+
 # test html files from plotlify
 /tests/**/plotly_*.html
