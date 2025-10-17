@@ -1,4 +1,5 @@
 import time
+from pydag.adapters.csv.CsvReadAdapter import CsvReadAdapter
 from pydag.buffers.DataType import DataType
 from pydag.buffers.SignalBuffer import SignalBuffer
 from pydag.buffers.signals.Sine import Sine
@@ -51,3 +52,17 @@ def test_010():
     time.sleep(5)
     
     service.stop()
+
+
+def test_020():
+    
+    agent = Agent()
+    agent.id = "G1"
+    
+    adapter = CsvReadAdapter()
+    agent.add_adapter(adapter)
+    
+    service = RestService(id = "S1", port=8001)
+    agent.add_service(service)
+    
+    agent.start_blocking()

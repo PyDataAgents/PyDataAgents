@@ -51,6 +51,12 @@ class BufferRESTAPI:
                     d["size"] = buffer.size()
                 li.append(d)
             return li
+        
+        @router.get("/available")
+        def available_buffers() -> list[str]:            
+            """ returns a list of buffer package names, that can be created            
+            """
+            return ClassUtils.get_subclasses(Buffer) 
                 
         @router.get("/{id}")
         def buffer(id : str = Path(..., description="unique ID of the buffer")) -> dict:

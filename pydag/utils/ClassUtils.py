@@ -207,3 +207,14 @@ class ClassUtils:
                     methods[qualified_name] = func
         
         return methods
+    
+    @staticmethod
+    def get_subclasses(cls):
+        """ returns all subclasses of type `cls` recursively
+            and returns them as set
+        """
+        subclasses = cls.__subclasses__()
+        names = [f"{sub.__module__}.{sub.__qualname__}" for sub in subclasses]
+        for sub in subclasses:
+            names.extend(ClassUtils.get_subclasses(sub))
+        return names

@@ -5,10 +5,15 @@ from loguru import logger
 from fastapi import APIRouter, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
+
+
 from ...agents.Agent import Agent
 from ..Service import Service
 from .BufferRESTAPI import BufferRESTAPI
 from .AgentRESTAPI import AgentRESTAPI
+from .AdapterRESTAPI import AdapterRESTAPI
+from .MappingRESTAPI import MappingRESTAPI
+from .ServiceRESTAPI import ServiceRESTAPI
 
 
 @dataclass
@@ -29,6 +34,9 @@ class RestService(Service):
         self.add_cors()
         self.add_router(AgentRESTAPI.get_api_router(self.agent))
         self.add_router(BufferRESTAPI.get_api_router(self.agent))
+        self.add_router(AdapterRESTAPI.get_api_router(self.agent))
+        self.add_router(MappingRESTAPI.get_api_router(self.agent))
+        self.add_router(ServiceRESTAPI.get_api_router(self.agent))
     
     def add_cors(self):
         """Add CORS middleware to the FastAPI app.
