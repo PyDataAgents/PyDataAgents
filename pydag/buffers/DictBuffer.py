@@ -1,14 +1,22 @@
 from __future__ import annotations
 import copy
 import threading
+from dataclasses import dataclass, field
 
 from ..agents.AgentConfig import AgentConfig
 from .Buffer import Buffer
 from ..agents import Agent
 
+import time
+import datetime
+
+@dataclass
 class DictBuffer(Buffer):
     """buffer that stores its values in a dictionary in a table like fashion, where every key contains a list of data
     """
+    timestamps_enabled : bool = field(default=False, metadata={"description": "Whether timestamps are enabled for this buffer."})
+    timestamps_key  : str = field(default="timestamps", metadata={"description": "The key under which timestamps are stored in the buffer."})
+    timestamps_format   :str = field(default="unix", metadata={"description": "The format of the timestamps. Options are 'unix' for UNIX epoch time in seconds, 'iso' for ISO 8601 format."})
         
     def __post_init__(self):
         super().__post_init__()
@@ -31,14 +39,14 @@ class DictBuffer(Buffer):
                     # fill non-present keys in input elements with None
                     # or fill new keys from input elements inside self.elements with None
                     new_keys = elements.keys()
-                    current_keys = self.elements.keys()
+                    current_keys = self.elements.keys() - {self.timestamps_key} # The timestamps key should not be considered
                     if new_keys == current_keys:
                         # do nothing
                         pass
                     else:
                         # check length of elements and length of self.elements
                         if isinstance(next(iter(elements.values())), list):
-                            ne = len(next(iter(elements.values())))
+                            ne = len(next(iter(elements.values()))) 
                         else:
                             ne = 1
                         if isinstance(next(iter(self.elements.values())), list):
@@ -61,19 +69,20 @@ class DictBuffer(Buffer):
                                 if ne == 1:
                                     elements[missing_current_key] = None
                                 else:
-                                    elements[missing_current_key] = [None] * ne              
+                                    elements[missing_current_key] = [None] * ne                
+                self._fr = True # First Run flag
                 for k, v in elements.items():
                     if k not in self.elements or not isinstance(self.elements[k], list):
                         self.elements[k] = []
-                    if isinstance(v, list):
-                        self.elements[k].extend(v)
-                    else:
-                        self.elements[k].append(v)
-
+                    self._add_data(k, v)
+                        
                     # enforce capacity
                     if self.capacity != AgentConfig.INFINITE_CAPACITY:
                         while len(self.elements[k]) > self.capacity:
                             self.elements[k].pop(0)
+                        if self.timestamps_key in self.elements:
+                            while len(self.elements[self.timestamps_key]) > self.capacity:
+                                self.elements[self.timestamps_key].pop(0)
 
             elif isinstance(elements, list) and all(isinstance(el, dict) for el in elements):
                 for el in elements:
@@ -140,3 +149,39 @@ class DictBuffer(Buffer):
 
         html += "</table>"
         return html
+    
+
+       
+    def _add_data(self, k, v): 
+        _sv = False
+        if isinstance(v, list):
+            self.elements[k].extend(v)
+        else:
+            self.elements[k].append(v)
+            _sv = True
+        # Add timestamps if enabled
+        if self.timestamps_enabled:
+            # only add timestamps once - all key have the same length at this time
+            if self._fr:
+                self._fr = False
+                if self.timestamps_key not in self.elements:
+                    self.elements[self.timestamps_key] = []
+                if _sv:
+                    if self.timestamps_format == "unix":
+                        timestamp = time.time()
+                    elif self.timestamps_format == "iso":
+                        timestamp = datetime.datetime.now().isoformat()
+                    else:
+                        timestamp = time.time()  # default to unix
+                    self.elements[self.timestamps_key].append(timestamp)
+                else:
+                    if self.timestamps_format == "unix":
+                        self.elements[self.timestamps_key].extend([time.time() for i in range(len(v))])
+                    elif self.timestamps_format == "iso":
+                        self.elements[self.timestamps_key].extend([datetime.datetime.now().isoformat() for i in range(len(v))])
+                    else:
+                        self.elements[self.timestamps_key].extend([time.time() for i in range(len(v))])
+
+
+    
+        
