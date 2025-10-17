@@ -3,6 +3,7 @@ from dataclasses import dataclass, field
 
 from loguru import logger
 
+from .StatemachineService import StatemachineService
 from ...services.ServiceException import ServiceException
 from ...nodes.NodeException import NodeException
 from ...nodes.Node import Node
@@ -43,7 +44,7 @@ class SimpleActionObserver(Observer):
             self.service.stop()
 
 @dataclass
-class SimpleActionService(Service):
+class SimpleActionService(StatemachineService):
 
     nodes : list[Action] = field(default_factory=list[Action], metadata={"description": "list of Action nodes to be executed in the statemachine"})
     retry_error_nodes : bool = field(default=False, metadata={"description" : "Statemachine object containing actions and transitions to go through to represent a state machine program flow"})    
