@@ -2,6 +2,7 @@ from __future__ import annotations
 import copy
 import threading
 from dataclasses import dataclass, field
+from typing import Dict, List, Any
 
 from ..agents.AgentConfig import AgentConfig
 from .Buffer import Buffer
@@ -12,15 +13,16 @@ import datetime
 
 @dataclass
 class DictBuffer(Buffer):
-    """buffer that stores its values in a dictionary in a table like fashion, where every key contains a list of data
+    """
+    Buffer that stores its values in a dictionary column-wise (each key -> list).
     """
     timestamps_enabled : bool = field(default=False, metadata={"description": "Whether timestamps are enabled for this buffer."})
-    timestamps_key  : str = field(default="timestamps", metadata={"description": "The key under which timestamps are stored in the buffer."})
-    timestamps_format   :str = field(default="unix", metadata={"description": "The format of the timestamps. Options are 'unix' for UNIX epoch time in seconds, 'iso' for ISO 8601 format."})
+    timestamps_key  : str = field(default="timestamps", metadata={"description": "Key under which timestamps are exposed."})
+    timestamps_format : str = field(default="unix", metadata={"description": "Format: 'unix' (seconds float) or 'iso' (ISO 8601 strings)."})
         
     def __post_init__(self):
         super().__post_init__()
-        self.elements : dict[list] = dict()
+        self.elements : Dict[str, List[Any]] = {}
         self.lock = threading.RLock()
 
     def install(self, agent : Agent = None):
@@ -31,86 +33,129 @@ class DictBuffer(Buffer):
     def uninstall(self, agent : Agent = None):
         super().uninstall(agent)
         self.elements = {}        
-    
-    def push(self, elements: list | dict):        
-        with self.lock:
-            if isinstance(elements, dict):
-                if len(self.elements) > 0:
-                    # fill non-present keys in input elements with None
-                    # or fill new keys from input elements inside self.elements with None
-                    new_keys = elements.keys()
-                    current_keys = self.elements.keys() - {self.timestamps_key} # The timestamps key should not be considered
-                    if new_keys == current_keys:
-                        # do nothing
-                        pass
-                    else:
-                        # check length of elements and length of self.elements
-                        if isinstance(next(iter(elements.values())), list):
-                            ne = len(next(iter(elements.values()))) 
-                        else:
-                            ne = 1
-                        if isinstance(next(iter(self.elements.values())), list):
-                            ce = len(next(iter(self.elements.values())))
-                        else:
-                            ce = 1
-                        
-                        # check for new keys among input elements
-                        missing_new_keys = new_keys - current_keys
-                        if len(missing_new_keys) > 0:
-                            for new_missing_key in missing_new_keys:
-                                if ce == 1:
-                                    self.elements[new_missing_key] = None
-                                else:
-                                    self.elements[new_missing_key] = [None] * ce
-                        # check for missing keys in input elements regarding existing keys in self.elements
-                        missing_current_keys = current_keys - new_keys                        
-                        if len(missing_current_keys) > 0:
-                            for missing_current_key in missing_current_keys:
-                                if ne == 1:
-                                    elements[missing_current_key] = None
-                                else:
-                                    elements[missing_current_key] = [None] * ne                
-                self._fr = True # First Run flag
-                for k, v in elements.items():
-                    if k not in self.elements or not isinstance(self.elements[k], list):
-                        self.elements[k] = []
-                    self._add_data(k, v)
-                        
-                    # enforce capacity
-                    if self.capacity != AgentConfig.INFINITE_CAPACITY:
-                        while len(self.elements[k]) > self.capacity:
-                            self.elements[k].pop(0)
-                        if self.timestamps_key in self.elements:
-                            while len(self.elements[self.timestamps_key]) > self.capacity:
-                                self.elements[self.timestamps_key].pop(0)
 
-            elif isinstance(elements, list) and all(isinstance(el, dict) for el in elements):
+    def push(self, elements: list | dict):
+        """
+        Accepts:
+          - dict: a batch insert; values can be scalars or lists. Mixed scalars + lists:
+              * If any list present, scalars are broadcast to that list length.
+          - list[dict]: sequence of dicts; pushes each individually.
+        Behavior:
+          - Ensures all columns stay length-aligned (excluding the timestamps column).
+          - Adds per-element timestamps if enabled.
+          - Capacity enforced once after insertion.
+        """
+        with self.lock:
+            # Case: list of dicts (iterate)
+            if isinstance(elements, list) and all(isinstance(el, dict) for el in elements):
                 for el in elements:
                     self.push(el)
-        
+                return
+
+            if not isinstance(elements, dict):
+                return  # Unsupported type
+
+            # Prevent user from injecting timestamps column
+            if self.timestamps_key in elements:
+                del elements[self.timestamps_key]
+
+            # Determine batch length (rows being added)
+            list_lengths = [len(v) for v in elements.values() if isinstance(v, list)]
+            if list_lengths:
+                first_len = list_lengths[0]
+                if any(l != first_len for l in list_lengths[1:]):
+                    raise ValueError(f"Inconsistent list lengths in batch insert: {list_lengths}")
+                batch_len = first_len
+            else:
+                batch_len = 1  # scalar-only insert
+
+            # Broadcast scalars if any list present
+            if batch_len > 1:
+                for k, v in list(elements.items()):
+                    if not isinstance(v, list):
+                        elements[k] = [v] * batch_len
+
+            existing_cols = [c for c in self.elements.keys() if c != self.timestamps_key]
+            current_size = self.size()
+
+            # New incoming columns: pad past rows with None
+            for col in elements.keys():
+                if col not in existing_cols:
+                    if current_size > 0:
+                        self.elements[col] = [None] * current_size
+                    else:
+                        self.elements[col] = []
+
+            # Missing columns this batch: create None placeholders
+            for col in existing_cols:
+                if col not in elements:
+                    # Must match batch_len; broadcast for consistency
+                    if batch_len > 1:
+                        elements[col] = [None] * batch_len
+                    else:
+                        elements[col] = None  # single row
+
+            # Insert values
+            for k, v in elements.items():
+                if k not in self.elements:
+                    self.elements[k] = []
+                if isinstance(v, list):
+                    # List of length batch_len
+                    self.elements[k].extend(v)
+                else:
+                    # Scalar (batch_len == 1 case)
+                    self.elements[k].append(v)
+
+            # Timestamps (per element) if enabled
+            if self.timestamps_enabled:
+                if self.timestamps_key not in self.elements:
+                    self.elements[self.timestamps_key] = []
+                if self.timestamps_format == "unix":
+                    if batch_len == 1:
+                        ts_list = [time.time()]
+                    else:
+                        # Per-element distinct timestamps
+                        ts_list = [time.time() for _ in range(batch_len)]
+                elif self.timestamps_format == "iso":
+                    if batch_len == 1:
+                        ts_list = [datetime.datetime.now().isoformat()]
+                    else:
+                        ts_list = [datetime.datetime.now().isoformat() for _ in range(batch_len)]
+                else:
+                    ts_list = [time.time() for _ in range(batch_len)]
+                self.elements[self.timestamps_key].extend(ts_list)
+
+            # Capacity enforcement
+            if self.capacity != AgentConfig.INFINITE_CAPACITY:
+                final_size = self.size()
+                if final_size > self.capacity:
+                    drop = final_size - self.capacity
+                    for col, col_data in self.elements.items():
+                        del col_data[0:drop]
 
     def data(self, n=0, persistent=True) -> dict:
         if n > 0:
-            if len(self.elements.keys()) > 0:
-                d = dict()
-                for k in self.elements.keys():
-                    if len(self.elements[k]) < n:
-                        n = len(self.elements[k])
-                    d[k] = self.elements[k][0:n]
-                    if not persistent:
-                        del self.elements[k][0:n]
-                return d
-            return None
-        else:
-            # always make a deep copy, otherwise a reference will be maintained
-            if len(self.elements) > 0:
-                d = copy.deepcopy(self.elements)
-                if not persistent:
-                    for k in self.elements.keys():
-                        self.elements[k].clear()
-                return d
-            else:
+            if len(self.elements) == 0:
                 return None
+            # Adjust n to available
+            first_col = next(iter(self.elements.values()))
+            if len(first_col) < n:
+                n = len(first_col)
+            d = {}
+            for k, lst in self.elements.items():
+                d[k] = lst[0:n]
+            if not persistent:
+                for k in list(self.elements.keys()):
+                    del self.elements[k][0:n]
+            return d
+        else:
+            if len(self.elements) == 0:
+                return None
+            d = copy.deepcopy(self.elements)
+            if not persistent:
+                for k in self.elements.keys():
+                    self.elements[k].clear()
+            return d
             
     def data_with_meta(self, n = 0, persistent = True) -> dict:        
         d = {}
@@ -119,69 +164,33 @@ class DictBuffer(Buffer):
         return d
 
     def size(self) -> int:
-        if len(self.elements) == 0:
+        # size determined by first non-timestamp column (or timestamps if only column)
+        if not self.elements:
             return 0
-        else:
-            return len(next(iter(self.elements.values())))
+        for k, v in self.elements.items():
+            if k != self.timestamps_key:
+                return len(v)
+        # Fallback: only timestamps present
+        return len(next(iter(self.elements.values())))
         
     def clear(self):
         self.elements.clear()
         
     def to_html(self) -> str:
-        """
-        returns this `Buffer`s data to HTML formatted Table string
-        """        
-        DEFAULT_CELL_STYLE : str = "border: 1px solid black; border-collapse: collapse; padding: 5px";
-        
+        DEFAULT_CELL_STYLE : str = "border: 1px solid black; border-collapse: collapse; padding: 5px"
         data = self.data()
-        # Transpose the data: get rows from column-based structure
-        rows = zip(*data.values())
-        columns = data.keys()
-        # Start HTML table
+        if not data:
+            return "<table></table>"
+        # Exclude timestamps from tabular rows if present
+        display_cols = [k for k in data.keys() if k != self.timestamps_key]
+        if not display_cols:
+            display_cols = list(data.keys())
+        rows = zip(*[data[c] for c in display_cols])
         html = "<table border='1' style='" + DEFAULT_CELL_STYLE + "'>\n"
-
-        # Add header row
-        html += "  <tr>" + "".join(f"<th>{col}</th>" for col in columns) + "</tr>\n"
-
-        # Add data rows
+        html += "  <tr>" + "".join(f"<th>{col}</th>" for col in display_cols) + "</tr>\n"
         for row in rows:
             html += "  <tr>" + "".join(f"<td>{val}</td>" for val in row) + "</tr>\n"
-
         html += "</table>"
         return html
-    
-
-       
-    def _add_data(self, k, v): 
-        _sv = False
-        if isinstance(v, list):
-            self.elements[k].extend(v)
-        else:
-            self.elements[k].append(v)
-            _sv = True
-        # Add timestamps if enabled
-        if self.timestamps_enabled:
-            # only add timestamps once - all key have the same length at this time
-            if self._fr:
-                self._fr = False
-                if self.timestamps_key not in self.elements:
-                    self.elements[self.timestamps_key] = []
-                if _sv:
-                    if self.timestamps_format == "unix":
-                        timestamp = time.time()
-                    elif self.timestamps_format == "iso":
-                        timestamp = datetime.datetime.now().isoformat()
-                    else:
-                        timestamp = time.time()  # default to unix
-                    self.elements[self.timestamps_key].append(timestamp)
-                else:
-                    if self.timestamps_format == "unix":
-                        self.elements[self.timestamps_key].extend([time.time() for i in range(len(v))])
-                    elif self.timestamps_format == "iso":
-                        self.elements[self.timestamps_key].extend([datetime.datetime.now().isoformat() for i in range(len(v))])
-                    else:
-                        self.elements[self.timestamps_key].extend([time.time() for i in range(len(v))])
 
 
-    
-        

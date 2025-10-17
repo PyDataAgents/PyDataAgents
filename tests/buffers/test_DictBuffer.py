@@ -83,6 +83,7 @@ def test_052():
     buf.push({"C1": 3, "C2": 4})      
     buf.push({"C1": [4, 5], "C3": [-1, -2]})    
     buf.push({"C3": [6,7,8], "C4": [8,9,10]})
+    print(buf.data())
     assert all(len(v) == buf.size() for v in buf.data().values()), "Buffer columns have different lengths"
 
 def test_053():  
@@ -93,18 +94,19 @@ def test_053():
     buf.push({"C1": 3, "C2": 4})    
     buf.push({"C1": [4, 5], "C3": [-1, -2]})    
     buf.push({"C3": [6,7,8], "C4": [8,9,10]})
+    print(buf.data())
     assert all(len(v) == 5 for v in buf.data().values()), "Buffer columns have different lengths"
 
 
 if __name__ == "__main__":
-    #test_000()
-    #test_010()
-    #test_011()
-    #test_020()
-    #test_030()
-    #test_040()
-    #test_050()
-    #test_051()
-    #test_052()
+    test_000()
+    test_010()
+    test_011()
+    test_020()
+    test_030()
+    test_040()
+    test_050()
+    test_051()
+    test_052()
     test_053()
        
