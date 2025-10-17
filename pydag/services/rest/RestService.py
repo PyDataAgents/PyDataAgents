@@ -14,6 +14,7 @@ from .AgentRESTAPI import AgentRESTAPI
 from .AdapterRESTAPI import AdapterRESTAPI
 from .MappingRESTAPI import MappingRESTAPI
 from .ServiceRESTAPI import ServiceRESTAPI
+from .NodeRESTAPI import NodeRESTAPI
 
 
 @dataclass
@@ -37,6 +38,7 @@ class RestService(Service):
         self.add_router(AdapterRESTAPI.get_api_router(self.agent))
         self.add_router(MappingRESTAPI.get_api_router(self.agent))
         self.add_router(ServiceRESTAPI.get_api_router(self.agent))
+        self.add_router(NodeRESTAPI.get_api_router(self.agent))
     
     def add_cors(self):
         """Add CORS middleware to the FastAPI app.
