@@ -13,6 +13,11 @@ class BufferNode(Node):
     persistent : bool = field(default=True, metadata={"description": "specifies whether data is removed (False) from parent or not (True)"})
     n : int = field(default=0, metadata={"description": "specifies how much data is retrieved from parent buffer. Default 0 -> all data"})
     
+    # New timestamp-related parameters (DictBuffer-specific)
+    timestamps_enabled: bool = field(default=False, metadata={"description": "Enable timestamps in underlying DictBuffer."})
+    timestamps_key: str = field(default="timestamps", metadata={"description": "Key name for timestamps column."})
+    timestamps_format: str = field(default="unix", metadata={"description": "Timestamp format: 'unix' or 'iso'."})
+
     def __post_init__(self):
         super().__post_init__()
         self.buffer : Buffer = None  # Placeholder for the buffer instance
@@ -32,12 +37,21 @@ class BufferNode(Node):
                 if self.buffer_id in agent.buffer_store:
                     self.buffer = agent.buffer_store[self.buffer_id]
                 else:
-                    self.buffer = DictBuffer(id=self.id + "-BUFFER", capacity=AgentConfig.INFINITE_CAPACITY)
+                    self.buffer = DictBuffer(id=self.id + "-BUFFER", capacity=AgentConfig.INFINITE_CAPACITY,
+                                             timestamps_enabled=self.timestamps_enabled,
+                                             timestamps_key=self.timestamps_key,
+                                             timestamps_format=self.timestamps_format)
                     self.buffer_id = self.buffer.id
                     self.buffer.install(agent)
                     agent.add_buffer(self.buffer)
             else:
-                self.buffer = DictBuffer(id=self.id + "-BUFFER", capacity=AgentConfig.INFINITE_CAPACITY)
+                self.buffer = DictBuffer(
+                    id=self.id + "-BUFFER",
+                    capacity=AgentConfig.INFINITE_CAPACITY,
+                    timestamps_enabled=self.timestamps_enabled,
+                    timestamps_key=self.timestamps_key,
+                    timestamps_format=self.timestamps_format
+                )
                 self.buffer_id = self.buffer.id
                 self.buffer.install(agent)
         
