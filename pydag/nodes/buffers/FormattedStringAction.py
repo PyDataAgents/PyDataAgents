@@ -44,14 +44,17 @@ class FormattedStringAction(BufferNode, Action):
                     if not isinstance(parent.buffer, DictBuffer):
                         raise NodeException("parents' buffers must be of type " + DictBuffer.cname())
                 d = parent.buffer.data(persistent=self.persistent)
-                rows = DataUtils.dict_to_list(d)
-                for row in rows:
-                    td : list = []
-                    s : str = ""
-                    for dk in self.data_keys:
-                        td.append(row[dk])
-                    s = self.template.format(*td)            
-                    self.buffer.push(s)
+                if d is None:
+                    continue
+                else:
+                    rows = DataUtils.dict_to_list(d)
+                    for row in rows:
+                        td : list = []
+                        s : str = ""
+                        for dk in self.data_keys:
+                            td.append(row[dk])
+                        s = self.template.format(*td)            
+                        self.buffer.push(s)
         else:
             raise NodeException(f"number of data_keys({len(self.data_keys)}) and placeholders ({self.template.count('{}')}) in template do not match")
         

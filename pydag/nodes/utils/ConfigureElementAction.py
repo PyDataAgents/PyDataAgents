@@ -21,7 +21,7 @@ class ConfigureElementAction(AgentNode, BufferNode):
     
     option : str = field(init=True, default=None, metadata={"description": "option to configure with new value"})
     element_id : str = field(init=True, default=None, metadata={"description": "id of the element to change the option for"})
-    extract_key : str = field(default=None, metadata={"specifies the key to extract from parent buffer, if no key is specified, the value for the new config option is selected based on buffer data"})
+    extract_key : str = field(default=None, metadata={"description": "specifies the key to extract from parent buffer, if no key is specified, the value for the new config option is selected based on buffer data"})
         
     def install(self, agent : Agent = None):
         AgentNode.install(self, agent)

@@ -7,9 +7,6 @@ class Adapter(AgentElement):
     Abstract base class for `Adapters`. All `Adapters` must inherit from this class.
     """
     
-    ADDRESS = "address"
-    ADDRESSES = "addresses"
-    
     @abstractmethod
     def connect(self) -> bool:
         """

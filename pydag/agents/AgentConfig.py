@@ -24,6 +24,11 @@ class AgentConfig:
     TYPE = "type"
     ID = "id"
     DESCRIPTION = "description"
+    
+    # Adapter Keywords    
+    ADDRESS = "address"
+    ADDRESSES = "addresses"
+    
 
     # Buffer Keywords    
     DATA_TYPE = "data_type"
