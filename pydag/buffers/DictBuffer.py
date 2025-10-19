@@ -3,13 +3,13 @@ import copy
 import threading
 from dataclasses import dataclass, field
 from typing import Dict, List, Any
+import time
+import datetime
 
 from ..agents.AgentConfig import AgentConfig
 from .Buffer import Buffer
 from ..agents import Agent
 
-import time
-import datetime
 
 @dataclass
 class DictBuffer(Buffer):
@@ -54,10 +54,6 @@ class DictBuffer(Buffer):
 
             if not isinstance(elements, dict):
                 return  # Unsupported type
-
-            # Prevent user from injecting timestamps column
-            if self.timestamps_key in elements:
-                del elements[self.timestamps_key]
 
             # Determine batch length (rows being added)
             list_lengths = [len(v) for v in elements.values() if isinstance(v, list)]
@@ -107,23 +103,25 @@ class DictBuffer(Buffer):
                     self.elements[k].append(v)
 
             # Timestamps (per element) if enabled
-            if self.timestamps_enabled:
-                if self.timestamps_key not in self.elements:
-                    self.elements[self.timestamps_key] = []
-                if self.timestamps_format == "unix":
-                    if batch_len == 1:
-                        ts_list = [time.time()]
+            if self.timestamps_enabled:                
+                # Prevent overwriting user defined timestamps
+                if self.timestamps_key not in elements:                    
+                    if self.timestamps_key not in self.elements:
+                        self.elements[self.timestamps_key] = []
+                    if self.timestamps_format == "unix":
+                        if batch_len == 1:
+                            ts_list = [int(time.time() * 1000)]
+                        else:
+                            # Per-element distinct timestamps
+                            ts_list = [int(time.time() * 1000) for _ in range(batch_len)]
+                    elif self.timestamps_format == "iso":
+                        if batch_len == 1:
+                            ts_list = [datetime.datetime.now().isoformat()]
+                        else:
+                            ts_list = [datetime.datetime.now().isoformat() for _ in range(batch_len)]
                     else:
-                        # Per-element distinct timestamps
                         ts_list = [time.time() for _ in range(batch_len)]
-                elif self.timestamps_format == "iso":
-                    if batch_len == 1:
-                        ts_list = [datetime.datetime.now().isoformat()]
-                    else:
-                        ts_list = [datetime.datetime.now().isoformat() for _ in range(batch_len)]
-                else:
-                    ts_list = [time.time() for _ in range(batch_len)]
-                self.elements[self.timestamps_key].extend(ts_list)
+                    self.elements[self.timestamps_key].extend(ts_list)
 
             # Capacity enforcement
             if self.capacity != AgentConfig.INFINITE_CAPACITY:
