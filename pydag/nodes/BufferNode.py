@@ -16,7 +16,7 @@ class BufferNode(Node):
     # New timestamp-related parameters (DictBuffer-specific)
     timestamps_enabled: bool = field(default=False, metadata={"description": "Enable timestamps in underlying DictBuffer."})
     timestamps_key: str = field(default="timestamps", metadata={"description": "Key name for timestamps column."})
-    timestamps_format: str = field(default="iso", metadata={"description": "Timestamp format: 'unix' or 'iso'."})
+    timestamps_format: str = field(default="unix", metadata={"description": "Timestamp format: 'unix' or 'iso'."})
 
     def __post_init__(self):
         super().__post_init__()

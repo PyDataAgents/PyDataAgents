@@ -13,7 +13,7 @@ class ZScore(Transform):
             ar = np.array(data[key])
             std = ar.std()
             if std == 0:
-                print(f"Warning: Standard deviation is zero during Z-Score normalization for key '{key}'. Original Data will be used.")
+                print("Warning: Standard deviation is zero during Z-Score normalization. Original Data will be used.")
                 zscores = ar
             else:
                 zscores : np.ndarray = (ar - ar.mean()) / (ar.std())

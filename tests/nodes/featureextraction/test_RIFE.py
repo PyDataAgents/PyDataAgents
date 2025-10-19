@@ -155,7 +155,7 @@ def test_030():
     lba_2 = LinkBufferAction()
     lba_2.buffer = signal_2
 
-    rife = RIFEExtractor(id="R1", sample_length=100, min_inference_samples=5, persistent=False, timestamps_enabled=True)
+    rife = RIFEExtractor(id="R1", sample_length=100, min_inference_samples=5, persistent=False, )
     rife.add_parent(lba)
 
     rs = RestService(port=8008)
