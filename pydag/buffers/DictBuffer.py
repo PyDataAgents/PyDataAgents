@@ -18,7 +18,7 @@ class DictBuffer(Buffer):
     """
     timestamps_enabled : bool = field(default=False, metadata={"description": "Whether timestamps are enabled for this buffer."})
     timestamps_key  : str = field(default="timestamps", metadata={"description": "Key under which timestamps are exposed."})
-    timestamps_format : str = field(default="unix", metadata={"description": "Format: 'unix' (seconds float) or 'iso' (ISO 8601 strings)."})
+    timestamps_format : str = field(default="iso", metadata={"description": "Format: 'unix' (seconds float) or 'iso' (ISO 8601 strings)."})
         
     def __post_init__(self):
         super().__post_init__()
