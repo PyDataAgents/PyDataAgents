@@ -209,12 +209,18 @@ class ClassUtils:
         return methods
     
     @staticmethod
-    def get_subclasses(cls):
+    def get_subclasses(cls, ignore_abstract : bool = False) -> set:
         """ returns all subclasses of type `cls` recursively
             and returns them as set
         """
         subclasses = cls.__subclasses__()
-        names = [f"{sub.__module__}.{sub.__qualname__}" for sub in subclasses]
+        names = set()
         for sub in subclasses:
-            names.extend(ClassUtils.get_subclasses(sub))
+            #print(sub.__qualname__)
+            if inspect.isabstract(sub) and ignore_abstract:
+                # do nothing
+                pass
+            else:
+                names.update({f"{sub.__module__}"})
+            names.update(ClassUtils.get_subclasses(sub, ignore_abstract))
         return names
