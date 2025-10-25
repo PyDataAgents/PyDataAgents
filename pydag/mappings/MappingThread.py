@@ -16,9 +16,9 @@ if TYPE_CHECKING:
 
 class MappingThread(AgentElement):
     
-    def __post_init__(self, mapping : Mapping):
+    def __post_init__(self):
         super().__post_init__()
-        self.mapping : Mapping = mapping
+        self.mapping : Mapping = None
         self.observer_thread : ObserverThread = None
         
     def start(self, agent : Agent):
