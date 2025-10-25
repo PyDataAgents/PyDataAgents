@@ -57,7 +57,7 @@ class AdapterRESTAPI:
             if adapter is None:
                 return {}
             elif isinstance(adapter, Adapter):
-                return adapter.config_options()
+                return adapter.config_options(with_descriptions=True)
             else:
                 return {}
             
