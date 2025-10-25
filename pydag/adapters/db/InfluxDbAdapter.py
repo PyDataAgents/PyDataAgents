@@ -2,9 +2,9 @@ from dataclasses import dataclass, field
 import influxdb_client
 from influxdb_client.client.write_api import SYNCHRONOUS
 
-from ...adapters.AdapterException import AdapterException
-from ...adapters.ReadAdapter import ReadAdapter
-from ...adapters.WriteAdapter import WriteAdapter
+from ..AdapterException import AdapterException
+from ..ReadAdapter import ReadAdapter
+from ..WriteAdapter import WriteAdapter
 from ...buffers.Buffer import Buffer
 from ...buffers.DictBuffer import DictBuffer
 from ...buffers.ListBuffer import ListBuffer
