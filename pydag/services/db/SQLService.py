@@ -1,4 +1,5 @@
 from dataclasses import dataclass, field
+from typing import Any
 import pyodbc
 from ...services.Service import Service
 
@@ -90,4 +91,17 @@ class SQLService(Service):
         self.cursor.execute(query, tuple(values.values()))
         self.conn.commit()
         return self.cursor.rowcount
+    
+    def execute(self, query: str) -> Any:
+        """Execute a custom SQL query
+
+        Args:
+            query (str): SQL query to execute
+        """
+        self.cursor.execute(query)
+        self.conn.commit()
+        results = self.cursor.fetchall()
+        columns = [column[0] for column in self.cursor.description]
+        data_with_columns = [dict(zip(columns, row)) for row in results]
+        return data_with_columns
 
