@@ -79,7 +79,7 @@ class BufferRESTAPI:
             return buffer.size()
         
         @router.get("/{id}/data")
-        def buffer_data(id : str = Path(..., description="unique ID of the buffer"), n : int = Query(1, description="number of samples to extract from buffer"), persistent : bool = Query(True, description="whether to keep the extracted data in the buffer or remove it on query"), with_meta : bool = Query(False, description="specifies whether to include meta data"), by_rows : bool = Query(False, description="specifies whether to return the data as list of dictionaries instead of a dictionary of lists, defaults to False")) -> dict:
+        def buffer_data(id : str = Path(..., description="unique ID of the buffer"), n : int = Query(1, description="number of samples to extract from buffer"), persistent : bool = Query(True, description="whether to keep the extracted data in the buffer or remove it on query"), with_meta : bool = Query(False, description="specifies whether to include meta data"), by_rows : bool = Query(False, description="specifies whether to return the data as list of dictionaries instead of a dictionary of lists, defaults to False")) -> Union[Dict|List]:
             """
             Returns the data stored in the specified buffer.
             """
