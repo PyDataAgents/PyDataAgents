@@ -60,6 +60,19 @@ class AdapterRESTAPI:
                 return adapter.config_options()
             else:
                 return {}
+            
+        @router.get("/usage")
+        def adapter_usage(type : str = Query(..., description="type of the adapter (fully qualified package name)")) -> str:
+            """
+            Returns the usage information for specified `Adapter` type contained in the doc string of the class.
+            """
+            adapter = ClassUtils.create_instance(type)
+            if adapter is None:
+                return None
+            elif isinstance(adapter, Adapter):
+                return adapter.__doc__.strip()
+            else:
+                return None
                 
         @router.get("/{id}")
         def adapter(id : str = Path(..., description="unique ID of the adapter")) -> dict:
