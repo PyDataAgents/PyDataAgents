@@ -99,8 +99,9 @@ class Color:
     r: int = 0
     g: int = 0
     b: int = 0
+    alpha : float = 1.0
         
-    def set_color(self, r : int = 0, g : int = 0, b : int = 0, hex_color : str = None):
+    def set_color(self, r : int = 0, g : int = 0, b : int = 0, alpha : float = 1.0, hex_color : str = None):
         if hex_color is not None:
             hex_color = hex_color.lstrip("#")
             if len(hex_color) != 6:
@@ -108,12 +109,17 @@ class Color:
             self.r = int(hex_color[0:2], 16)
             self.g = int(hex_color[2:4], 16)
             self.b = int(hex_color[4:6], 16)
+            self.alpha = alpha
         else:
             self.r = r
             self.g = g
             self.b = b
+            self.alpha = self.alpha
         return self
-
+    
+    def ___str__(self) -> str:
+        return f'rgba({self.r}, {self.g}, {self.b}, {self.alpha})'
+            
 # Predefined constants (class attributes)
 Color.RED = Color(255, 0, 0)
 Color.GREEN = Color(0, 255, 0)
@@ -611,6 +617,13 @@ class PlotType(str, Enum):
     def __str__(self) -> str:
         return self.value
     
+class FillType(str, Enum):
+    TO_ZERO_Y = "tozeroy"
+    TO_NEXT_Y = "tonexty"
+    
+    def __str__(self) -> str:
+        return self.value
+    
 class TextPosition(str, Enum):
     TOP = "top"
     BOTTOM = "bottom"
@@ -635,6 +648,8 @@ class Trace:
     z: Union[list[object], list[float], list[int], np.ndarray] = None
     mode: Optional[str] = None
     type: Optional[str] = None
+    fill: Optional[str] = None
+    fillcolor: Optional[str] = None
     name: str = None
     line: Optional[Line] = None
     text: Optional[List[str]] = None
@@ -710,6 +725,14 @@ class Trace:
 
     def set_type(self, t: PlotType):
         self.type = str(t)
+        return self
+    
+    def set_fill(self, fill : FillType):
+        self.fill = str(fill)
+        return self
+    
+    def set_fillcolor(self, fillcolor : Color):
+        self.fillcolor = str(fillcolor)
         return self
 
     def set_name(self, name: str):
