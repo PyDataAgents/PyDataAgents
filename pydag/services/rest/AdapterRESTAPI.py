@@ -1,5 +1,5 @@
 from typing import Any, Dict, List, Union
-from fastapi import APIRouter, Path
+from fastapi import APIRouter, Path, Query
 from pydantic import BaseModel, Field
 
 from pydag.agents.AgentConfig import AgentConfig
@@ -32,21 +32,47 @@ class AdapterRESTAPI:
             return list(agent.adapter_store.keys())
         
         @router.get("/available")
-        def available_adapters() -> list[str]:
+        def available_adapters() -> set[str]:
             """ returns a list of adapter package names, that can be created            
             """
-            return ClassUtils.get_subclasses(Adapter)                        
+            return ClassUtils.get_subclasses(Adapter, True)                        
         
-        @router.get("/config")
-        def adapter_config() -> list:
+        @router.get("/configs")
+        def adapter_configs() -> list:
             """
             Returns a list of all adapter configurations.
             """
             li = list()
-            for buffer in agent.buffer_store.values():
-                d = buffer.config_options()
+            for adapter in agent.buffer_store.values():
+                d = adapter.config_options()
                 li.append(d)
             return li
+        
+        @router.get("/config")
+        def adapter_type(type : str = Query(..., description="type of the adapter (fully qualified package name)")) -> dict:
+            """
+            Returns the configuration options for specified `Adapter` type.
+            """
+            adapter = ClassUtils.create_instance(type)
+            if adapter is None:
+                return {}
+            elif isinstance(adapter, Adapter):
+                return adapter.config_options(with_descriptions=True)
+            else:
+                return {}
+            
+        @router.get("/usage")
+        def adapter_usage(type : str = Query(..., description="type of the adapter (fully qualified package name)")) -> str:
+            """
+            Returns the usage information for specified `Adapter` type contained in the doc string of the class.
+            """
+            adapter = ClassUtils.create_instance(type)
+            if adapter is None:
+                return None
+            elif isinstance(adapter, Adapter):
+                return adapter.__doc__.strip()
+            else:
+                return None
                 
         @router.get("/{id}")
         def adapter(id : str = Path(..., description="unique ID of the adapter")) -> dict:

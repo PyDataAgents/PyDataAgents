@@ -18,11 +18,7 @@ class SampledSine(SampledSignal):
     a : float = field(default=1.0, metadata={"description": "amplitude of sine wave"})
     p : float = field(default=0.0, metadata={"description": "phase angle of sine wave in °"})
     n : float = field(default=0.0, metadata={"description": "noise level of sine wave in respect to ampltidue [0..1]"})
-    
-
-    def __post_init__(self):
-        super().__post_init__()
-        
+            
     def sample(self) -> tuple[float, float]:
         """
         Samples the sine wave signal at the current sample count.
@@ -30,7 +26,7 @@ class SampledSine(SampledSignal):
         Returns:
             tuple: A tuple containing the timestamp and the sampled value.
         """
-        t, v = super().sample()
-        s = MathUtils.sine(t, self.a, self.f, self.p, self.n)        
+        t, et = super().sample()
+        s = MathUtils.sine(et, self.a, self.f, self.p, self.n)        
         return t, s
     

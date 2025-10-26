@@ -19,6 +19,6 @@ class Sawtooth(Signal):
         :param t: The timestamp in milliseconds. If None, uses the current time.
         :return: A tuple containing the elapsed time in seconds and the sine value.
         """
-        t, v = super().value()
-        s = 2 * self.a * (v * self.f - math.floor(0.5 + v * self.f))
+        t, et = super().value()
+        s = 2 * self.a * (et * self.f - math.floor(0.5 + et * self.f))
         return t, float(s)

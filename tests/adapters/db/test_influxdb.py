@@ -1,7 +1,7 @@
 import configparser
 import time
 
-from pydag.adapters.influxdb.InfluxDbAdapter import InfluxDbAdapter
+from pydag.adapters.db.InfluxDbAdapter import InfluxDbAdapter
 from pydag.buffers.SignalBuffer import SignalBuffer
 from pydag.buffers.signals.Sine import Sine
 from pydag.utils.AdapterUtils import AdapterUtils

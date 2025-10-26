@@ -23,6 +23,6 @@ class Sine(Signal):
         :param t: The timestamp in milliseconds. If None, uses the current time.
         :return: A tuple containing the elapsed time in seconds and the sine value.
         """
-        t, v = super().value()
-        s = MathUtils.sine(t, self.a, self.f, self.p, self.n)
+        t, et = super().value()
+        s = MathUtils.sine(et, self.a, self.f, self.p, self.n)
         return t, s
