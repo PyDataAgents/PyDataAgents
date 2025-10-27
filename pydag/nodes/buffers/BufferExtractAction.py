@@ -37,9 +37,11 @@ class BufferExtractAction(BufferNode, Action):
         d = {}
         for key in self.extract_keys:
             bd = self.extract_buffer.data(n=self.n, persistent=self.persistent)
-            if key in bd:
-                d[key] = bd[key]
-        self.buffer.push(d)
+            if bd is not None:
+                if key in bd:
+                    d[key] = bd[key]
+        if len(d) > 0:
+            self.buffer.push(d)
             
                   
                         

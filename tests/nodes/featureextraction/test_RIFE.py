@@ -144,7 +144,7 @@ def test_030():
     ag = Agent()
         
     signal = DatasetBuffer(id="B1", dataset_name="CWRU", sort_by_y=True)    
-    signal_2 = DatasetBuffer(id="B2", dataset_name="CWRU", sort_by_y=True)
+    signal_2 = DatasetBuffer(id="B2", dataset_name="CWRU", sort_by_y=True, timestamps_enabled=True)
     
 
     sm = SimpleActionService() 
@@ -155,7 +155,7 @@ def test_030():
     lba_2 = LinkBufferAction()
     lba_2.buffer = signal_2
 
-    rife = RIFEExtractor(id="R1", sample_length=100, min_inference_samples=5, persistent=False)
+    rife = RIFEExtractor(id="R1", sample_length=100, min_inference_samples=5, persistent=False, timestamps_enabled=True)
     rife.add_parent(lba)
 
     rs = RestService(port=8008)
