@@ -144,7 +144,7 @@ def test_030():
     ag = Agent()
         
     signal = DatasetBuffer(id="B1", dataset_name="CWRU", sort_by_y=True)    
-    signal_2 = DatasetBuffer(id="B2", dataset_name="CWRU", sort_by_y=True)
+    signal_2 = DatasetBuffer(id="B2", dataset_name="CWRU", sort_by_y=True, timestamps_enabled=True)
     
 
     sm = SimpleActionService() 
