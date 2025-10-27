@@ -87,3 +87,24 @@ class MathUtils:
         denominators = [Fraction(x).limit_denominator().denominator for x in floats]
         # Compute LCM of all denominators
         return reduce(lcm, denominators)
+    
+    @staticmethod
+    def sma(data : list, window : int) -> list:
+        """
+        smoothing moving average
+        
+        computes the moving average of a list of numbers
+
+        :param data: list of numbers
+        :param window: size of moving window
+        :return: smoothed list of numbers
+        """
+        if not data or window <= 0:
+            return []
+
+        result = []
+        for i in range(len(data) - window + 1):
+            window = data[i : i + window]      # aktuelles Fenster
+            avg = sum(window) / window       # Mittelwert berechnen
+            result.append(avg)
+        return result

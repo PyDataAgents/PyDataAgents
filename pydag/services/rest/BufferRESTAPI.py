@@ -1,17 +1,20 @@
 from typing import Any, Dict, List, Union
 from fastapi import APIRouter, Path, Query
 from pydantic import BaseModel, Field
+
+from ...buffers.DictBuffer import DictBuffer
+from ...agents.AgentConfig import AgentConfig
+from ...utils.DataUtils import DataUtils
 from ...buffers.Buffer import Buffer
 from ...buffers.DataType import DataType
-from ...buffers.ListBuffer import ListBuffer
 from ...agents.Agent import Agent
 from ...utils.ClassUtils import ClassUtils
 
 ROOT_URL : str = "/api/v1/buffers"
  
 class BufferDefinition(BaseModel):
-    type : str = Field(default=ListBuffer.__module__, title="type of the buffer to create")
-    id : str = Field(default=ListBuffer().unique_id(), title="unique identifer throughout agent application")
+    type : str = Field(default=DictBuffer.__module__, title="type of the buffer to create")
+    id : str = Field(default=DictBuffer().unique_id(), title="unique identifer throughout agent application")
     capacity : int = Field(default=1, title="number of elements that can be stored in buffer before being discarded in FiFo fashion")
     data_type : str = Field(default=DataType.FLOAT.value, title="datatype to expect from buffer elements, can be DataType enum or list of enums")
     initial_values : Any = Field(default=None, title="initial values in buffer")
@@ -51,6 +54,12 @@ class BufferRESTAPI:
                     d["size"] = buffer.size()
                 li.append(d)
             return li
+        
+        @router.get("/available")
+        def available_buffers() -> list[str]:            
+            """ returns a list of buffer package names, that can be created            
+            """
+            return ClassUtils.get_subclasses(Buffer) 
                 
         @router.get("/{id}")
         def buffer(id : str = Path(..., description="unique ID of the buffer")) -> dict:
@@ -70,7 +79,7 @@ class BufferRESTAPI:
             return buffer.size()
         
         @router.get("/{id}/data")
-        def buffer_data(id : str = Path(..., description="unique ID of the buffer"), n : int = Query(1, description="number of samples to extract from buffer"), persistent : bool = Query(True, description="whether to keep the extracted data in the buffer or remove it on query"), with_meta : bool = Query(False, description="specifies whether to include meta data")) -> dict:
+        def buffer_data(id : str = Path(..., description="unique ID of the buffer"), n : int = Query(1, description="number of samples to extract from buffer"), persistent : bool = Query(True, description="whether to keep the extracted data in the buffer or remove it on query"), with_meta : bool = Query(False, description="specifies whether to include meta data"), by_rows : bool = Query(False, description="specifies whether to return the data as list of dictionaries instead of a dictionary of lists, defaults to False")) -> Union[Dict|List]:
             """
             Returns the data stored in the specified buffer.
             """
@@ -78,9 +87,17 @@ class BufferRESTAPI:
             if buffer is None:
                 return {"error": "Buffer not found"}
             if with_meta:
-                return buffer.data_with_meta(n, persistent)
+                mdata = buffer.data_with_meta(n, persistent)
+                data = mdata[AgentConfig.DATA]
+                if by_rows:
+                    mdata[AgentConfig.DATA] = DataUtils.dict_to_list(data)
+                return mdata
             else:
-                return buffer.data(n, persistent)
+                data = buffer.data(n, persistent)
+                if by_rows:
+                    return DataUtils.dict_to_list(data)
+                else:
+                    return data
                
         @router.post("/")
         def add_buffer(buffer_def : BufferDefinition) -> str:

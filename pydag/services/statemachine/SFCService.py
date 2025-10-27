@@ -1,6 +1,8 @@
 from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING
+
+from .StatemachineService import StatemachineService
 from ...mappings.ObserverThread import ObserverThread
 from ...mappings.ThreadType import ThreadType
 from ..Service import Service
@@ -68,7 +70,7 @@ class SFCObserver(Observer):
             self.statemachine.stop()
 
 @dataclass
-class SFCService(Service):
+class SFCService(StatemachineService):
     
     retry_error_nodes : bool = field(default=False, metadata={"description" : "Statemachine object containing actions and transitions to go through to represent a state machine program flow"})    
     start_action_id : str = field(default=None, metadata={"description": "ID of the start node in the statemachine service"})

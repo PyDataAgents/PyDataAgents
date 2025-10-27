@@ -6,6 +6,7 @@ from pydag.agents.Agent import Agent
 from pydag.mappings.Mapping import Mapping
 from pydag.mappings.MappingType import MappingType
 from pydag.mappings.ThreadType import ThreadType
+from pydag.services.rest.RestService import RestService
 from pydag.utils.AdapterUtils import AdapterUtils
 
 
@@ -86,4 +87,43 @@ def test_010():
     agent.add_mapping(mapping)
     
     agent.get_element("N1")
+    
+def test_011():
+    """
+    this test requires the installation of Prosys OPC UA Simulation Server
+    https://prosysopc.com/products/opc-ua-simulation-server/evaluate/
+    """
+    agent = Agent()
+    agent.id = "AG1"
+    
+    buf = ListBuffer()
+    buf.id = "T1"
+    buf.capacity = 1
+    buf.data_type = DataType.FLOAT
+    buf.unit = "°C"
+    
+    agent.add_buffer(buf)
+    
+    opcua = OpcUaAdapter()
+    opcua.id = "A1"
+    opcua.endpoint = "opc.tcp://jh:48010"
+    
+    agent.add_adapter(opcua)
+    
+    mapping = Mapping()
+    mapping.id = "M1"
+    mapping.buffers = buf.to_dict()
+    mapping.addresses = AdapterUtils.address_to_list("ns=4;s=AirConditioner_1.Temperature")
+    mapping.adapter = opcua
+    mapping.mapping_type = MappingType.READ
+    mapping.n = 1
+    mapping.sampling_period = 1000
+    mapping.thread_type = ThreadType.MILLI_SECOND
+    
+    agent.add_mapping(mapping)
+    
+    rs = RestService(port=8002)
+    agent.add_service(rs)
+    
+    agent.start_blocking()
     

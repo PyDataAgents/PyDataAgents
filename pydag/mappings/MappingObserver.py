@@ -11,11 +11,11 @@ class MappingObserver(Observer):
     """abstract base class for mapping observers
     """
     
-    def __post_init__(self, mapping : Mapping):
-        super().__post_init__()
-        self.mapping : Mapping = mapping
+    def __init__(self, mapping : Mapping):
+        super().__init__()
+        self.mapping = mapping
         self.check_mapping()
-    
+        
     def check_mapping(self):
         match self.mapping.mapping_type:
             case MappingType.READ:
