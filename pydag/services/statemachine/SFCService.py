@@ -23,7 +23,7 @@ class SFCObserver(Observer):
     Observer for the SFCService.
     This observer is be used to start the statemachine in a separate thread
     """
-        
+     
     def __init__(self, statemachine: SFCService):
         super().__init__()
         self.statemachine = statemachine
@@ -74,18 +74,12 @@ class SFCService(StatemachineService):
     
     retry_error_nodes : bool = field(default=False, metadata={"description" : "Statemachine object containing actions and transitions to go through to represent a state machine program flow"})    
     start_action_id : str = field(default=None, metadata={"description": "ID of the start node in the statemachine service"})
-    nodes : dict[str, Node] = field(default_factory=dict[str, Node], metadata={"description": "dictionary of nodes in the statemachine service"})
-    thread_type : str = field(default=ThreadType.ONLY_ONCE.value, metadata={"description": "the type of ObserverThread to use: ONLY_ONCE | MILLI_SECONDS | SECONDS | INSTANT | TRIGGERED"})
-    sampling_period : int = field(default=0, metadata={"description": "sampling period that specifies the interval the observer thread should run for"})
-    
+
     def __post_init__(self):
         super().__post_init__()
-        self.observer_thread : ObserverThread = None
-        self.nodes : dict[str, Node] = dict()
         self.actions : dict[str, Action] = dict()
         self.transitions : dict[str, Transition] = dict()
         self.start_action : Action = None
-        self.is_running = False
 
     def install(self, agent : Agent = None):
         super().install(agent)
@@ -126,25 +120,6 @@ class SFCService(StatemachineService):
         observer = SFCObserver(self)
         self.observer_thread.add_observer(observer)
         self.observer_thread.start()
-
-    def stop(self):
-        self.is_running = False
-    
-    def add_node(self, node : Node):
-        self.nodes[node.id] = node
-        
-    def connect_nodes(self):
-        """
-        Connect nodes in the statemachine service.
-        This method should be called after all nodes have been added to the service.
-        """
-        for node in self.nodes.values():
-            for child_id in node.child_ids:
-                if child_id in self.nodes:
-                    if not node.has_child(child_id):
-                        node.add_child(self.nodes[child_id])
-                else:
-                    raise ServiceException(f"Child node with ID {child_id} not found for node {node.id}.")
        
     def set_start_action(self, action : Action):
         """sets the start action and this `Service` `start_action_id` property
@@ -167,16 +142,19 @@ class SFCService(StatemachineService):
             if transition.state == State.ACTIVE:
                 return True
         return False
-    
-    def node_by_id(self, id) -> Node:
-        if id in self.actions:
-            return self.actions[id]
-        if id in self.transitions:
-            return self.transitions[id]
-        return None
-        
+            
     def activate(self, action : Action):
         action.activate()
     
     def deactivate(self, action: Action):
-        action.deactivate()     
+        action.deactivate()
+        
+    def remove_node(self, node_id : str):
+        super().remove_node(node_id)
+        if node_id in self.actions:
+            del self.actions[node_id]        
+        if node_id in self.transitions:
+            del self.transitions[node_id]
+        if node_id == self.start_action_id:
+            self.start_action = None
+            self.start_action_id = None
