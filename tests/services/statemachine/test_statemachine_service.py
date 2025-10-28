@@ -280,7 +280,7 @@ def test_050():
     sm.start_action = n1
     sm.start()
 
-def test_simple_action_service_only_once():
+def test_060():
     """Test that SimpleActionService executes each Action exactly once with ONLY_ONCE thread type."""
     # Arrange
     a1 = StartAction()

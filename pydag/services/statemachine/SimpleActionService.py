@@ -22,17 +22,10 @@ class SimpleActionObserver(Observer):
         self.service = service
 
     def observe(self):
-        for node in self.service.nodes:
+        for node in self.service.nodes.values():
             if isinstance(node, Action):
                 node.activate()
-                if self.service.retry_error_nodes:
-                    try:
-                        node.execute()
-                    except NodeException as e:
-                        logger.error(f"Reattempting Node {node.id} execution: {e}")
-                        node.execute()
-                else:
-                    node.execute()
+                node.execute()
                 node.deactivate()
     
     def unobserve(self):
