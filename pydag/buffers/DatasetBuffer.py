@@ -65,9 +65,9 @@ class DatasetBuffer(DictBuffer):
         elif self.dataset_name == "CNC":
             file_paths = []
             os.chdir(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-            for file in os.listdir(os.path.join("_resources","inputs", "BOSCH_CNC")):
+            for file in os.listdir(os.path.join("resources","inputs", "BOSCH_CNC")):
                 if file.endswith(".csv"):
-                    file_paths.append(os.path.join("_resources","inputs", "BOSCH_CNC", file))
+                    file_paths.append(os.path.join("resources","inputs", "BOSCH_CNC", file))
 
             combined_datasets = pd.DataFrame()
             for file_path in file_paths:
@@ -101,9 +101,9 @@ class DatasetBuffer(DictBuffer):
 
             file_paths = []
             os.chdir(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-            for file in os.listdir(os.path.join("_resources","inputs", "CWRU_Bearing", "Data")):
+            for file in os.listdir(os.path.join("resources","inputs", "CWRU_Bearing", "Data")):
                 if file.endswith(".npz"):
-                    file_paths.append(os.path.join("_resources","inputs", "CWRU_Bearing", "Data", file))
+                    file_paths.append(os.path.join("resources","inputs", "CWRU_Bearing", "Data", file))
 
             combined_datasets = pd.DataFrame()
             for file_path in file_paths:
