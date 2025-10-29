@@ -3,8 +3,6 @@ from sktime.datasets import load_UCR_UEA_dataset
 import numpy as np
 import pandas as pd
 import os
-import sys
-sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))))
 
 from ..agents.Agent import Agent
 from .DictBuffer import DictBuffer
@@ -64,7 +62,7 @@ class DatasetBuffer(DictBuffer):
 
         elif self.dataset_name == "CNC":
             file_paths = []
-            os.chdir(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
+            os.chdir(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
             for file in os.listdir(os.path.join("resources","inputs", "BOSCH_CNC")):
                 if file.endswith(".csv"):
                     file_paths.append(os.path.join("resources","inputs", "BOSCH_CNC", file))
@@ -100,7 +98,7 @@ class DatasetBuffer(DictBuffer):
         elif self.dataset_name == "CWRU":
 
             file_paths = []
-            os.chdir(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
+            os.chdir(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
             for file in os.listdir(os.path.join("resources","inputs", "CWRU_Bearing", "Data")):
                 if file.endswith(".npz"):
                     file_paths.append(os.path.join("resources","inputs", "CWRU_Bearing", "Data", file))
