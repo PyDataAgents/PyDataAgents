@@ -115,3 +115,18 @@ class MathUtils:
         normal_cutoff = f_cutoff / nyquist
         b, a = butter(order, normal_cutoff, btype='low', analog=False)
         return filtfilt(b, a, data)
+    
+    @staticmethod
+    def highpass_filter(data : Union[np.ndarray | list], f_cutoff : float, fs : float, order : int = 1) -> np.ndarray:
+        nyquist = 0.5 * fs
+        normal_cutoff = f_cutoff / nyquist
+        b, a = butter(order, normal_cutoff, btype='high', analog=False)
+        return filtfilt(b, a, data)
+    
+    @staticmethod
+    def bandpass_filter(data : Union[np.ndarray | list], f_low : float, f_high : float, fs : float, order : int = 1) -> np.ndarray:
+        nyquist = 0.5 * fs
+        normal_low_cutoff = f_low / nyquist
+        normal_high_cutoff = f_high / nyquist
+        b, a = butter(order, [normal_low_cutoff, normal_high_cutoff], btype='bandpass', analog=False)
+        return filtfilt(b, a, data)
