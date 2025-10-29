@@ -1,6 +1,7 @@
 import os
 import sys
 
+
 # Ensure project root (directory containing pydag) is on path
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../..'))
 if PROJECT_ROOT not in sys.path:
@@ -9,6 +10,7 @@ from pydag.agents.Agent import Agent
 from pydag.agents.AgentConfig import AgentConfig
 from pydag.agents.YAMLConfig import YAMLConfig
 from pydag.nodes.utils.JoinTransition import JoinTransition
+from pydag.services.statemachine.SFCService import SFCService
 from pydag.services.statemachine.StatemachineService import StatemachineService
 from pydag.nodes.utils.SleepAction import SleepAction
 from pydag.nodes.utils.StartAction import StartAction
@@ -27,7 +29,7 @@ def test_000():
     
     n1 = StartAction()
     
-    sms = StatemachineService()
+    sms = SFCService()
     sms.start_action = n1
     
     sms.add_node(n1)
@@ -67,7 +69,7 @@ def test_010():
     n2.add_child(n3)
     n3.add_child(n4)
     
-    sm = StatemachineService()
+    sm = SFCService()
     sm.start_action = n1
     
     sm.add_node(n1)
@@ -99,7 +101,7 @@ def test_011():
     n5.add_child(n6)
     n6.add_child(n7)
     
-    sm = StatemachineService()
+    sm = SFCService()
     sm.start_action = n1
     
     sm.add_node(n1)
@@ -134,7 +136,7 @@ def test_020():
     n6.add_child(n7)
     n7.add_child(n2)
     
-    sm = StatemachineService()
+    sm = SFCService()
     sm.start_action = n1
     
     sm.add_node(n1)
@@ -166,7 +168,7 @@ def test_021():
     n4.add_child(n6)
     n6.add_child(n2)
     
-    sm = StatemachineService()
+    sm = SFCService()
     sm.start_action = n1
     
     sm.add_node(n1)
@@ -197,7 +199,7 @@ def test_030():
     n4.add_child(n5)
     n5.add_child(n6)
     
-    sm = StatemachineService()
+    sm = SFCService()
     sm.start_action = n1
     
     sm.add_node(n1)
@@ -231,7 +233,7 @@ def test_040():
     n5.add_child(n6)
     n6.add_child(n7)
     
-    sm = StatemachineService()
+    sm = SFCService()
     sm.start_action = n1
     
     sm.add_node(n1)
@@ -268,7 +270,7 @@ def test_050():
     n6.add_child(n7)
     n7.add_child(n8)
     
-    sm = StatemachineService()
+    sm = SFCService()
     sm.add_node(n1)
     sm.add_node(n2)
     sm.add_node(n3)
@@ -293,7 +295,6 @@ def test_060():
     service.add_node(a1)
     service.add_node(a2)
     service.add_node(a3)
-    service.start_action = a1
     # Force ONLY_ONCE execution semantics
     service.thread_type = ThreadType.ONLY_ONCE.value
 
