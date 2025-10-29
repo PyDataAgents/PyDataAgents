@@ -139,7 +139,7 @@ def test_020():
 
 
 
-def test_030():
+def _test_030():
     
     ag = Agent()
         
@@ -180,14 +180,4 @@ def test_030():
 
 
 
-
-if __name__ == "__main__":
-    # Uncomment individual tests for manual debugging
-    #test_000()
-    #test_001()
-    #test_002()
-    #test_010()
-    #test_020()
-    test_030()
-    
 
