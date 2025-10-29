@@ -110,7 +110,7 @@ class MathUtils:
         return result
     
     @staticmethod
-    def butter_worth_filter(data : Union[np.ndarray | list], f_cutoff : float, fs : float, order : int = 1) -> np.ndarray:
+    def lowpass_filter(data : Union[np.ndarray | list], f_cutoff : float, fs : float, order : int = 1) -> np.ndarray:
         nyquist = 0.5 * fs
         normal_cutoff = f_cutoff / nyquist
         b, a = butter(order, normal_cutoff, btype='low', analog=False)
