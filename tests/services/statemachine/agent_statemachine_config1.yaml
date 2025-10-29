@@ -1,15 +1,21 @@
 agent:
-  type: pydatagrabber.grabbers.agent
-  id: agent [5dbad1ca-517c-4a56-9ee7-68c7f685096d]
+  type: pydag.agents.Agent
+  id: Agent [2d53b098-b64f-4ff1-96c1-1174edc421e1]
+  load_on_install: false
 adapters: []
 buffers: []
 mappings: []
 services:
-- type: pydatagrabber.statemachine.StatemachineService
-  id: StatemachineService [c267b002-5364-46ca-ac3d-53ed011668f4]
-  start_node_id: null
+- type: pydag.services.statemachine.SFCService
+  id: SFCService [843d9388-a3c6-4e78-a9a4-4629e3a50eb9]
+  load_on_install: false
   nodes:
-    StartAction [2eeeab1a-89fd-4798-8da8-0f255b545e5d]:
-      type: pydatagrabber.statemachine.actions.StartAction
-      id: StartAction [2eeeab1a-89fd-4798-8da8-0f255b545e5d]
+    StartAction [1ae454af-363d-4f72-9427-298318f48fb1]:
+      type: pydag.nodes.utils.StartAction
+      id: StartAction [1ae454af-363d-4f72-9427-298318f48fb1]
+      load_on_install: false
       child_ids: []
+  thread_type: INSTANT
+  sampling_period: 0
+  retry_error_nodes: false
+  start_action_id: null
