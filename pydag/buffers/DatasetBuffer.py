@@ -43,6 +43,10 @@ class DatasetBuffer(DictBuffer):
         data = {}
         X : pd.DataFrame = None
         y : np.ndarray = None
+        
+        # this directory should contain raw data files depending on the dataset
+        resource_dir : str = os.getcwd() + os.sep + "resources"
+        
         if self.dataset_name == "Blobs":
             from sklearn.datasets import make_blobs
             X, y = make_blobs(
@@ -62,10 +66,9 @@ class DatasetBuffer(DictBuffer):
 
         elif self.dataset_name == "CNC":
             file_paths = []
-            os.chdir(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-            for file in os.listdir(os.path.join("resources","inputs", "BOSCH_CNC")):
+            for file in os.listdir(os.path.join(resource_dir, "inputs", "BOSCH_CNC")):
                 if file.endswith(".csv"):
-                    file_paths.append(os.path.join("resources","inputs", "BOSCH_CNC", file))
+                    file_paths.append(os.path.join(resource_dir, "inputs", "BOSCH_CNC", file))
 
             combined_datasets = pd.DataFrame()
             for file_path in file_paths:
@@ -98,12 +101,12 @@ class DatasetBuffer(DictBuffer):
         elif self.dataset_name == "CWRU":
 
             file_paths = []
-            os.chdir(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-            for file in os.listdir(os.path.join("resources","inputs", "CWRU_Bearing", "Data")):
+            for file in os.listdir(os.path.join(resource_dir, "inputs", "CWRU_Bearing", "Data")):
                 if file.endswith(".npz"):
-                    file_paths.append(os.path.join("resources","inputs", "CWRU_Bearing", "Data", file))
+                    file_paths.append(os.path.join(resource_dir, "inputs", "CWRU_Bearing", "Data", file))
 
             combined_datasets = pd.DataFrame()
+            file_path : str
             for file_path in file_paths:
                 dnpz = np.load(file_path)
                 if not ("DE" in dnpz.files and "FE" in dnpz.files and "BA" in dnpz.files):

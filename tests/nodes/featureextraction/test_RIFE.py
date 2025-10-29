@@ -139,7 +139,7 @@ def test_020():
 
 
 
-def _test_030():
+def test_030():
     
     ag = Agent()
         
@@ -188,6 +188,6 @@ if __name__ == "__main__":
     #test_002()
     #test_010()
     #test_020()
-    _test_030()
+    test_030()
     
 
