@@ -18,7 +18,6 @@ class DictBuffer(Buffer):
     """
     timestamps_enabled : bool = field(default=False, metadata={"description": "Whether timestamps are enabled for this buffer."})
     timestamps_key  : str = field(default="timestamps", metadata={"description": "Key under which timestamps are exposed."})
-    timestamps_format : str = field(default="unix", metadata={"description": "Format: 'unix' (seconds float) or 'iso' (ISO 8601 strings)."})
         
     def __post_init__(self):
         super().__post_init__()
@@ -110,7 +109,6 @@ class DictBuffer(Buffer):
                 if self.timestamps_key not in elements:                    
                     if self.timestamps_key not in self.elements:
                         self.elements[self.timestamps_key] = []
-                        
                     if batch_len == 1:
                         ts_list = [int(time_now * 1000)]
                     else:
