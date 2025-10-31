@@ -3,6 +3,7 @@ from pydag.agents.Agent import Agent
 from pydag.agents.AgentConfig import AgentConfig
 from pydag.agents.YAMLConfig import YAMLConfig
 from pydag.nodes.utils.JoinTransition import JoinTransition
+from pydag.services.statemachine.SFCService import SFCService
 from pydag.services.statemachine.StatemachineService import StatemachineService
 from pydag.nodes.utils.SleepAction import SleepAction
 from pydag.nodes.utils.StartAction import StartAction
@@ -11,6 +12,8 @@ from pydag.nodes.utils.TrueTransition import TrueTransition
 from pydag.nodes.utils.CountAction import CountAction
 from pydag.nodes.utils.CountTransition import CountTransition
 from pydag.nodes.utils.PrintAction import PrintAction
+from pydag.services.statemachine.SimpleActionService import SimpleActionService
+from pydag.mappings.ThreadType import ThreadType
 
 
 def test_000():
@@ -19,7 +22,7 @@ def test_000():
     
     n1 = StartAction()
     
-    sms = StatemachineService()
+    sms = SFCService()
     sms.start_action = n1
     
     sms.add_node(n1)
@@ -59,7 +62,7 @@ def test_010():
     n2.add_child(n3)
     n3.add_child(n4)
     
-    sm = StatemachineService()
+    sm = SFCService()
     sm.start_action = n1
     
     sm.add_node(n1)
@@ -91,7 +94,7 @@ def test_011():
     n5.add_child(n6)
     n6.add_child(n7)
     
-    sm = StatemachineService()
+    sm = SFCService()
     sm.start_action = n1
     
     sm.add_node(n1)
@@ -126,7 +129,7 @@ def test_020():
     n6.add_child(n7)
     n7.add_child(n2)
     
-    sm = StatemachineService()
+    sm = SFCService()
     sm.start_action = n1
     
     sm.add_node(n1)
@@ -158,7 +161,7 @@ def test_021():
     n4.add_child(n6)
     n6.add_child(n2)
     
-    sm = StatemachineService()
+    sm = SFCService()
     sm.start_action = n1
     
     sm.add_node(n1)
@@ -189,7 +192,7 @@ def test_030():
     n4.add_child(n5)
     n5.add_child(n6)
     
-    sm = StatemachineService()
+    sm = SFCService()
     sm.start_action = n1
     
     sm.add_node(n1)
@@ -223,7 +226,7 @@ def test_040():
     n5.add_child(n6)
     n6.add_child(n7)
     
-    sm = StatemachineService()
+    sm = SFCService()
     sm.start_action = n1
     
     sm.add_node(n1)
@@ -260,7 +263,7 @@ def test_050():
     n6.add_child(n7)
     n7.add_child(n8)
     
-    sm = StatemachineService()
+    sm = SFCService()
     sm.add_node(n1)
     sm.add_node(n2)
     sm.add_node(n3)
@@ -271,4 +274,30 @@ def test_050():
     sm.add_node(n8)
     sm.start_action = n1
     sm.start()
+
+def test_060():
+    """Test that SimpleActionService executes each Action exactly once with ONLY_ONCE thread type."""
+    # Arrange
+    a1 = StartAction()
+    a2 = CountAction()
+    a3 = StopAction()
+    a1.add_child(a2)
+    a2.add_child(a3)
+
+    service = SimpleActionService()
+    service.add_node(a1)
+    service.add_node(a2)
+    service.add_node(a3)
+    # Force ONLY_ONCE execution semantics
+    service.thread_type = ThreadType.ONLY_ONCE.value
+
+    # Act
+    service.start()
+    # Wait for thread to finish (ONLY_ONCE runs observer once and returns)
+    service.observer_thread.thread.join(timeout=2)
+
+    # Assert
+    # StartAction inherits Action but doesn't increment count; CountAction increments once
+    assert a2.count == 1, f"Expected CountAction to execute once, executed {a2.count} times"
+    assert service.observer_thread.is_running is False or service.observer_thread.thread.is_alive() is False
     
