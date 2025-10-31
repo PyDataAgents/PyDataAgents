@@ -92,6 +92,7 @@ class DictBuffer(Buffer):
                         elements[col] = None  # single row
 
             # Insert values
+            time_now = time.time()
             for k, v in elements.items():
                 if k not in self.elements:
                     self.elements[k] = []
@@ -101,6 +102,7 @@ class DictBuffer(Buffer):
                 else:
                     # Scalar (batch_len == 1 case)
                     self.elements[k].append(v)
+            time_then = time.time()
 
             # Timestamps (per element) if enabled
             if self.timestamps_enabled:                
@@ -108,19 +110,15 @@ class DictBuffer(Buffer):
                 if self.timestamps_key not in elements:                    
                     if self.timestamps_key not in self.elements:
                         self.elements[self.timestamps_key] = []
-                    if self.timestamps_format == "unix":
-                        if batch_len == 1:
-                            ts_list = [int(time.time() * 1000)]
-                        else:
-                            # Per-element distinct timestamps
-                            ts_list = [int(time.time() * 1000) for _ in range(batch_len)]
-                    elif self.timestamps_format == "iso":
-                        if batch_len == 1:
-                            ts_list = [datetime.datetime.now().isoformat()]
-                        else:
-                            ts_list = [datetime.datetime.now().isoformat() for _ in range(batch_len)]
+                        
+                    if batch_len == 1:
+                        ts_list = [int(time_now * 1000)]
                     else:
-                        ts_list = [time.time() for _ in range(batch_len)]
+                        # Per-element distinct timestamps
+                        ts_list = []
+                        interval = (time_then - time_now) / batch_len
+                        ts_list = [int(time_now * 1000 + interval * i) for i in range(batch_len)]
+                
                     self.elements[self.timestamps_key].extend(ts_list)
 
             # Capacity enforcement
