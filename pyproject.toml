@@ -65,7 +65,8 @@ dependencies = [
     "cadquery",
     "cq-editor",
     "matplotlib",
-    "psutil"
+    "psutil",
+    "librosa"
 ]
 
 [tool.setuptools.packages.find]

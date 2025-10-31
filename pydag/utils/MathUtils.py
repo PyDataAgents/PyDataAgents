@@ -3,9 +3,7 @@ from functools import reduce
 from math import pi, sin
 import math
 import random
-from typing import Tuple, Union
-from scipy.signal import butter, filtfilt
-import numpy as np
+from typing import Tuple
 
 
 class MathUtils:
@@ -87,46 +85,3 @@ class MathUtils:
         denominators = [Fraction(x).limit_denominator().denominator for x in floats]
         # Compute LCM of all denominators
         return reduce(lcm, denominators)
-    
-    @staticmethod
-    def sma(data : list, window : int) -> list:
-        """
-        smoothing moving average
-        
-        computes the moving average of a list of numbers
-
-        :param data: list of numbers
-        :param window: size of moving window
-        :return: smoothed list of numbers
-        """
-        if not data or window <= 0:
-            return []
-
-        result = []
-        for i in range(len(data) - window + 1):
-            window = data[i : i + window]      # aktuelles Fenster
-            avg = sum(window) / window       # Mittelwert berechnen
-            result.append(avg)
-        return result
-    
-    @staticmethod
-    def lowpass_filter(data : Union[np.ndarray | list], f_cutoff : float, fs : float, order : int = 1) -> np.ndarray:
-        nyquist = 0.5 * fs
-        normal_cutoff = f_cutoff / nyquist
-        b, a = butter(order, normal_cutoff, btype='low', analog=False)
-        return filtfilt(b, a, data)
-    
-    @staticmethod
-    def highpass_filter(data : Union[np.ndarray | list], f_cutoff : float, fs : float, order : int = 1) -> np.ndarray:
-        nyquist = 0.5 * fs
-        normal_cutoff = f_cutoff / nyquist
-        b, a = butter(order, normal_cutoff, btype='high', analog=False)
-        return filtfilt(b, a, data)
-    
-    @staticmethod
-    def bandpass_filter(data : Union[np.ndarray | list], f_low : float, f_high : float, fs : float, order : int = 1) -> np.ndarray:
-        nyquist = 0.5 * fs
-        normal_low_cutoff = f_low / nyquist
-        normal_high_cutoff = f_high / nyquist
-        b, a = butter(order, [normal_low_cutoff, normal_high_cutoff], btype='bandpass', analog=False)
-        return filtfilt(b, a, data)
