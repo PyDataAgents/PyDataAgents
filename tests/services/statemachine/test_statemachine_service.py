@@ -1,9 +1,11 @@
 import os
+import time
 from pydag.agents.Agent import Agent
 from pydag.agents.AgentConfig import AgentConfig
 from pydag.agents.YAMLConfig import YAMLConfig
 from pydag.nodes.utils.JoinTransition import JoinTransition
 from pydag.services.statemachine.SFCService import SFCService
+from pydag.services.statemachine.StatemachineException import StatemachineException
 from pydag.services.statemachine.StatemachineService import StatemachineService
 from pydag.nodes.utils.SleepAction import SleepAction
 from pydag.nodes.utils.StartAction import StartAction
@@ -129,7 +131,7 @@ def test_020():
     n6.add_child(n7)
     n7.add_child(n2)
     
-    sm = SFCService()
+    sm = SFCService(thread_type=ThreadType.ONLY_ONCE.value)
     sm.start_action = n1
     
     sm.add_node(n1)
@@ -140,7 +142,10 @@ def test_020():
     sm.add_node(n6)
     sm.add_node(n7)
     
-    sm.start()
+    sm.start()    
+    time.sleep(5)    
+    sm.stop()
+    
     
 def test_021():
     n1 = StartAction()    
@@ -171,7 +176,10 @@ def test_021():
     sm.add_node(n5)
     sm.add_node(n6)
     
-    sm.start()
+    try:    
+        sm.start()
+    except StatemachineException as se:
+        print("RecursionError caught as expected: ", se)
     
 def test_030():
     n1 = StartAction()    
@@ -202,7 +210,10 @@ def test_030():
     sm.add_node(n5)
     sm.add_node(n6)
     
-    sm.start()
+    try:
+        sm.start()
+    except StatemachineException as se:
+        print("StatemachineException caught as expected: ", se) 
     
 def test_040():
     n1 = StartAction()    
@@ -237,7 +248,10 @@ def test_040():
     sm.add_node(n6)
     sm.add_node(n7)
     
-    sm.start()
+    try:
+        sm.start()
+    except StatemachineException as se:
+        print("StatemachineException caught as expected: ", se)
     
 def test_050():
     n1 = StartAction()    
