@@ -98,6 +98,14 @@ def test_053():
     print(buf.data())
     assert all(len(v) == 5 for v in buf.data().values()), "Buffer columns have different lengths"
 
+def test_060():
+    buf = DictBuffer(capacity=10, index_enabled=True)
+    buf.push({"C1": 1, "C2": 2})
+    buf.push({"C1": 2, "C2": 3})
+    buf.push({"C1": 3, "C2": 4})
+    print(buf.data())    
+    buf.push({"C1": [4, 5], "C2": [-1, -2]})
+    print(buf.data())
 
 if __name__ == "__main__":
     test_000()
