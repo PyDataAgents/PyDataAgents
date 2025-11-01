@@ -3,6 +3,7 @@ from dataclasses import dataclass, field
 
 from loguru import logger
 
+from ...nodes.Transition import Transition
 from .StatemachineService import StatemachineService
 from ...mappings.Observer import Observer
 from ...mappings.ObserverThread import ObserverThread
@@ -10,9 +11,9 @@ from ...mappings.ThreadType import ThreadType
 from ...nodes.Action import Action
 
 
-class SimpleActionObserver(Observer):
+class SimpleStatemachineObserver(Observer):
 
-    def __init__(self, service: SimpleActionService):
+    def __init__(self, service: SimpleStatemachine):
         super().__init__()
         self.service = service
 
@@ -22,6 +23,11 @@ class SimpleActionObserver(Observer):
                 node.activate()
                 node.execute()
                 node.deactivate()
+            if isinstance(node, Transition):
+                if node.check():
+                    continue
+                else:
+                    break
     
     def unobserve(self):
         """
@@ -32,10 +38,10 @@ class SimpleActionObserver(Observer):
             self.service.stop()
 
 @dataclass
-class SimpleActionService(StatemachineService):
+class SimpleStatemachine(StatemachineService):
           
     def start(self):
         self.observer_thread = ObserverThread(id=ObserverThread.unique_id(), thread_type=ThreadType[self.thread_type])
-        observer = SimpleActionObserver(self)
+        observer = SimpleStatemachineObserver(self)
         self.observer_thread.add_observer(observer)
         self.observer_thread.start()  

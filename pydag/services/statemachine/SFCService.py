@@ -2,10 +2,10 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING
 
+from ...nodes.utils.StopAction import StopAction
 from .StatemachineService import StatemachineService
 from ...mappings.ObserverThread import ObserverThread
 from ...mappings.ThreadType import ThreadType
-from ..Service import Service
 from ..ServiceException import ServiceException
 from ...nodes.Action import Action
 from ...nodes.Node import Node
@@ -59,7 +59,7 @@ class SFCObserver(Observer):
                     
                     # deactivate the transition itself
                     transition.state = State.INACTIVE
-        self.statemachine.is_running = False
+        self.statemachine.stop()
     
     def unobserve(self):
         """
@@ -108,7 +108,10 @@ class SFCService(StatemachineService):
                     self.assemble(node2)
             else:
                 if len(self.transitions) == 0:
-                    raise StatemachineException("this " + self.name() + " network causes a " + RecursionError.__name__ + "! Make sure to break your loop Statemachine Network with a " + Transition.cname() + " or change the network layout.")
+                    # check for stop action
+                    last_node = next(reversed(self.nodes.values()))
+                    if not isinstance(last_node, StopAction):
+                        raise StatemachineException("this " + self.name() + " network causes a " + RecursionError.__name__ + "! Make sure to break your loop " + self.cname() +  " Network with a " + Transition.cname() + ", include a " + StopAction.cname() + " at the end of your network or change the network layout.")
         
     def start(self):
         if self.start_action is None:
