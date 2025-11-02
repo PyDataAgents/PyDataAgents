@@ -134,6 +134,8 @@ class DictBuffer(Buffer):
                         index_list = []
                         index_list = [self.index + i for i in range(batch_len)]
                     self.elements[self.index_key].extend(index_list)
+                # increment index count
+                self.index += batch_len
 
             # Capacity enforcement
             if self.capacity != AgentConfig.INFINITE_CAPACITY:
