@@ -1,20 +1,16 @@
 import time
+import matplotlib.pyplot as plt
 
 from pydag.nodes.featureextraction.RIFEExtractor import RIFEExtractor
 from pydag.buffers.DatasetBuffer import DatasetBuffer
 from pydag.nodes.buffers.LinkBufferAction import LinkBufferAction
 from pydag.buffers.signals.Sine import Sine
 from pydag.buffers.SignalBuffer import SignalBuffer
-import numpy as np
-import matplotlib.pyplot as plt
-from pydag.nodes.dimreduction.PCADimReduction import PCADimReduction
 from pydag.agents.Agent import Agent
-from pydag.services.statemachine.StatemachineService import StatemachineService
 from pydag.services.statemachine.SimpleActionService import SimpleActionService
 from pydag.services.rest.RestService import RestService
 
 # The tests mirror those in test_PSD but adapted for 256 RIFE features and key naming (-feature-rife-<i>)
-
 
 def test_000():
     # Single streaming sine signal; expect exactly 256 features when data available.
