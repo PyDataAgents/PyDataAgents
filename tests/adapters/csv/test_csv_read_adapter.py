@@ -51,7 +51,7 @@ def test_020():
     a1.id = "CSV1"
     a1.mode = CSVReadMode.LOOP.value
     a1.auto_detect = True
-    a1.file_path = "tests\\data\\csv\\ballscrew_drive_data.csv"
+    a1.file_path = os.path.dirname(__file__) + os.sep + "ballscrew_drive_data.csv"
     a1.force_numeric = True
     
     buffers : dict[str, Buffer] = buf1.to_dict()
