@@ -35,9 +35,11 @@ class SerialAdapter(ByteStreamAdapter):
         return True        
         
     def _send(self, data: bytes):
-        if self.send_bytes is not None:
-            self.serial.write(self.send_bytes)
+        if self.before_send_bytes is not None:
+            self.serial.write(self.before_send_bytes)
         self.serial.write(data)
+        if self.after_send_bytes is not None:
+            self.serial.write(self.after_send_bytes)
     
     def _receive(self, n: int) -> bytes:
         if self.before_receive_bytes is not None:

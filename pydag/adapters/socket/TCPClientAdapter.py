@@ -29,9 +29,11 @@ class TCPClientAdapter(ByteStreamAdapter):
         """
         method to send bytes
         """
-        if self.send_bytes is not None:
-            self.socket.sendall(self.send_bytes)
+        if self.before_send_bytes is not None:
+            self.socket.sendall(self.before_send_bytes)
         self.socket.sendall(data)
+        if self.after_send_bytes is not None:
+            self.socket.sendall(self.after_send_bytes)
         
     def _receive(self, n : int) -> bytes:
         """
