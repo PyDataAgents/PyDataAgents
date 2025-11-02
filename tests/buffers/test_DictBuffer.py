@@ -99,23 +99,14 @@ def test_053():
     assert all(len(v) == 5 for v in buf.data().values()), "Buffer columns have different lengths"
 
 def test_060():
+    # test index column
     buf = DictBuffer(capacity=10, index_enabled=True)
     buf.push({"C1": 1, "C2": 2})
     buf.push({"C1": 2, "C2": 3})
     buf.push({"C1": 3, "C2": 4})
     print(buf.data())    
     buf.push({"C1": [4, 5], "C2": [-1, -2]})
-    print(buf.data())
-
-if __name__ == "__main__":
-    test_000()
-    test_010()
-    test_011()
-    test_020()
-    test_030()
-    test_040()
-    test_050()
-    test_051()
-    test_052()
-    test_053()
-       
+    print(buf.data(persistent=True))
+    assert all(len(v) == buf.size() for v in buf.data().values()), "Buffer columns have different lengths"
+    assert len(buf.data()[buf.index_key]) == 5, "Index column does not match expected sequence"
+    assert buf.data()[buf.index_key] == [0, 1, 2, 3, 4], "Index column does not match expected sequence"
