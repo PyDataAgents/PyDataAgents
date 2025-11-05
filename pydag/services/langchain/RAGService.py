@@ -131,7 +131,7 @@ class RAGService(LLMService):
         self.embedding_store.add_documents(split_docs)
     
     def chat(self, question : str) -> str:
-        #self.LOGGER.debug(self.retriever.get_relevant_documents(question))
+        #logger.debug(self.retriever.get_relevant_documents(question))
         if self.retain_messages:        
             ai_message = self.langchain.invoke({"question" : question}, config={"configurable" : {"session_id": "DEFAULT_SESSION"}})
         else:

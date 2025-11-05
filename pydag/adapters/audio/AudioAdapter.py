@@ -34,7 +34,7 @@ class AudioAdapter(SubscribeAdapter):
 
     def subscribe(self, buffers : dict[str, Buffer], addresses : list[str] = None, sampling_period : int = 0, n : int = 1024):
         self.subscribing = True
-        buf = buffers.values()[0]
+        buf = next(iter(buffers.values()))
 
         def audio_callback(indata : np.ndarray, frames, time, status):
             if status:

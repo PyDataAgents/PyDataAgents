@@ -1,12 +1,8 @@
-from typing import Any, Dict, List, Union
-from fastapi import APIRouter, Path
+from fastapi import APIRouter, Path, Query
 from pydantic import BaseModel, Field
 
 from ...mappings.ThreadType import ThreadType
 from ...mappings.Mapping import Mapping
-from ...agents.AgentConfig import AgentConfig
-from ...services.Service import Service
-from ...adapters.Adapter import Adapter
 from ...agents.Agent import Agent
 from ...utils.ClassUtils import ClassUtils
 
@@ -26,8 +22,7 @@ class MappingDefinition(BaseModel):
     auto_start : bool = Field(default=True, title="specifies whether to start the mapping with agent start")
         
 class MappingRESTAPI:
-    """
-    REST API for `Mapping`s using FastAPI.
+    """ REST API for `Mapping`s using FastAPI.
     Provides endpoints to interact with the mapping instances.
     """
    
@@ -50,7 +45,20 @@ class MappingRESTAPI:
             return ClassUtils.get_subclasses(Mapping)                        
         
         @router.get("/config")
-        def mapping_config() -> list:
+        def mapping_type(type : str = Query(..., description="specifies the fully qualified name of the mapping type")) -> dict:
+            """
+            Returns the specifieds buffer default configuration.
+            """
+            mapping = ClassUtils.create_instance(type)
+            if mapping is None:
+                return {}
+            elif isinstance(mapping, Mapping):
+                return mapping.config_options(with_descriptions=True)
+            else:
+                return {}
+        
+        @router.get("/configs")
+        def mapping_configs() -> list:
             """
             Returns a list of all mapping configurations.
             """
@@ -59,6 +67,19 @@ class MappingRESTAPI:
                 d = mapping_thread.mapping.config_options()
                 li.append(d)
             return li
+        
+        @router.get("/usage")
+        def mapping_usage(type : str = Query(..., description="type of the mapping (fully qualified package name)")) -> str:
+            """
+            Returns the usage information for specified `Mapping` type contained in the doc string of the class.
+            """
+            mapping = ClassUtils.create_instance(type)
+            if mapping is None:
+                return None
+            elif isinstance(mapping, Mapping):
+                return mapping.__doc__.strip()
+            else:
+                return None
                 
         @router.get("/{id}")
         def mapping(id : str = Path(..., description="unique ID of the mapping")) -> dict:

@@ -1,29 +1,28 @@
-from typing import Any, Dict, List, Union
-from fastapi import APIRouter, Path
+from typing import Any, Dict
+from fastapi import APIRouter, Path, Query
 from pydantic import BaseModel, Field
 
 from ...agents.AgentConfig import AgentConfig
 from ...services.Service import Service
-from ...adapters.Adapter import Adapter
 from ...agents.Agent import Agent
 from ...utils.ClassUtils import ClassUtils
 
 ROOT_URL : str = "/api/v1/services"
- 
+
 class ServiceDefinition(BaseModel):
     definition : Dict[str, Any] = Field(default=None, title="service config")
-        
+      
 class ServiceRESTAPI:
     """
     REST API for `Services`s using FastAPI.
     Provides endpoints to interact with the service instances.
     """
-   
+
     @staticmethod
     def get_api_router(agent : Agent) -> APIRouter:
-        
+
         router = APIRouter(prefix=ROOT_URL, tags=[Service.cname()],)
-        
+
         @router.get("/")
         def services() -> list[str]:
             """
@@ -37,8 +36,8 @@ class ServiceRESTAPI:
             """
             return ClassUtils.get_subclasses(Service)                        
         
-        @router.get("/config")
-        def service_config() -> list:
+        @router.get("/configs")
+        def service_configs() -> list:
             """
             Returns a list of all service configurations.
             """
@@ -47,6 +46,19 @@ class ServiceRESTAPI:
                 d = service.config_options()
                 li.append(d)
             return li
+        
+        @router.get("/usage")
+        def service_usage(type : str = Query(..., description="type of the service (fully qualified package name)")) -> str:
+            """
+            Returns the usage information for specified `Service` type contained in the doc string of the class.
+            """
+            service = ClassUtils.create_instance(type)
+            if service is None:
+                return None
+            elif isinstance(service, Service):
+                return service.__doc__.strip()
+            else:
+                return None
                 
         @router.get("/{id}")
         def service(id : str = Path(..., description="unique ID of the service")) -> dict:

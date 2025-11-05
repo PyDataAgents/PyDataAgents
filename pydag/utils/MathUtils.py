@@ -1,9 +1,10 @@
 from fractions import Fraction
 from functools import reduce
-from math import pi, sin
 import math
 import random
 from typing import Tuple
+from math import pi, sin
+import numpy as np
 
 
 class MathUtils:

@@ -1,6 +1,7 @@
 from dataclasses import dataclass, field
 import threading
 import websocket
+from loguru import logger
 
 from ...adapters.AdapterException import AdapterException
 from ...buffers.Buffer import Buffer
@@ -16,7 +17,7 @@ class WebSocketAdapter(WriteAdapter, SubscribeAdapter):
     url : str = field(default=None, metadata={"description":"socket url, e.g. wss://localhost:10001"})
     
     def __post_init__(self):
-        super().__post_init__
+        super().__post_init__()
         self.socket : websocket.WebSocketApp = None
         self.thread : threading.Thread = None
         
@@ -72,7 +73,7 @@ class WebSocketAdapter(WriteAdapter, SubscribeAdapter):
                 else:
                     raise AdapterException("No " + Buffer.cname() + " with id=" + i + " was found")
             else:
-                self.LOGGER.debug("Socket message does not conform with schema {id: <BUFFER_ID>, data: [...]}: " + message)
+                logger.debug("Socket message does not conform with schema {id: <BUFFER_ID>, data: [...]}: " + message)
         
         self.socket.on_message = on_message        
     

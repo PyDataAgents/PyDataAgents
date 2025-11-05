@@ -1,6 +1,10 @@
 import time
 from pydag.adapters.csv.CsvReadAdapter import CsvReadAdapter
+from pydag.adapters.csv.CsvWriteAdapter import CsvWriteAdapter
+from pydag.adapters.db.SQLAdapter import SQLAdapter
 from pydag.buffers.DataType import DataType
+from pydag.buffers.DictBuffer import DictBuffer
+from pydag.buffers.ListBuffer import ListBuffer
 from pydag.buffers.SignalBuffer import SignalBuffer
 from pydag.buffers.signals.Sine import Sine
 from pydag.agents.Agent import Agent
@@ -59,8 +63,20 @@ def test_020():
     agent = Agent()
     agent.id = "G1"
     
-    adapter = CsvReadAdapter()
-    agent.add_adapter(adapter)
+    b1 = ListBuffer()
+    agent.add_buffer(b1)
+    
+    b2 = DictBuffer()
+    agent.add_buffer(b2)
+    
+    adapter1 = CsvReadAdapter()
+    agent.add_adapter(adapter1)
+    
+    adapter2 = CsvWriteAdapter()
+    agent.add_adapter(adapter2)    
+    
+    adapter3 = SQLAdapter()
+    agent.add_adapter(adapter3)
     
     service = RestService(id = "S1", port=8001)
     agent.add_service(service)

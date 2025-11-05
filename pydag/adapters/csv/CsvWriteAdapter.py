@@ -1,6 +1,8 @@
 import csv
 from dataclasses import dataclass, field
 import os
+from loguru import logger
+
 from ...adapters.AdapterException import AdapterException
 from ...adapters.WriteAdapter import WriteAdapter
 from ...buffers.Buffer import Buffer
@@ -28,8 +30,11 @@ class CsvWriteAdapter(WriteAdapter):
         self.rows : int = 0
         
     def connect(self) -> bool:
+        if self.folder is None:
+            logger.error("folder for " + self.cname() + " was not specified")
+            return False
         if FileUtils.exists_folder(self.folder):
-            self.csv_file = open(self._new_file_name(), "w")
+            self.csv_file = open(self._new_file_name(), "w", encoding="utf-8")
             self.csv_writer = csv.writer(self.csv_file, delimiter=self.delimiter, lineterminator="\n")
             return True
         else:
@@ -64,9 +69,9 @@ class CsvWriteAdapter(WriteAdapter):
                         if self.rows > self.max_samples:
                             self.rows = 0
                             self.csv_file.close()
-                            self.csv_file = open(self._new_file_name(), "w")
+                            self.csv_file = open(self._new_file_name(), "w", encoding="utf-8")
                             self.csv_writer = csv.writer(self.csv_file, delimiter=self.delimiter, lineterminator="\n")
-                            self.LOGGER.debug("created new csv file in " + self.folder)
+                            logger.debug("created new csv file in " + self.folder)
                     else:
                         raise AdapterException("write_to_sink is not defined for n > 1")
             else:
@@ -96,9 +101,9 @@ class CsvWriteAdapter(WriteAdapter):
                         if self.rows > self.max_samples:
                             self.rows = 0
                             self.csv_file.close()
-                            self.csv_file = open(self._new_file_name(), "w")
+                            self.csv_file = open(self._new_file_name(), "w", encoding="utf-8")
                             self.csv_writer = csv.writer(self.csv_file, delimiter=self.delimiter, lineterminator="\n")
-                            self.LOGGER.debug("created new csv file in " + self.folder)
+                            logger.debug("created new csv file in " + self.folder)
                     else:
                         raise AdapterException("write_to_sink is not defined for n > 1") 
                     
