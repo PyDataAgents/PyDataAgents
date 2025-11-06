@@ -10,6 +10,11 @@ Examples:<br>
 - INFLUXDB
 ![pydataagents_sources_and_sinks.png](docs/pydataagents_sources_and_sinks.png)
 
+
+Data Agents are autonomous Software Roboters for the purpose of Data Transformation, Data Visualization, Prozess Supervision or any other intelligent interaction with industrial data systems like ERP Systems which can be connected via an openly accessible API.
+
+Data Agents are mainly running autonomously in the background for the purpose of automation. And for the purpose of making things more efficient. That is what physical Robots are for and that is what intelligent software robots are for.
+
 ## Supported Sources / Sinks
 | Name  | Source | Sink | Action |
 |-------|--------|------|--------|
