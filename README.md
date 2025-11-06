@@ -15,6 +15,9 @@ Data Agents are autonomous Software Roboters for the purpose of Data Transformat
 
 Data Agents are mainly running autonomously in the background for the purpose of automation. And for the purpose of making things more efficient. That is what physical Robots are for and that is what intelligent software robots are for.
 
+## How to contribute?
+Have a look at [Contribute.md](PyDataAgents/PyDataAgents/Contribute.md)
+
 ## Supported Sources / Sinks
 | Name  | Source | Sink | Action |
 |-------|--------|------|--------|
