@@ -312,9 +312,5 @@ Project Dependencies can be found in [pyproject.toml](pyproject.toml)
 ## Examples and Testing
 All Unittests and Examples are found in [tests](tests/)
 
-## Naming Rules for Contributions, Issues, Branches 
-
-issues always with label
-branch names start with feature_, bug_, ...
-
-
+## License
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details
