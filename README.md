@@ -22,6 +22,58 @@ Have a look at [Contribute.md](Contribute.md)
 | Name  | Source | Sink | Action |
 |-------|--------|------|--------|
 | OPCUA Client | &check; | &check; | &cross; |
+| OPCUA Server | &cross; | &cross; | &cross; |
+| ADS / Beckhoff | &check; | &check; | &cross; |
+| System Audio | &check; | &cross; | &cross; |
+| CSV | &check; | &check; | &check; |
+| JSON | &cross; | &cross; | &check; |
+| Excel | &cross; | &cross; | &check; |
+| Document Text | &check; | &cross; | &cross; |
+| Docx / Word | &cross; | &check; | &check; |
+| NPZ / numpy | &check; | &cross; | &cross; |
+| SQL | &check; | &check; | &check; |
+| Influx DB | &check; | &check; | &cross; |
+| Solid PDM | &hourglass; | &cross; | &cross; |
+| HTTP | &check; | &check; | &check; |
+| MQTT | &check; | &check; | &cross; |
+| S7 / Siemens | &check; | &check; | &cross; |
+| TCP/IP Client | &check; | &check; | &cross; |
+| TCP/IP Server | &hourglass; | &hourglass; | &cross; |
+| UDP Client | &hourglass; | &hourglass; | &cross; |
+| UDP Server | &hourglass; | &hourglass; | &cross; |
+| Serial Client | &check; | &check; | &cross; |
+| ifm VSE Client | &hourglass; | &cross; | &cross; |
+| Websocket | &check; | &check; | &cross; |
+| Webcam Client | &check; | &cross; | &cross; |
+| Browser Automation | &cross; | &cross; | &check; |
+| Plotly | &cross; | &cross; | &check; |
+| Browser Automation | &cross; | &cross; | &check; |
+| ICAL / Calendar | &cross; | &cross; | &check; |
+| Python Script | &cross; | &cross; | &check; |
+
+## Supported Services
+| Name  | Status | Description |
+|-------|--------|-------------|
+| RAG Chat | &check; |         |
+| LLM Chat | &check; |         |
+| LLM SQL Chat | &check; |         |
+| Folder Mail | &check; |         |
+| Copy/Delete Fileservice | &check; |         |
+| Microsoft Graph | &check; |         |
+| Excel Knowledge Tables | &check; |         |
+| Excel Knowledge Tables | &check; |         |
+| Fileserver | &check; |         |
+| HTML Server | &check; |         |
+| Excel Knowledge Tables | &check; |         |
+| Plotly Service | &check; |         |
+| Statemachine Service | &check; |         |
+
+## Supported Dataelements
+| Name  | Status | Description |
+|-------|--------|-------------|
+| Feature Extraction | &check; |   |
+| ... | &hourglass; |   |
+
 
 ## architecture
 the core element of the framework is a [(data)agent](pydag/agents/Agents.py)
