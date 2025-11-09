@@ -10,6 +10,9 @@ from ...buffers.Buffer import Buffer
 @dataclass
 class DocxAdapter(WriteAdapter):
     """ `Adapter` for writing data to DOCX documents.
+    
+    The specified addresses in `write_to_sink` can be used to map data keys from buffer to place holders in word template.
+    If no addresses are specified all buffer keys are directly mapped to the context of the word template
     """
     output_path: str = field(default="output.docx")
     template_path: str = field(default=None)
@@ -47,7 +50,7 @@ class DocxAdapter(WriteAdapter):
         else:
             for buffer in buffers.values():
                 data = buffer.data(n, persistent)
-            context.update(data)
+                context.update(data)
             
         self.doc.render(context)
         FileUtils.create_dir(FileUtils.parent_folder(self.output_path))

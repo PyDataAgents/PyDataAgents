@@ -12,12 +12,12 @@ class BufferNode(Node):
     buffer_id : str = field(init=True, default=None, metadata={"description": "unique ID of the buffer"})
     persistent : bool = field(default=True, metadata={"description": "specifies whether data is removed (False) from parent or not (True)"})
     n : int = field(default=0, metadata={"description": "specifies how much data is retrieved from parent buffer. Default 0 -> all data"})
-    
     # New timestamp-related parameters (DictBuffer-specific)
     timestamps_enabled: bool = field(default=False, metadata={"description": "Enable timestamps in underlying DictBuffer."})
     timestamps_key: str = field(default="timestamps", metadata={"description": "Key name for timestamps column."})
     index_enabled : bool = field(default=False, metadata={"description": "Whether an index column is enabled for this buffer. The index column is a simple integer sequence starting from 0 and adds +1 per point."})
     index_key : str = field(default="index", metadata={"description": "Key name for index column."})
+    
     def __post_init__(self):
         super().__post_init__()
         self.buffer : Buffer = None  # Placeholder for the buffer instance
