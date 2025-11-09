@@ -21,57 +21,57 @@ Have a look at [Contribute.md](Contribute.md)
 ## Supported Sources / Sinks
 | Name  | Source | Sink | Action |
 |-------|--------|------|--------|
-| OPCUA Client | &check; | &check; | &cross; |
-| OPCUA Server | &cross; | &cross; | &cross; |
-| ADS / Beckhoff | &check; | &check; | &cross; |
-| System Audio | &check; | &cross; | &cross; |
-| CSV | &check; | &check; | &check; |
-| JSON | &cross; | &cross; | &check; |
-| Excel | &cross; | &cross; | &check; |
-| Document Text | &check; | &cross; | &cross; |
-| Docx / Word | &cross; | &check; | &check; |
-| NPZ / numpy | &check; | &cross; | &cross; |
-| SQL | &check; | &check; | &check; |
-| Influx DB | &check; | &check; | &cross; |
-| Solid PDM | :hourglass_flowing_sand: | &cross; | &cross; |
-| HTTP | &check; | &check; | &check; |
-| MQTT | &check; | &check; | &cross; |
-| S7 / Siemens | &check; | &check; | &cross; |
-| TCP/IP Client | &check; | &check; | &cross; |
-| TCP/IP Server | :hourglass_flowing_sand: | :hourglass_flowing_sand: | &cross; |
-| UDP Client | :hourglass_flowing_sand: | :hourglass_flowing_sand: | &cross; |
-| UDP Server | :hourglass_flowing_sand: | :hourglass_flowing_sand: | &cross; |
-| Serial Client | &check; | &check; | &cross; |
-| ifm VSE Client | :hourglass_flowing_sand: | &cross; | &cross; |
-| Websocket | &check; | &check; | &cross; |
-| Webcam Client | &check; | &cross; | &cross; |
-| Browser Automation | &cross; | &cross; | &check; |
-| Plotly | &cross; | &cross; | &check; |
-| Browser Automation | &cross; | &cross; | &check; |
-| ICAL / Calendar | &cross; | &cross; | &check; |
-| Python Script | &cross; | &cross; | &check; |
+| OPCUA Client | :white_check_mark: | :white_check_mark: | :x: |
+| OPCUA Server | :x: | :x: | :x: |
+| ADS / Beckhoff | :white_check_mark: | :white_check_mark: | :x: |
+| System Audio | :white_check_mark: | :x: | :x: |
+| CSV | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| JSON | :x: | :x: | :white_check_mark: |
+| Excel | :x: | :x: | :white_check_mark: |
+| Document Text | :white_check_mark: | :x: | :x: |
+| Docx / Word | :x: | :white_check_mark: | :white_check_mark: |
+| NPZ / numpy | :white_check_mark: | :x: | :x: |
+| SQL | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| Influx DB | :white_check_mark: | :white_check_mark: | :x: |
+| Solid PDM | :hourglass_flowing_sand: | :x: | :x: |
+| HTTP | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| MQTT | :white_check_mark: | :white_check_mark: | :x: |
+| S7 / Siemens | :white_check_mark: | :white_check_mark: | :x: |
+| TCP/IP Client | :white_check_mark: | :white_check_mark: | :x: |
+| TCP/IP Server | :hourglass_flowing_sand: | :hourglass_flowing_sand: | :x: |
+| UDP Client | :hourglass_flowing_sand: | :hourglass_flowing_sand: | :x: |
+| UDP Server | :hourglass_flowing_sand: | :hourglass_flowing_sand: | :x: |
+| Serial Client | :white_check_mark: | :white_check_mark: | :x: |
+| ifm VSE Client | :hourglass_flowing_sand: | :x: | :x: |
+| Websocket | :white_check_mark: | :white_check_mark: | :x: |
+| Webcam Client | :white_check_mark: | :x: | :x: |
+| Browser Automation | :x: | :x: | :white_check_mark: |
+| Plotly | :x: | :x: | :white_check_mark: |
+| Browser Automation | :x: | :x: | :white_check_mark: |
+| ICAL / Calendar | :x: | :x: | :white_check_mark: |
+| Python Script | :x: | :x: | :white_check_mark: |
 
 ## Supported Services
 | Name  | Status | Description |
 |-------|--------|-------------|
-| RAG Chat | &check; |         |
-| LLM Chat | &check; |         |
-| LLM SQL Chat | &check; |         |
-| Folder Mail | &check; |         |
-| Copy/Delete Fileservice | &check; |         |
-| Microsoft Graph | &check; |         |
-| Excel Knowledge Tables | &check; |         |
-| Excel Knowledge Tables | &check; |         |
-| Fileserver | &check; |         |
-| HTML Server | &check; |         |
-| Excel Knowledge Tables | &check; |         |
-| Plotly Service | &check; |         |
-| Statemachine Service | &check; |         |
+| RAG Chat | :white_check_mark: |         |
+| LLM Chat | :white_check_mark: |         |
+| LLM SQL Chat | :white_check_mark: |         |
+| Folder Mail | :white_check_mark: |         |
+| Copy/Delete Fileservice | :white_check_mark: |         |
+| Microsoft Graph | :white_check_mark: |         |
+| Excel Knowledge Tables | :white_check_mark: |         |
+| Excel Knowledge Tables | :white_check_mark: |         |
+| Fileserver | :white_check_mark: |         |
+| HTML Server | :white_check_mark: |         |
+| Excel Knowledge Tables | :white_check_mark: |         |
+| Plotly Service | :white_check_mark: |         |
+| Statemachine Service | :white_check_mark: |         |
 
 ## Supported Dataelements
 | Name  | Status | Description |
 |-------|--------|-------------|
-| Feature Extraction | &check; |   |
+| Feature Extraction | :white_check_mark: |   |
 | ... | :hourglass_flowing_sand: |   |
 
 
