@@ -67,7 +67,8 @@ dependencies = [
     "matplotlib",
     "psutil",
     "librosa",
-    "pyserial"
+    "pyserial",
+    "docxtpl"
 ]
 
 [tool.setuptools.packages.find]
