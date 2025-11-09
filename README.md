@@ -33,16 +33,16 @@ Have a look at [Contribute.md](Contribute.md)
 | NPZ / numpy | &check; | &cross; | &cross; |
 | SQL | &check; | &check; | &check; |
 | Influx DB | &check; | &check; | &cross; |
-| Solid PDM | &hourglass; | &cross; | &cross; |
+| Solid PDM | :hourglass_flowing_sand: | &cross; | &cross; |
 | HTTP | &check; | &check; | &check; |
 | MQTT | &check; | &check; | &cross; |
 | S7 / Siemens | &check; | &check; | &cross; |
 | TCP/IP Client | &check; | &check; | &cross; |
-| TCP/IP Server | &hourglass; | &hourglass; | &cross; |
-| UDP Client | &hourglass; | &hourglass; | &cross; |
-| UDP Server | &hourglass; | &hourglass; | &cross; |
+| TCP/IP Server | :hourglass_flowing_sand: | :hourglass_flowing_sand: | &cross; |
+| UDP Client | :hourglass_flowing_sand: | :hourglass_flowing_sand: | &cross; |
+| UDP Server | :hourglass_flowing_sand: | :hourglass_flowing_sand: | &cross; |
 | Serial Client | &check; | &check; | &cross; |
-| ifm VSE Client | &hourglass; | &cross; | &cross; |
+| ifm VSE Client | :hourglass_flowing_sand: | &cross; | &cross; |
 | Websocket | &check; | &check; | &cross; |
 | Webcam Client | &check; | &cross; | &cross; |
 | Browser Automation | &cross; | &cross; | &check; |
@@ -72,7 +72,7 @@ Have a look at [Contribute.md](Contribute.md)
 | Name  | Status | Description |
 |-------|--------|-------------|
 | Feature Extraction | &check; |   |
-| ... | &hourglass; |   |
+| ... | :hourglass_flowing_sand: |   |
 
 
 ## architecture
