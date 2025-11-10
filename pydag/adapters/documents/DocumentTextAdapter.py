@@ -1,5 +1,7 @@
 from dataclasses import dataclass, field
 import os
+from loguru import logger
+
 
 from unstructured.partition.xlsx import partition_xlsx
 from unstructured.partition.docx import partition_docx
@@ -70,7 +72,7 @@ class DocumentTextAdapter(ReadAdapter):
                 case "jpg" | "jpeg" | "png":
                     elements = partition_image(file)
                 case _:
-                    DocumentTextAdapter.LOGGER.warning("File Extension " + ext + " is not supported")
+                    logger.warning("File Extension " + ext + " is not supported")
                     return None
             
             s = ""

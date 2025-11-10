@@ -18,12 +18,14 @@ class DictBuffer(Buffer):
     """
     timestamps_enabled : bool = field(default=False, metadata={"description": "Whether timestamps are enabled for this buffer."})
     timestamps_key  : str = field(default="timestamps", metadata={"description": "Key under which timestamps are exposed."})
-    timestamps_format : str = field(default="unix", metadata={"description": "Format: 'unix' (seconds float) or 'iso' (ISO 8601 strings)."})
-        
+    index_enabled : bool = field(default=False, metadata={"description": "Whether an index column is enabled for this buffer. The index column is a simple integer sequence starting from 0 and adds +1 per point."})
+    index_key : str = field(default="index", metadata={"description": "Key name for index column."})
+
     def __post_init__(self):
         super().__post_init__()
         self.elements : Dict[str, List[Any]] = {}
         self.lock = threading.RLock()
+        self.index = 0
 
     def install(self, agent : Agent = None):
         super().install(agent)
@@ -71,7 +73,7 @@ class DictBuffer(Buffer):
                     if not isinstance(v, list):
                         elements[k] = [v] * batch_len
 
-            existing_cols = [c for c in self.elements.keys() if c != self.timestamps_key]
+            existing_cols = [c for c in self.elements.keys() if c not in {self.timestamps_key, self.index_key}]
             current_size = self.size()
 
             # New incoming columns: pad past rows with None
@@ -92,6 +94,7 @@ class DictBuffer(Buffer):
                         elements[col] = None  # single row
 
             # Insert values
+            time_now = time.time_ns() # time in nanoseconds
             for k, v in elements.items():
                 if k not in self.elements:
                     self.elements[k] = []
@@ -101,6 +104,7 @@ class DictBuffer(Buffer):
                 else:
                     # Scalar (batch_len == 1 case)
                     self.elements[k].append(v)
+            time_then = time.time_ns() # time in nanoseconds
 
             # Timestamps (per element) if enabled
             if self.timestamps_enabled:                
@@ -108,20 +112,30 @@ class DictBuffer(Buffer):
                 if self.timestamps_key not in elements:                    
                     if self.timestamps_key not in self.elements:
                         self.elements[self.timestamps_key] = []
-                    if self.timestamps_format == "unix":
-                        if batch_len == 1:
-                            ts_list = [int(time.time() * 1000)]
-                        else:
-                            # Per-element distinct timestamps
-                            ts_list = [int(time.time() * 1000) for _ in range(batch_len)]
-                    elif self.timestamps_format == "iso":
-                        if batch_len == 1:
-                            ts_list = [datetime.datetime.now().isoformat()]
-                        else:
-                            ts_list = [datetime.datetime.now().isoformat() for _ in range(batch_len)]
+                    if batch_len == 1:
+                        ts_list = [time_now]  # single timestamp in ns
                     else:
-                        ts_list = [time.time() for _ in range(batch_len)]
+                        # Per-element distinct timestamps
+                        ts_list = []
+                        interval = (time_then - time_now) / batch_len
+                        ts_list = [int(time_now + interval * i) for i in range(batch_len)]
+                        print(ts_list)
+                
                     self.elements[self.timestamps_key].extend(ts_list)
+
+            if self.index_enabled:        
+                if self.index_key not in elements:
+                    if self.index_key not in self.elements:
+                        self.elements[self.index_key] = []                           
+                    if batch_len == 1:
+                        index_list = [self.index]  # single index 
+                    else:
+                        # Per-element distinct timestamps
+                        index_list = []
+                        index_list = [self.index + i for i in range(batch_len)]
+                    self.elements[self.index_key].extend(index_list)
+                # increment index count
+                self.index += batch_len
 
             # Capacity enforcement
             if self.capacity != AgentConfig.INFINITE_CAPACITY:

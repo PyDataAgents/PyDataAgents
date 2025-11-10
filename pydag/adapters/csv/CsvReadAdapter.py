@@ -17,8 +17,7 @@ class CSVReadMode(str, enum.Enum):
 
 @dataclass
 class CsvReadAdapter(ReadAdapter):
-    """
-    `Adapter` for reading data from CSV files.
+    """`Adapter` for reading data from CSV files.
     """
     
     file_path : str = field(default=None, metadata={"description": "path to the csv file to read"})

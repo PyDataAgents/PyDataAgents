@@ -12,7 +12,7 @@ def test_000():
         
     rs = RAGService()
     rs.api_key = config["OPENAI"]["OPENAI_API_KEY"]
-    rs.document_links = [os.getcwd() + "\\tests\\data\\pdf\\wama.pdf"]
+    rs.document_links = [os.path.dirname(__file__) + os.sep + "wama.pdf"]
     rs.model = "gpt-4o"
     rs.model_provider = "OPENAI"
     

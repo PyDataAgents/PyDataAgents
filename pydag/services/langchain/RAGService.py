@@ -28,7 +28,7 @@ class RAGService(LLMService):
     # Constants
     MODEL_RESOURCE_FOLDER = Path("./resources/models/")
     
-    document_links : list[str] = field(default_factory=list(), metadata={"description": "list of document links to load into embedded store on startup"})
+    document_links : list[str] = field(default_factory=list, metadata={"description": "list of document links to load into embedded store on startup"})
     ignore_invalid_documents : bool = field(default=False, metadata={"description": "api token for a web based model provider, e.g. OPENAI"})
     embedding_model_name : str = field(default="all-MiniLM-L6-v2", metadata={"description": "name of the embedding model to use for embedding store"})
     persist_directory : str = field(default=None, metadata={"description": "directory for persisting the embedded store"})
@@ -39,7 +39,6 @@ class RAGService(LLMService):
         self.embedding_store = None
         self.embedding_model = None
         self.retriever = None
-        self.document_links = list()
             
     def start(self):
         # attempt local download of embedding model
@@ -129,9 +128,10 @@ class RAGService(LLMService):
         text_splitter = CharacterTextSplitter(chunk_size=500, chunk_overlap=100)
         split_docs = text_splitter.split_documents(filtered_docs)
         self.embedding_store.add_documents(split_docs)
+        self.document_links.append(document_link)
     
     def chat(self, question : str) -> str:
-        #self.LOGGER.debug(self.retriever.get_relevant_documents(question))
+        #logger.debug(self.retriever.get_relevant_documents(question))
         if self.retain_messages:        
             ai_message = self.langchain.invoke({"question" : question}, config={"configurable" : {"session_id": "DEFAULT_SESSION"}})
         else:

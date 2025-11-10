@@ -1,14 +1,12 @@
 import time
+import matplotlib.pyplot as plt
 
 
-from pydag.nodes.featureextraction.ChronosExtractor import ChronosExtractor
 from pydag.buffers.DatasetBuffer import DatasetBuffer
-from pydag.nodes.dataset.DatasetNames import DatasetNames
 from pydag.nodes.buffers.LinkBufferAction import LinkBufferAction
 from pydag.buffers.signals.Sine import Sine
 from pydag.buffers.SignalBuffer import SignalBuffer
 from pydag.nodes.featureextraction.PSDExtractor import PSDExtractor
-import matplotlib.pyplot as plt
 
 
 # Test one inference sample as well as multiple inference samples on different datasets.

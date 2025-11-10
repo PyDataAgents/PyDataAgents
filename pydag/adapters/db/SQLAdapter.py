@@ -13,7 +13,7 @@ from ...adapters.WriteAdapter import WriteAdapter
 @dataclass
 class SQLAdapter(ReadAdapter, WriteAdapter):
     """`Adapter` for reading and writing data from/to SQL databases using pyodbc.
-        <br>Required ODBC driver must be installed for the specific SQL database (e.g. MySQL, PostgreSQL, SQLite, etc.) and sytem
+    <br>Required ODBC driver must be installed for the specific SQL database (e.g. MySQL, PostgreSQL, SQLite, etc.) and sytem
     """
 
     connection_str : str = field(default=None, metadata={"description": "connection string for the specific SQL database"})
@@ -25,6 +25,9 @@ class SQLAdapter(ReadAdapter, WriteAdapter):
         logger.debug(pyodbc.drivers())
 
     def connect(self) -> bool:
+        if self.connection_str is None:
+            logger.error("No connection string was specified for " + self.cname())
+            return False
         self.connection = pyodbc.connect(self.connection_str)
         if self.connection is None:
             return False

@@ -1,10 +1,11 @@
+import os
 from pathlib import Path
 from langchain_unstructured import UnstructuredLoader
 from langchain_text_splitters import CharacterTextSplitter
 from langchain_community.vectorstores.utils import filter_complex_metadata
 
 def test_000():
-    file = "tests\\data\\pdf\\unsup.pdf"
+    file = os.path.dirname(__file__) + os.sep + "unsup.pdf"
     loader = UnstructuredLoader(file)
     documents = loader.load()
     # filter for complex data        

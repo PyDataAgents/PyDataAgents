@@ -77,6 +77,8 @@ class StatemachineService(Service):
         
     def stop(self):
         self.is_running = False
+        if self.observer_thread is not None:
+            self.observer_thread.stop()
     
     def add_node(self, node : Node):
         self.nodes[node.id] = node 

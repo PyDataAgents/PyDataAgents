@@ -21,6 +21,13 @@ class BufferDefinition(BaseModel):
     unit : Any = Field(default=None, title="unit of element values in this buffer, can be string or list of strings")
     description : str = Field(default=None, title="buffer description")
 
+class DictBufferDefinition(BufferDefinition):
+    timestamps_enabled : bool = Field(default=False, title="Whether timestamps are enabled for this buffer.")
+    timestamps_key  : str = Field(default="timestamps", title="Key under which timestamps are exposed.")
+    index_enabled : bool = Field(default=False, title="Whether an index column is enabled for this buffer. The index column is a simple integer sequence starting from 0 and adds +1 per point.")
+    index_key : str = Field(default="index", title="Key name for index column.")
+
+
 class BufferData(BaseModel):
     data: Union[Any, List[Any], Dict[str, Any]]
         
@@ -43,7 +50,20 @@ class BufferRESTAPI:
             return list(agent.buffer_store.keys())
         
         @router.get("/config")
-        def buffer_config(with_sizes : bool = Query(False, description="specifies whether to return the current size on top of configurations")) -> list:
+        def buffer_type(type : str = Query(..., description="specifies the fully qualified name of the buffer type")) -> dict:
+            """
+            Returns the specifieds buffer default configuration.
+            """
+            buffer = ClassUtils.create_instance(type)
+            if buffer is None:
+                return {}
+            elif isinstance(buffer, Buffer):
+                return buffer.config_options(with_descriptions=True)
+            else:
+                return {}
+        
+        @router.get("/configs")
+        def buffer_configs(with_sizes : bool = Query(False, description="specifies whether to return the current size on top of configurations")) -> list:
             """
             Returns a list of all buffer configurations.
             """
@@ -60,6 +80,19 @@ class BufferRESTAPI:
             """ returns a list of buffer package names, that can be created            
             """
             return ClassUtils.get_subclasses(Buffer) 
+        
+        @router.get("/usage")
+        def buffer_usage(type : str = Query(..., description="type of the buffer (fully qualified package name)")) -> str:
+            """
+            Returns the usage information for specified `Buffer` type contained in the doc string of the class.
+            """
+            buffer = ClassUtils.create_instance(type)
+            if buffer is None:
+                return None
+            elif isinstance(buffer, Buffer):
+                return buffer.__doc__.strip()
+            else:
+                return None
                 
         @router.get("/{id}")
         def buffer(id : str = Path(..., description="unique ID of the buffer")) -> dict:
@@ -100,15 +133,9 @@ class BufferRESTAPI:
                     return data
                
         @router.post("/")
-        def add_buffer(buffer_def : BufferDefinition) -> str:
+        def add_buffer(buffer_def : Union[BufferDefinition, DictBufferDefinition]) -> str:
             buffer : Buffer = ClassUtils.create_instance(buffer_def.type)
-            buffer.type = buffer_def.type
-            buffer.id = buffer_def.id
-            buffer.capacity = buffer_def.capacity
-            buffer.data_type = buffer_def.data_type
-            buffer.initial_values = buffer_def.initial_values
-            buffer.unit = buffer_def.unit
-            buffer.description = buffer_def.description
+            ClassUtils.set_properties(buffer, buffer_def.model_dump())
             agent.add_buffer(buffer)
             return buffer_def.id
         
