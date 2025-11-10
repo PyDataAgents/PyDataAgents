@@ -11,7 +11,7 @@ class BufferEmptyTransition(BufferNode, Transition):
     """
     
     def check(self) -> bool:
-        if len(self.buffer) == 0:
+        if self.buffer.size() == 0:
             return True
         else:
             return False
