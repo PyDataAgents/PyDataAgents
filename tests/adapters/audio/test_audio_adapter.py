@@ -102,3 +102,23 @@ def test_020():
     print(audio.config_options())
     
     
+def test_030():
+    
+    audio = AudioAdapter()
+    audio.id = "A1"
+    audio.sample_rate = 16_000    
+    audio.connect()
+    
+    print(audio.config_options())
+    
+    buf = ListBuffer()
+    buffers = buf.to_dict()
+    
+    audio.subscribe(buffers)
+    
+    time.sleep(5000)
+    
+    audio.unsubscribe()
+    
+    print(buf.data())
+    
