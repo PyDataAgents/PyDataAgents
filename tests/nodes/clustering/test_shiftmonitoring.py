@@ -88,6 +88,7 @@ def test_001():
         print(data)
 
 
+
 def test_002():
     "Test Basic Functionality on Raw Sine Data (Without Feature Extraction and Dimensionality Reduction) as well as Plotting"
     n = 2
@@ -264,11 +265,12 @@ def test_007():
         shift.execute()
         data = shift.buffer.data(persistent=False) # We extract the last two samples since PCA returns two dimensional data.
         print(data)
-        if len(data.values()) > 0:
-            if len(list(data.values())[0]) > 0:
-                assert len(list(data.values())[0]) == 1 # Always one value is returned
-                assert len(list(data["values"])[0]) == 2
-                assert len(list(data.values())) == 3 # values, feature-decision, feature-shift
+        if hasattr(data, 'values') and data is not None:
+            if len(data.values()) > 0:
+                if len(list(data.values())[0]) > 0:
+                    assert len(list(data.values())[0]) == 1 # Always one value is returned
+                    assert len(list(data["values"])[0]) == 2
+                    assert len(list(data.values())) == 3 # values, feature-decision, feature-shift
                 
                 if data["values-feature-shift"][0] == 0.0010442282266369285:
                     assert data["values-feature-decision"][0] == 1, f"At value 0.0010442282266369285 a shift should be detected but {data['values-feature-decision'][0]} was detected."
@@ -278,20 +280,20 @@ def test_007():
                     assert data["values-feature-decision"][0] == 1, f"At value 0.001993711222241038 a shift should be detected but {data['values-feature-decision'][0]} was detected."
                 
 
-        if len(data.values()) > 0:
-            if data["values-feature-decision"][0] == 0:
-                color = 'g'
-            elif data["values-feature-decision"][0] == None:
-                color = 'b'
-            else:
-                color = 'r'
-            #ax[2].scatter(data["values-feature-amazon-chronos-bolt-mini-0-feature-PCA"][-1][0], data["values-feature-amazon-chronos-bolt-mini-0-feature-PCA"][-1][1], color=color)
-            #plt.pause(0.05)
-            ax.scatter(data["values"][-1][0], data["values"][-1][1], color=color)
-        if i % 10 == 0:
-            pass
-            fig.savefig(f"C:/Users/tobia/Python Scripts/PyDataAgents-DataElements/resources/outputs/shiftmonitoring_test007_plot_iteration{i}.png")
-        #fig.show()
+            if len(data.values()) > 0:
+                if data["values-feature-decision"][0] == 0:
+                    color = 'g'
+                elif data["values-feature-decision"][0] == None:
+                    color = 'b'
+                else:
+                    color = 'r'
+                #ax[2].scatter(data["values-feature-amazon-chronos-bolt-mini-0-feature-PCA"][-1][0], data["values-feature-amazon-chronos-bolt-mini-0-feature-PCA"][-1][1], color=color)
+                #plt.pause(0.05)
+                ax.scatter(data["values"][-1][0], data["values"][-1][1], color=color)
+            if i % 10 == 0:
+                pass
+                fig.savefig(f"C:/Users/tobia/Python Scripts/PyDataAgents-DataElements/resources/outputs/shiftmonitoring_test007_plot_iteration{i}.png")
+            #fig.show()
 
 
 
@@ -621,3 +623,52 @@ def test_011():
                 fig.savefig(f"C:/Users/tobia/Python Scripts/PyDataAgents-DataElements/resources/outputs/shiftmonitoring_test007_plot_iteration{i}.png")
 
 
+def test_020():
+
+    # Test Distribution Shift Monitoring in Agent mode with REST-API
+    
+    ag = Agent()
+    
+    signal = DatasetBuffer(id="signal", dataset_name="CWRU", sort_by_y=True)
+    signal_2 = DatasetBuffer(id="signal_2", dataset_name="CWRU", sort_by_y=True)
+
+    sm = SimpleActionService() 
+     
+    lba = LinkBufferAction()
+    lba.buffer = signal
+
+    lba_2 = LinkBufferAction()
+    lba_2.buffer = signal_2
+
+    extractor = ChronosExtractor(id="Chronos", sample_length=100, persistent=False, normalize=True, features_from_parent=["values_0"])
+    extractor.add_parent(lba)
+
+    pca = PCADimReduction(id="PCA", dimensions=2, min_learning_samples=400, sample_length=384, min_inference_samples=1,normalize=True, features_from_parent=["values_0-feature-amazon-chronos-bolt-mini-0"], persistent=False)
+    pca.add_parent(extractor)
+
+    sm_node = ShiftMonitoring(id="shiftmonitoring_node", min_learning_samples=600, sample_length=2, min_inference_samples=1, persistent=False, return_input=False, sensitivity=2)
+    sm_node.add_parent(pca)
+
+
+    rs = RestService(port=8008)
+
+    # Add buffers
+    ag.add_buffer(signal)
+    ag.add_buffer(signal_2)
+
+
+    # Add Nodes
+    sm.add_node(lba)
+    sm.add_node(extractor)
+    sm.add_node(pca)
+    sm.add_node(sm_node)
+    
+    # Add Services
+    ag.add_service(sm)
+    ag.add_service(rs)
+    
+    # Start Agent
+    ag.start_blocking()   
+
+
+test_020()

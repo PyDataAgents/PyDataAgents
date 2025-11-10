@@ -75,7 +75,7 @@ class ShiftMonitoring(LearningElement):
                 d = np.squeeze(d, axis=0) 
             transformed_data, decision = self.models[key].transform(d)
             forecast[f"{key}-{DataElementConfig.FEATURE}-shift"] = transformed_data.tolist()  #convert to list
-            forecast[f"{key}-{DataElementConfig.FEATURE}-decision"] = [decision]  #convert to list
+            forecast[f"{key}-{DataElementConfig.FEATURE}-decision"] = decision.tolist()  #convert to list
             if self.return_input:
                 forecast[key] = d.tolist()
         
