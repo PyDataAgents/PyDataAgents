@@ -676,6 +676,3 @@ def test_l_011():
     
     # Start Agent
     ag.start_blocking()   
-
-
-test_l_011()
