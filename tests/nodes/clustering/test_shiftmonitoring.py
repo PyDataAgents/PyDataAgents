@@ -48,7 +48,7 @@ def test_000():
         data = pca.buffer.data(n=n, persistent=False) # We extract the last two samples since PCA returns two dimensional data.
         print(data)
         
-        if len(data.values()) > 0:
+        if hasattr(data, "values") and len(data.values()) > 0:
             assert len(data[list(data.keys())[0]]) > 0 and len(data[list(data.keys())[0]]) == n, f"Data length out of bounds: {len(data[list(data.keys())[0]])}"
 
 
@@ -75,7 +75,7 @@ def test_001():
     pca.add_parent(chronos)
 
 
-    shift = ShiftMonitoring(min_learning_samples=10, sample_length=2, min_inference_samples=1, persistent=False, plot_folder=f"C:/Users/tobia/Python Scripts/PyDataAgents-DataElements/resources/outputs", plot_on=True)
+    shift = ShiftMonitoring(min_learning_samples=10, sample_length=2, min_inference_samples=1, persistent=False)
     shift.install()
     shift.add_parent(pca)
 
@@ -103,7 +103,7 @@ def test_002():
 
     
 
-    shift = ShiftMonitoring(min_learning_samples=10, sample_length=4, min_inference_samples=1, persistent=False, plot_folder=f"C:/Users/tobia/Python Scripts/PyDataAgents-DataElements/resources/outputs", plot_on=True)
+    shift = ShiftMonitoring(min_learning_samples=10, sample_length=4, min_inference_samples=1, persistent=False)
     shift.install()
     shift.add_parent(lba)
 
@@ -112,13 +112,13 @@ def test_002():
         shift.execute()
         data = shift.buffer.data(persistent=False) # We extract the last two samples
         print(data)
-        if len(data.values()) > 0:
+        if hasattr(data, "values") and len(data.values()) > 0:
             assert len(list(data.values())[0]) == 1 # Always one value is returned
-            assert len(list(data.values())) == 2 # Signal buffer returns two keys: values and timestamps and for each key one value is returned
+            assert len(list(data.values())) == 4 # Signal buffer returns four keys: values-decision, values-shift, timestamps-decision and timestamps-shift and for each key one value is returned
 
 
 
-def test_003():
+def test_0021():
     "Test 002 but with more inference samples."
     n = 2
 
@@ -132,7 +132,7 @@ def test_003():
 
     
 
-    shift = ShiftMonitoring(min_learning_samples=10, sample_length=3, min_inference_samples=5, persistent=False, plot_folder=f"C:/Users/tobia/Python Scripts/PyDataAgents-DataElements/resources/outputs", plot_on=True)
+    shift = ShiftMonitoring(min_learning_samples=10, sample_length=3, min_inference_samples=5, persistent=False)
     shift.install()
     shift.add_parent(lba)
 
@@ -142,13 +142,46 @@ def test_003():
         data = shift.buffer.data(persistent=False)
         print(i)
         print(data)
-        if len(data.values()) > 0:
+        if hasattr(data, "values") and len(data.values()) > 0:
             if len(list(data.values())[0]) > 0:
                 assert len(list(data.values())[0]) == 1 # Always one value is returned
-                assert len(list(data.values())) == 2 # Signal buffer returns two keys: values and timestamps and for each key one value is returned
+                assert len(list(data.values())) == 4 # Signal buffer returns four keys: values-decision, values-shift, timestamps-decision and timestamps-shift and for each key one value is returned
+                assert all([isinstance(val, list) for val in data.values()]), "Values are not stored as lists."
+                assert len(set([len(val) for val in data.values()])) == 1 # All lists must have the same length.
+
+def test_0022():
+    "Test 002 but with more inference samples and input values returned"
+    n = 2
+
+    singal = Sine(f=1, a=1, p=0, n=0.1)
+    sine_buff = SignalBuffer(signal=singal, capacity=1000)
+    sine_buff.install()
 
 
-def test_004():
+    lba = LinkBufferAction()
+    lba.buffer = sine_buff
+
+    
+
+    shift = ShiftMonitoring(min_learning_samples=10, sample_length=3, min_inference_samples=5, persistent=False, return_input=True)
+    shift.install()
+    shift.add_parent(lba)
+
+    for i in range(100):
+        time.sleep(0.5)
+        shift.execute()
+        data = shift.buffer.data(persistent=False)
+        print(i)
+        print(data)
+        if hasattr(data, "values") and len(data.values()) > 0:
+            if len(list(data.values())[0]) > 0:
+                assert len(list(data.values())[0]) == 1 # Always one value is returned
+                assert len(list(data.values())) == 10 # Signal buffer returns four keys: values-decision, values-shift, timestamps-decision, timestamps-shift values-0, values-1, values-2, timestamps-0, timestamps-1, timestamps-2
+                assert all([isinstance(val, list) for val in data.values()]), "Values are not stored as lists."
+                assert len(set([len(val) for val in data.values()])) == 1 # All lists must have the same length.
+
+
+def test_003():
     "Test Basic Functionality on Raw Sine Data (Without Feature Extraction and Dimensionality Reduction) as well as Plotting and return input data as well"
     sample_length = 2
 
@@ -162,7 +195,7 @@ def test_004():
 
     
 
-    shift = ShiftMonitoring(min_learning_samples=10, sample_length=sample_length, min_inference_samples=1, persistent=False, plot_folder=f"C:/Users/tobia/Python Scripts/PyDataAgents-DataElements/resources/outputs", plot_on=True, return_input=True)
+    shift = ShiftMonitoring(min_learning_samples=10, sample_length=sample_length, min_inference_samples=1, persistent=False, return_input=True)
     shift.install()
     shift.add_parent(lba)
 
@@ -171,48 +204,17 @@ def test_004():
         shift.execute()
         data = shift.buffer.data(persistent=False) # We extract the last two samples
         print(data)
-        if len(data.values()) > 0:
+        if hasattr(data, "values") and len(data.values()) > 0:
             if len(list(data.values())[0]) > 0:
                 assert len(list(data.values())[0]) == 1 # Always one value is returned
-                assert len(list(data["values"])) == 1 
-                assert len(list(data["values"])[0]) == 2
-                assert len(list(data.values())) == 4 # Signal buffer returns two keys: values and timestamps and for each key one value is returned
+                assert len(list(data.values())) == 8 # Signal buffer returns four keys: values-decision, values-shift, timestamps-decision, timestamps-shift values-0, values-1, timestamps-0, timestamps-1
+                assert all([isinstance(val, list) for val in data.values()]), "Values are not stored as lists."
+                assert len(set([len(val) for val in data.values()])) == 1 # All lists must have the same length.
+
 
 
 
 def test_005():
-    "Test Basic Functionality on Raw Sine Data (Without Feature Extraction and Dimensionality Reduction) as well as Plotting and return input data as well for multiple inference samples"
-    sample_length = 2
-
-    singal = Sine(f=1, a=1, p=0, n=0.1)
-    sine_buff = SignalBuffer(signal=singal, capacity=1000)
-    sine_buff.install()
-
-
-    lba = LinkBufferAction()
-    lba.buffer = sine_buff
-
-    
-
-    shift = ShiftMonitoring(min_learning_samples=10, sample_length=sample_length, min_inference_samples=10, persistent=False, plot_folder=f"C:/Users/tobia/Python Scripts/PyDataAgents-DataElements/resources/outputs", plot_on=True, return_input=True)
-    shift.install()
-    shift.add_parent(lba)
-
-    for i in range(50):
-        time.sleep(0.5)
-        shift.execute()
-        data = shift.buffer.data(persistent=False) # We extract the last two samples
-        print(data)
-        
-        if len(data.values()) > 0:
-            if len(list(data.values())[0]) > 0:
-                assert len(list(data.values())[0]) == 1 # Always one value is returned
-                assert len(list(data["values"])) == 10 
-                assert len(list(data["values"])[0]) == 2
-                assert len(list(data.values())) == 4 # Signal buffer returns two keys: values and timestamps and for each key one value is returned"""
-
-
-def test_006():
     "Test Basic Functionality on UCR Data."
     
     sample_length = 2
@@ -223,7 +225,7 @@ def test_006():
     lba = LinkBufferAction()
     lba.buffer = signal
 
-    shift = ShiftMonitoring(min_learning_samples=10, sample_length=sample_length, features_from_parent=["values"], min_inference_samples=3, plot_folder=f"C:/Users/tobia/Python Scripts/PyDataAgents-DataElements/resources/outputs", plot_on=True, persistent=False, return_input=True)
+    shift = ShiftMonitoring(min_learning_samples=10, sample_length=sample_length, features_from_parent=["values"], min_inference_samples=3, persistent=False, return_input=True)
     shift.install()
     shift.add_parent(lba)
 
@@ -231,18 +233,20 @@ def test_006():
         time.sleep(0.5)
         shift.execute()
         data = shift.buffer.data(persistent=False) # We extract the last two samples since PCA returns two dimensional data.
-        if len(data.values()) > 0:
+        if hasattr(data, "values") and len(data.values()) > 0:
             if len(list(data.values())[0]) > 0:
                 assert len(list(data.values())[0]) == 1 # Always one value is returned
-                assert len(list(data["values"])) == 3 
-                assert len(list(data["values"])[0]) == 2
-                assert len(list(data.values())) == 3 # values, feature-decision, feature-shift
+                assert len(list(data.values())) == 4 # Signal buffer returns four keys: values-decision, values-shift, values-0, values-1
+                assert all([isinstance(val, list) for val in data.values()]), "Values are not stored as lists."
+                assert len(set([len(val) for val in data.values()])) == 1 # All lists must have the same length.
 
 
 
 
-def test_007():
+def test_006():
     "Test Functionality on Blobs data without feature extraction to really identify shifts in data."
+    "Test that the returned data is correctly formatted as lists and has a consistent length."
+
     
 
     signal = DatasetBuffer(dataset_name="Blobs", sort_by_y=True)
@@ -269,8 +273,9 @@ def test_007():
             if len(data.values()) > 0:
                 if len(list(data.values())[0]) > 0:
                     assert len(list(data.values())[0]) == 1 # Always one value is returned
-                    assert len(list(data["values"])[0]) == 2
-                    assert len(list(data.values())) == 3 # values, feature-decision, feature-shift
+                    assert len(list(data.values())) == 4 # values-0, values-1, feature-decision, feature-shift
+                    assert all([isinstance(val, list) for val in data.values()]), "Values are not stored as lists."
+                    assert len(set([len(val) for val in data.values()])) == 1 # All lists must have the same length.
                 
                 if data["values-feature-shift"][0] == 0.0010442282266369285:
                     assert data["values-feature-decision"][0] == 1, f"At value 0.0010442282266369285 a shift should be detected but {data['values-feature-decision'][0]} was detected."
@@ -289,15 +294,17 @@ def test_007():
                     color = 'r'
                 #ax[2].scatter(data["values-feature-amazon-chronos-bolt-mini-0-feature-PCA"][-1][0], data["values-feature-amazon-chronos-bolt-mini-0-feature-PCA"][-1][1], color=color)
                 #plt.pause(0.05)
-                ax.scatter(data["values"][-1][0], data["values"][-1][1], color=color)
+                ax.scatter(data["values-0"], data["values-1"], color=color)
             if i % 10 == 0:
                 pass
-                fig.savefig(f"C:/Users/tobia/Python Scripts/PyDataAgents-DataElements/resources/outputs/shiftmonitoring_test007_plot_iteration{i}.png")
-            #fig.show()
+                #fig.savefig(f"C:/Users/tobia/Python Scripts/PyDataAgents-DataElements/resources/outputs/shiftmonitoring_test007_plot_iteration{i}.png")
+            fig.show()
 
 
 
-def test_008():
+
+
+def test_l_007():
     "Test Functionality on ECG5000 data with feature extraction."
     # ECG5000 Length for class 1: 400.000 Datapoints. Length for "one-sample" = 140 Points.
     # Car Length for class 1: 10.000 Datapoints. Length for "one-sample" = 577 Points.
@@ -376,7 +383,7 @@ def test_008():
                 fig.savefig(f"C:/Users/tobia/Python Scripts/PyDataAgents-DataElements/resources/outputs/shiftmonitoring_test007_plot_iteration{i}.png")
 
 
-def test_009():
+def test_l_008():
     "Test Functionality on ECG5000 data with ROCKET feature extraction."
     # ECG5000 Length for class 1: 400.000 Datapoints. Length for "one-sample" = 140 Points.
     # Car Length for class 1: 10.000 Datapoints. Length for "one-sample" = 577 Points.
@@ -458,7 +465,7 @@ def test_009():
 
 
 
-def test_010():
+def test_l_09():
     "Long Time Test Functionality on one feature of BOSCH CNC  data WITHOUT feature extraction."
     # ECG5000 Length for class 1: 400.000 Datapoints. Length for "one-sample" = 140 Points.
     # Car Length for class 1: 10.000 Datapoints. Length for "one-sample" = 577 Points.
@@ -541,7 +548,7 @@ def test_010():
 
 
 
-def test_011():
+def test_l_010():
     "Long Time Test Functionality on one feature of CWRU data with feature extraction."
     # ECG5000 Length for class 1: 400.000 Datapoints. Length for "one-sample" = 140 Points.
     # Car Length for class 1: 10.000 Datapoints. Length for "one-sample" = 577 Points.
@@ -623,14 +630,14 @@ def test_011():
                 fig.savefig(f"C:/Users/tobia/Python Scripts/PyDataAgents-DataElements/resources/outputs/shiftmonitoring_test007_plot_iteration{i}.png")
 
 
-def test_020():
+def test_l_011():
 
     # Test Distribution Shift Monitoring in Agent mode with REST-API
     
     ag = Agent()
     
     signal = DatasetBuffer(id="signal", dataset_name="CWRU", sort_by_y=True)
-    signal_2 = DatasetBuffer(id="signal_2", dataset_name="CWRU", sort_by_y=True)
+    signal_2 = DatasetBuffer(id="signal_2", dataset_name="CWRU", sort_by_y=True, index_enabled=True)
 
     sm = SimpleActionService() 
      
@@ -642,11 +649,11 @@ def test_020():
 
     extractor = ChronosExtractor(id="Chronos", sample_length=100, persistent=False, normalize=True, features_from_parent=["values_0"])
     extractor.add_parent(lba)
-
-    pca = PCADimReduction(id="PCA", dimensions=2, min_learning_samples=400, sample_length=384, min_inference_samples=1,normalize=True, features_from_parent=["values_0-feature-amazon-chronos-bolt-mini-0"], persistent=False)
+    #400
+    pca = PCADimReduction(id="PCA", dimensions=2, min_learning_samples=40, sample_length=384, min_inference_samples=1,normalize=True, features_from_parent=["values_0-feature-amazon-chronos-bolt-mini-0"], persistent=False)
     pca.add_parent(extractor)
-
-    sm_node = ShiftMonitoring(id="shiftmonitoring_node", min_learning_samples=600, sample_length=2, min_inference_samples=1, persistent=False, return_input=False, sensitivity=2)
+    #600
+    sm_node = ShiftMonitoring(id="shiftmonitoring_node", min_learning_samples=60, sample_length=2, min_inference_samples=1, persistent=False, return_input=True, sensitivity=2, index_enabled=True)
     sm_node.add_parent(pca)
 
 
@@ -669,6 +676,3 @@ def test_020():
     
     # Start Agent
     ag.start_blocking()   
-
-
-test_020()
