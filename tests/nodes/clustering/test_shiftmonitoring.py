@@ -345,19 +345,19 @@ def test_l_007():
         data = shift.buffer.data(persistent=False) # We extract the last two samples since PCA returns two dimensional data.
         data_2 = lba_2.buffer.data(n=140, persistent=False)
         print(data)
-        if len(data.values()) > 0:
+        if hasattr(data, "values") and len(data.values()) > 0:
             if len(list(data.values())[0]) > 0:
                 assert len(list(data.values())[0]) == 1 # Always one value is returned
-                assert len(list(data['values-feature-amazon-chronos-bolt-mini-0-feature-PCA-feature-shift'])[0]) == 1
-                assert len(list(data.values())) == 3 # Input data is returned in this test. 
+                assert len(list(data['values-feature-amazon-chronos-bolt-mini-0-feature-PCA-feature-shift'])) == 1
+                assert len(list(data.values())) == 4 # Input data is returned in this test. 
                 
-                if data["values-feature-amazon-chronos-bolt-mini-0-feature-PCA-feature-shift"][0] == 5.407847548518865e-05:
-                    assert data["values-feature-amazon-chronos-bolt-mini-0-feature-PCA-feature-decision"][0] == 1, f"At value 5.407847548518865e-05 a shift should be detected but {data['values-feature-decision'][0]} was detected."
-                if data["values-feature-amazon-chronos-bolt-mini-0-feature-PCA-feature-shift"][0] == 3.308598942337312e-06:
-                    assert data["values-feature-amazon-chronos-bolt-mini-0-feature-PCA-feature-decision"][0] == 1, f"At value 3.308598942337312e-06 a shift should be detected but {data['values-feature-decision'][0]} was detected."
+                if data["values-feature-amazon-chronos-bolt-mini-0-feature-PCA-feature-shift"] == 5.407847548518865e-05:
+                    assert data["values-feature-amazon-chronos-bolt-mini-0-feature-PCA-feature-decision"] == 1, f"At value 5.407847548518865e-05 a shift should be detected but {data['values-feature-decision'][0]} was detected."
+                if data["values-feature-amazon-chronos-bolt-mini-0-feature-PCA-feature-shift"] == 3.308598942337312e-06:
+                    assert data["values-feature-amazon-chronos-bolt-mini-0-feature-PCA-feature-decision"] == 1, f"At value 3.308598942337312e-06 a shift should be detected but {data['values-feature-decision'][0]} was detected."
 
 
-        if len(data.values()) > 0:
+        if hasattr(data, "values") and len(data.values()) > 0:
             if len(list(data.values())[0]) > 0:
                 
                 # Groundtruth Color
@@ -375,9 +375,9 @@ def test_l_007():
                     color = 'r'
                 #ax[2].scatter(data["values-feature-amazon-chronos-bolt-mini-0-feature-PCA"][-1][0], data["values-feature-amazon-chronos-bolt-mini-0-feature-PCA"][-1][1], color=color)
                 #plt.pause(0.05)
-                ax[0].scatter(data["values-feature-amazon-chronos-bolt-mini-0-feature-PCA"][-1][0], data["values-feature-amazon-chronos-bolt-mini-0-feature-PCA"][-1][1], color=color)
+                ax[0].scatter(data["values-feature-amazon-chronos-bolt-mini-0-feature-PCA-0"][-1], data["values-feature-amazon-chronos-bolt-mini-0-feature-PCA-1"][-1], color=color)
                 ax[0].set_title("Prediction")
-                ax[1].scatter(data["values-feature-amazon-chronos-bolt-mini-0-feature-PCA"][-1][0], data["values-feature-amazon-chronos-bolt-mini-0-feature-PCA"][-1][1], color=g_color)
+                ax[1].scatter(data["values-feature-amazon-chronos-bolt-mini-0-feature-PCA-0"][-1], data["values-feature-amazon-chronos-bolt-mini-0-feature-PCA-1"][-1], color=g_color)
                 ax[1].set_title("Groundtruth")
             if i % 10 == 0:
                 fig.savefig(f"C:/Users/tobia/Python Scripts/PyDataAgents-DataElements/resources/outputs/shiftmonitoring_test007_plot_iteration{i}.png")
@@ -456,9 +456,9 @@ def test_l_008():
                     color = 'r'
                 #ax[2].scatter(data["values-feature-amazon-chronos-bolt-mini-0-feature-PCA"][-1][0], data["values-feature-amazon-chronos-bolt-mini-0-feature-PCA"][-1][1], color=color)
                 #plt.pause(0.05)
-                ax[0].scatter(data["values-feature-ROCKET-0-feature-PCA"][-1][0], data["values-feature-ROCKET-0-feature-PCA"][-1][1], color=color)
+                ax[0].scatter(data["values-feature-ROCKET-0-feature-PCA-0"][-1], data["values-feature-ROCKET-0-feature-PCA-1"][-1], color=color)
                 ax[0].set_title("Prediction")
-                ax[1].scatter(data["values-feature-ROCKET-0-feature-PCA"][-1][0], data["values-feature-ROCKET-0-feature-PCA"][-1][1], color=g_color)
+                ax[1].scatter(data["values-feature-ROCKET-0-feature-PCA-0"][-1], data["values-feature-ROCKET-0-feature-PCA-1"][-1], color=g_color)
                 ax[1].set_title("Groundtruth")
             if i % 10 == 0:
                 fig.savefig(f"C:/Users/tobia/Python Scripts/PyDataAgents-DataElements/resources/outputs/shiftmonitoring_test007_plot_iteration{i}.png")
@@ -538,9 +538,9 @@ def test_l_09():
                     color = 'r'
                 #ax[2].scatter(data["values-feature-amazon-chronos-bolt-mini-0-feature-PCA"][-1][0], data["values-feature-amazon-chronos-bolt-mini-0-feature-PCA"][-1][1], color=color)
                 #plt.pause(0.05)
-                ax[0].scatter(data["values_0-feature-PCA"][-1][0], data["values_0-feature-PCA"][-1][1], color=color)
+                ax[0].scatter(data["values_0-feature-PCA-0"][-1], data["values_0-feature-PCA-1"][-1], color=color)
                 ax[0].set_title("Prediction")
-                ax[1].scatter(data["values_0-feature-PCA"][-1][0], data["values_0-feature-PCA"][-1][1], color=g_color)
+                ax[1].scatter(data["values_0-feature-PCA-0"][-1], data["values_0-feature-PCA-1"][-1], color=g_color)
                 ax[1].set_title("Groundtruth")
             if i % 10 == 0:
                 fig.savefig(f"C:/Users/tobia/Python Scripts/PyDataAgents-DataElements/resources/outputs/shiftmonitoring_test007_plot_iteration{i}.png")
@@ -622,9 +622,9 @@ def test_l_010():
                     color = 'r'
                 #ax[2].scatter(data["values_0-feature-amazon-chronos-bolt-mini-0-feature-PCA"][-1][0], data["values_0-feature-amazon-chronos-bolt-mini-0-feature-PCA"][-1][1], color=color)
                 #plt.pause(0.05)
-                ax[0].scatter(data["values_0-feature-amazon-chronos-bolt-mini-0-feature-PCA"][-1][0], data["values_0-feature-amazon-chronos-bolt-mini-0-feature-PCA"][-1][1], color=color)
+                ax[0].scatter(data["values_0-feature-amazon-chronos-bolt-mini-0-feature-PCA-0"][-1], data["values_0-feature-amazon-chronos-bolt-mini-0-feature-PCA-1"][-1], color=color)
                 ax[0].set_title("Prediction")
-                ax[1].scatter(data["values_0-feature-amazon-chronos-bolt-mini-0-feature-PCA"][-1][0], data["values_0-feature-amazon-chronos-bolt-mini-0-feature-PCA"][-1][1], color=g_color)
+                ax[1].scatter(data["values_0-feature-amazon-chronos-bolt-mini-0-feature-PCA-0"][-1], data["values_0-feature-amazon-chronos-bolt-mini-0-feature-PCA-1"][-1], color=g_color)
                 ax[1].set_title("Groundtruth")
             if i % 10 == 0:
                 fig.savefig(f"C:/Users/tobia/Python Scripts/PyDataAgents-DataElements/resources/outputs/shiftmonitoring_test007_plot_iteration{i}.png")
@@ -676,3 +676,6 @@ def test_l_011():
     
     # Start Agent
     ag.start_blocking()   
+
+
+test_l_011()
