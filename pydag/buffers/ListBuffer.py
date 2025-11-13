@@ -1,6 +1,5 @@
 from __future__ import annotations
 import copy
-import threading
 from loguru import logger
 
 from ..agents.AgentConfig import AgentConfig
@@ -14,12 +13,6 @@ class ListBuffer(Buffer):
     def __post_init__(self):
         super().__post_init__()        
         self.elements = list()
-        self.lock = threading.RLock()
-
-    def install(self, agent : Agent = None):
-        super().install(agent)
-        if self.initial_values is not None:
-            self.elements = self.initial_values
             
     def uninstall(self, agent : Agent = None):
         super().uninstall(agent)

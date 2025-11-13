@@ -23,7 +23,7 @@ def test_000():
     print(bea.buffer.data())
     
     
-def test_001():
+def test_001(): 
     
     buf = DictBuffer(id="B1", capacity=5)
     buf.initial_values = {

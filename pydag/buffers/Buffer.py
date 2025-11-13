@@ -2,6 +2,9 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 import json
 from abc import abstractmethod
+import threading
+
+from ..agents.Agent import Agent
 from .DataType import DataType
 from ..agents.AgentElement import AgentElement
 
@@ -20,6 +23,12 @@ class Buffer(AgentElement):
     def __post_init__(self):
         super().__post_init__()
         self.elements = any
+        self.lock = threading.RLock()
+
+    def install(self, agent : Agent = None):
+        super().install(agent)
+        if self.initial_values is not None:
+            self.elements = self.initial_values
 
     @abstractmethod
     def push(self, elements):

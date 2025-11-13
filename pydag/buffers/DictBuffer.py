@@ -24,13 +24,7 @@ class DictBuffer(Buffer):
     def __post_init__(self):
         super().__post_init__()
         self.elements : Dict[str, List[Any]] = {}
-        self.lock = threading.RLock()
         self.index = 0
-
-    def install(self, agent : Agent = None):
-        super().install(agent)
-        if self.initial_values is not None:
-            self.elements = self.initial_values
         
     def uninstall(self, agent : Agent = None):
         super().uninstall(agent)
