@@ -18,6 +18,7 @@ class BufferNode(Node):
     timestamps_key: str = field(default="timestamps", metadata={"description": "Key name for timestamps column."})
     index_enabled : bool = field(default=False, metadata={"description": "Whether an index column is enabled for this buffer. The index column is a simple integer sequence starting from 0 and adds +1 per point."})
     index_key : str = field(default="index", metadata={"description": "Key name for index column."})
+    capacity : int = field(default=AgentConfig.INFINITE_CAPACITY, metadata={"description": "Capacity of the buffer. Default is infinite."})
     def __post_init__(self):
         super().__post_init__()
         self.buffer : Buffer = None  # Placeholder for the buffer instance
