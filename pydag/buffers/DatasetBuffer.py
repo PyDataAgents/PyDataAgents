@@ -4,14 +4,16 @@ import numpy as np
 import pandas as pd
 import os
 
+from ..buffers.BufferException import BufferException
 from ..agents.Agent import Agent
 from .DictBuffer import DictBuffer
-
 from ..nodes.dataset.DatasetNames import DatasetNames
 
 
 @dataclass
 class DatasetBuffer(DictBuffer):
+    """ A `Buffer` that loads a dataset and stores it in its elements
+    """
     
     dataset_name : str = field(default=DatasetNames.Blobs.value, metadata={"description": """Dataset names. Tested are:
                                                                                 ArrowHead: https://www.timeseriesclassification.com/description.php?Dataset=ArrowHead,
@@ -158,7 +160,7 @@ class DatasetBuffer(DictBuffer):
                 data["y"] = fary[perm].tolist()
             except ValueError:
                 # If conversation fails, throw error
-                raise ValueError("y values could not be converted to numeric values. Sorting not possible.")
+                raise BufferException("y values could not be converted to numeric values. Sorting not possible.")
         else:
             data["values"] = far.tolist()
             data["y"] = fary.tolist()

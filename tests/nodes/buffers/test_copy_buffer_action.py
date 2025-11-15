@@ -1,9 +1,11 @@
+import time
 from pydag.buffers.DatasetBuffer import DatasetBuffer
-from pydag.nodes.Action import Action
+from pydag.buffers.SignalBuffer import SignalBuffer
+from pydag.buffers.signals.Sine import Sine
 from pydag.nodes.BufferNode import BufferNode
-from pydag.nodes.buffers.CopyDataAction import CopyDataAction
+from pydag.nodes.buffers.CopyBufferAction import CopyBufferAction
 from pydag.nodes.buffers.LinkBufferAction import LinkBufferAction
-
+from pydag.nodes.Action import Action
 
 def test_000():
     
@@ -14,20 +16,39 @@ def test_000():
     lba.set_buffer(db)
     lba.install()
     
-    cba1 = CopyDataAction(n=1000, persistent=True)
-    cba1.add_parent(lba)
-    cba1.install()
+    cba = CopyBufferAction()
+    cba.add_parent(lba)
+    cba.install()
     
-    cba2 = CopyDataAction(n=1000, persistent=False)
-    cba2.add_parent(cba1)
-    cba2.install()
+    nodes : list[Action] = [lba, cba]
     
-    nodes : list[Action] = [lba, cba1, cba2]
+    for node in nodes:
+        node.execute()
+        if isinstance(node, BufferNode):
+            if node.buffer:
+                print(node.buffer.data())
+                
+def test_010():
     
+    s = Sine()
+    sb = SignalBuffer(signal=s, sampling_period=100, capacity=100)
+    sb.install()
+    
+    lba = LinkBufferAction()
+    lba.set_buffer(sb)
+    lba.install()
+    
+    cba = CopyBufferAction()
+    cba.add_parent(lba)
+    cba.install()
+    
+    nodes : list[Action] = [lba, cba]
     
     for i in range(0, 5):
         print(i)
+        time.sleep(0.5)
         for node in nodes:
             node.execute()
             if isinstance(node, BufferNode):
-                print(node.buffer.data())
+                if node.buffer:
+                    print(node.buffer.data())

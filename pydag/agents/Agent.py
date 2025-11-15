@@ -53,16 +53,24 @@ class Agent(AgentElement):
             service.uninstall(self)
             
     def add_buffer(self, buffer : Buffer):
+        if buffer.id in self.buffer_store:
+            logger.warning(f"A {Buffer.cname()} with id='{buffer.id}' already exists in {Agent.cname()}'s buffer_store and is overwritten!")        
         self.buffer_store[buffer.id] = buffer
         
     def add_adapter(self, adapter : Adapter):
+        if adapter.id in self.adapter_store:
+            logger.warning(f"A {Adapter.cname()} with id='{adapter.id}' already exists in {Agent.cname()}'s adapter_store and is overwritten!")
         self.adapter_store[adapter.id] = adapter
         
     def add_mapping(self, mapping : Mapping):
         mapping_thread = MappingThread(mapping)
+        if mapping.id in self.mapping_store:
+            logger.warning(f"A {Mapping.cname()} with id='{mapping.id}' already exists in {Agent.cname()}'s mapping_store and is overwritten!")
         self.mapping_store[mapping.id] = mapping_thread
         
     def add_service(self, service : Service):
+        if service.id in self.service_store:
+            logger.warning(f"A {Service.cname()} with id='{service.id}' already exists in {Agent.cname()}'s service_store and is overwritten!")
         self.service_store[service.id] = service
         
     def start_blocking(self):

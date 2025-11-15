@@ -170,8 +170,13 @@ class DictBuffer(Buffer):
         return d
 
     def size(self) -> int:
+        """ returns the size of this `DictBuffer`
+
+        Returns:
+            int: number of samples in dict
+        """
         # size determined by first non-timestamp column (or timestamps if only column)
-        if not self.elements:
+        if len(self.elements) == 0:
             return 0
         for k, v in self.elements.items():
             if k != self.timestamps_key:

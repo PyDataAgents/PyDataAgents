@@ -1,12 +1,9 @@
 from __future__ import annotations
-from dataclasses import dataclass, field
-
-from loguru import logger
+from dataclasses import dataclass
 
 from .StatemachineService import StatemachineService
 from ...mappings.Observer import Observer
 from ...mappings.ObserverThread import ObserverThread
-from ...mappings.ThreadType import ThreadType
 from ...nodes.Action import Action
 
 
@@ -33,9 +30,15 @@ class SimpleActionObserver(Observer):
 
 @dataclass
 class SimpleActionService(StatemachineService):
+    """ `Service` for executing any number of `Action`s in sequence
+    """
           
     def start(self):
-        self.observer_thread = ObserverThread(id=ObserverThread.unique_id(), thread_type=ThreadType[self.thread_type])
+        self.observer_thread = ObserverThread(
+            id=ObserverThread.unique_id(),
+            thread_type=self.thread_type,
+            sampling_period=self.sampling_period
+        )
         observer = SimpleActionObserver(self)
         self.observer_thread.add_observer(observer)
         self.observer_thread.start()  

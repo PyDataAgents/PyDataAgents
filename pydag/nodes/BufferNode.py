@@ -34,14 +34,23 @@ class BufferNode(Node):
         super().install(agent)
         if self.buffer is None:
             if agent is not None:
-                if self.buffer_id in agent.buffer_store:
-                    self.buffer = agent.buffer_store[self.buffer_id]
+                if self.buffer_id is not None:
+                    if self.buffer_id in agent.buffer_store:
+                        self.buffer = agent.buffer_store[self.buffer_id]
+                    else:
+                        self.buffer = DictBuffer(id=self.buffer_id, capacity=AgentConfig.INFINITE_CAPACITY,
+                                                timestamps_enabled=self.timestamps_enabled,
+                                                timestamps_key=self.timestamps_key,
+                                                index_enabled=self.index_enabled,
+                                                index_key=self.index_key)
+                        self.buffer.install(agent)
+                        agent.add_buffer(self.buffer)
                 else:
                     self.buffer = DictBuffer(id=self.id + "-BUFFER", capacity=AgentConfig.INFINITE_CAPACITY,
-                                             timestamps_enabled=self.timestamps_enabled,
-                                             timestamps_key=self.timestamps_key,
-                                             index_enabled=self.index_enabled,
-                                             index_key=self.index_key)
+                                                timestamps_enabled=self.timestamps_enabled,
+                                                timestamps_key=self.timestamps_key,
+                                                index_enabled=self.index_enabled,
+                                                index_key=self.index_key)
                     self.buffer_id = self.buffer.id
                     self.buffer.install(agent)
                     agent.add_buffer(self.buffer)
