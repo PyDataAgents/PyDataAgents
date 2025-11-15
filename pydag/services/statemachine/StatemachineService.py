@@ -67,9 +67,11 @@ class StatemachineService(Service):
 
     def install(self, agent : Agent = None):
         super().install(agent)
+        # add children and parents first
+        self.connect_nodes()
+        # then install nodes
         for node in self.nodes.values():
             node.install(agent)
-        self.connect_nodes()
         
     @abstractmethod    
     def start(self):

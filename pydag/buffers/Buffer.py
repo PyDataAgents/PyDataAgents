@@ -3,10 +3,13 @@ from dataclasses import dataclass, field
 import json
 from abc import abstractmethod
 import threading
+from typing import TYPE_CHECKING
 
-from ..agents.Agent import Agent
 from .DataType import DataType
 from ..agents.AgentElement import AgentElement
+
+if TYPE_CHECKING:
+    from ..agents.Agent import Agent
 
 @dataclass
 class Buffer(AgentElement):
@@ -25,7 +28,7 @@ class Buffer(AgentElement):
         self.elements = any
         self.lock = threading.RLock()
 
-    def install(self, agent : Agent = None):
+    def install(self, agent: Agent = None):
         super().install(agent)
         if self.initial_values is not None:
             self.elements = self.initial_values
