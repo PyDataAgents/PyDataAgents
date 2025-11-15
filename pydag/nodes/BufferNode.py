@@ -38,7 +38,7 @@ class BufferNode(Node):
                 if self.buffer_id in agent.buffer_store:
                     self.buffer = agent.buffer_store[self.buffer_id]
                 else:
-                    self.buffer = DictBuffer(id=self.id + "-BUFFER", capacity=AgentConfig.INFINITE_CAPACITY,
+                    self.buffer = DictBuffer(id=self.id + "-BUFFER", capacity=self.capacity,
                                              timestamps_enabled=self.timestamps_enabled,
                                              timestamps_key=self.timestamps_key,
                                              index_enabled=self.index_enabled,
@@ -49,7 +49,7 @@ class BufferNode(Node):
             else:
                 self.buffer = DictBuffer(
                     id=self.id + "-BUFFER",
-                    capacity=AgentConfig.INFINITE_CAPACITY,
+                    capacity=self.capacity,
                     timestamps_enabled=self.timestamps_enabled,
                     timestamps_key=self.timestamps_key,
                     index_enabled=self.index_enabled,
