@@ -10,7 +10,7 @@ class DuplicateBuffer(DictBuffer):
     """ `Buffer` that pushes all its inserted data to specified other buffers as well.
     """
     
-    duplicate_ids : list = field(default_factory = list, metadata={"description", "id's of the other buffers used for duplicating the data"})
+    duplicate_ids : list = field(default_factory = list, metadata={"description": "id's of the other buffers used for duplicating the data"})
     
     def __post_init__(self):
         super().__post_init__()
@@ -18,7 +18,7 @@ class DuplicateBuffer(DictBuffer):
 
     def install(self, agent : Agent = None):
         super().install(agent)
-        if self.duplicates is not None:
+        if len(self.duplicates) > 0:
             self.duplicate_ids = list(self.duplicates.keys())
         elif len(self.duplicate_ids) > 0:
             for di in self.duplicate_ids:
