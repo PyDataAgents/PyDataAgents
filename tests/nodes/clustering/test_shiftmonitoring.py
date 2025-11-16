@@ -653,7 +653,7 @@ def test_l_011():
     pca = PCADimReduction(id="PCA", dimensions=2, min_learning_samples=40, sample_length=384, min_inference_samples=1,normalize=True, features_from_parent=["values_0-feature-amazon-chronos-bolt-mini-0"], persistent=False)
     pca.add_parent(extractor)
     #600
-    sm_node = ShiftMonitoring(id="shiftmonitoring_node", min_learning_samples=60, sample_length=2, min_inference_samples=1, persistent=False, return_input=True, sensitivity=2, index_enabled=True)
+    sm_node = ShiftMonitoring(id="shiftmonitoring_node", min_learning_samples=60, sample_length=2, min_inference_samples=1, persistent=False, return_input=True, sensitivity=2, index_enabled=True, capacity=200)
     sm_node.add_parent(pca)
 
 
@@ -676,3 +676,6 @@ def test_l_011():
     
     # Start Agent
     ag.start_blocking()   
+
+
+test_l_011()
