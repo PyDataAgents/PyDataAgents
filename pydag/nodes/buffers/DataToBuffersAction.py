@@ -35,15 +35,28 @@ class DataToBuffersAction(BufferNode, Action):
                 if isinstance(parent, BufferNode):
                     self.parent_ref = parent                    
                     break
-            if self.buffers is not None:
-                if agent is not None:
-                    for buffer_id in self.buffer_ids:
-                        if buffer_id in agent.buffer_store:
-                            self.buffers.update(buffer_id, agent.buffer_store[buffer_id])
-                        else:
-                            buffer = DictBuffer(id=buffer_id, capacity=AgentConfig.INFINITE_CAPACITY)
-                            buffer.install(agent)
-                            agent.add_buffer(buffer)
+        if self.buffers is not None:
+            if agent is not None:
+                for buffer in self.buffers.values():
+                    if buffer.id not in agent.buffer_store:
+                        buffer.install(agent)
+                        agent.add_buffer(buffer)
+        else:
+            self.buffers = {}
+            if agent is not None:
+                for buffer_id in self.buffer_ids:
+                    if buffer_id in agent.buffer_store:
+                        self.buffers[buffer_id] = agent.buffer_store[buffer_id]
+                    else:
+                        buffer = DictBuffer(id=buffer_id, capacity=AgentConfig.INFINITE_CAPACITY)
+                        buffer.install(agent)
+                        agent.add_buffer(buffer)
+                        self.buffers[buffer_id] = buffer
+            else:
+                for buffer_id in self.buffer_ids:
+                    buffer = DictBuffer(id=buffer_id, capacity=AgentConfig.INFINITE_CAPACITY)
+                    buffer.install(agent)
+                    self.buffers[buffer_id] = buffer
             
 
     def execute(self):
