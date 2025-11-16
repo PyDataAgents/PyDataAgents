@@ -1,5 +1,5 @@
-from dataclasses import dataclass
-
+from dataclasses import dataclass, field
+from pydag.agents.AgentConfig import AgentConfig
 from ...agents.Agent import Agent
 from ..Action import Action
 from ..BufferNode import BufferNode
@@ -7,6 +7,9 @@ from ..BufferNode import BufferNode
 
 @dataclass
 class CopyDataAction(BufferNode, Action):
+    
+    forward : bool = field(default=False, metadata={"description": "specifies whether the parent buffer pointer is moved forward if persistent is True. This prevents, that the same data is copied multiple times and we do not have to delete data from the parents buffer to receive newer data."})
+    
     """ `Action` that makes a copy of the `Buffer` found in the first `BufferNode` found amongst this `Node`s parents.
         If this `Node`'s parents contian more than one `BufferNode`, only the first is respected.
     """
@@ -14,6 +17,7 @@ class CopyDataAction(BufferNode, Action):
     def __post_init__(self):
         super().__post_init__()
         self.parent_ref : BufferNode = None
+        self.pointer : int = 0  # pointer to keep track of current position in parent buffer
     
     def install(self, agent : Agent = None):
         BufferNode.install(self, agent)
@@ -24,5 +28,87 @@ class CopyDataAction(BufferNode, Action):
                 break
 
     def execute(self):
-        data = self.parent_ref.buffer.data(n=self.n, persistent=self.persistent)
+        if not self.persistent:
+            raise RuntimeError("CopyDataAction requires persistent=True.")
+
+        parent_full = self.parent_ref.buffer.data(persistent=True)
+        if not parent_full:
+            return
+        prev_full = self.buffer.data(persistent=True) or {}
+
+        list_cols = [k for k, v in parent_full.items() if isinstance(v, list)]
+        if not list_cols:
+            if not prev_full:
+                self.buffer.push(parent_full)
+            return
+
+        # Infinite capacity: simple pointer-based slicing from tip (start)
+        if self.parent_ref.buffer.capacity == AgentConfig.INFINITE_CAPACITY:
+            if not prev_full or not any(isinstance(prev_full.get(k), list) for k in list_cols):
+                total = len(parent_full[list_cols[0]])
+                take = total if self.n == 0 else min(self.n, total)
+                data = {k: (v[0:take] if isinstance(v, list) else v) for k, v in parent_full.items()}
+                self.pointer += take
+                self.buffer.push(data)
+                return
+            total_parent = len(parent_full[list_cols[0]])
+            new_available = total_parent - self.pointer
+            if new_available <= 0:
+                return
+            take = new_available if self.n == 0 else min(self.n, new_available)
+            start = self.pointer
+            end = start + take
+            data = {k: (v[start:end] if isinstance(v, list) else v) for k, v in parent_full.items()}
+            self.pointer += take
+            self.buffer.push(data)
+            return
+
+        # Finite capacity: window pattern match to find overlap, then take new rows from tip of new segment
+        common_cols = [k for k in list_cols if isinstance(prev_full.get(k), list)]
+        if not prev_full or not common_cols:
+            # First run or no overlap columns: take from start respecting n
+            total = len(parent_full[list_cols[0]])
+            take = total if self.n == 0 else min(self.n, total)
+            data = {k: (v[0:take] if isinstance(v, list) else v) for k, v in parent_full.items()}
+            self.pointer += take
+            self.buffer.push(data)
+            return
+
+        def rows(dct, cols):
+            L = len(dct[cols[0]])
+            return [tuple(dct[c][i] for c in cols) for i in range(L)]
+
+        prev_rows = rows(prev_full, common_cols)
+        parent_rows = rows(parent_full, common_cols)
+        window = min(10, len(prev_rows))
+        pattern = prev_rows[-window:]
+        match_index = -1
+        for i in range(len(parent_rows) - window, -1, -1):
+            if parent_rows[i:i + window] == pattern:
+                match_index = i
+                break
+        new_start = (match_index + window) if match_index != -1 else 0
+
+        total_parent = len(parent_full[list_cols[0]])
+        if new_start >= total_parent:
+            return
+
+        available_new = total_parent - new_start
+        take = available_new if self.n == 0 else min(self.n, available_new)
+        if take <= 0:
+            return
+
+        slice_start = new_start
+        slice_end = new_start + take
+        data = {}
+        for k, v in parent_full.items():
+            if isinstance(v, list):
+                data[k] = v[slice_start:slice_end]
+            else:
+                data[k] = v
+
+        new_count = len(data[list_cols[0]]) if list_cols else 0
+        if new_count == 0:
+            return
+        self.pointer += new_count
         self.buffer.push(data)

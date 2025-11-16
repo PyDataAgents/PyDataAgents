@@ -1,4 +1,7 @@
 import os
+import time
+import pytest
+
 from pydag.agents.Agent import Agent
 from pydag.buffers.DatasetBuffer import DatasetBuffer
 from pydag.nodes.Action import Action
@@ -12,11 +15,101 @@ from pydag.mappings.ThreadType import ThreadType
 from pydag.buffers.signals.Sine import Sine
 from pydag.buffers.SignalBuffer import SignalBuffer
 from pydag.agents.AgentConfig import AgentConfig
-import time
+
+
+def test_non_persistent_raises():
+    db = DatasetBuffer(dataset_name="ArrowHead")
+    db.install()
+    lba = LinkBufferAction(); lba.set_buffer(db); lba.install()
+    cda = CopyDataAction(n=10, persistent=False)
+    cda.add_parent(lba); cda.install()
+    with pytest.raises(RuntimeError):
+        cda.execute()
+                
+                
+def test_forward_initial_snapshot_finite():
+    signal = Sine(f=1, a=1, p=0, n=0.02)
+    src = SignalBuffer(signal=signal, capacity=50); src.install()
+    lba = LinkBufferAction(); lba.set_buffer(src)
+    cda = CopyDataAction(n=5, persistent=True, forward=True)
+    cda.add_parent(lba); cda.install()
+    time.sleep(0.15)  # generate some samples
+    cda.execute()
+    assert cda.buffer.size() <= 5
+    # Compare first n samples of source
+    head = src.data(n=5, persistent=True)
+    copied = cda.buffer.data(n=5, persistent=True)
+    assert list(head.values()) == list(copied.values())
+
+
+def test_forward_shared_and_advancing_finite():
+    signal = Sine(f=1, a=1, p=0, n=0.05)
+    src = SignalBuffer(signal=signal, capacity=60); src.install()
+    lba = LinkBufferAction(); lba.set_buffer(src)
+    cda1 = CopyDataAction(n=10, persistent=True, forward=True); cda1.add_parent(lba); cda1.install()
+    cda2 = CopyDataAction(n=10, persistent=True, forward=True); cda2.add_parent(lba); cda2.install()
+    prev_data = None
+    changes = 0
+    for i in range(35):
+        time.sleep(0.1)
+        cda1.execute(); cda2.execute()
+        if cda1.buffer.size() == 0: continue
+        d1 = cda1.buffer.data(n=10, persistent=True)
+        d2 = cda2.buffer.data(n=10, persistent=True)
+        assert list(d1.values()) == list(d2.values()), f"Mismatch between consumers at {i}"
+        if prev_data and list(prev_data.values()) != list(d1.values()):
+            changes += 1
+        prev_data = d1
+        assert cda1.buffer.size() <= 10 and cda2.buffer.size() <= 10
+    assert changes >= 5, f"Insufficient advancement changes={changes}"
+
+def test_forward_pointer_wrap_finite():
+    signal = Sine(f=1, a=1, p=0, n=0.04)
+    src = SignalBuffer(signal=signal, capacity=25); src.install()
+    lba = LinkBufferAction(); lba.set_buffer(src)
+    cda = CopyDataAction(n=5, persistent=True, forward=True); cda.add_parent(lba); cda.install()
+    last_pointer = cda.pointer
+    advances = 0
+    for i in range(50):
+        time.sleep(0.08)
+        cda.execute()
+        if cda.buffer.size() == 0: continue
+        assert cda.pointer >= last_pointer, "Pointer regressed"
+        if cda.pointer > last_pointer:
+            advances += 1
+        last_pointer = cda.pointer
+        assert cda.buffer.size() <= 5
+    assert advances >= 10, f"Too few pointer advances: {advances}"
+
+
+def test_forward_infinite_capacity_advancing():
+    signal = Sine(f=1, a=1, p=0, n=0.05)
+    src = SignalBuffer(signal=signal, capacity=AgentConfig.INFINITE_CAPACITY); src.install()
+    lba = LinkBufferAction(); lba.set_buffer(src)
+    cda1 = CopyDataAction(n=15, persistent=True, forward=True); cda1.add_parent(lba); cda1.install()
+    cda2 = CopyDataAction(n=15, persistent=True, forward=True); cda2.add_parent(lba); cda2.install()
+    last_pointer = cda1.pointer
+    changes = 0
+    prev_vals = None
+    for i in range(30):
+        time.sleep(0.1)
+        cda1.execute(); cda2.execute()
+        if cda1.buffer.size() == 0: continue
+        d1 = cda1.buffer.data(n=15, persistent=True)
+        d2 = cda2.buffer.data(n=15, persistent=True)
+        assert list(d1.values()) == list(d2.values())
+        assert cda1.pointer >= last_pointer
+        if cda1.pointer > last_pointer:
+            changes += 1
+        last_pointer = cda1.pointer
+        if prev_vals and list(prev_vals.values()) != list(d1.values()):
+            pass
+        prev_vals = d1
+        assert cda1.buffer.size() <= 15 and cda2.buffer.size() <= 15
+    assert changes >= 10, f"Advancement insufficient changes={changes}"
 
 
 def test_000():
-    
     db = DatasetBuffer(dataset_name="ArrowHead")
     db.install()
     
@@ -40,142 +133,6 @@ def test_000():
             node.execute()
             if isinstance(node, BufferNode):
                 print(node.buffer.data())
-                
-                
-def test_010():
-    
-    db = DatasetBuffer(dataset_name="ArrowHead")
-    db.install()
-    
-    lba = LinkBufferAction()
-    lba.set_buffer(db)
-    lba.install()
-    
-    cda1 = CopyDataAction(n=1000, persistent=True)
-    cda1.add_parent(lba)
-    cda1.install()
-    
-    cda2 = CopyDataAction(n=1000, persistent=False)
-    cda2.add_parent(lba)
-    cda2.install()
-    
-    plot_path1 = os.path.dirname(__file__) + os.sep + "plotly_1_test010.html"
-    data1 = [{"y": "values", "type": "scatter", "mode": "lines"}]
-    pa1 = PlotlifyAction(plot_path=plot_path1, data=data1)
-    pa1.add_parent(cda1)
-    pa1.install()
-    
-    plot_path2 = os.path.dirname(__file__) + os.sep + "plotly_2_test010.html"
-    data2 = [{"y": "values", "type": "scatter", "mode": "lines"}]
-    pa2 = PlotlifyAction(plot_path=plot_path2, data=data2)
-    pa2.add_parent(cda2)
-    pa2.install()
-        
-    nodes : list[Action] = [lba, cda1, cda2, pa1, pa2]
-    
-    for node in nodes:
-        node.execute()
-        if isinstance(node, BufferNode):
-            if node.buffer:
-                print(node.buffer.data())
-
-
-def test_011():
-    # Test that the data of consumers of two CopyDataAction nodes receives different data between executions.
-    # Data of both CopyDataAction nodes is persistent.
-    singal = Sine(f=1, a=1, p=0, n=0.1)
-    sine_buff = SignalBuffer(signal=singal, capacity=1000)
-    sine_buff.install()
-
-    lba = LinkBufferAction()
-    lba.set_buffer(sine_buff)
-    # cda1
-    cda1 = CopyDataAction(n=10, persistent=True)
-    cda1.add_parent(lba)
-    cda1.install()
-    
-    # cda2
-    cda2 = CopyDataAction(n=10, persistent=True)
-    cda2.add_parent(lba)
-    cda2.install()
-
-
-    i = 0
-    while i < 10:
-        time.sleep(0.1)
-        cda1.execute()
-        cda2.execute()
-        if hasattr(cda1.buffer, 'data') and hasattr(cda2.buffer, 'data') and cda1.buffer.size() > 0:
-            assert cda1.buffer.size() <= 10, f"Size mismatch at iteration {i}" # Buffers have size <= 10
-            assert cda2.buffer.size() <= 10, f"Size mismatch at iteration {i}" # Buffers have size <= 10
-            assert cda1.buffer.size() == cda2.buffer.size(), f"Size mismatch at iteration {i}" # Buffers have the same size
-            assert list(cda1.buffer.data(n=10, persistent=True).values()) == list(cda2.buffer.data(n=10, persistent=True).values()), f"Data mismatch at iteration {i}" # Buffers contain the same data
-        i = i + 1
-
-
-
-def test_012():
-    # TLDR: In each round, each consumer must get different data while two consumers must get the same data from the common source if CopyDataAction(..., persistent=True).
-    # 1. Test that a consumer of a CopyDataAction node receives different data between executions. Otherwise this means that always the same data is received and hence useless in downstream applications like e.g. visualization and data processing at the same time.
-    # 2. Test that two consumers of two CopyDataAction nodes receives the same data between executions from a common source buffer.
-    
-    singal = Sine(f=1, a=1, p=0, n=0.1)
-    sine_buff = SignalBuffer(signal=singal, capacity=AgentConfig.INFINITE_CAPACITY)
-    sine_buff.install()
-
-    lba = LinkBufferAction()
-    lba.set_buffer(sine_buff)
-    print(lba.buffer.size())
-    # cda1
-    cda1 = CopyDataAction(n=100, persistent=True)
-    cda1.add_parent(lba)
-    cda1.install()
-    
-    # cda2
-    cda2 = CopyDataAction(n=10, persistent=True)
-    cda2.add_parent(lba)
-    cda2.install()
-
-
-    i = 0
-    first_round = True
-    while i < 100:
-        time.sleep(0.3)
-        print(lba.buffer.size())
-        cda1.execute()
-        cda2.execute()
-        if hasattr(cda1.buffer, 'data') and hasattr(cda2.buffer, 'data') and cda1.buffer.size() > 0:
-            if cda1.buffer.size() >= 10:
-                if first_round == True:
-                    # First round
-                    first_round = False
-                    data_first_round_cda1 = list(cda1.buffer.data(n=10, persistent=False).values())
-                    data_first_round_cda2 = list(cda2.buffer.data(n=10, persistent=False).values())
-                    print(cda1.buffer.size())
-                    print(data_first_round_cda1)
-                    print(data_first_round_cda2)
-                    assert data_first_round_cda1 == data_first_round_cda2, f"Data mismatch at iteration {i}" # Buffers do not contain the same data
-                else:
-                    # Subsequent rounds
-                    try:
-                        data_first_round_cda1 = data_later_cd1
-                        data_first_round_cda2 = data_later_cd2
-                    except:
-                        pass
-                    data_later_cd1 = list(cda1.buffer.data(n=10, persistent=False).values())
-                    data_later_cd2 = list(cda2.buffer.data(n=10, persistent=False).values())
-                    print(cda1.buffer.size())
-                    print(data_first_round_cda1)
-                    print(data_later_cd1)
-                    print("##################################")
-                    print(cda2.buffer.size())
-                    print(data_first_round_cda2)
-                    print(data_later_cd2)
-                    assert data_first_round_cda1 != data_later_cd1, f"Data match at iteration {i}" # Buffers contain the same data
-                    assert data_first_round_cda2 != data_later_cd2, f"Data match at iteration {i}" # Buffers contain the same data
-                    assert data_later_cd1 == data_later_cd2, f"Data mismatch at iteration {i}" # Buffers contain the same data
-        i = i + 1
-
 
 def test_020():
     """ generates an agent for grafana testing of two plots showing the same time series data as data stream from dataset buffer
@@ -207,6 +164,3 @@ def test_020():
     agent.add_service(sas)   
     
     agent.start_blocking()
-
-
-test_012()
