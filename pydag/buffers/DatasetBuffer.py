@@ -4,6 +4,8 @@ import numpy as np
 import pandas as pd
 import os
 
+from pydag.agents.AgentConfig import AgentConfig
+
 from ..buffers.BufferException import BufferException
 from ..agents.Agent import Agent
 from .DictBuffer import DictBuffer
@@ -45,6 +47,7 @@ class DatasetBuffer(DictBuffer):
         data = {}
         X : pd.DataFrame = None
         y : np.ndarray = None
+        self.capacity = AgentConfig.INFINITE_CAPACITY
         
         # this directory should contain raw data files depending on the dataset
         resource_dir : str = os.getcwd() + os.sep + "resources"

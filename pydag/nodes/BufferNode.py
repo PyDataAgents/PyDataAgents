@@ -13,9 +13,9 @@ class BufferNode(Node):
     persistent : bool = field(default=True, metadata={"description": "specifies whether data is removed (False) from parent or not (True)"})
     n : int = field(default=0, metadata={"description": "specifies how much data is retrieved from parent buffer. Default 0 -> all data"})
     # New timestamp-related parameters (DictBuffer-specific)
-    timestamps_enabled: bool = field(default=False, metadata={"description": "Enable timestamps in underlying DictBuffer."})
+    timestamps_enabled : bool = field(default=False, metadata={"description": "Whether timestamps are enabled for this buffer. If the parent buffer has a timestamps column which is named in the same way as this buffer's timestamps_key, those timestamps will be copied over. If set to False and a timestamp column is present in the input data, it will be ignored."})
     timestamps_key: str = field(default="timestamps", metadata={"description": "Key name for timestamps column."})
-    index_enabled : bool = field(default=False, metadata={"description": "Whether an index column is enabled for this buffer. The index column is a simple integer sequence starting from 0 and adds +1 per point."})
+    index_enabled : bool = field(default=False, metadata={"description": "Whether an index column is enabled for this buffer. The index column is a simple integer sequence starting from 0 and adds +1 per point. If the parent buffer has an index column which is named in the same way as this buffer's index_key, those indices will be copied over. If set to False and an index column is present in the input data, it will be ignored."})
     index_key : str = field(default="index", metadata={"description": "Key name for index column."})
     
     def __post_init__(self):
