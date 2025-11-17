@@ -10,8 +10,8 @@ class CopyDataAction(BufferNode, Action):
     
     forward : bool = field(default=False, metadata={"description": "specifies whether the parent buffer pointer is moved forward if persistent is True. This prevents, that the same data is copied multiple times and we do not have to delete data from the parents buffer to receive newer data."})
     
-    """ `Action` that makes a copy of the `Buffer` found in the first `BufferNode` found amongst this `Node`s parents.
-        If this `Node`'s parents contian more than one `BufferNode`, only the first is respected.
+    """ `Action` that makes a copy of the `Buffer` found in the first `BufferNode` found amongst this `Node`s parents and adds it to a buffer with infinite capacity.
+        If this `Node`'s parents contain more than one `BufferNode`, only the first is respected.
     """
     
     def __post_init__(self):
@@ -105,17 +105,17 @@ class CopyDataAction(BufferNode, Action):
         if take <= 0:
             return
 
-        slice_start = new_start
-        slice_end = new_start + take
+        self._slice_start = new_start
+        self._slice_end = new_start + take
         data = {}
         for k, v in parent_full.items():
             if isinstance(v, list):
-                data[k] = v[slice_start:slice_end]
+                data[k] = v[self._slice_start:self._slice_end]
             else:
                 data[k] = v
 
-        new_count = len(data[list_cols[0]]) if list_cols else 0
-        if new_count == 0:
+        self._new_count = len(data[list_cols[0]]) if list_cols else 0
+        if self._new_count == 0:
             return
-        self.pointer += new_count
+        self.pointer += self._new_count
         self.buffer.push(data)

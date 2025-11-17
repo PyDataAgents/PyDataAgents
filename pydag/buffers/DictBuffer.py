@@ -92,12 +92,19 @@ class DictBuffer(Buffer):
                     if batch_len > 1:
                         elements[self.index_key] = [idx_val] * batch_len
                     # batch_len == 1 keeps scalar
-            existing_cols = [c for c in self.elements.keys() if c not in {self.timestamps_key, self.index_key}]
+            # Determine existing non-meta columns conditionally excluding timestamp/index only if disabled.
+            excluded = set()
+            if not self.timestamps_enabled:
+                excluded.add(self.timestamps_key)
+            if not self.index_enabled:
+                excluded.add(self.index_key)
+            existing_cols = [c for c in self.elements.keys() if c not in excluded]
             current_size = self.size()
 
             # New incoming columns: pad past rows with None
             for col in elements.keys():
-                if col not in existing_cols:
+                # Skip padding for timestamp/index if disabled (already excluded) or if already present
+                if col not in existing_cols and col not in excluded:
                     if current_size > 0:
                         self.elements[col] = [None] * current_size
                     else:
