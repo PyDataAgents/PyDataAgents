@@ -16,9 +16,9 @@ class DictBuffer(Buffer):
     """
     Buffer that stores its values in a dictionary column-wise (each key -> list).
     """
-    timestamps_enabled : bool = field(default=False, metadata={"description": "Whether timestamps are enabled for this buffer."})
+    timestamps_enabled : bool = field(default=False, metadata={"description": "Whether timestamps are enabled for this buffer. If the parent buffer has a timestamps column which is named in the same way as this buffer's timestamps_key, those timestamps will be copied over. If set to False and a timestamp column is present in the input data, it will be ignored."})
     timestamps_key  : str = field(default="timestamps", metadata={"description": "Key under which timestamps are exposed."})
-    index_enabled : bool = field(default=False, metadata={"description": "Whether an index column is enabled for this buffer. The index column is a simple integer sequence starting from 0 and adds +1 per point."})
+    index_enabled : bool = field(default=False, metadata={"description": "Whether an index column is enabled for this buffer. The index column is a simple integer sequence starting from 0 and adds +1 per point. If the parent buffer has an index column which is named in the same way as this buffer's index_key, those indices will be copied over. If set to False and an index column is present in the input data, it will be ignored."})
     index_key : str = field(default="index", metadata={"description": "Key name for index column."})
 
     def __post_init__(self):
@@ -67,6 +67,31 @@ class DictBuffer(Buffer):
                     if not isinstance(v, list):
                         elements[k] = [v] * batch_len
 
+            # Normalize user-provided timestamp / index columns based on enabled flags
+            if not self.timestamps_enabled and self.timestamps_key in elements:
+                del elements[self.timestamps_key]
+            if not self.index_enabled and self.index_key in elements:
+                del elements[self.index_key]
+
+            if self.timestamps_enabled and self.timestamps_key in elements:
+                ts_val = elements[self.timestamps_key]
+                if isinstance(ts_val, list):
+                    if len(ts_val) != batch_len:
+                        raise ValueError(f"Timestamps list length {len(ts_val)} != batch length {batch_len}")
+                else:
+                    if batch_len > 1:
+                        elements[self.timestamps_key] = [ts_val] * batch_len
+                    # batch_len == 1 keeps scalar
+
+            if self.index_enabled and self.index_key in elements:
+                idx_val = elements[self.index_key]
+                if isinstance(idx_val, list):
+                    if len(idx_val) != batch_len:
+                        raise ValueError(f"Index list length {len(idx_val)} != batch length {batch_len}")
+                else:
+                    if batch_len > 1:
+                        elements[self.index_key] = [idx_val] * batch_len
+                    # batch_len == 1 keeps scalar
             existing_cols = [c for c in self.elements.keys() if c not in {self.timestamps_key, self.index_key}]
             current_size = self.size()
 
