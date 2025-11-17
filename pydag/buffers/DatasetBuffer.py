@@ -8,6 +8,7 @@ from pydag.agents.AgentConfig import AgentConfig
 
 from ..buffers.BufferException import BufferException
 from ..agents.Agent import Agent
+from ..agents.AgentConfig import AgentConfig
 from .DictBuffer import DictBuffer
 from ..nodes.dataset.DatasetNames import DatasetNames
 
@@ -51,6 +52,9 @@ class DatasetBuffer(DictBuffer):
         
         # this directory should contain raw data files depending on the dataset
         resource_dir : str = os.getcwd() + os.sep + "resources"
+
+        #set the capacity to infinite
+        self.capacity = AgentConfig.INFINITE_CAPACITY
         
         if self.dataset_name == "Blobs":
             from sklearn.datasets import make_blobs
@@ -100,8 +104,8 @@ class DatasetBuffer(DictBuffer):
             # Subsample data by factor of 10 to reduce size
             for key in data.keys():
                     data[key] = data[key][::10]
-            self.elements = data
-            return
+            
+            
         
         elif self.dataset_name == "CWRU":
 
@@ -140,8 +144,8 @@ class DatasetBuffer(DictBuffer):
                     for dim in range(far.shape[0]):
                         data["values_{0}".format(dim)] = far[dim].tolist()
                     data["y"] = fary.tolist()
-            self.elements = data
-            return
+            
+            
             
                
         else:
@@ -155,18 +159,22 @@ class DatasetBuffer(DictBuffer):
             far = ar.reshape(-1) # flatten the array    
             fary = y.reshape(-1) # flatten the array    
         
-        if self.sort_by_y:
-            try:
-                fary = pd.to_numeric(fary)  # Convert y values to numeric if possible
-                perm = np.argsort(fary, kind='mergesort')   # stable: preserves order inside each label
-                data["values"] = far[perm].tolist()
-                data["y"] = fary[perm].tolist()
-            except ValueError:
-                # If conversation fails, throw error
-                raise BufferException("y values could not be converted to numeric values. Sorting not possible.")
-        else:
-            data["values"] = far.tolist()
-            data["y"] = fary.tolist()
-        self.elements = data
+            if self.sort_by_y:
+                try:
+                    fary = pd.to_numeric(fary)  # Convert y values to numeric if possible
+                    perm = np.argsort(fary, kind='mergesort')   # stable: preserves order inside each label
+                    data["values"] = far[perm].tolist()
+                    data["y"] = fary[perm].tolist()
+                except ValueError:
+                    # If conversation fails, throw error
+                    raise ValueError("y values could not be converted to numeric values. Sorting not possible.")
+            else:
+                data["values"] = far.tolist()
+                data["y"] = fary.tolist()
+           
+            
+        
+        # Push to buffer
+        self.push(data)
 
         

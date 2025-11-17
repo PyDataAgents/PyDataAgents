@@ -145,8 +145,6 @@ class DictBuffer(Buffer):
                         ts_list = []
                         interval = (time_then - time_now) / batch_len
                         ts_list = [int(time_now + interval * i) for i in range(batch_len)]
-                        print(ts_list)
-                
                     self.elements[self.timestamps_key].extend(ts_list)
 
             if self.index_enabled:        

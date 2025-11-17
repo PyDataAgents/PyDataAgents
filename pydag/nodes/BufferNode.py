@@ -17,7 +17,7 @@ class BufferNode(Node):
     timestamps_key: str = field(default="timestamps", metadata={"description": "Key name for timestamps column."})
     index_enabled : bool = field(default=False, metadata={"description": "Whether an index column is enabled for this buffer. The index column is a simple integer sequence starting from 0 and adds +1 per point. If the parent buffer has an index column which is named in the same way as this buffer's index_key, those indices will be copied over. If set to False and an index column is present in the input data, it will be ignored."})
     index_key : str = field(default="index", metadata={"description": "Key name for index column."})
-    
+    capacity : int = field(default=AgentConfig.INFINITE_CAPACITY, metadata={"description": "Capacity of the buffer. Default is infinite."})
     def __post_init__(self):
         super().__post_init__()
         self.buffer : Buffer = None  # Placeholder for the buffer instance
@@ -46,18 +46,18 @@ class BufferNode(Node):
                         self.buffer.install(agent)
                         agent.add_buffer(self.buffer)
                 else:
-                    self.buffer = DictBuffer(id=self.id + "-BUFFER", capacity=AgentConfig.INFINITE_CAPACITY,
-                                                timestamps_enabled=self.timestamps_enabled,
-                                                timestamps_key=self.timestamps_key,
-                                                index_enabled=self.index_enabled,
-                                                index_key=self.index_key)
+                    self.buffer = DictBuffer(id=self.id + "-BUFFER", capacity=self.capacity,
+                                             timestamps_enabled=self.timestamps_enabled,
+                                             timestamps_key=self.timestamps_key,
+                                             index_enabled=self.index_enabled,
+                                             index_key=self.index_key)
                     self.buffer_id = self.buffer.id
                     self.buffer.install(agent)
                     agent.add_buffer(self.buffer)
             else:
                 self.buffer = DictBuffer(
                     id=self.id + "-BUFFER",
-                    capacity=AgentConfig.INFINITE_CAPACITY,
+                    capacity=self.capacity,
                     timestamps_enabled=self.timestamps_enabled,
                     timestamps_key=self.timestamps_key,
                     index_enabled=self.index_enabled,

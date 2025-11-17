@@ -18,6 +18,7 @@ class CopyDataAction(BufferNode, Action):
         super().__post_init__()
         self.parent_ref : BufferNode = None
         self.pointer : int = 0  # pointer to keep track of current position in parent buffer
+        self.capacity : int = AgentConfig.INFINITE_CAPACITY
     
     def install(self, agent : Agent = None):
         BufferNode.install(self, agent)

@@ -74,10 +74,12 @@ class ShiftMonitoring(LearningElement):
             elif d.ndim == 3:
                 d = np.squeeze(d, axis=0) 
             transformed_data, decision = self.models[key].transform(d)
-            forecast[f"{key}-{DataElementConfig.FEATURE}-shift"] = transformed_data.tolist()  #convert to list
-            forecast[f"{key}-{DataElementConfig.FEATURE}-decision"] = [decision]  #convert to list
+            forecast[f"{key}-{DataElementConfig.FEATURE}-shift"] = transformed_data[0].tolist()  #convert to list
+            forecast[f"{key}-{DataElementConfig.FEATURE}-decision"] = decision.tolist()  #convert to list
             if self.return_input:
-                forecast[key] = d.tolist()
+                for index in d:
+                    for f,feat in enumerate(index):
+                        forecast[key+f"-{f}"] = feat.tolist()
         
         return forecast, None
         
