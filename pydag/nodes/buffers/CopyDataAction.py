@@ -42,11 +42,12 @@ class CopyDataAction(BufferNode, Action):
                 self.buffer.push(parent_full)
             return
 
-        # Infinite capacity: simple pointer-based slicing from tip (start)
+        # Infinite capacity: FIFO semantics (take from current pointer forward; initial copy uses head)
         if self.parent_ref.buffer.capacity == AgentConfig.INFINITE_CAPACITY:
             if not prev_full or not any(isinstance(prev_full.get(k), list) for k in list_cols):
                 total = len(parent_full[list_cols[0]])
                 take = total if self.n == 0 else min(self.n, total)
+                # Head slice preserves original arrival order (FIFO)
                 data = {k: (v[0:take] if isinstance(v, list) else v) for k, v in parent_full.items()}
                 self.pointer += take
                 self.buffer.push(data)
@@ -66,7 +67,7 @@ class CopyDataAction(BufferNode, Action):
         # Finite capacity: window pattern match to find overlap, then take new rows from tip of new segment
         common_cols = [k for k in list_cols if isinstance(prev_full.get(k), list)]
         if not prev_full or not common_cols:
-            # First run or no overlap columns: take from start respecting n
+            # First run or no overlap columns: take head respecting n (FIFO)
             total = len(parent_full[list_cols[0]])
             take = total if self.n == 0 else min(self.n, total)
             data = {k: (v[0:take] if isinstance(v, list) else v) for k, v in parent_full.items()}
@@ -80,7 +81,8 @@ class CopyDataAction(BufferNode, Action):
 
         prev_rows = rows(prev_full, common_cols)
         parent_rows = rows(parent_full, common_cols)
-        window = min(10, len(prev_rows))
+        # Dynamic window: at least 3, half of previous rows, capped by available length
+        window = min(max(3, len(prev_rows)//2), len(prev_rows))
         pattern = prev_rows[-window:]
         match_index = -1
         for i in range(len(parent_rows) - window, -1, -1):
@@ -91,6 +93,11 @@ class CopyDataAction(BufferNode, Action):
 
         total_parent = len(parent_full[list_cols[0]])
         if new_start >= total_parent:
+            return
+
+        # Skip push if this would just duplicate the entire current parent (no new data)
+        # Condition: full overlap (new_start == 0) AND identical row tuples
+        if new_start == 0 and prev_rows == parent_rows:
             return
 
         available_new = total_parent - new_start
