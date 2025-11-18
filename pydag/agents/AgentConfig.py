@@ -38,7 +38,8 @@ class AgentConfig:
     DATA = "data"
     META = "meta"    
     VALUES = "values"
-    TIMESTAMPS = "timestamps"    
+    TIMESTAMPS = "timestamps"   
+    INDEX = "index" 
     INFINITE_CAPACITY = -1
 
     def __init__(self, agent : Agent = None):
