@@ -65,7 +65,10 @@ class DictBuffer(Buffer):
             if batch_len > 1:
                 for k, v in list(elements.items()):
                     if not isinstance(v, list):
-                        elements[k] = [v] * batch_len
+                        if not isinstance(v, (int, float)):
+                            raise ValueError(f"Unsupported type for key '{k}': {type(v)}. Only lists and scalars (int, float) are supported.")
+                        else:
+                            elements[k] = [v] * batch_len
 
             # Normalize user-provided timestamp / index columns based on enabled flags
             if not self.timestamps_enabled and self.timestamps_key in elements:
@@ -92,32 +95,36 @@ class DictBuffer(Buffer):
                     if batch_len > 1:
                         elements[self.index_key] = [idx_val] * batch_len
                     # batch_len == 1 keeps scalar
-            # Determine existing non-meta columns conditionally excluding timestamp/index only if disabled.
+            # Determine existing non-meta columns; always exclude meta columns from alignment padding.
+            meta_keys = {self.timestamps_key, self.index_key}
             excluded = set()
             if not self.timestamps_enabled:
                 excluded.add(self.timestamps_key)
             if not self.index_enabled:
                 excluded.add(self.index_key)
-            existing_cols = [c for c in self.elements.keys() if c not in excluded]
+            # existing columns excluding meta keys entirely for alignment purposes
+            existing_cols = [c for c in self.elements.keys() if c not in meta_keys]
             current_size = self.size()
 
-            # New incoming columns: pad past rows with None
+            # New incoming columns: pad past rows with None.
+            # Always ignore meta columns (timestamps/index) here; they are handled separately below.
             for col in elements.keys():
-                # Skip padding for timestamp/index if disabled (already excluded) or if already present
-                if col not in existing_cols and col not in excluded:
-                    if current_size > 0:
-                        self.elements[col] = [None] * current_size
-                    else:
-                        self.elements[col] = []
+                if col in meta_keys:  # meta columns handled later
+                    continue
+                if col in self.elements:  # already present
+                    continue
+                if current_size > 0:
+                    self.elements[col] = [None] * current_size
+                else:
+                    self.elements[col] = []
 
-            # Missing columns this batch: create None placeholders
+            # Existing columns missing in this incoming batch: extend with None placeholders
             for col in existing_cols:
-                if col not in self.elements:
-                    # Must match batch_len; broadcast for consistency
+                if col not in elements:
                     if batch_len > 1:
-                        self.elements[col] = [None] * batch_len
+                        self.elements[col].extend([None] * batch_len)
                     else:
-                        self.elements[col] = [None]  # single row
+                        self.elements[col].append(None)
 
             # Insert values
             time_now = time.time_ns() # time in nanoseconds
@@ -132,34 +139,52 @@ class DictBuffer(Buffer):
                     self.elements[k].append(v)
             time_then = time.time_ns() # time in nanoseconds
 
-            # Timestamps (per element) if enabled
-            if self.timestamps_enabled:                
-                # Prevent overwriting user defined timestamps
-                if self.timestamps_key not in elements:                    
+            # Timestamps handling:
+            # If timestamps are enabled and user provides them, they were already inserted above.
+            # If enabled but not provided:
+            #   - When the timestamps column already exists (e.g., copied from a parent), pad with None.
+            #   - When the timestamps column does not yet exist, generate new timestamps as before.
+            if self.timestamps_enabled:
+                if self.timestamps_key not in elements:
                     if self.timestamps_key not in self.elements:
                         self.elements[self.timestamps_key] = []
-                    if batch_len == 1:
-                        ts_list = [time_now]  # single timestamp in ns
+                        # Generate initial timestamps for first creation
+                        if batch_len == 1:
+                            ts_list = [time_now]
+                        else:
+                            interval = (time_then - time_now) / batch_len
+                            ts_list = [int(time_now + interval * i) for i in range(batch_len)]
                     else:
-                        # Per-element distinct timestamps
-                        ts_list = []
-                        interval = (time_then - time_now) / batch_len
-                        ts_list = [int(time_now + interval * i) for i in range(batch_len)]
+                        # Existing timestamp column: pad with None to preserve alignment without fabrication
+                        ts_list = [None] * batch_len
                     self.elements[self.timestamps_key].extend(ts_list)
 
             if self.index_enabled:        
                 if self.index_key not in elements:
                     if self.index_key not in self.elements:
                         self.elements[self.index_key] = []                           
-                    if batch_len == 1:
-                        index_list = [self.index]  # single index 
+                        if batch_len == 1:
+                            index_list = [self.index]  # single index 
+                        else:
+                            # Per-element distinct timestamps
+                            index_list = [self.index + i for i in range(batch_len)]
+                            self.index += batch_len
                     else:
-                        # Per-element distinct timestamps
-                        index_list = []
-                        index_list = [self.index + i for i in range(batch_len)]
+                        # Existing index column: get index from parent and increment accordingly
+                        elin = self.elements[self.index_key]
+                        if isinstance(elin, list):
+                            elindex : int = elin[-1]
+                            self.index = elindex+1
+                            index_list = [self.index + i for i in range(batch_len)]
+                        else:
+                            if batch_len == 1:
+                                elindex :int = elin
+                                self.index = elindex+1
+                                index_list = [self.index]
+                            else:
+                                index_list = [None] * batch_len
+                        self.index += batch_len
                     self.elements[self.index_key].extend(index_list)
-                # increment index count
-                self.index += batch_len
 
             # Capacity enforcement
             if self.capacity != AgentConfig.INFINITE_CAPACITY:
