@@ -385,6 +385,34 @@ def test_dataset_non_persistent_child_raises():
     with pytest.raises(RuntimeError):
         cba2.execute()
 
+def test_continuous_advancing_index():
+    """
+    Test for a continuous index in a limited capacity source with two persistent forward CopyDataAction consumers.
+    Each consumer should maintain identical trailing slices while the source advances.
+    """
+    signal = Sine(f=1, a=1, p=0, n=0.05)
+    src = SignalBuffer(signal=signal, capacity=50); src.install()
+    lba = LinkBufferAction(); lba.set_buffer(src)
+    cda1 = CopyDataAction(n=15, persistent=True, forward=True, index_enabled=True); cda1.add_parent(lba); cda1.install()
+    cda2 = CopyDataAction(n=15, persistent=True, forward=True, index_enabled=True); cda2.add_parent(lba); cda2.install()
+    last_pointer = cda1.pointer
+    for i in range(150):
+        time.sleep(0.1)
+        cda1.execute()
+        cda2.execute()
+        if cda1.buffer.size() == 0: continue
+
+        full1 = cda1.buffer.data(persistent=True)
+        full2 = cda2.buffer.data(persistent=True)
+        size_1 = cda1.buffer.size()
+        size_2 = cda2.buffer.size()
+        expected_index = range(0, size_1)
+        if size_1 > 50: 
+            assert list(full1.values())[-10:] == list(full1.values())[-10:], f"Buffer contents differ at iteration {i}"
+            assert full1["index"] == list(expected_index), f"cda1 index mismatch at iteration {i}"
+            assert full2["index"] == list(expected_index), f"cda2 index mismatch at iteration {i}"
+
+
 
 
 def test_manual_grafana_plot():

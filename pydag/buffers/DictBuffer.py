@@ -112,12 +112,12 @@ class DictBuffer(Buffer):
 
             # Missing columns this batch: create None placeholders
             for col in existing_cols:
-                if col not in elements:
+                if col not in self.elements:
                     # Must match batch_len; broadcast for consistency
                     if batch_len > 1:
-                        elements[col] = [None] * batch_len
+                        self.elements[col] = [None] * batch_len
                     else:
-                        elements[col] = None  # single row
+                        self.elements[col] = [None]  # single row
 
             # Insert values
             time_now = time.time_ns() # time in nanoseconds
