@@ -1,0 +1,23 @@
+from dataclasses import dataclass, field
+
+from ..NodeException import NodeException
+from ...buffers.ListBuffer import ListBuffer
+from ..Action import Action
+from ..BufferNode import BufferNode
+from ...utils.FileUtils import FileUtils
+
+@dataclass
+class CopyFilesAction(BufferNode, Action):
+    
+    target_folder : str = field(default=None, metadata={"description": "target folder to copy all the files to in Buffer"})
+           
+    def _on_execute(self):
+        if FileUtils.exists_folder(self.target_folder):
+            if isinstance(self._buffer, ListBuffer):
+                data = self._buffer.data(n = 0, persistent = False)
+                for file in data:
+                    FileUtils.copy_file(file, self.target_folder)
+            else:
+                raise NodeException("Only " +ListBuffer.cname()+ " is supported for this " + self.cname())                      
+        else:
+            raise NodeException("folder " + self.target_folder + " does not exist")
