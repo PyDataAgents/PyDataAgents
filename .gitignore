@@ -1,0 +1,63 @@
+.venv
+.vscode
+
+__pycache__
+.pytest_cache
+
+/build
+/dist
+
+*.spec
+
+
+*.ini
+
+*.egg-info
+
+*.code-workspace
+
+# exclude llm models
+/resources
+
+# test html files from plotlify
+/tests/**/plotly_*.html
+/tests/**/plotlifyservice_*.html
+/tests/**/test_*.html
+
+# test docx files
+/tests/**/*.docx
+
+# test images
+/tests/**/image_*.jpg
+/tests/**/image_*.png
+/tests/**/image_*.jpeg
+/tests/**/test_*.jpg
+/tests/**/test_*.jpeg
+/tests/**/test_*.png
+
+# test *.zip files
+/tests/**/*.zip
+
+# test video files
+/tests/**/*.mp4
+/tests/**/*.avi
+
+# test ical files
+/tests/**/test*.ics
+
+# test sqlite files
+/tests/**/test*.sqlite
+
+
+# ignore csv test files
+/tests/**/*test.csv
+
+
+# ignore txt test files
+/tests/**/test_*.txt
+/tests/**/Test_*.txt
+
+
+# ignore PDF test files
+/tests/**/test_*.pdf
+/tests/**/Test_*.pdf

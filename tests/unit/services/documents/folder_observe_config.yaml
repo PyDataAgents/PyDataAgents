@@ -1,0 +1,30 @@
+agent:
+  type: pydag.agents.Agent
+  id: Agent [ce74c82a-8eb0-4d48-a643-53720b114b6c]
+  load_on_install: false
+adapters: []
+buffers: []
+services:
+- type: pydag.services.documents.FolderObserveMailService
+  id: TestFolderObserveMailService
+  load_on_install: false
+  folder: C:\Users\jhillenb\Downloads
+  interval: 10
+  skip_weekends: false
+  max_entries: 5
+  list_files: true
+  html_report: true
+  mail_action:
+    type: pydag.statemachine.actions.MailAction
+    id: TestMailAction
+    load_on_install: false
+    child_ids: []
+    smtp_server: mail.gmx.net
+    port: 587
+    mail_account: watchdogge@gmx.net
+    pw: WatchDog19
+    recipients:
+    - jonas.hillenbrand@steinmeyer.com
+    subject: null
+    body: null
+    tls: true
