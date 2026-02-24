@@ -458,8 +458,6 @@ All unit tests and examples are found in [unit](tests/unit) and [regression](tes
 ## License
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details
 
-
 ## What's new? | Upcoming Features
-
 - prompt based generation of Agents
-  in form of a CLI and REST API
+  in form of executable scripts, a CLI or REST API (as Developer Feature)

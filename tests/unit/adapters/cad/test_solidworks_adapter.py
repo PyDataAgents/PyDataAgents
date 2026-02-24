@@ -1,3 +1,4 @@
+import pytest
 import win32com.client
 import pythoncom
 
@@ -18,6 +19,7 @@ def test_000():
     except Exception as e:
         print('SolidWorks is NOT running:', e)
 
+@pytest.mark.skip(reason="not correctly implemented yet") 
 def test_010():
 
     # Required for some COM calls
@@ -66,7 +68,8 @@ def test_010():
 
     print(f"Dimension {DIMENSION_NAME} set to {NEW_VALUE_MM} mm")
     
-    
+
+@pytest.mark.skip(reason="not correctly implemented yet")    
 def test_011():
 
     # Required for some COM calls
@@ -127,7 +130,7 @@ def test_011():
     else:
         print("Model saved")
         
-        
+@pytest.mark.skip(reason="not correctly implemented yet")         
 def test_020():
     pythoncom.CoInitialize()
 

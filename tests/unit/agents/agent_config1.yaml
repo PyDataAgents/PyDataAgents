@@ -23,8 +23,9 @@ service_store:
     id: M1
     load_on_install: false
     auto_start: true
-    observing_time: 100
     thread_type: MILLI_SECOND
+    observing_time: null
+    week_days: null
     buffer_ids:
     - B1
     adapter_id: A1
