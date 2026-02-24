@@ -1,0 +1,111 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pydag"
+version = "v0.0.0a2"
+description = "An IIoT framework for reading and writing from sources/sinks."
+readme = "README.md"
+requires-python = ">=3.11"
+license = "MIT"
+keywords = ["IIoT", "Industrial Datalogging", "software robots", "data agents"]
+authors = [
+  { name = "Jonas Hillenbrand", email = "hillenbrandjonas@hotmail.com" },
+  { name = "2Obe", email = "twoobe.mail@gmail.com" }
+]
+classifiers = [
+  "Development Status :: 2 - Experimental",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3.11"
+]
+dependencies = [
+    # base packages
+    "pytest",
+    "matplotlib",
+    "loguru",
+    "PyYAML",
+    "numpy",
+    "pandas",
+    "fastapi[standard]",
+    "APScheduler",
+    "pychrono",
+
+    # IIoT
+    "opcua",
+    "pyads",
+    "sounddevice",
+    "paho-mqtt",
+    "urllib3",
+    "jsonpath-ng",
+    "python-snap7",
+    "websocket-client",
+    "pyserial",
+
+    # database processing
+    "influxdb-client",
+    "pyodbc",
+    #"pyrfc",
+
+    # document processing
+    "openpyxl",
+    "pypdf",
+    "unstructured[all-docs]",
+    "watchdog",
+    "cadquery",
+    "cq-editor",
+    "vobject",
+    "psutil",
+    "docxtpl",
+    "bs4",
+    "lxml",
+
+    # browser automation
+    "selenium",
+    
+    # office
+    "msal",
+        
+    # ocr
+    "pdf2image",
+    "pytesseract",
+    "pillow",
+    "mistralai",
+    
+    # data / signal processing    
+    "numba",
+    "torch",
+    "sktime",
+    "seaborn",
+    "tirex-ts @ git+https://github.com/NX-AI/tirex",
+    "chronos-forecasting",
+    "librosa",
+    "ross-rotordynamics",
+
+    # langchain / llm packages
+    "langchain-ollama",
+    "langchain-chroma",
+    "langchain-unstructured",
+    "langchain-tavily",
+    "langchain[huggingface,openai,all]",
+    "sentence-transformers",
+
+    # optional core functionality
+    "graphviz"
+]
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["pydag*"]
+exclude = ["tests"]
+
+[tool.setuptools.package-data]
+"pydag" = ["services/plot/*.html", "_docs/element_icons/**/*"]
+
+[project.urls]
+Documentation = "https://github.com/PyDataAgents/PyDataAgents.git"
+Issues = "https://github.com/PyDataAgents/PyDataAgents.git"
+Source = "https://github.com/PyDataAgents/PyDataAgents.git"

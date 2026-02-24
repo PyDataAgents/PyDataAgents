@@ -1,0 +1,34 @@
+id: G1
+description: null
+buffer_store:
+  B1:
+    type: pydag.buffers.ListBuffer
+    id: B1
+    load_on_install: false
+    capacity: 1000
+    data_type: FLOAT
+    initial_values: null
+    unit: null
+    description: Test buffer
+    duplicate_ids: []
+adapter_store:
+  A1:
+    type: pydag.adapters.opcua.OpcUaAdapter
+    id: A1
+    load_on_install: false
+    endpoint: opc.tcp://localhost:4840/freeopcua/server/
+service_store:
+  M1:
+    type: pydag.services.mappings.MappingService
+    id: M1
+    load_on_install: false
+    auto_start: true
+    observing_time: 100
+    thread_type: MILLI_SECOND
+    buffer_ids:
+    - B1
+    adapter_id: A1
+    addresses: []
+    mapping_type: null
+    n: 1
+    persistent: true

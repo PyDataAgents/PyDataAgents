@@ -1,0 +1,12 @@
+<root>
+    <book id="1">
+        <title>Python Basics</title>
+        <author>John Doe</author>
+        <price>29.99</price>
+    </book>
+    <book id="2">
+        <title>Advanced Python</title>
+        <author>Jane Smith</author>
+        <price>49.99</price>
+    </book>
+</root>

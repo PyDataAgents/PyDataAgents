@@ -1,0 +1,43 @@
+from abc import abstractmethod
+from dataclasses import dataclass, field
+from .DataType import DataType
+from ..agents.Agent import Agent
+from ..agents.AgentElement import AgentElement
+
+@dataclass
+class ObjectTransformation(AgentElement):
+    """
+    Abstract base class for object transformations for buffers
+    """
+    
+    datatype : str = field(default=DataType.FLOAT.value, metadata={"description": "type of data expected for the transform"})
+            
+    def install(self, agent : Agent = None):
+        pass
+    
+    def uninstall(self, agent : Agent = None):
+        pass
+       
+    @abstractmethod 
+    def apply(self, element: any) -> any:
+        """
+        Apply the transformation to the data.
+        
+        Args:
+            data (any): The data to transform.
+        
+        Returns:
+            any: The transformed data.
+        """
+        
+    def apply_n(self, elements: list[any]) -> list[any]:
+        """
+        Apply the transformation to a list of data.
+        
+        Args:
+            data (list[any]): The data to transform.
+        
+        Returns:
+            list[any]: The transformed data.
+        """
+        return [self.apply(element) for element in elements]
