@@ -2,6 +2,8 @@
 import time
 
 import pytest
+pytest.importorskip("serial")
+
 from pydag.adapters.socket.ByteStreamAdapter import ByteStreamAdapter
 from pydag.adapters.socket.SerialAdapter import SerialAdapter
 

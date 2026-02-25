@@ -1,10 +1,13 @@
 import os
-import cadquery as cq
 import http.server
 import socketserver
 import threading
 import webbrowser
 from pathlib import Path
+
+import pytest
+
+cq = pytest.importorskip("cadquery")
 
 # Settings
 FOLDER = os.path.dirname(__file__)  # <-- change this

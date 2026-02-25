@@ -1,6 +1,9 @@
 import math
 import os
 import pytest
+
+pytest.importorskip("ross")
+
 import ross as rs
 from ross.units import Q_
 import numpy as np

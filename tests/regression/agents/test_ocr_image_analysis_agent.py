@@ -1,6 +1,9 @@
 import configparser
 import os
 
+import pytest
+
+pytest.importorskip("mistralai")
 
 from pydag.agents.AgentConfig import AgentConfig
 from pydag.buffers.ListBuffer import ListBuffer

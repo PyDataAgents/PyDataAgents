@@ -1,4 +1,9 @@
 import os
+
+import pytest
+
+pytest.importorskip("docxtpl")
+
 from pydag.buffers.DictBuffer import DictBuffer
 from pydag.nodes.documents.DocxTemplateAction import DocxTemplateAction
 

@@ -1,14 +1,15 @@
 import numpy as np
 from pydag.utils.DataUtils import DataUtils
+import pytest
 
 
-class TestClass1:    
+class TestClass1():    
     def __init__(self):
         self.a = 10
         self.b = 'a'
         self.c = TestClass2()
         
-class TestClass2:    
+class TestClass2():    
     def __init__(self):
         self.d = 'Joe'
         self.e = 10.1

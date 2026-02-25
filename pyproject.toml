@@ -105,6 +105,10 @@ exclude = ["tests"]
 [tool.setuptools.package-data]
 "pydag" = ["services/plot/*.html", "_docs/element_icons/**/*"]
 
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
+
 [project.urls]
 Documentation = "https://github.com/PyDataAgents/PyDataAgents.git"
 Issues = "https://github.com/PyDataAgents/PyDataAgents.git"

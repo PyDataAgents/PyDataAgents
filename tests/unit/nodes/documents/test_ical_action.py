@@ -2,6 +2,10 @@ from datetime import datetime, timedelta
 import os
 
 import pytz
+import pytest
+
+pytest.importorskip("vobject")
+
 from pydag.buffers.DictBuffer import DictBuffer
 from pydag.nodes.documents.ICalAction import ICalAction
 from pydag.utils.FileUtils import FileUtils

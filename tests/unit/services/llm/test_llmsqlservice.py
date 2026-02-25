@@ -3,6 +3,8 @@ import os
 from langchain_community.utilities import SQLDatabase
 import pytest
 
+pytest.importorskip("langgraph")
+
 
 from pydag.services.llm.LLMSQLService import LLMSQLService
 

@@ -1,6 +1,9 @@
 import matplotlib.pyplot as plt
 import time
 
+import pytest
+
+pytest.importorskip("sktime.forecasting.chronos")
 
 from pydag.nodes.regression.RegressionTransform import RegressionTransform
 from pydag.buffers.signals.Sine import Sine

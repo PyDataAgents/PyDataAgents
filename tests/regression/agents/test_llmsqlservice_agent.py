@@ -1,6 +1,10 @@
 import configparser
 import os
 
+import pytest
+
+pytest.importorskip("langgraph")
+
 from pydag.agents.Agent import Agent
 from pydag.services.llm.LLMRestService import LLMRestService
 from pydag.services.llm.LLMSQLService import LLMSQLService

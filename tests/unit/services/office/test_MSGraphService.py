@@ -1,6 +1,9 @@
 import configparser
 
 import pytest
+
+pytest.importorskip("msal")
+
 from pydag.services.office.MSGraphService import MSGraphService, MSGraphType
 
 

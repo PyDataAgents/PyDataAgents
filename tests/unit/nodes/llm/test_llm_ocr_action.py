@@ -1,10 +1,15 @@
 import configparser
+import os
+import re
+
+import pytest
+
+pytest.importorskip("mistralai")
+
 from pydag.buffers.ListBuffer import ListBuffer
 from pydag.nodes.buffers.LinkBufferAction import LinkBufferAction
 from pydag.services.llm.LLMService import LLMService
 from pydag.nodes.llm.LLMOCRAction import LLMOCRAction
-import os
-import re
 
 
 def test_correctly_extract_value_from_pdf():

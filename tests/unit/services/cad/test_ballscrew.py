@@ -1,5 +1,8 @@
-import cadquery as cq
 import math
+
+import pytest
+
+cq = pytest.importorskip("cadquery")
 
 
 def test_000():
