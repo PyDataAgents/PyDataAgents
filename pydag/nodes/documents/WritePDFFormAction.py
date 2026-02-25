@@ -50,7 +50,9 @@ class WritePDFFormAction(BufferNode, Action):
     )
     require_two_parents: bool = field(
         default=True,
-        metadata={"description": "if True, require at least two parents (paths + fill payloads)"},
+        metadata={
+            "description": "if True, require at least two parents (paths + fill payloads); if False, paths and payloads may be provided by a single parent"
+        },
     )
 
     def _on_install(self, agent: Agent = None):
