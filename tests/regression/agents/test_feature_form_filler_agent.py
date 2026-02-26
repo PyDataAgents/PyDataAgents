@@ -62,7 +62,8 @@ def _build_instruction() -> str:
         "Return only a plain JSON object without markdown.\n"
         "You must return exactly the same json keys as in the input context. Do NOT add any keys. Fill the field 'current_value' with your answer but with values filled in based on the retrieved RAG context.\n"
         "Where <field_id> is the key from the input context and <current_value> is the inferred value.\n"
-        "If you cannot infer a value, leave 'current_value' as an empty string."
+        "Look into 'label_context' for additional context to infer values."
+        "You are not allowed to alter any values other than 'current_value'."
     )
 
 
@@ -71,7 +72,7 @@ def test_feature_form_filler_agent_end_to_end_local_example():
     ollama_endpoint = os.environ.get("OLLAMA_ENDPOINT", "http://localhost:11434")
     ollama_model = os.environ.get("OLLAMA_MODEL", "deepseek-r1")
 
-    embedding_store_name = "form_filler_agent_e2e_local_" + uuid.uuid4().hex[0:8]
+    embedding_store_name = "form_filler_agent_e2e_local_"# + uuid.uuid4().hex[0:8]
     embedding_service = FileEmbeddingService(
         id="FILE_EMBEDDING_SERVICE_LOCAL",
         docs_folder=str(_rag_context_folder()),
@@ -168,7 +169,7 @@ def test_feature_form_filler_agent_end_to_end_openai_example():
     config = configparser.ConfigParser()
     config.read("config.ini")
 
-    embedding_store_name = "form_filler_agent_e2e_openai_" + uuid.uuid4().hex[0:8]
+    embedding_store_name = "form_filler_agent_e2e_openai_" #+ uuid.uuid4().hex[0:8]
     embedding_service = FileEmbeddingService(
         id="FILE_EMBEDDING_SERVICE_OPENAI",
         docs_folder=str(_rag_context_folder()),
@@ -183,6 +184,8 @@ def test_feature_form_filler_agent_end_to_end_openai_example():
         id="RAG_SERVICE_OPENAI",
         api_key=config["OPENAI"]["OPENAI_API_KEY"],
         vector_store_path=vector_store_directory,
+        model="gpt-4.1-mini",
+        model_provider="OPENAI",
         retain_messages=False,
     )
 
@@ -197,7 +200,7 @@ def test_feature_form_filler_agent_end_to_end_openai_example():
         input_keys=["values"],
         label_max_tokens=10,
         label_y_tolerance=18,
-        fields_output_mode="per_pdf",
+        fields_output_mode="per_field",
     )
     read_pdf_form_action.add_parent(list_files_action)
 
@@ -209,6 +212,7 @@ def test_feature_form_filler_agent_end_to_end_openai_example():
         input_context_keys=["fields"],
         pass_through_keys=["filepath"],
         use_rag_context=True,
+        input_context_mode="template_fill"
     )
     llm_fill_action.add_parent(read_pdf_form_action)
     llm_fill_action.set_service(rag_service)
