@@ -162,6 +162,12 @@ def test_execute_raises_if_two_parents_are_required_but_missing():
         wpa.execute()
 
 
+def test_install_raises_for_invalid_fill_payload_mode():
+    wpa = WritePDFFormAction(fill_payload_mode="invalid")
+    with pytest.raises(NodeException):
+        wpa.install()
+
+
 def test_execute_raises_for_mismatched_payload_count(tmp_path):
     pdf_file = _test_pdf_form_file()
 
@@ -326,9 +332,70 @@ def test_merge_prefers_last_non_empty_value(tmp_path):
     assert fields["az-persnr"]["/V"] == "111"
 
 
-def test_roundtrip_read_then_write_preserves_field_values(tmp_path):
+def test_fill_payload_mode_per_field_merges_sequential_payloads_for_single_pdf(tmp_path):
+    pdf_file = _test_pdf_form_file()
+
+    path_buf = ListBuffer(id="B_PDF_PATHS_PER_FIELD_MODE")
+    path_buf.install()
+    path_buf.push(pdf_file)
+    path_parent = _link_buffer(path_buf)
+
+    payload_buf = DictBuffer(id="B_PDF_FILL_PER_FIELD_MODE")
+    payload_buf.install()
+    payload_buf.push({"answer": ['{"kasse":"AOK"}', '{"az-persnr":"12345"}']})
+    payload_parent = _link_buffer(payload_buf)
+
+    wpa = WritePDFFormAction(
+        path_input_keys=["values"],
+        fill_input_keys=["answer"],
+        fill_payload_mode="per_field",
+        output_folder=_test_output_folder(),
+    )
+    wpa.add_parent(path_parent)
+    wpa.add_parent(payload_parent)
+    wpa.install()
+    wpa.execute()
+
+    out_file = wpa.get_buffer().data()["output_filepath"][0]
+    reader = PdfReader(out_file)
+    fields = reader.get_fields() or {}
+    assert fields["kasse"]["/V"] == "AOK"
+    assert fields["az-persnr"]["/V"] == "12345"
+
+
+def test_fill_payload_mode_per_field_raises_for_ambiguous_multi_pdf_without_mapping(tmp_path):
+    pdf_file = _test_pdf_form_file()
+
+    path_buf = ListBuffer(id="B_PDF_PATHS_PER_FIELD_AMBIG")
+    path_buf.install()
+    path_buf.push(pdf_file)
+    path_buf.push(pdf_file)
+    path_parent = _link_buffer(path_buf)
+
+    payload_buf = DictBuffer(id="B_PDF_FILL_PER_FIELD_AMBIG")
+    payload_buf.install()
+    payload_buf.push({"answer": ['{"kasse":"AOK"}', '{"az-persnr":"12345"}', '{"datum2":"01.01.2026"}']})
+    payload_parent = _link_buffer(payload_buf)
+
+    wpa = WritePDFFormAction(
+        path_input_keys=["values"],
+        fill_input_keys=["answer"],
+        fill_payload_mode="per_field",
+        output_folder=_test_output_folder(),
+    )
+    wpa.add_parent(path_parent)
+    wpa.add_parent(payload_parent)
+    wpa.install()
+
+    with pytest.raises(NodeException):
+        wpa.execute()
+
+
+@pytest.mark.parametrize("fields_output_mode", ["per_field", "per_pdf"])
+@pytest.mark.parametrize("fill_payload_mode", ["auto", "per_field", "per_pdf"])
+def test_roundtrip_read_then_write_preserves_field_values(fields_output_mode: str, fill_payload_mode: str, tmp_path):
     lfa = ListFilesAction(folder=_test_pdf_form_folder(), extension=".pdf")
-    rpa = ReadPDFFormAction(input_keys=["values"])
+    rpa = ReadPDFFormAction(input_keys=["values"], fields_output_mode=fields_output_mode)
     rpa.add_parent(lfa)
 
     wpa = WritePDFFormAction(
@@ -336,7 +403,8 @@ def test_roundtrip_read_then_write_preserves_field_values(tmp_path):
         path_input_keys=["filepath"],
         fill_input_keys=["fields"],
         output_folder=_test_output_folder(),
-        output_suffix="_roundtrip",
+        output_suffix=f"_roundtrip_{fields_output_mode}_{fill_payload_mode}",
+        fill_payload_mode=fill_payload_mode,
     )
     wpa.add_parent(rpa)
 

@@ -16,7 +16,7 @@ from ..NodeException import NodeException
 
 @dataclass
 class WritePDFFormAction(BufferNode, Action):
-    """`Action` that writes form values into parent-provided PDF files."""
+    """`Action` that writes form values into parent-provided PDF files. Best used together with the `ReadPDFFormAction` to fill the same fields that were read from the PDF."""
 
     path_input_keys: list[str] = field(
         default_factory=lambda: ["values", "filepath"],
@@ -25,6 +25,12 @@ class WritePDFFormAction(BufferNode, Action):
     fill_input_keys: list[str] = field(
         default_factory=lambda: ["answer", "answers", "fields", "form_fields", "field_values", "content"],
         metadata={"description": "keys used to extract filled form payloads from parent data"},
+    )
+    fill_payload_mode: str = field(
+        default="auto",
+        metadata={
+            "description": "Controls how sequential fill payload rows are interpreted when no filepath->payload mapping is available. 'auto' keeps legacy behavior, 'per_pdf' expects one payload per PDF (or one payload for all PDFs), 'per_field' merges sequential field payload rows for single-PDF inputs."
+        },
     )
     output_keys: list[str] = field(
         default_factory=lambda: ["filepath", "output_filepath", "written_fields", "written_field_count"],
@@ -66,6 +72,8 @@ class WritePDFFormAction(BufferNode, Action):
             )
         if self.overwrite_source and self.output_folder is not None:
             raise NodeException("output_folder cannot be used when overwrite_source=True")
+        if self.fill_payload_mode not in {"auto", "per_pdf", "per_field"}:
+            raise NodeException("fill_payload_mode must be one of: 'auto', 'per_pdf', 'per_field'")
 
     def _on_execute(self):
         """Extract file paths + fill payloads from parents and write one output PDF per input path."""
@@ -86,6 +94,11 @@ class WritePDFFormAction(BufferNode, Action):
         if len(payloads_by_path) > 0:
             file_paths = self._dedupe_paths(file_paths)
         sequential_payloads = self._extract_fill_payloads(data)
+        sequential_payloads = self._normalize_sequential_payloads_for_mode(
+            sequential_payloads=sequential_payloads,
+            file_paths=file_paths,
+            has_payloads_by_path=len(payloads_by_path) > 0,
+        )
         if len(payloads_by_path) == 0 and len(sequential_payloads) == 0:
             raise NodeException("No valid filled form payloads were found in parent buffer data")
 
@@ -160,6 +173,35 @@ class WritePDFFormAction(BufferNode, Action):
             if normalized is not None and len(normalized) > 0:
                 payloads.append(normalized)
         return payloads
+
+    def _normalize_sequential_payloads_for_mode(
+        self,
+        sequential_payloads: list[dict[str, Any]],
+        file_paths: list[str],
+        has_payloads_by_path: bool,
+    ) -> list[dict[str, Any]]:
+        """Apply configured interpretation mode to sequential payload rows."""
+        if self.fill_payload_mode in {"auto", "per_pdf"}:
+            return sequential_payloads
+        if has_payloads_by_path:
+            # If payloads are already aligned by explicit filepath mapping, keep raw rows.
+            return sequential_payloads
+        if len(sequential_payloads) == 0:
+            return sequential_payloads
+
+        if len(file_paths) == 1:
+            merged: dict[str, Any] = {}
+            for payload in sequential_payloads:
+                merged = self._merge_field_values(merged, payload)
+            return [merged] if len(merged) > 0 else []
+
+        if len(sequential_payloads) in (1, len(file_paths)):
+            return sequential_payloads
+
+        raise NodeException(
+            "fill_payload_mode='per_field' requires explicit filepath mapping for multiple PDFs, "
+            "or exactly one payload per filepath"
+        )
 
     def _extract_payloads_by_path(self, data: dict) -> dict[str, dict[str, Any]]:
         """Extract filepath->payload mappings when both filepath and fill columns are present."""

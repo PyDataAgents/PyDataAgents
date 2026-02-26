@@ -30,6 +30,12 @@ class ReadPDFFormAction(BufferNode, Action):
             "description": "output keys in the order [filepath, metadata, fields, full_text_content]"
         },
     )
+    fields_output_mode: str = field(
+        default="per_pdf",
+        metadata={
+            "description": "Controls row emission for extracted fields: 'per_field' emits one output row per field (default), 'per_pdf' (default) emits one output row per PDF containing all fields."
+        },
+    )
     label_y_tolerance: float = field(
         default=18.0,
         metadata={
@@ -58,9 +64,11 @@ class ReadPDFFormAction(BufferNode, Action):
             raise NodeException(
                 f"{self.cname()} requires exactly 4 output_keys, got {len(self.output_keys)}"
             )
+        if self.fields_output_mode not in {"per_field", "per_pdf"}:
+            raise NodeException("fields_output_mode must be either 'per_field' or 'per_pdf'")
 
     def _on_execute(self):
-        """Read parent-provided PDF paths, extract structured content, and push one row per field."""
+        """Read parent-provided PDF paths, extract structured content, and push rows according to `fields_output_mode`."""
         file_paths = self._extract_paths_from_parent_data(self.get_parent_data())
         if len(file_paths) == 0:
             raise NodeException("No PDF file paths were found in parent buffer data")
@@ -73,10 +81,7 @@ class ReadPDFFormAction(BufferNode, Action):
 
             pdf_result = self._read_pdf(file_path)
             fields = pdf_result["fields"]
-            if len(fields) == 0:
-                field_rows = [[]]
-            else:
-                field_rows = [[field] for field in fields]
+            field_rows = self._build_field_rows(fields)
 
             for row_fields in field_rows:
                 row = dict(
@@ -92,6 +97,14 @@ class ReadPDFFormAction(BufferNode, Action):
                 )
                 # Push one row batch to preserve list-valued cells like `fields`.
                 self.add_data({key: [value] for key, value in row.items()})
+
+    def _build_field_rows(self, fields: list[dict]) -> list[list[dict]]:
+        """Build output rows according to configured field row emission mode."""
+        if self.fields_output_mode == "per_pdf":
+            return [list(fields)]
+        if len(fields) == 0:
+            return [[]]
+        return [[field] for field in fields]
 
     def _read_pdf(self, file_path: str) -> dict:
         """Parse one PDF into metadata, AcroForm fields, and full text.

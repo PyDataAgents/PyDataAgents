@@ -59,10 +59,39 @@ def _fixture_extracted_field_count() -> int:
     rpa = ReadPDFFormAction()
     return len(rpa._read_pdf(_test_pdf_form_file())["fields"])
 
-def test_reads_pdf_from_list_files_parent_and_writes_structured_output():
+
+def _expected_rows_for_pdf_count(
+    fixture_field_count: int, pdf_count: int, fields_output_mode: str
+) -> int:
+    if fields_output_mode == "per_pdf":
+        return pdf_count
+    return (pdf_count * fixture_field_count) if fixture_field_count > 0 else pdf_count
+
+
+def _assert_fields_layout(field_rows: list[list[dict]], fixture_field_count: int, fields_output_mode: str):
+    assert all(isinstance(row_fields, list) for row_fields in field_rows)
+    if fields_output_mode == "per_pdf":
+        expected_len = fixture_field_count if fixture_field_count > 0 else 0
+        assert all(len(row_fields) == expected_len for row_fields in field_rows)
+    elif fixture_field_count > 0:
+        assert all(len(row_fields) == 1 for row_fields in field_rows)
+    else:
+        assert all(len(row_fields) == 0 for row_fields in field_rows)
+
+
+def _contains_field_id(field_rows: list[list[dict]], field_id: str) -> bool:
+    return any(field.get("field_id") == field_id for row_fields in field_rows for field in row_fields)
+
+
+def _count_field_id(field_rows: list[list[dict]], field_id: str) -> int:
+    return sum(1 for row_fields in field_rows for field in row_fields if field.get("field_id") == field_id)
+
+
+@pytest.mark.parametrize("fields_output_mode", ["per_field", "per_pdf"])
+def test_reads_pdf_from_list_files_parent_and_writes_structured_output(fields_output_mode: str):
     """Integration: read PDF via ListFilesAction and assert structured output with non-empty text/fields."""
     lfa = ListFilesAction(folder=_test_pdf_form_folder(), extension=".pdf")
-    rpa = ReadPDFFormAction(input_keys=["values"])
+    rpa = ReadPDFFormAction(input_keys=["values"], fields_output_mode=fields_output_mode)
     rpa.add_parent(lfa)
 
     lfa.install()
@@ -75,7 +104,11 @@ def test_reads_pdf_from_list_files_parent_and_writes_structured_output():
 
     expected_file = os.path.basename(_test_pdf_form_file())
     fixture_field_count = _fixture_extracted_field_count()
-    expected_rows = fixture_field_count if fixture_field_count > 0 else 1
+    expected_rows = _expected_rows_for_pdf_count(
+        fixture_field_count=fixture_field_count,
+        pdf_count=1,
+        fields_output_mode=fields_output_mode,
+    )
     assert "filepath" in data
     assert len(data["filepath"]) == expected_rows
     assert all(path.endswith(expected_file) for path in data["filepath"])
@@ -84,23 +117,17 @@ def test_reads_pdf_from_list_files_parent_and_writes_structured_output():
     assert all(meta["pages"] >= 1 for meta in data["metadata"])
     assert "fields" in data
     assert len(data["fields"]) == expected_rows
-    assert all(isinstance(row_fields, list) for row_fields in data["fields"])
-    if fixture_field_count > 0:
-        assert all(len(row_fields) == 1 for row_fields in data["fields"])
-    else:
-        assert all(len(row_fields) == 0 for row_fields in data["fields"])
-    assert any(
-        len(row_fields) > 0 and row_fields[0].get("field_id") == "kasse"
-        for row_fields in data["fields"]
-    )
+    _assert_fields_layout(data["fields"], fixture_field_count, fields_output_mode)
+    assert _contains_field_id(data["fields"], "kasse")
     assert "full_text_content" in data
     assert len(data["full_text_content"]) == expected_rows
     assert all(len(text) > 0 for text in data["full_text_content"])
     assert all("Besoldung" in text for text in data["full_text_content"])
 
 
-def test_reads_same_pdf_twice_and_writes_rows_per_field_for_each_pdf():
-    """Verify row count scales with field count when reading the same PDF twice."""
+@pytest.mark.parametrize("fields_output_mode", ["per_field", "per_pdf"])
+def test_reads_same_pdf_twice_and_writes_expected_rows_for_each_pdf(fields_output_mode: str):
+    """Verify row count scales with field count and selected output mode when reading the same PDF twice."""
     pdf_file = _test_pdf_form_file()
 
     buf = ListBuffer(id="B_MULTI_PDF")
@@ -112,7 +139,7 @@ def test_reads_same_pdf_twice_and_writes_rows_per_field_for_each_pdf():
     lba.set_buffer(buf)
     lba.install()
 
-    rpa = ReadPDFFormAction(input_keys=["values"])
+    rpa = ReadPDFFormAction(input_keys=["values"], fields_output_mode=fields_output_mode)
     rpa.add_parent(lba)
     rpa.install()
     rpa.execute()
@@ -121,28 +148,25 @@ def test_reads_same_pdf_twice_and_writes_rows_per_field_for_each_pdf():
 
     expected_file = os.path.basename(_test_pdf_form_file())
     fixture_field_count = _fixture_extracted_field_count()
-    expected_rows = (2 * fixture_field_count) if fixture_field_count > 0 else 2
+    expected_rows = _expected_rows_for_pdf_count(
+        fixture_field_count=fixture_field_count,
+        pdf_count=2,
+        fields_output_mode=fields_output_mode,
+    )
     assert "filepath" in data
     assert len(data["filepath"]) == expected_rows
     assert all(path.endswith(expected_file) for path in data["filepath"])
     assert len(data["metadata"]) == expected_rows
     assert all(meta["pages"] >= 1 for meta in data["metadata"])
     assert len(data["fields"]) == expected_rows
-    assert all(isinstance(row_fields, list) for row_fields in data["fields"])
-    if fixture_field_count > 0:
-        assert all(len(row_fields) == 1 for row_fields in data["fields"])
-    else:
-        assert all(len(row_fields) == 0 for row_fields in data["fields"])
-    assert sum(
-        1
-        for row_fields in data["fields"]
-        if len(row_fields) > 0 and row_fields[0].get("field_id") == "kasse"
-    ) >= 2
+    _assert_fields_layout(data["fields"], fixture_field_count, fields_output_mode)
+    assert _count_field_id(data["fields"], "kasse") >= 2
     assert len(data["full_text_content"]) == expected_rows
     assert all("Besoldung" in text for text in data["full_text_content"])
 
 
-def test_reads_pdf_from_dictbuffer_parent_link():
+@pytest.mark.parametrize("fields_output_mode", ["per_field", "per_pdf"])
+def test_reads_pdf_from_dictbuffer_parent_link(fields_output_mode: str):
     """Verify parent-link extraction when the parent buffer is a DictBuffer with a valid path key."""
     pdf_file = _test_pdf_form_file()
 
@@ -154,7 +178,7 @@ def test_reads_pdf_from_dictbuffer_parent_link():
     lba.set_buffer(parent_buf)
     lba.install()
 
-    rpa = ReadPDFFormAction(input_keys=["values"])
+    rpa = ReadPDFFormAction(input_keys=["values"], fields_output_mode=fields_output_mode)
     rpa.add_parent(lba)
     rpa.install()
     rpa.execute()
@@ -162,34 +186,32 @@ def test_reads_pdf_from_dictbuffer_parent_link():
     data = rpa.get_buffer().data()
     expected_file = os.path.basename(pdf_file)
     fixture_field_count = _fixture_extracted_field_count()
-    expected_rows = fixture_field_count if fixture_field_count > 0 else 1
+    expected_rows = _expected_rows_for_pdf_count(
+        fixture_field_count=fixture_field_count,
+        pdf_count=1,
+        fields_output_mode=fields_output_mode,
+    )
 
     assert "filepath" in data
     assert len(data["filepath"]) == expected_rows
     assert all(path.endswith(expected_file) for path in data["filepath"])
     assert "fields" in data
     assert len(data["fields"]) == expected_rows
-    assert all(isinstance(row_fields, list) for row_fields in data["fields"])
-    if fixture_field_count > 0:
-        assert all(len(row_fields) == 1 for row_fields in data["fields"])
-    else:
-        assert all(len(row_fields) == 0 for row_fields in data["fields"])
-    assert any(
-        len(row_fields) > 0 and row_fields[0].get("field_id") == "kasse"
-        for row_fields in data["fields"]
-    )
+    _assert_fields_layout(data["fields"], fixture_field_count, fields_output_mode)
+    assert _contains_field_id(data["fields"], "kasse")
     assert "full_text_content" in data
     assert len(data["full_text_content"]) == expected_rows
     assert all("Besoldung" in text for text in data["full_text_content"])
 
 
-def test_agent_pipeline_executes_list_and_read_actions_only_once():
-    """Agent-level pipeline test: ONLY_ONCE service should produce parsed per-field rows."""
+@pytest.mark.parametrize("fields_output_mode", ["per_field", "per_pdf"])
+def test_agent_pipeline_executes_list_and_read_actions_only_once(fields_output_mode: str):
+    """Agent-level pipeline test: ONLY_ONCE service should produce parsed rows for both output modes."""
     agent = Agent(id="PDF_AGENT")
 
     service = SimpleActionService(id="PDF_SVC", thread_type=ThreadType.ONLY_ONCE.value)
     lfa = ListFilesAction(folder=_test_pdf_form_folder(), extension=".pdf")
-    rpa = ReadPDFFormAction(input_keys=["values"])
+    rpa = ReadPDFFormAction(input_keys=["values"], fields_output_mode=fields_output_mode)
     rpa.add_parent(lfa)
 
     service.add_node(lfa)
@@ -203,20 +225,17 @@ def test_agent_pipeline_executes_list_and_read_actions_only_once():
         data = rpa.get_buffer().data()
         expected_file = os.path.basename(_test_pdf_form_file())
         fixture_field_count = _fixture_extracted_field_count()
-        expected_rows = fixture_field_count if fixture_field_count > 0 else 1
+        expected_rows = _expected_rows_for_pdf_count(
+            fixture_field_count=fixture_field_count,
+            pdf_count=1,
+            fields_output_mode=fields_output_mode,
+        )
         assert "filepath" in data
         assert len(data["filepath"]) == expected_rows
         assert all(path.endswith(expected_file) for path in data["filepath"])
         assert all(meta["pages"] >= 1 for meta in data["metadata"])
-        assert all(isinstance(row_fields, list) for row_fields in data["fields"])
-        if fixture_field_count > 0:
-            assert all(len(row_fields) == 1 for row_fields in data["fields"])
-        else:
-            assert all(len(row_fields) == 0 for row_fields in data["fields"])
-        assert any(
-            len(row_fields) > 0 and row_fields[0].get("field_id") == "kasse"
-            for row_fields in data["fields"]
-        )
+        _assert_fields_layout(data["fields"], fixture_field_count, fields_output_mode)
+        assert _contains_field_id(data["fields"], "kasse")
         assert all("Besoldung" in text for text in data["full_text_content"])
     finally:
         agent.terminate()
@@ -230,6 +249,12 @@ def test_install_creates_default_dict_buffer():
 
     assert isinstance(rpa.get_buffer(), DictBuffer)
     assert rpa.buffer_id is not None
+
+
+def test_install_raises_for_invalid_fields_output_mode():
+    rpa = ReadPDFFormAction(fields_output_mode="invalid")
+    with pytest.raises(NodeException):
+        rpa.install()
 
 
 def test_execute_raises_without_parent_data():
@@ -279,12 +304,14 @@ def test_execute_raises_for_missing_pdf_file(tmp_path):
         rpa.execute()
 
 
-def test_custom_output_keys_are_used():
+@pytest.mark.parametrize("fields_output_mode", ["per_field", "per_pdf"])
+def test_custom_output_keys_are_used(fields_output_mode: str):
     """Custom output_keys should rename output columns while preserving values."""
     lfa = ListFilesAction(folder=_test_pdf_form_folder(), extension=".pdf")
     rpa = ReadPDFFormAction(
         input_keys=["values"],
         output_keys=["pdf", "meta", "form_fields", "text"],
+        fields_output_mode=fields_output_mode,
     )
     rpa.add_parent(lfa)
 
@@ -297,7 +324,11 @@ def test_custom_output_keys_are_used():
     data = rpa.get_buffer().data()
     expected_file = os.path.basename(_test_pdf_form_file())
     fixture_field_count = _fixture_extracted_field_count()
-    expected_rows = fixture_field_count if fixture_field_count > 0 else 1
+    expected_rows = _expected_rows_for_pdf_count(
+        fixture_field_count=fixture_field_count,
+        pdf_count=1,
+        fields_output_mode=fields_output_mode,
+    )
 
     assert "pdf" in data
     assert "meta" in data
@@ -310,10 +341,7 @@ def test_custom_output_keys_are_used():
     assert len(data["pdf"]) == expected_rows
     assert all(path.endswith(expected_file) for path in data["pdf"])
     assert len(data["form_fields"]) == expected_rows
-    if fixture_field_count > 0:
-        assert all(isinstance(row_fields, list) and len(row_fields) == 1 for row_fields in data["form_fields"])
-    else:
-        assert all(isinstance(row_fields, list) and len(row_fields) == 0 for row_fields in data["form_fields"])
+    _assert_fields_layout(data["form_fields"], fixture_field_count, fields_output_mode)
 
 
 def test_extracts_field_structure_and_label_context_with_mocked_pdfreader(monkeypatch, tmp_path):

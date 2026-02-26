@@ -62,6 +62,7 @@ def _build_instruction() -> str:
         "Return only a plain JSON object without markdown.\n"
         "You must return exactly the same json keys as in the input context. Do NOT add any keys. Fill the field 'current_value' with your answer but with values filled in based on the retrieved RAG context.\n"
         "Where <field_id> is the key from the input context and <current_value> is the inferred value.\n"
+        "If you cannot infer a value, leave 'current_value' as an empty string."
     )
 
 
@@ -99,6 +100,7 @@ def test_feature_form_filler_agent_end_to_end_local_example():
     read_pdf_form_action = ReadPDFFormAction(
         id="READ_PDF_FORM_LOCAL",
         input_keys=["values"],
+        fields_output_mode="per_pdf",
     )
     read_pdf_form_action.add_parent(list_files_action)
 
@@ -193,6 +195,9 @@ def test_feature_form_filler_agent_end_to_end_openai_example():
     read_pdf_form_action = ReadPDFFormAction(
         id="READ_PDF_FORM_OPENAI",
         input_keys=["values"],
+        label_max_tokens=10,
+        label_y_tolerance=18,
+        fields_output_mode="per_pdf",
     )
     read_pdf_form_action.add_parent(list_files_action)
 

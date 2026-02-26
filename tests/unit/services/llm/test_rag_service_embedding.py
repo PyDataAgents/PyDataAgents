@@ -184,7 +184,11 @@ def test_on_start_uses_existing_vector_store_and_appends_document_links(tmp_path
             return _Retriever()
 
     monkeypatch.setattr(rag_module, "SentenceTransformer", DummySentenceTransformer)
-    monkeypatch.setattr(rag_module, "HuggingFaceEmbeddings", lambda model_name: {"model_name": model_name})
+    monkeypatch.setattr(
+        rag_module,
+        "HuggingFaceEmbeddings",
+        lambda model_name, **kwargs: {"model_name": model_name, **kwargs},
+    )
     monkeypatch.setattr(rag_module, "Chroma", DummyChroma)
     monkeypatch.setattr(rag_module, "UnstructuredLoader", DummyLoader)
     monkeypatch.setattr(rag_module, "RecursiveCharacterTextSplitter", DummySplitter)
