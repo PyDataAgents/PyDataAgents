@@ -1,4 +1,5 @@
 import json
+from pathlib import Path
 import sys
 import types
 
@@ -61,6 +62,38 @@ class RecordingRAGService(RAGService):
             }
         )
         return self.next_answer
+
+
+class _ContextRetriever:
+    def __init__(self, key_values: dict[str, str]):
+        self._key_values = key_values
+        self.calls = []
+
+    def get_relevant_documents(self, query: str):
+        key = str(query).strip()
+        self.calls.append(key)
+        if key in self._key_values:
+            return [types.SimpleNamespace(page_content=f"{key}: {self._key_values[key]}")]
+        return [types.SimpleNamespace(page_content=f"{k}: {v}") for k, v in self._key_values.items()]
+
+
+class _ContextAnsweringChain:
+    def __init__(self, service: RAGService):
+        self._service = service
+
+    def invoke(self, payload, config=None):
+        _ = config
+        retrieved_context = self._service._get_retrieved_context_text(
+            retrieval_query=payload["retrieval_query"],
+            use_rag_context=payload["use_rag_context"],
+        )
+        for raw_line in retrieved_context.splitlines():
+            line = raw_line.strip()
+            if not line or ":" not in line:
+                continue
+            _, value = line.split(":", 1)
+            return value.strip()
+        return ""
 
 
 def _link_parent_with_row(row: dict):
@@ -669,3 +702,73 @@ def test_ragservice_create_llm_and_chain_calls_inherited_create_llm(monkeypatch)
     service._create_llm_and_chain()
 
     assert len(create_llm_calls) == 1
+
+
+def test_llm_chat_action_uses_rag_context_file_for_all_keys():
+    """Ensure LLMChatAction uses RAG retrieval to answer every key from the test context file."""
+    expected_values = {
+        "Geburtsdatum": "01.01.1900",
+        "Akademische Grade": "Doktor der Ingenieuwissenschaften",
+        "Personalnummer": "123456dwwe",
+        "Datum": "22.02.2026",
+        "Krankenkasse": "DAK",
+        "Geboren in": "Italy",
+        "Beginn der Arbeit": "01.10.1920",
+        "Institut": "Bank",
+        "IBAN": "DE57659801200082151005",
+        "BIC": "GENODES1EBT",
+        "Verheiratet": "X",
+        "Stelle": "Universität",
+        "Staatsangehörigkeit": "Schweizer.",
+        "Vorname": "John",
+        "Nachname": "Doe",
+    }
+
+    context_path = Path(__file__).with_name("context.txt")
+    context_lines = context_path.read_text(encoding="utf-8").splitlines()
+    parsed_values = {}
+    for raw_line in context_lines:
+        line = raw_line.strip()
+        if not line or ":" not in line:
+            continue
+        key, value = line.split(":", 1)
+        parsed_values[key.strip()] = value.strip()
+
+    assert parsed_values == expected_values
+
+    retriever = _ContextRetriever(parsed_values)
+    service = RAGService(id="RAG_CONTEXT_FILE_TEST")
+    service.retain_messages = False
+    service._retriever = retriever
+    service._langchain = _ContextAnsweringChain(service)
+
+    parent_buf = DictBuffer(id="RAG_PARENT_BUF")
+    parent_buf.install()
+    for key in expected_values.keys():
+        parent_buf.push(
+            {
+                "question": "Was ist der Wert fuer " + key + "?",
+                "key": key,
+            }
+        )
+
+    parent_link = LinkBufferAction()
+    parent_link.set_buffer(parent_buf)
+    parent_link.install()
+
+    action = LLMChatAction(
+        question_key="question",
+        retrieval_query_key="key",
+        pass_through_keys=["key"],
+        use_rag_context=True,
+    )
+    action.set_service(service)
+    action.add_parent(parent_link)
+    action.install()
+    action.execute()
+
+    output = action.get_buffer().data()
+    answer_by_key = dict(zip(output["key"], output["answer"]))
+
+    assert answer_by_key == expected_values
+    assert retriever.calls == list(expected_values.keys())
