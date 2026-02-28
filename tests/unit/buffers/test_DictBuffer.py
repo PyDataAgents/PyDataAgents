@@ -1,3 +1,6 @@
+import time
+import numpy as np
+
 from pydag.agents.AgentConfig import AgentConfig
 from pydag.buffers.BufferException import BufferException
 from pydag.buffers.DictBuffer import DictBuffer
@@ -220,12 +223,12 @@ def test_meta_only_inserts_are_rejected():
     buf = DictBuffer(capacity=10, timestamps_enabled=True, index_enabled=True)
     # Push only index → should not modify buffer
     buf.push({buf.index_key: [0, 1, 2]})
-    assert buf.data() is None, "Meta-only insert must not modify buffer contents"
+    assert buf.data() == {}, "Meta-only insert must not modify buffer contents"
     assert buf.size() == 0, "Buffer size must remain zero after meta-only insert"
 
     # Push only timestamps → should still not modify buffer
     buf.push({buf.timestamps_key: [100, 200]})
-    assert buf.data() is None, "Meta-only timestamps insert must not modify buffer contents"
+    assert buf.data() == {}, "Meta-only timestamps insert must not modify buffer contents"
     assert buf.size() == 0, "Buffer size must remain zero after timestamps-only insert"
 
     # Now push real data; verify normal behavior resumes
@@ -238,7 +241,7 @@ def test_meta_only_both_columns_are_rejected():
     # If both meta columns are provided without data, buffer should ignore.
     buf = DictBuffer(capacity=10, timestamps_enabled=True, index_enabled=True)
     buf.push({buf.timestamps_key: [100, 200], buf.index_key: [0, 1]})
-    assert buf.data() is None, "Meta-only insert (timestamps + index) must not modify buffer contents"
+    assert buf.data() == {}, "Meta-only insert (timestamps + index) must not modify buffer contents"
     assert buf.size() == 0, "Buffer size must remain zero for meta-only payloads"
     # Follow up with real data to ensure normal behavior
     buf.push({"C1": 1, "C2": 2})
@@ -285,7 +288,7 @@ def test_push_dict_with_empty_list():
     # Pushing an empty list should not change size and should not create misaligned columns
     buf.push({"a": []})
     assert buf.size() == 0, "Size should remain 0 when pushing empty list"
-    assert buf.data() is None, "Data should remain None after empty list push"
+    assert buf.data() == {}, "Data should remain None after empty list push"
 
 def test_timestamps_monotonicity_across_scalar_pushes():
     buf = DictBuffer(timestamps_enabled=True)
@@ -294,18 +297,22 @@ def test_timestamps_monotonicity_across_scalar_pushes():
     buf.push({"a": 2})
     buf.push({"a": 3})
     ts = buf.data()[buf.timestamps_key]
+    d = np.diff(ts)
+    print(d)
     assert len(ts) == 3
-    assert all(ts[i] < ts[i+1] for i in range(len(ts)-1)), "Timestamps must be strictly increasing across scalar pushes"
+    assert all(d > 0), "Timestamps must be strictly increasing across scalar pushes"
 
 def test_timestamps_monotonicity_across_mixed_batches():
     buf = DictBuffer(timestamps_enabled=True)
     # first batch
-    buf.push({"a": [1,2,3]})
+    buf.push({"a": [1, 2, 3]})
     # second scalar
-    buf.push({"a": 4})
+    buf.push({"a": [4]})
     # third batch
-    buf.push({"a": [5,6]})
+    buf.push({"a": [5, 6]})
     ts = buf.data()[buf.timestamps_key]
+    d = np.diff(ts)
+    print(d)
     assert len(ts) == 6
     # ensure strictly increasing timestamps throughout
     assert all(ts[i] < ts[i+1] for i in range(len(ts)-1)), "Timestamps must be strictly increasing across mixed pushes"

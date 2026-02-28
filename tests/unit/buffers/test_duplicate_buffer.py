@@ -88,8 +88,8 @@ def test_040():
     
     tbuf.push([10,20,30])
     
-    tbuf1 = tbuf._duplicates["TB1"]
-    tbuf2 = tbuf._duplicates["TB2"]
+    tbuf1 = tbuf.get_duplicates()["TB1"]
+    tbuf2 = tbuf.get_duplicates()["TB2"]
     
     print(tbuf.data())
     print(tbuf1.data())
@@ -103,15 +103,10 @@ def test_duplicate_dataset_buffer():
     buf1 = DatasetBuffer(id="DATASET_BUF_1", dataset_name="ArrowHead", duplicate_ids = ["DATASET_BUF_2", "DATASET_BUF_3"])
     buf1.install()
     ag.add_buffer(buf1)
-    ag.add_buffer(buf1._duplicates["DATASET_BUF_2"])
-    ag.add_buffer(buf1._duplicates["DATASET_BUF_3"])
+    ag.add_buffer(buf1.get_duplicates()["DATASET_BUF_2"])
+    ag.add_buffer(buf1.get_duplicates()["DATASET_BUF_3"])
     
-    ag.install()
-
-    
-    
-
-    bs = ag._buffer_store
+    bs = ag.buffer_store
 
     # assert that the values in all three buffers are the same
     data1 = bs["DATASET_BUF_1"].data()

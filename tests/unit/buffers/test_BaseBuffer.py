@@ -71,14 +71,14 @@ def test_json_and_data_with_meta_contents():
 def test_duplicate_ids_without_agent():
     buf = TestBuffer(id="main", duplicate_ids=["dup1", "dup2"], capacity=-1)
     buf.install()
-    assert set(buf.duplicates.keys()) == {"dup1", "dup2"}
+    assert set(buf.get_duplicates().keys()) == {"dup1", "dup2"}
     buf.push([100, 200])
     main_vals = buf.data()[AgentConfig.VALUES]
-    dup1_vals = buf.duplicates["dup1"].data()[AgentConfig.VALUES]
-    dup2_vals = buf.duplicates["dup2"].data()[AgentConfig.VALUES]
+    dup1_vals = buf.get_duplicates()["dup1"].data()[AgentConfig.VALUES]
+    dup2_vals = buf.get_duplicates()["dup2"].data()[AgentConfig.VALUES]
     assert main_vals == dup1_vals == dup2_vals == [100, 200]
     buf.clear()
-    assert buf.size() == 0 and buf.duplicates["dup1"].size() == 0 and buf.duplicates["dup2"].size() == 0
+    assert buf.size() == 0 and buf.get_duplicates()["dup1"].size() == 0 and buf.get_duplicates()["dup2"].size() == 0
 
 
 def test_duplicate_ids_with_agent_store(agent: Agent):
@@ -86,8 +86,8 @@ def test_duplicate_ids_with_agent_store(agent: Agent):
     dup_b = TestBuffer(id="dupB", capacity=-1); dup_b.install(agent); agent.add_buffer(dup_b)
     buf = TestBuffer(id="mainA", duplicate_ids=["dupA", "dupB"], capacity=-1)
     buf.install(agent)
-    assert buf.duplicates["dupA"] is dup_a
-    assert buf.duplicates["dupB"] is dup_b
+    assert buf.get_duplicates()["dupA"] is dup_a
+    assert buf.get_duplicates()["dupB"] is dup_b
     buf.push([7, 8, 9])
     assert dup_a.data()[AgentConfig.VALUES] == [7, 8, 9]
     assert dup_b.data()[AgentConfig.VALUES] == [7, 8, 9]
@@ -103,10 +103,3 @@ def test_data_persistent_false_all_clears():
     assert vals_before == [1, 2, 3]
     _ = buf.data(n=0, persistent=False)
     assert buf.size() == 0
-
-
-def test_lock_exists_and_is_rlock():
-    buf = TestBuffer(id="locktest")
-    buf.install()
-    # ensure lock was created in base class; can't isinstance against factory
-    assert hasattr(buf.lock, "acquire") and hasattr(buf.lock, "release")

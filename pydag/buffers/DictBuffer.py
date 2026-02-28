@@ -24,6 +24,8 @@ class DictBuffer(Buffer):
         super().__post_init__()
         self._elements = {}
         self._index = 0
+        self._last_timestamp = 0
+        self._last_timer = 0
         
     def _on_push(self, elements: list | dict):
         """
@@ -128,6 +130,12 @@ class DictBuffer(Buffer):
 
             # Insert values
             time_now = time.time_ns() # time in nanoseconds
+            st = time.perf_counter_ns() # start ns timer
+            if time_now <= self._last_timestamp:
+                dt =  st - self._last_timer
+                if dt == 0:
+                    dt = 1  # ensure some positive delta to maintain monotonicity
+                time_now = self._last_timestamp + dt
             for k, v in elements.items():
                 if k not in self._elements:
                     self._elements[k] = []
@@ -137,9 +145,9 @@ class DictBuffer(Buffer):
                 else:
                     # Scalar (batch_len == 1 case)
                     self._elements[k].append(v)
-            time_then = time.time_ns() # time in nanoseconds
-
-            
+            et = time.perf_counter_ns() # end ns timer
+            el = et - st # elapsed time in ns for precise timestamp insertion
+            #time_then = time.time_ns() # time in nanoseconds
 
             # Timestamps handling:
             # If timestamps are enabled and user provides them, they were already inserted above.
@@ -154,7 +162,7 @@ class DictBuffer(Buffer):
                     if batch_len == 1:
                         ts_list = [time_now]
                     else:
-                        interval = (time_then - time_now) / batch_len
+                        interval = el / batch_len
                         ts_list = [int(time_now + interval * i) for i in range(batch_len)]
                     self._elements[self.timestamps_key].extend(ts_list)
 
@@ -193,6 +201,9 @@ class DictBuffer(Buffer):
                     drop = final_size - self.capacity
                     for col, col_data in self._elements.items():
                         del col_data[0:drop]
+            
+            self._last_timer = time.perf_counter_ns()
+            self._last_timestamp = time_now
         else:
             # non dict elements case, force the insertion with a standard key or already present key (but only if only one user-specified key is present)
             if len(self._elements) == 0:

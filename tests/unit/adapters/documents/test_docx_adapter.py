@@ -6,7 +6,7 @@ from pydag.buffers.DictBuffer import DictBuffer
 def test_000():
     
     template_path = os.path.dirname(__file__) + os.sep + "template1.docx"
-    output_path = os.path.dirname(__file__) + os.sep + "out1.docx"
+    output_path = os.path.dirname(__file__) + os.sep + "test_out1.docx"
     
     da = DocxAdapter(template_path=template_path, output_path=output_path)
     

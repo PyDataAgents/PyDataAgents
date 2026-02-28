@@ -1,3 +1,4 @@
+import platform
 import pytest
 import win32com.client
 import pythoncom
@@ -5,8 +6,8 @@ import pythoncom
 from pydag.utils.FileUtils import FileUtils
 
 
+@pytest.mark.skip(reason="only works on system with solidworks installed") 
 def test_000():
-    import sys, platform, win32com.client, pythoncom
     py_bits = platform.architecture()[0]
     print(f'Python bitness: {py_bits}')
     try:
@@ -19,7 +20,8 @@ def test_000():
     except Exception as e:
         print('SolidWorks is NOT running:', e)
 
-@pytest.mark.skip(reason="not correctly implemented yet") 
+
+@pytest.mark.skip(reason="only works on system with solidworks installed") 
 def test_010():
 
     # Required for some COM calls
@@ -69,7 +71,7 @@ def test_010():
     print(f"Dimension {DIMENSION_NAME} set to {NEW_VALUE_MM} mm")
     
 
-@pytest.mark.skip(reason="not correctly implemented yet")    
+@pytest.mark.skip(reason="only works on system with solidworks installed")     
 def test_011():
 
     # Required for some COM calls
@@ -130,7 +132,7 @@ def test_011():
     else:
         print("Model saved")
         
-@pytest.mark.skip(reason="not correctly implemented yet")         
+@pytest.mark.skip(reason="only works on system with solidworks installed")         
 def test_020():
     pythoncom.CoInitialize()
 
