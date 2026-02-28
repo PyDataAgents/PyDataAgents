@@ -1,6 +1,6 @@
 import json
 import pytest
-from pydag.buffers.ListBuffer import ListBuffer as TestBuffer
+from pydag.buffers.ListBuffer import ListBuffer as BufferUnderTest
 from pydag.agents.Agent import Agent
 from pydag.buffers.DataType import DataType
 from pydag.agents.AgentConfig import AgentConfig
@@ -12,7 +12,7 @@ def agent():
 
 
 def test_install_uninstall_initial_values():
-    buf = TestBuffer(id="b1", initial_values=[1, 2, 3])
+    buf = BufferUnderTest(id="b1", initial_values=[1, 2, 3])
     buf.install()
     assert buf.size() == 3
     buf.uninstall()
@@ -20,7 +20,7 @@ def test_install_uninstall_initial_values():
 
 
 def test_push_and_capacity_fifo():
-    buf = TestBuffer(id="b2", capacity=3)
+    buf = BufferUnderTest(id="b2", capacity=3)
     buf.install()
     buf.push([1, 2])
     buf.push(3)
@@ -31,7 +31,7 @@ def test_push_and_capacity_fifo():
 
 
 def test_data_persistent_false_removes_returned():
-    buf = TestBuffer(id="b3", capacity=-1)
+    buf = BufferUnderTest(id="b3", capacity=-1)
     buf.install()
     buf.push([10, 20, 30])
     out = buf.data(n=2, persistent=False)
@@ -41,7 +41,7 @@ def test_data_persistent_false_removes_returned():
 
 
 def test_clear_and_to_dict_and_str_json():
-    buf = TestBuffer(id="b4", description="desc", unit="V", data_type=DataType.FLOAT.value)
+    buf = BufferUnderTest(id="b4", description="desc", unit="V", data_type=DataType.FLOAT.value)
     buf.install()
     buf.push([5, 6])
     d = buf.to_dict()
@@ -54,7 +54,7 @@ def test_clear_and_to_dict_and_str_json():
 
 
 def test_json_and_data_with_meta_contents():
-    buf = TestBuffer(id="b5", capacity=-1, description="test", unit="m", data_type=DataType.INT.value)
+    buf = BufferUnderTest(id="b5", capacity=-1, description="test", unit="m", data_type=DataType.INT.value)
     buf.install()
     buf.push([1, 2, 3])
     meta = buf.data_with_meta()
@@ -69,7 +69,7 @@ def test_json_and_data_with_meta_contents():
 
 
 def test_duplicate_ids_without_agent():
-    buf = TestBuffer(id="main", duplicate_ids=["dup1", "dup2"], capacity=-1)
+    buf = BufferUnderTest(id="main", duplicate_ids=["dup1", "dup2"], capacity=-1)
     buf.install()
     assert set(buf.duplicates.keys()) == {"dup1", "dup2"}
     buf.push([100, 200])
@@ -82,9 +82,9 @@ def test_duplicate_ids_without_agent():
 
 
 def test_duplicate_ids_with_agent_store(agent: Agent):
-    dup_a = TestBuffer(id="dupA", capacity=-1); dup_a.install(agent); agent.add_buffer(dup_a)
-    dup_b = TestBuffer(id="dupB", capacity=-1); dup_b.install(agent); agent.add_buffer(dup_b)
-    buf = TestBuffer(id="mainA", duplicate_ids=["dupA", "dupB"], capacity=-1)
+    dup_a = BufferUnderTest(id="dupA", capacity=-1); dup_a.install(agent); agent.add_buffer(dup_a)
+    dup_b = BufferUnderTest(id="dupB", capacity=-1); dup_b.install(agent); agent.add_buffer(dup_b)
+    buf = BufferUnderTest(id="mainA", duplicate_ids=["dupA", "dupB"], capacity=-1)
     buf.install(agent)
     assert buf.duplicates["dupA"] is dup_a
     assert buf.duplicates["dupB"] is dup_b
@@ -94,7 +94,7 @@ def test_duplicate_ids_with_agent_store(agent: Agent):
 
 
 def test_data_persistent_false_all_clears():
-    buf = TestBuffer(id="b6", capacity=-1)
+    buf = BufferUnderTest(id="b6", capacity=-1)
     buf.install()
     buf.push([1, 2, 3])
     assert buf.size() == 3
@@ -106,7 +106,7 @@ def test_data_persistent_false_all_clears():
 
 
 def test_lock_exists_and_is_rlock():
-    buf = TestBuffer(id="locktest")
+    buf = BufferUnderTest(id="locktest")
     buf.install()
     # ensure lock was created in base class; can't isinstance against factory
     assert hasattr(buf.lock, "acquire") and hasattr(buf.lock, "release")

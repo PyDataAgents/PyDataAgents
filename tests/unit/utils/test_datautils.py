@@ -3,20 +3,20 @@ from pydag.utils.DataUtils import DataUtils
 import pytest
 
 
-class TestClass1():    
+class SampleClass1():    
     def __init__(self):
         self.a = 10
         self.b = 'a'
-        self.c = TestClass2()
+        self.c = SampleClass2()
         
-class TestClass2():    
+class SampleClass2():    
     def __init__(self):
         self.d = 'Joe'
         self.e = 10.1
 
 def test_000():
     
-    tc = TestClass1()
+    tc = SampleClass1()
     print(DataUtils.obj_to_dict(tc))
     
 def test_001():    

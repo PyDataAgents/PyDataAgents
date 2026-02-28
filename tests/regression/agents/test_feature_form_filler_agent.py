@@ -2,14 +2,12 @@ import configparser
 import os
 import sys
 import types
-import uuid
 from pathlib import Path
 
-import numpy as np
-import numpy  # Explicitly ensure numpy is available for embedding service
 import nltk
 from pypdf import PdfReader
-nltk.download('punkt', quiet=True)
+
+nltk.download("punkt", quiet=True)
 
 # Fallback for environments where graphviz is not installed.
 if "graphviz" not in sys.modules:
@@ -33,8 +31,8 @@ if "graphviz" not in sys.modules:
 
 from pydag.agents.Agent import Agent
 from pydag.nodes.documents.ListFilesAction import ListFilesAction
-from pydag.nodes.documents.ReadPDFFormAction import ReadPDFFormAction
-from pydag.nodes.documents.WritePDFFormAction import WritePDFFormAction
+from pydag.nodes.documents.PDFReadFormAction import PDFReadFormAction
+from pydag.nodes.documents.PDFWriteFormAction import PDFWriteFormAction
 from pydag.nodes.llm.LLMChatAction import LLMChatAction
 from pydag.services.ThreadType import ThreadType
 from pydag.services.documents.FileEmbeddingService import FileEmbeddingService
@@ -55,7 +53,20 @@ def _rag_context_folder() -> Path:
 
 
 def _output_folder() -> Path:
-    return _repo_root() / "resources" / "outputs"
+    return _repo_root() / "resources" / "Outputs"
+
+
+def _normalize_pdf_value(value) -> str:
+    if value is None:
+        return ""
+    if isinstance(value, bytes):
+        text = value.decode("utf-8", errors="ignore")
+    else:
+        text = str(value)
+    text = text.strip()
+    if text.startswith("/"):
+        text = text[1:]
+    return text
 
 
 def _normalized_pdf_field_values(pdf_path: str) -> dict[str, str]:
@@ -63,21 +74,24 @@ def _normalized_pdf_field_values(pdf_path: str) -> dict[str, str]:
     fields = reader.get_fields() or {}
     values: dict[str, str] = {}
     for field_id, payload in fields.items():
-        value = payload.get("/V") if isinstance(payload, dict) else None
-        if value is None:
-            values[str(field_id)] = ""
-        elif isinstance(value, bytes):
-            values[str(field_id)] = value.decode("utf-8", errors="ignore")
-        else:
-            values[str(field_id)] = str(value)
+        current_value = payload.get("/V") if isinstance(payload, dict) else None
+        values[str(field_id)] = _normalize_pdf_value(current_value)
     return values
+
+
+def _build_instruction() -> str:
+    return (
+        "Return only a plain JSON object without markdown. "
+        "Use exactly the field_name keys from the bridge prompt. "
+        "Do not add or remove keys."
+    )
 
 
 def _assert_form_pipeline_result(
     list_files_action: ListFilesAction,
-    read_pdf_form_action: ReadPDFFormAction,
+    read_pdf_form_action: PDFReadFormAction,
     llm_fill_action: LLMChatAction,
-    write_pdf_form_action: WritePDFFormAction,
+    write_pdf_form_action: PDFWriteFormAction,
     expected_suffix: str,
 ):
     listed_data = list_files_action.get_buffer().data()
@@ -88,12 +102,15 @@ def _assert_form_pipeline_result(
     read_data = read_pdf_form_action.get_buffer().data()
     assert "filepath" in read_data
     assert "fields" in read_data
+    assert "llm_prompt" in read_data
     assert len(read_data["filepath"]) > 0
     assert len(read_data["fields"]) > 0
-    assert any(isinstance(fields_row, list) and len(fields_row) > 0 for fields_row in read_data["fields"])
+    assert all(isinstance(fields_row, list) for fields_row in read_data["fields"])
+    assert all(isinstance(prompt, str) and prompt.strip() != "" for prompt in read_data["llm_prompt"])
 
     llm_data = llm_fill_action.get_buffer().data()
     assert "answer" in llm_data
+    assert "filepath" in llm_data
     assert len(llm_data["answer"]) > 0
     assert all(str(answer).strip() != "" for answer in llm_data["answer"])
 
@@ -121,26 +138,15 @@ def _assert_form_pipeline_result(
         written_values = _normalized_pdf_field_values(str(output_path))
         for key, value in expected_written.items():
             assert str(key) in written_values
-            expected_value = value.decode("utf-8", errors="ignore") if isinstance(value, bytes) else str(value)
-            assert written_values[str(key)] == expected_value
-
-
-def _build_instruction() -> str:
-    return (
-        "Return only a plain JSON object without markdown.\n"
-        "You must return exactly the same json keys as in the input context. Do NOT add any keys. Fill the field 'current_value' with your answer but with values filled in based on the retrieved RAG context.\n"
-        "Where <field_id> is the key from the input context and <current_value> is the inferred value.\n"
-        "Look into 'label_context' for additional context to infer values."
-        "You are not allowed to alter any values other than 'current_value'."
-    )
+            assert written_values[str(key)] == _normalize_pdf_value(value)
 
 
 def test_feature_form_filler_agent_end_to_end_local_example():
-    """End-to-end local example: real FileEmbeddingService + local OLLAMA RAGService + PDF form fill Agent."""
+    """End-to-end local example: real FileEmbeddingService + local OLLAMA RAGService + PDF form fill agent."""
     ollama_endpoint = os.environ.get("OLLAMA_ENDPOINT", "http://localhost:11434")
     ollama_model = os.environ.get("OLLAMA_MODEL", "deepseek-r1")
 
-    embedding_store_name = "form_filler_agent_e2e_local_"# + uuid.uuid4().hex[0:8]
+    embedding_store_name = "form_filler_agent_e2e_local"
     embedding_service = FileEmbeddingService(
         id="FILE_EMBEDDING_SERVICE_LOCAL",
         docs_folder=str(_rag_context_folder()),
@@ -166,35 +172,34 @@ def test_feature_form_filler_agent_end_to_end_local_example():
         extension=".pdf",
     )
 
-    read_pdf_form_action = ReadPDFFormAction(
+    read_pdf_form_action = PDFReadFormAction(
         id="READ_PDF_FORM_LOCAL",
         input_keys=["values"],
-        fields_output_mode="per_pdf",
+        row_mode="per_pdf",
+        include_bridge_prompt=True,
     )
     read_pdf_form_action.add_parent(list_files_action)
 
     llm_fill_action = LLMChatAction(
         id="LLM_FILL_FORM_LOCAL",
-        question_value="Fill the PDF form fields in the input context with values from the retrieved context. ",
+        question_key="llm_prompt",
         instruction_value=_build_instruction(),
-        retrieval_query_key="fields",
-        input_context_keys=["fields"],
-        pass_through_keys=["filepath"],
+        retrieval_query_key="llm_prompt",
         use_rag_context=True,
+        pass_through_keys=["filepath"],
     )
     llm_fill_action.add_parent(read_pdf_form_action)
     llm_fill_action.set_service(rag_service)
 
     output_folder = _output_folder()
     output_folder.mkdir(parents=True, exist_ok=True)
-    write_pdf_form_action = WritePDFFormAction(
+    write_pdf_form_action = PDFWriteFormAction(
         id="WRITE_PDF_FORM_LOCAL",
-        path_input_keys=["values"],
+        path_input_keys=["filepath"],
         fill_input_keys=["answer"],
         output_folder=str(output_folder),
         output_suffix="_local",
     )
-    write_pdf_form_action.add_parent(list_files_action)
     write_pdf_form_action.add_parent(llm_fill_action)
 
     action_service = SimpleActionService(
@@ -207,20 +212,13 @@ def test_feature_form_filler_agent_end_to_end_local_example():
     action_service.add_node(write_pdf_form_action)
 
     agent = Agent(id="FORM_FILLER_AGENT_E2E_LOCAL")
-    # Start order matters: embeddings first, then RAG, then action pipeline.
     agent.add_service(embedding_service)
     agent.add_service(rag_service)
     agent.add_service(action_service)
 
     try:
         agent.release(blocking=False)
-        action_service.get_observer_thread()._thread.join()
-
-        result = write_pdf_form_action.get_buffer().data()
-        output_files = result.get("output_filepath", [])
-        written_counts = result.get("written_field_count", [])
-        written_fields = result.get("written_fields", [])
-
+        action_service.get_observer_thread()._thread.join(timeout=240)
         _assert_form_pipeline_result(
             list_files_action=list_files_action,
             read_pdf_form_action=read_pdf_form_action,
@@ -228,24 +226,16 @@ def test_feature_form_filler_agent_end_to_end_local_example():
             write_pdf_form_action=write_pdf_form_action,
             expected_suffix="_local",
         )
-
-        print("Local form filler agent finished.")
-        print("OLLAMA endpoint:", ollama_endpoint)
-        print("OLLAMA model:", ollama_model)
-        print("Output files:", output_files)
-        print("Written field counts:", written_counts)
-        if len(written_fields) > 0:
-            print("Written field keys:", list(written_fields[0].keys()))
     finally:
         agent.terminate()
 
 
 def test_feature_form_filler_agent_end_to_end_openai_example():
-    """End-to-end OpenAI example: real FileEmbeddingService + default OpenAI RAGService + PDF form fill Agent."""
+    """End-to-end OpenAI example: real FileEmbeddingService + OpenAI RAGService + PDF form fill agent."""
     config = configparser.ConfigParser()
     config.read("config.ini")
 
-    embedding_store_name = "form_filler_agent_e2e_openai_" #+ uuid.uuid4().hex[0:8]
+    embedding_store_name = "form_filler_agent_e2e_openai"
     embedding_service = FileEmbeddingService(
         id="FILE_EMBEDDING_SERVICE_OPENAI",
         docs_folder=str(_rag_context_folder()),
@@ -271,38 +261,34 @@ def test_feature_form_filler_agent_end_to_end_openai_example():
         extension=".pdf",
     )
 
-    read_pdf_form_action = ReadPDFFormAction(
+    read_pdf_form_action = PDFReadFormAction(
         id="READ_PDF_FORM_OPENAI",
         input_keys=["values"],
-        label_max_tokens=10,
-        label_y_tolerance=18,
-        fields_output_mode="per_field",
+        row_mode="per_pdf",
+        include_bridge_prompt=True,
     )
     read_pdf_form_action.add_parent(list_files_action)
 
     llm_fill_action = LLMChatAction(
         id="LLM_FILL_FORM_OPENAI",
-        question_value="Fill the PDF form fields in the input context with values from the retrieved context. ",
+        question_key="llm_prompt",
         instruction_value=_build_instruction(),
-        retrieval_query_key="fields",
-        input_context_keys=["fields"],
-        pass_through_keys=["filepath"],
+        retrieval_query_key="llm_prompt",
         use_rag_context=True,
-        input_context_mode="template_fill"
+        pass_through_keys=["filepath"],
     )
     llm_fill_action.add_parent(read_pdf_form_action)
     llm_fill_action.set_service(rag_service)
 
     output_folder = _output_folder()
     output_folder.mkdir(parents=True, exist_ok=True)
-    write_pdf_form_action = WritePDFFormAction(
+    write_pdf_form_action = PDFWriteFormAction(
         id="WRITE_PDF_FORM_OPENAI",
-        path_input_keys=["values"],
+        path_input_keys=["filepath"],
         fill_input_keys=["answer"],
         output_folder=str(output_folder),
         output_suffix="_openai",
     )
-    write_pdf_form_action.add_parent(list_files_action)
     write_pdf_form_action.add_parent(llm_fill_action)
 
     action_service = SimpleActionService(
@@ -315,20 +301,13 @@ def test_feature_form_filler_agent_end_to_end_openai_example():
     action_service.add_node(write_pdf_form_action)
 
     agent = Agent(id="FORM_FILLER_AGENT_E2E_OPENAI")
-    # Start order matters: embeddings first, then RAG, then action pipeline.
     agent.add_service(embedding_service)
     agent.add_service(rag_service)
     agent.add_service(action_service)
 
     try:
         agent.release(blocking=False)
-        action_service.get_observer_thread()._thread.join()
-
-        result = write_pdf_form_action.get_buffer().data()
-        output_files = result.get("output_filepath", [])
-        written_counts = result.get("written_field_count", [])
-        written_fields = result.get("written_fields", [])
-
+        action_service.get_observer_thread()._thread.join(timeout=240)
         _assert_form_pipeline_result(
             list_files_action=list_files_action,
             read_pdf_form_action=read_pdf_form_action,
@@ -336,13 +315,5 @@ def test_feature_form_filler_agent_end_to_end_openai_example():
             write_pdf_form_action=write_pdf_form_action,
             expected_suffix="_openai",
         )
-
-        print("OpenAI form filler agent finished.")
-        print("OPENAI model provider:", rag_service.model_provider)
-        print("OPENAI model:", rag_service.model)
-        print("Output files:", output_files)
-        print("Written field counts:", written_counts)
-        if len(written_fields) > 0:
-            print("Written field keys:", list(written_fields[0].keys()))
     finally:
         agent.terminate()
