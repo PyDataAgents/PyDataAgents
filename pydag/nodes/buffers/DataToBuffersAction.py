@@ -62,7 +62,7 @@ class DataToBuffersAction(BufferNode, Action):
             if data is not None:
                 for buffer in self._buffers.values():
                     if self.clear_first:
-                        self._buffer.clear()
+                        buffer.clear()
                     buffer.push(data)
             else:
                 raise NodeException(f"No data was extracted from this {Node.cname()}'s {Buffer.cname()} or any parent")

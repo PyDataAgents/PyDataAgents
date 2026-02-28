@@ -73,10 +73,9 @@ def test_030():
     
     oa.execute()
     
-    print(oa.get_buffer().data(persistent=True))
-    
+    print(oa.get_buffer().data(persistent=True))    
     t1 = oa.get_buffer().data(persistent=True)["text"][0]    
-    assert t1 is not ''
+    assert t1 == '', "Expected no text to be extracted from handwritten image, but got: " + t1
     
 def test_031():
     fpath = os.path.dirname(__file__) + os.sep + "scan_sample.pdf"

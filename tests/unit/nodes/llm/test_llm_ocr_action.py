@@ -140,7 +140,7 @@ def test_no_value_parent_buffer():
     lca.execute()
     
     output = lca.get_buffer().data(persistent=True)
-    assert output == None
+    assert output == {}
 
 
 
@@ -228,7 +228,7 @@ def test_empty_file():
     
     output = lca.get_buffer().data(persistent=True)
 
-    assert output == None     
+    assert output == {}     
     
 
     

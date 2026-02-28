@@ -5,17 +5,17 @@ from pydag.utils.FileUtils import FileUtils
 
 
 def test_compress_action():
-    source_file = os.path.dirname(__file__) + os.sep + "test.csv"
+    source_file = os.path.dirname(__file__) + os.sep + "plotly_test_000.html"
     ca = CompressAction(source_file=source_file, target_file=None)
     ca.install()
     ca.execute()
     
-    zip_file = os.path.dirname(__file__) + os.sep + "test.zip"
+    zip_file = os.path.dirname(__file__) + os.sep + "plotly_test_000.zip"
     
     assert FileUtils.exists_file(zip_file), "no test.zip was created"
     
 def test_decompress_action():
-    source_file = os.path.dirname(__file__) + os.sep + "test.zip"
+    source_file = os.path.dirname(__file__) + os.sep + "plotly_test_000.zip"
     target_dir = os.path.dirname(__file__) + os.sep + "test_decompressed"
     ca = DecompressAction(source_file=source_file, target_dir=target_dir)
     ca.install()

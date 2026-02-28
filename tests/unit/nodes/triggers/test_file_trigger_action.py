@@ -1,4 +1,5 @@
 import os
+import time
 from pydag.agents.Agent import Agent
 from pydag.nodes.triggers.FileTriggerAction import FileTriggerAction
 from pydag.nodes.utils.PrintBufferAction import PrintBufferAction
@@ -25,7 +26,17 @@ def test_000():
     
     ag.add_service(sas)
     
-    ag.release()
+    ag.release(blocking=False)
+    
+    time.sleep(1.0)
+    
+    # In a real test, we would want to programmatically create/modify files in the folder to trigger the action and verify the output.
+    with open(folder + os.sep + "test_file_trigger.txt", "w", encoding="utf-8") as f:
+        f.write("This is a test file to trigger the FileTriggerAction.")
+    
+    time.sleep(1.0)
+        
+    ag.terminate()
     
     
 def test_001():
@@ -46,7 +57,17 @@ def test_001():
     
     ag.add_service(sas)
     
-    ag.release()
+    ag.release(blocking=False)
+    
+    time.sleep(1.0)
+    
+    # In a real test, we would want to programmatically create/modify files in the folder to trigger the action and verify the output.
+    with open(folder + os.sep + "test_file_trigger.txt", "w", encoding="utf-8") as f:
+        f.write("This is a test file to trigger the FileTriggerAction.")
+    
+    time.sleep(1.0)
+        
+    ag.terminate()
     
     
 def test_002():
@@ -67,7 +88,17 @@ def test_002():
     
     ag.add_service(sas)
     
-    ag.release()
+    ag.release(blocking=False)
+    
+    time.sleep(1.0)
+    
+    # In a real test, we would want to programmatically create/modify files in the folder to trigger the action and verify the output.
+    with open(folder + os.sep + "test_file_trigger.txt", "w", encoding="utf-8") as f:
+        f.write("This is a test file to trigger the FileTriggerAction.")
+    
+    time.sleep(1.0)
+        
+    ag.terminate()
     
 
 def test_003():
@@ -88,4 +119,14 @@ def test_003():
     
     ag.add_service(sas)
     
-    ag.release()
+    ag.release(blocking=False)
+    
+    time.sleep(1.0)
+    
+    # In a real test, we would want to programmatically create/modify files in the folder to trigger the action and verify the output.
+    with open(folder + os.sep + "test_file_trigger.txt", "w", encoding="utf-8") as f:
+        f.write("This is a test file to trigger the FileTriggerAction.")
+    
+    time.sleep(1.0)
+        
+    ag.terminate()

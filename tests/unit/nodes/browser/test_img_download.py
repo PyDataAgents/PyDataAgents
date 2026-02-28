@@ -1,8 +1,10 @@
 import os
+import pytest
 import requests
 from urllib.parse import urljoin, urlparse
 from bs4 import BeautifulSoup
 
+@pytest.mark.skip(reason="This test is more of an integration test and may not be suitable for unit testing. It also depends on external factors like network connectivity and the structure of the target website, which can lead to flaky tests.")
 def test_000():
     # Website URL
     url = "https://example.com"
