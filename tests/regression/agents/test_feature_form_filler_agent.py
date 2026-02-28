@@ -8,6 +8,7 @@ from pathlib import Path
 import numpy as np
 import numpy  # Explicitly ensure numpy is available for embedding service
 import nltk
+from pypdf import PdfReader
 nltk.download('punkt', quiet=True)
 
 # Fallback for environments where graphviz is not installed.
@@ -55,6 +56,73 @@ def _rag_context_folder() -> Path:
 
 def _output_folder() -> Path:
     return _repo_root() / "resources" / "outputs"
+
+
+def _normalized_pdf_field_values(pdf_path: str) -> dict[str, str]:
+    reader = PdfReader(pdf_path)
+    fields = reader.get_fields() or {}
+    values: dict[str, str] = {}
+    for field_id, payload in fields.items():
+        value = payload.get("/V") if isinstance(payload, dict) else None
+        if value is None:
+            values[str(field_id)] = ""
+        elif isinstance(value, bytes):
+            values[str(field_id)] = value.decode("utf-8", errors="ignore")
+        else:
+            values[str(field_id)] = str(value)
+    return values
+
+
+def _assert_form_pipeline_result(
+    list_files_action: ListFilesAction,
+    read_pdf_form_action: ReadPDFFormAction,
+    llm_fill_action: LLMChatAction,
+    write_pdf_form_action: WritePDFFormAction,
+    expected_suffix: str,
+):
+    listed_data = list_files_action.get_buffer().data()
+    assert "values" in listed_data
+    assert len(listed_data["values"]) > 0
+    assert all(str(path).lower().endswith(".pdf") for path in listed_data["values"])
+
+    read_data = read_pdf_form_action.get_buffer().data()
+    assert "filepath" in read_data
+    assert "fields" in read_data
+    assert len(read_data["filepath"]) > 0
+    assert len(read_data["fields"]) > 0
+    assert any(isinstance(fields_row, list) and len(fields_row) > 0 for fields_row in read_data["fields"])
+
+    llm_data = llm_fill_action.get_buffer().data()
+    assert "answer" in llm_data
+    assert len(llm_data["answer"]) > 0
+    assert all(str(answer).strip() != "" for answer in llm_data["answer"])
+
+    result = write_pdf_form_action.get_buffer().data()
+    output_files = result.get("output_filepath", [])
+    written_counts = result.get("written_field_count", [])
+    written_fields = result.get("written_fields", [])
+
+    assert len(output_files) > 0
+    assert len(output_files) == len(written_counts)
+    assert len(output_files) == len(written_fields)
+    assert any(int(count) > 0 for count in written_counts)
+
+    expected_folder = _output_folder().resolve()
+    for idx, output_file in enumerate(output_files):
+        output_path = Path(output_file)
+        assert output_path.exists()
+        assert output_path.parent.resolve() == expected_folder
+        assert output_path.name.endswith(expected_suffix + ".pdf")
+
+        expected_written = written_fields[idx]
+        assert isinstance(expected_written, dict)
+        assert int(written_counts[idx]) == len(expected_written)
+
+        written_values = _normalized_pdf_field_values(str(output_path))
+        for key, value in expected_written.items():
+            assert str(key) in written_values
+            expected_value = value.decode("utf-8", errors="ignore") if isinstance(value, bytes) else str(value)
+            assert written_values[str(key)] == expected_value
 
 
 def _build_instruction() -> str:
@@ -152,6 +220,14 @@ def test_feature_form_filler_agent_end_to_end_local_example():
         output_files = result.get("output_filepath", [])
         written_counts = result.get("written_field_count", [])
         written_fields = result.get("written_fields", [])
+
+        _assert_form_pipeline_result(
+            list_files_action=list_files_action,
+            read_pdf_form_action=read_pdf_form_action,
+            llm_fill_action=llm_fill_action,
+            write_pdf_form_action=write_pdf_form_action,
+            expected_suffix="_local",
+        )
 
         print("Local form filler agent finished.")
         print("OLLAMA endpoint:", ollama_endpoint)
@@ -252,6 +328,14 @@ def test_feature_form_filler_agent_end_to_end_openai_example():
         output_files = result.get("output_filepath", [])
         written_counts = result.get("written_field_count", [])
         written_fields = result.get("written_fields", [])
+
+        _assert_form_pipeline_result(
+            list_files_action=list_files_action,
+            read_pdf_form_action=read_pdf_form_action,
+            llm_fill_action=llm_fill_action,
+            write_pdf_form_action=write_pdf_form_action,
+            expected_suffix="_openai",
+        )
 
         print("OpenAI form filler agent finished.")
         print("OPENAI model provider:", rag_service.model_provider)
