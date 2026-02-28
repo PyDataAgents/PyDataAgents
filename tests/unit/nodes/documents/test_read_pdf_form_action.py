@@ -87,6 +87,44 @@ def _count_field_id(field_rows: list[list[dict]], field_id: str) -> int:
     return sum(1 for row_fields in field_rows for field in row_fields if field.get("field_id") == field_id)
 
 
+def _iter_fields(field_rows: list[list[dict]]):
+    for row_fields in field_rows:
+        for field in row_fields:
+            yield field
+
+
+def _assert_enriched_field_payload(field_rows: list[list[dict]]):
+    all_fields = list(_iter_fields(field_rows))
+    if len(all_fields) == 0:
+        return
+    required_keys = {
+        "field_id",
+        "write_target_field_id",
+        "field_type",
+        "label_context",
+        "current_value",
+        "proposed_value",
+        "rect",
+        "is_fillable",
+        "context_bundle",
+        "value_profile",
+        "retrieval_query",
+        "context_confidence",
+        "needs_review",
+    }
+    for field in all_fields:
+        assert required_keys.issubset(set(field.keys()))
+        assert field["is_fillable"] is True
+        assert isinstance(field["write_target_field_id"], str)
+        assert field["write_target_field_id"] != ""
+        assert field["proposed_value"] == ""
+        assert isinstance(field["context_bundle"], dict)
+        assert isinstance(field["value_profile"], dict)
+        assert isinstance(field["retrieval_query"], str)
+        assert isinstance(field["context_confidence"], float)
+        assert isinstance(field["needs_review"], bool)
+
+
 @pytest.mark.parametrize("fields_output_mode", ["per_field", "per_pdf"])
 def test_reads_pdf_from_list_files_parent_and_writes_structured_output(fields_output_mode: str):
     """Integration: read PDF via ListFilesAction and assert structured output with non-empty text/fields."""
@@ -118,6 +156,7 @@ def test_reads_pdf_from_list_files_parent_and_writes_structured_output(fields_ou
     assert "fields" in data
     assert len(data["fields"]) == expected_rows
     _assert_fields_layout(data["fields"], fixture_field_count, fields_output_mode)
+    _assert_enriched_field_payload(data["fields"])
     assert _contains_field_id(data["fields"], "kasse")
     assert "full_text_content" in data
     assert len(data["full_text_content"]) == expected_rows
@@ -160,6 +199,7 @@ def test_reads_same_pdf_twice_and_writes_expected_rows_for_each_pdf(fields_outpu
     assert all(meta["pages"] >= 1 for meta in data["metadata"])
     assert len(data["fields"]) == expected_rows
     _assert_fields_layout(data["fields"], fixture_field_count, fields_output_mode)
+    _assert_enriched_field_payload(data["fields"])
     assert _count_field_id(data["fields"], "kasse") >= 2
     assert len(data["full_text_content"]) == expected_rows
     assert all("Besoldung" in text for text in data["full_text_content"])
@@ -198,6 +238,7 @@ def test_reads_pdf_from_dictbuffer_parent_link(fields_output_mode: str):
     assert "fields" in data
     assert len(data["fields"]) == expected_rows
     _assert_fields_layout(data["fields"], fixture_field_count, fields_output_mode)
+    _assert_enriched_field_payload(data["fields"])
     assert _contains_field_id(data["fields"], "kasse")
     assert "full_text_content" in data
     assert len(data["full_text_content"]) == expected_rows
@@ -235,6 +276,7 @@ def test_agent_pipeline_executes_list_and_read_actions_only_once(fields_output_m
         assert all(path.endswith(expected_file) for path in data["filepath"])
         assert all(meta["pages"] >= 1 for meta in data["metadata"])
         _assert_fields_layout(data["fields"], fixture_field_count, fields_output_mode)
+        _assert_enriched_field_payload(data["fields"])
         assert _contains_field_id(data["fields"], "kasse")
         assert all("Besoldung" in text for text in data["full_text_content"])
     finally:
@@ -429,10 +471,18 @@ def test_extracts_field_structure_and_label_context_with_mocked_pdfreader(monkey
     assert len(fields) == 1
     first_field = fields[0]
     assert first_field["field_id"] == "Date_01"
+    assert first_field["write_target_field_id"] == "Date_01"
     assert first_field["field_type"] == "/Text"
     assert first_field["current_value"] == "2024-01-01"
+    assert first_field["proposed_value"] == ""
+    assert first_field["is_fillable"] is True
     assert first_field["rect"] == [80.0, 90.0, 180.0, 110.0]
     assert "Geburtsdatum" in first_field["label_context"]
+    assert isinstance(first_field["context_bundle"], dict)
+    assert isinstance(first_field["value_profile"], dict)
+    assert isinstance(first_field["retrieval_query"], str)
+    assert isinstance(first_field["context_confidence"], float)
+    assert isinstance(first_field["needs_review"], bool)
 
 def test_fixture_pdf_has_acroform_fields():
     """Sanity check: fixture PDF must expose real AcroForm fields (guard against bad test assets)."""

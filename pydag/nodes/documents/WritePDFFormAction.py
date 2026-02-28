@@ -16,48 +16,89 @@ from ..NodeException import NodeException
 
 @dataclass
 class WritePDFFormAction(BufferNode, Action):
-    """`Action` that writes form values into parent-provided PDF files. Best used together with the `ReadPDFFormAction` to fill the same fields that were read from the PDF."""
+    """Write values into native PDF AcroForm fields.
+
+    Purpose:
+    This action writes structured field payloads into PDF *form fields* and is
+    intended to pair with `ReadPDFFormAction` in closed-loop pipelines.
+
+    Not OCR:
+    This action does not write arbitrary OCR text regions. It targets native
+    AcroForm field names and values only.
+
+    Compatibility:
+    Accepts both legacy payloads (simple JSON maps, `field_id/current_value`)
+    and enriched read payloads (`write_target_field_id`, `proposed_value`,
+    `is_fillable`, context metadata).
+    """
 
     path_input_keys: list[str] = field(
         default_factory=lambda: ["values", "filepath"],
-        metadata={"description": "keys used to extract source PDF paths from parent data"},
+        metadata={
+            "description": "Keys used to extract source PDF paths from parent data."
+        },
     )
     fill_input_keys: list[str] = field(
         default_factory=lambda: ["answer", "answers", "fields", "form_fields", "field_values", "content"],
-        metadata={"description": "keys used to extract filled form payloads from parent data"},
+        metadata={
+            "description": "Keys used to extract fill payloads from parent data."
+        },
     )
     fill_payload_mode: str = field(
         default="auto",
         metadata={
-            "description": "Controls how sequential fill payload rows are interpreted when no filepath->payload mapping is available. 'auto' keeps legacy behavior, 'per_pdf' expects one payload per PDF (or one payload for all PDFs), 'per_field' merges sequential field payload rows for single-PDF inputs."
+            "description": "How sequential fill payload rows are interpreted when no explicit "
+            "filepath->payload mapping exists. 'auto' and 'per_pdf' keep row-wise behavior; "
+            "'per_field' merges sequential field rows for single-PDF inputs."
         },
     )
     output_keys: list[str] = field(
         default_factory=lambda: ["filepath", "output_filepath", "written_fields", "written_field_count"],
         metadata={
-            "description": "output keys in the order [filepath, output_filepath, written_fields, written_field_count]"
+            "description": "Output keys in the fixed order "
+            "[filepath, output_filepath, written_fields, written_field_count]."
         },
     )
     output_suffix: str = field(
         default="_filled",
-        metadata={"description": "suffix appended to output files when overwrite_source is False"},
+        metadata={"description": "Suffix appended to output files when overwrite_source is False."},
     )
     output_folder: str = field(
         default=None,
-        metadata={"description": "optional folder for written PDFs; defaults to source file folder"},
+        metadata={"description": "Optional folder for written PDFs; defaults to source file folder."},
     )
     overwrite_source: bool = field(
         default=False,
-        metadata={"description": "if True, write directly into source PDFs"},
+        metadata={"description": "If True, overwrite source PDFs in-place."},
     )
     require_pdf_extension: bool = field(
         default=True,
-        metadata={"description": "if True, reject non-.pdf inputs before parsing"},
+        metadata={"description": "If True, reject non-.pdf inputs before parsing."},
     )
     require_two_parents: bool = field(
         default=True,
         metadata={
-            "description": "if True, require at least two parents (paths + fill payloads); if False, paths and payloads may be provided by a single parent"
+            "description": "If True, require two parent inputs (paths and payloads). "
+            "If False, one parent may provide both."
+        },
+    )
+    value_source_priority: list[str] = field(
+        default_factory=lambda: ["proposed_value", "current_value", "value", "field_value", "answer"],
+        metadata={
+            "description": "Priority order for selecting values from field objects. "
+            "Default supports enriched read payloads and legacy keys."
+        },
+    )
+    target_field_priority: list[str] = field(
+        default_factory=lambda: ["write_target_field_id", "field_id"],
+        metadata={
+            "description": "Priority order for resolving target PDF field names from field objects."
+        },
+    )
+    respect_is_fillable: bool = field(
+        default=True,
+        metadata={
+            "description": "If True, skip field objects with `is_fillable=False`."
         },
     )
 
@@ -74,6 +115,10 @@ class WritePDFFormAction(BufferNode, Action):
             raise NodeException("output_folder cannot be used when overwrite_source=True")
         if self.fill_payload_mode not in {"auto", "per_pdf", "per_field"}:
             raise NodeException("fill_payload_mode must be one of: 'auto', 'per_pdf', 'per_field'")
+        if len(self.value_source_priority) == 0:
+            raise NodeException("value_source_priority must contain at least one key")
+        if len(self.target_field_priority) == 0:
+            raise NodeException("target_field_priority must contain at least one key")
 
     def _on_execute(self):
         """Extract file paths + fill payloads from parents and write one output PDF per input path."""
@@ -254,11 +299,11 @@ class WritePDFFormAction(BufferNode, Action):
             isinstance(value, (list, tuple))
             and len(value) > 0
             and all(isinstance(item, dict) for item in value)
-            and any("field_id" in item for item in value)
+            and any(("field_id" in item or "write_target_field_id" in item) for item in value)
         )
 
     def _normalize_field_values(self, payload: Any) -> dict[str, Any] | None:
-        """Normalize supported payload formats into {field_id: value}."""
+        """Normalize supported payload formats into `{target_field_id: value}`."""
         if payload is None:
             return None
 
@@ -270,51 +315,53 @@ class WritePDFFormAction(BufferNode, Action):
 
         if isinstance(payload, (list, tuple)):
             if self._looks_like_field_list(payload):
-                result = {}
-                for item in payload:
-                    field_id = item.get("field_id")
-                    if field_id is None:
-                        continue
-                    value = self._coalesce(
-                        item.get("current_value"),
-                        item.get("value"),
-                        item.get("field_value"),
-                        item.get("answer"),
-                        "",
-                    )
-                    if self._is_empty_value(value):
-                        continue
-                    result[str(field_id)] = self._normalize_write_value(value)
-                return result if len(result) > 0 else None
+                return self._normalize_field_list_payload(payload)
             if len(payload) == 1:
                 return self._normalize_field_values(payload[0])
-            return None
+            merged: dict[str, Any] = {}
+            for item in payload:
+                nested = self._normalize_field_values(item)
+                if nested is not None and len(nested) > 0:
+                    merged = self._merge_field_values(merged, nested)
+            return merged if len(merged) > 0 else None
 
         if isinstance(payload, dict):
+            merged_wrappers: dict[str, Any] = {}
             for wrapper_key in ["fields", "form_fields", "field_values", "values", "answer", "content", "data"]:
                 if wrapper_key in payload:
                     nested = self._normalize_field_values(payload[wrapper_key])
                     if nested is not None and len(nested) > 0:
-                        return nested
+                        merged_wrappers = self._merge_field_values(merged_wrappers, nested)
+            if len(merged_wrappers) > 0:
+                return merged_wrappers
 
-            if "field_id" in payload:
-                field_id = payload.get("field_id")
-                if field_id is None:
-                    return None
-                value = self._coalesce(
-                    payload.get("current_value"),
-                    payload.get("value"),
-                    payload.get("field_value"),
-                    payload.get("answer"),
-                    "",
-                )
-                if self._is_empty_value(value):
-                    return None
-                return {str(field_id): self._normalize_write_value(value)}
+            if self._looks_like_field_item(payload):
+                return self._normalize_field_item_payload(payload)
 
             result = {}
             for key, value in payload.items():
-                if key in {"filepath", "file_path", "metadata", "full_text_content", "question", "prompt"}:
+                if key in {
+                    "filepath",
+                    "file_path",
+                    "metadata",
+                    "full_text_content",
+                    "question",
+                    "prompt",
+                    "label_context",
+                    "field_type",
+                    "rect",
+                    "is_fillable",
+                    "write_target_field_id",
+                    "field_id",
+                    "proposed_value",
+                    "current_value",
+                    "context_bundle",
+                    "value_profile",
+                    "retrieval_query",
+                    "context_confidence",
+                    "needs_review",
+                    "page_index",
+                }:
                     continue
                 if isinstance(value, (dict, list, tuple)):
                     nested = self._normalize_field_values(value)
@@ -326,6 +373,72 @@ class WritePDFFormAction(BufferNode, Action):
                 result[str(key)] = self._normalize_write_value(value)
             return result if len(result) > 0 else None
 
+        return None
+
+    def _looks_like_field_item(self, payload: dict[str, Any]) -> bool:
+        """Return True if a dict resembles a single field object."""
+        has_target = any(
+            key in payload and not self._is_empty_value(payload.get(key))
+            for key in (self.target_field_priority + ["field_id", "write_target_field_id"])
+        )
+        has_value = any(
+            key in payload and not self._is_empty_value(payload.get(key))
+            for key in (self.value_source_priority + ["value", "field_value", "answer"])
+        )
+        return has_target and (has_value or "current_value" in payload or "proposed_value" in payload)
+
+    def _normalize_field_list_payload(self, payload: list[dict[str, Any]] | tuple[dict[str, Any], ...]) -> dict[str, Any] | None:
+        """Normalize a list of field objects into target->value mapping."""
+        result: dict[str, Any] = {}
+        for item in payload:
+            if not isinstance(item, dict):
+                continue
+            normalized = self._normalize_field_item_payload(item)
+            if normalized is None or len(normalized) == 0:
+                continue
+            result = self._merge_field_values(result, normalized)
+        return result if len(result) > 0 else None
+
+    def _normalize_field_item_payload(self, payload: dict[str, Any]) -> dict[str, Any] | None:
+        """Normalize a single field object into `{target_field_id: value}`."""
+        if self.respect_is_fillable and payload.get("is_fillable") is False:
+            return None
+
+        target_field = self._resolve_target_field(payload)
+        if target_field is None:
+            return None
+
+        value = self._resolve_field_value(payload)
+        if self._is_empty_value(value):
+            return None
+        return {target_field: self._normalize_write_value(value)}
+
+    def _resolve_target_field(self, payload: dict[str, Any]) -> str | None:
+        """Resolve target field id using configured priority."""
+        for key in self.target_field_priority:
+            value = payload.get(key)
+            if self._is_empty_value(value):
+                continue
+            return str(value)
+        for fallback in ["write_target_field_id", "field_id"]:
+            value = payload.get(fallback)
+            if self._is_empty_value(value):
+                continue
+            return str(value)
+        return None
+
+    def _resolve_field_value(self, payload: dict[str, Any]) -> Any:
+        """Resolve field value using configured priority and legacy fallback keys."""
+        for key in self.value_source_priority:
+            value = payload.get(key)
+            if self._is_empty_value(value):
+                continue
+            return value
+        for fallback in ["proposed_value", "current_value", "value", "field_value", "answer"]:
+            value = payload.get(fallback)
+            if self._is_empty_value(value):
+                continue
+            return value
         return None
 
     def _parse_payload_text(self, text: str) -> Any:

@@ -155,6 +155,91 @@ def test_writes_pdf_form_from_read_style_fields_payload(tmp_path):
     assert fields["az-persnr"]["/V"] == "4711"
 
 
+def test_write_prefers_proposed_value_over_current_value(tmp_path):
+    pdf_file = _test_pdf_form_file()
+
+    path_buf = ListBuffer(id="B_PDF_PATHS_PRIORITY_VALUE")
+    path_buf.install()
+    path_buf.push(pdf_file)
+    path_parent = _link_buffer(path_buf)
+
+    payload_buf = DictBuffer(id="B_PDF_FILL_PRIORITY_VALUE")
+    payload_buf.install()
+    payload_buf.push(
+        {
+            "fields": [
+                [
+                    {
+                        "field_id": "kasse",
+                        "write_target_field_id": "kasse",
+                        "is_fillable": True,
+                        "current_value": "AOK",
+                        "proposed_value": "TK",
+                    }
+                ]
+            ]
+        }
+    )
+    payload_parent = _link_buffer(payload_buf)
+
+    wpa = WritePDFFormAction(
+        path_input_keys=["values"],
+        fill_input_keys=["fields"],
+        output_folder=_test_output_folder(),
+    )
+    wpa.add_parent(path_parent)
+    wpa.add_parent(payload_parent)
+    wpa.install()
+    wpa.execute()
+
+    out_file = wpa.get_buffer().data()["output_filepath"][0]
+    reader = PdfReader(out_file)
+    fields = reader.get_fields() or {}
+    assert fields["kasse"]["/V"] == "TK"
+
+
+def test_write_uses_write_target_field_id_over_field_id(tmp_path):
+    pdf_file = _test_pdf_form_file()
+
+    path_buf = ListBuffer(id="B_PDF_PATHS_PRIORITY_TARGET")
+    path_buf.install()
+    path_buf.push(pdf_file)
+    path_parent = _link_buffer(path_buf)
+
+    payload_buf = DictBuffer(id="B_PDF_FILL_PRIORITY_TARGET")
+    payload_buf.install()
+    payload_buf.push(
+        {
+            "fields": [
+                [
+                    {
+                        "field_id": "non_existing_field",
+                        "write_target_field_id": "kasse",
+                        "is_fillable": True,
+                        "proposed_value": "DAK",
+                    }
+                ]
+            ]
+        }
+    )
+    payload_parent = _link_buffer(payload_buf)
+
+    wpa = WritePDFFormAction(
+        path_input_keys=["values"],
+        fill_input_keys=["fields"],
+        output_folder=_test_output_folder(),
+    )
+    wpa.add_parent(path_parent)
+    wpa.add_parent(payload_parent)
+    wpa.install()
+    wpa.execute()
+
+    out_file = wpa.get_buffer().data()["output_filepath"][0]
+    reader = PdfReader(out_file)
+    fields = reader.get_fields() or {}
+    assert fields["kasse"]["/V"] == "DAK"
+
+
 def test_execute_raises_if_two_parents_are_required_but_missing():
     wpa = WritePDFFormAction(require_two_parents=True)
     wpa.install()
