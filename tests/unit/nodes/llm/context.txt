@@ -1,0 +1,15 @@
+Geburtsdatum: 01.01.1900
+Akademische Grade: Doktor der Ingenieuwissenschaften
+Personalnummer: 123456dwwe
+Datum: 22.02.2026
+Krankenkasse: DAK
+Geboren in: Italy
+Beginn der Arbeit: 01.10.1920
+Institut: Bank
+IBAN: DE57659801200082151005
+BIC: GENODES1EBT
+Verheiratet: X
+Stelle: Universität
+Staatsangehörigkeit: Schweizer.
+Vorname: John
+Nachname: Doe

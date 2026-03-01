@@ -69,7 +69,13 @@ class RAGService(LLMService):
             model = SentenceTransformer(self.embedding_model_name)
             model.save(str(RAGService.MODEL_RESOURCE_FOLDER / self.embedding_model_name))
             logger.debug("downloaded embedding model " + self.embedding_model_name + " to " + str(RAGService.MODEL_RESOURCE_FOLDER / self.embedding_model_name))
-        self._embedding_model = HuggingFaceEmbeddings(model_name=str(RAGService.MODEL_RESOURCE_FOLDER / self.embedding_model_name))
+        # Return tensors directly to avoid NumPy conversion issues and keep
+        # compatibility with sentence-transformers versions that return lists
+        # when only convert_to_numpy=False is set.
+        self._embedding_model = HuggingFaceEmbeddings(
+            model_name=str(RAGService.MODEL_RESOURCE_FOLDER / self.embedding_model_name),
+            encode_kwargs={"convert_to_tensor": True},
+        )
 
         resolved_directory = self._resolve_vector_store_directory()
         if resolved_directory is None:

@@ -452,21 +452,7 @@ pip uninstall pydag -y; pip install git+https://github.com/PyDataAgents/PyDataAg
 Project Dependencies can be found in [pyproject.toml](pyproject.toml)
 
 
-## Example Applications
-PyDataAgents can be used to build a wide variety of applications. Some examples include:
-- Watchdogs for filesystem monitoring and automated file processing (e.g. move files, extract metadata, classify content, etc.)
-- remote monitoring of testbenches or machines with automated data collection, preprocessing and dashboarding (using Grafana)
-- Mail Alerts for Project Management based on ERP data or project management database
-- IIoT gateways for data collection, transformation and routing in production environments
-or smarthome applications
-- CAD configurators for automatic generation of CAD files based on user input and predefined templates (Solidworks, STEP, ...)
-- Backends for Web Product Configurators with complex computation engines for automatic generation of product configurations based on user input and predefined templates (e.g. for e-commerce)
-- Digital Shadows of Machine Elements with data collection and physics based modeling for predictive maintenance and simulation purposes
-- LLM based querying of database content with automated data retrieval
-- LLM based document processing with automated document retrieval and information extraction (image to text applications, PDF processing, etc.)
-- ... and many more
-
-## Testing
+## Examples and Testing
 All unit tests and examples are found in [unit](tests/unit) and [regression](tests/regression) folders.
 
 ## License

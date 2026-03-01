@@ -50,6 +50,7 @@ dependencies = [
     # document processing
     "openpyxl",
     "pypdf",
+    "PyMuPDF",
     "unstructured[all-docs]",
     "watchdog",
     "cadquery",
@@ -106,6 +107,19 @@ exclude = ["tests"]
 
 [tool.setuptools.package-data]
 "pydag" = ["services/plot/*.html", "_docs/element_icons/**/*"]
+
+[project.urls]
+Documentation = "https://github.com/PyDataAgents/PyDataAgents.git"
+Issues = "https://github.com/PyDataAgents/PyDataAgents.git"
+Source = "https://github.com/PyDataAgents/PyDataAgents.git"
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
+filterwarnings = [
+    "ignore:Failed to initialize NumPy.*_ARRAY_API not found.*:UserWarning:transformers\\.cache_utils",
+    "ignore:datetime\\.datetime\\.utcfromtimestamp\\(\\) is deprecated and scheduled for removal.*:DeprecationWarning:reactivex\\.internal\\.constants",
+    "ignore:'pkgutil\\.find_loader' is deprecated and slated for removal in Python 3\\.14.*:DeprecationWarning:pytesseract\\.pytesseract",
+]
 
 [project.urls]
 Documentation = "https://github.com/PyDataAgents/PyDataAgents.git"

@@ -1,10 +1,12 @@
 import os
 import sys
 import types
-import json
-import random
+import uuid
 
 import pytest
+
+#pytest.importorskip("fitz")
+
 from pypdf import PdfReader
 
 # Fallback for environments where graphviz is not installed.
@@ -31,32 +33,18 @@ from pydag.buffers.DictBuffer import DictBuffer
 from pydag.buffers.ListBuffer import ListBuffer
 from pydag.nodes.NodeException import NodeException
 from pydag.nodes.buffers.LinkBufferAction import LinkBufferAction
-from pydag.nodes.documents.ListFilesAction import ListFilesAction
-from pydag.nodes.documents.WritePDFFormAction import WritePDFFormAction
-from pydag.nodes.llm.LLMChatAction import LLMChatAction
-from pydag.services.llm.LLMService import LLMService
+from pydag.nodes.documents.PDFReadFormAction import PDFReadFormAction
+from pydag.nodes.documents.PDFWriteFormAction import PDFWriteFormAction
 
 
-def _test_pdf_form_folder() -> str:
-    return os.path.join(os.path.dirname(__file__), "test_pdf_form")
+def _test_pdf_file() -> str:
+    return os.path.join(os.path.dirname(__file__), "test_pdf_form", "test_5031.pdf")
 
 
-def _test_output_folder() -> str:
-    return os.path.join(_test_pdf_form_folder(), "output")
-
-
-def _test_pdf_form_file() -> str:
-    folder = _test_pdf_form_folder()
-    pdfs = sorted(
-        [
-            os.path.join(folder, name)
-            for name in os.listdir(folder)
-            if name.lower().endswith(".pdf")
-        ]
+def _output_folder() -> str:
+    return os.path.abspath(
+        os.path.join(os.path.dirname(__file__), "..", "..", "..", "..", "resources", "outputs")
     )
-    if len(pdfs) == 0:
-        raise AssertionError("No PDF fixture found in test_pdf_form folder.")
-    return pdfs[0]
 
 
 def _link_buffer(buffer):
@@ -66,166 +54,315 @@ def _link_buffer(buffer):
     return lba
 
 
-def test_writes_pdf_form_from_two_parents_with_json_answer_payload(tmp_path):
-    lfa = ListFilesAction(folder=_test_pdf_form_folder(), extension=".pdf")
-    lfa.install()
-    lfa.execute()
+def _normalize_pdf_value(value) -> str:
+    if value is None:
+        return ""
+    if isinstance(value, bytes):
+        text = value.decode("utf-8", errors="ignore")
+    else:
+        text = str(value)
+    text = text.strip()
+    if text.startswith("/"):
+        text = text[1:]
+    if text.lower() == "off":
+        return ""
+    return text
 
-    payload_buf = DictBuffer(id="B_PDF_FILL_JSON")
+
+def _normalized_pdf_field_values(pdf_path: str) -> dict[str, str]:
+    reader = PdfReader(pdf_path)
+    fields = reader.get_fields() or {}
+    return {str(key): _normalize_pdf_value(value.get("/V") if isinstance(value, dict) else None) for key, value in fields.items()}
+
+
+def test_write_pdf_form_writes_text_fields_from_json_mapping():
+    path_buf = ListBuffer(id="B_PDFWRITE_PATHS_TEXT")
+    path_buf.install()
+    path_buf.push(_test_pdf_file())
+    path_parent = _link_buffer(path_buf)
+
+    payload_buf = DictBuffer(id="B_PDFWRITE_PAYLOAD_TEXT")
     payload_buf.install()
-    payload_buf.push({"answer": ['{"kasse":"AOK","az-persnr":"12345"}']})
+    payload_buf.push({"answer": ['{"kasse":"DAK","az-persnr":"12345"}']})
     payload_parent = _link_buffer(payload_buf)
 
-    wpa = WritePDFFormAction(
+    writer = PDFWriteFormAction(
         path_input_keys=["values"],
         fill_input_keys=["answer"],
-        output_folder=_test_output_folder(),
+        output_folder=_output_folder(),
+        output_suffix="_ut_text_" #+ uuid.uuid4().hex[:8],
     )
-    wpa.add_parent(lfa)
-    wpa.add_parent(payload_parent)
-    wpa.install()
-    wpa.execute()
+    writer.add_parent(path_parent)
+    writer.add_parent(payload_parent)
+    writer.install()
+    writer.execute()
 
-    data = wpa.get_buffer().data()
-    assert "filepath" in data
-    assert "output_filepath" in data
-    assert "written_fields" in data
-    assert "written_field_count" in data
-    assert len(data["filepath"]) == 1
+    data = writer.get_buffer().data()
+    assert len(data["output_filepath"]) == 1
     assert data["written_field_count"][0] == 2
+    output_file = data["output_filepath"][0]
+    assert os.path.isfile(output_file)
 
-    out_file = data["output_filepath"][0]
-    assert os.path.isfile(out_file)
-    assert out_file.endswith("_filled.pdf")
-
-    reader = PdfReader(out_file)
-    fields = reader.get_fields() or {}
-    assert fields["kasse"]["/V"] == "AOK"
-    assert fields["az-persnr"]["/V"] == "12345"
+    values = _normalized_pdf_field_values(output_file)
+    assert values["kasse"] == "DAK"
+    assert values["az-persnr"] == "12345"
 
 
-def test_writes_pdf_form_from_read_style_fields_payload(tmp_path):
-    pdf_file = _test_pdf_form_file()
+def test_write_pdf_form_wraps_widget_update_runtime_error_as_node_exception(monkeypatch):
+    def _fake_import_fitz(self):
+        class _FakeDocument:
+            def close(self):
+                return
 
-    path_buf = ListBuffer(id="B_PDF_PATHS")
+        class _FakeFitz:
+            @staticmethod
+            def open(_path):
+                return _FakeDocument()
+
+        return _FakeFitz()
+
+    def _fake_index_widgets(self, _document):
+        return {"kasse": [object()]}, []
+
+    def _fake_write_field_to_widgets(self, _field_name, _widgets, _value, _fitz):
+        raise RuntimeError("Annot is not bound to a page")
+
+    def _fake_save_document(self, _document, _source_path, _output_path):
+        return
+
+    monkeypatch.setattr(PDFWriteFormAction, "_import_fitz", _fake_import_fitz)
+    monkeypatch.setattr(PDFWriteFormAction, "_index_widgets", _fake_index_widgets)
+    monkeypatch.setattr(PDFWriteFormAction, "_write_field_to_widgets", _fake_write_field_to_widgets)
+    monkeypatch.setattr(PDFWriteFormAction, "_save_document", _fake_save_document)
+
+    path_buf = ListBuffer(id="B_PDFWRITE_PATHS_WRAP_ERR")
     path_buf.install()
-    path_buf.push(pdf_file)
+    path_buf.push(_test_pdf_file())
     path_parent = _link_buffer(path_buf)
 
-    field_list = [
-        {"field_id": "kasse", "current_value": "BKK"},
-        {"field_id": "az-persnr", "current_value": "4711"},
-    ]
-    payload_buf = DictBuffer(id="B_PDF_FIELDS")
-    payload_buf.install()
-    payload_buf.push({"fields": [field_list]})
-    payload_parent = _link_buffer(payload_buf)
-
-    wpa = WritePDFFormAction(
-        path_input_keys=["values"],
-        fill_input_keys=["fields"],
-        output_folder=_test_output_folder(),
-    )
-    wpa.add_parent(path_parent)
-    wpa.add_parent(payload_parent)
-    wpa.install()
-    wpa.execute()
-
-    out_file = wpa.get_buffer().data()["output_filepath"][0]
-    reader = PdfReader(out_file)
-    fields = reader.get_fields() or {}
-
-    assert fields["kasse"]["/V"] == "BKK"
-    assert fields["az-persnr"]["/V"] == "4711"
-
-
-def test_execute_raises_if_two_parents_are_required_but_missing():
-    wpa = WritePDFFormAction(require_two_parents=True)
-    wpa.install()
-    with pytest.raises(NodeException):
-        wpa.execute()
-
-
-def test_execute_raises_for_mismatched_payload_count(tmp_path):
-    pdf_file = _test_pdf_form_file()
-
-    path_buf = ListBuffer(id="B_PDF_PATHS_MISMATCH")
-    path_buf.install()
-    path_buf.push(pdf_file)
-    path_parent = _link_buffer(path_buf)
-
-    payload_buf = DictBuffer(id="B_PDF_FILL_MISMATCH")
-    payload_buf.install()
-    payload_buf.push({"answer": ['{"kasse":"AOK"}', '{"kasse":"TK"}']})
-    payload_parent = _link_buffer(payload_buf)
-
-    wpa = WritePDFFormAction(
-        path_input_keys=["values"],
-        fill_input_keys=["answer"],
-        output_folder=_test_output_folder(),
-    )
-    wpa.add_parent(path_parent)
-    wpa.add_parent(payload_parent)
-    wpa.install()
-
-    with pytest.raises(NodeException):
-        wpa.execute()
-
-
-def test_custom_output_keys_are_used(tmp_path):
-    pdf_file = _test_pdf_form_file()
-
-    path_buf = ListBuffer(id="B_PDF_PATHS_CUSTOM")
-    path_buf.install()
-    path_buf.push(pdf_file)
-    path_parent = _link_buffer(path_buf)
-
-    payload_buf = DictBuffer(id="B_PDF_FILL_CUSTOM")
+    payload_buf = DictBuffer(id="B_PDFWRITE_PAYLOAD_WRAP_ERR")
     payload_buf.install()
     payload_buf.push({"answer": ['{"kasse":"DAK"}']})
     payload_parent = _link_buffer(payload_buf)
 
-    wpa = WritePDFFormAction(
+    writer = PDFWriteFormAction(
         path_input_keys=["values"],
         fill_input_keys=["answer"],
-        output_keys=["source", "target", "fields_written", "count"],
-        output_folder=_test_output_folder(),
+        output_folder=_output_folder(),
+        output_suffix="_ut_wrap_"# + uuid.uuid4().hex[:8],
     )
-    wpa.add_parent(path_parent)
-    wpa.add_parent(payload_parent)
-    wpa.install()
-    wpa.execute()
+    writer.add_parent(path_parent)
+    writer.add_parent(payload_parent)
+    writer.install()
 
-    data = wpa.get_buffer().data()
-    assert "source" in data
-    assert "target" in data
-    assert "fields_written" in data
-    assert "count" in data
-    assert "filepath" not in data
-    assert "output_filepath" not in data
+    with pytest.raises(NodeException, match="could not write pdf file"):
+        writer.execute()
 
 
-def test_execute_raises_when_values_is_used_for_paths_and_fill_payloads(tmp_path):
-    pdf_file = _test_pdf_form_file()
+def test_write_pdf_form_non_strict_unknown_fields_ignores_extras(monkeypatch):
+    def _fake_import_fitz(self):
+        class _FakeDocument:
+            def close(self):
+                return
 
-    path_buf = ListBuffer(id="B_VALUES_PATH")
+        class _FakeFitz:
+            @staticmethod
+            def open(_path):
+                return _FakeDocument()
+
+        return _FakeFitz()
+
+    def _fake_index_widgets(self, _document):
+        return {"kasse": [object()]}, []
+
+    def _fake_write_field_to_widgets(self, _field_name, _widgets, value, _fitz):
+        return value
+
+    def _fake_save_document(self, _document, _source_path, _output_path):
+        return
+
+    monkeypatch.setattr(PDFWriteFormAction, "_import_fitz", _fake_import_fitz)
+    monkeypatch.setattr(PDFWriteFormAction, "_index_widgets", _fake_index_widgets)
+    monkeypatch.setattr(PDFWriteFormAction, "_write_field_to_widgets", _fake_write_field_to_widgets)
+    monkeypatch.setattr(PDFWriteFormAction, "_save_document", _fake_save_document)
+
+    path_buf = ListBuffer(id="B_PDFWRITE_PATHS_NON_STRICT")
+    path_buf.install()
+    path_buf.push(_test_pdf_file())
+    path_parent = _link_buffer(path_buf)
+
+    payload_buf = DictBuffer(id="B_PDFWRITE_PAYLOAD_NON_STRICT")
+    payload_buf.install()
+    payload_buf.push({"answer": ['{"kasse":"DAK","__unknown__":"X"}']})
+    payload_parent = _link_buffer(payload_buf)
+
+    writer = PDFWriteFormAction(
+        path_input_keys=["values"],
+        fill_input_keys=["answer"],
+        output_folder=_output_folder(),
+        output_suffix="_ut_nonstrict_",# + uuid.uuid4().hex[:8],
+        strict_unknown_fields=False,
+    )
+    writer.add_parent(path_parent)
+    writer.add_parent(payload_parent)
+    writer.install()
+    writer.execute()
+
+    data = writer.get_buffer().data()
+    assert data["written_field_count"][0] == 1
+
+
+def test_write_pdf_form_rejects_non_pdf_input_when_extension_required(tmp_path):
+    non_pdf_file = tmp_path / "not_a_pdf.txt"
+    non_pdf_file.write_text("not a pdf", encoding="utf-8")
+
+    path_buf = ListBuffer(id="B_PDFWRITE_PATHS_NONPDF")
+    path_buf.install()
+    path_buf.push(str(non_pdf_file))
+    path_parent = _link_buffer(path_buf)
+
+    payload_buf = DictBuffer(id="B_PDFWRITE_PAYLOAD_NONPDF")
+    payload_buf.install()
+    payload_buf.push({"answer": ['{"kasse":"DAK"}']})
+    payload_parent = _link_buffer(payload_buf)
+
+    writer = PDFWriteFormAction(
+        path_input_keys=["values"],
+        fill_input_keys=["answer"],
+        output_folder=_output_folder(),
+        output_suffix="_ut_nonpdf_",# + uuid.uuid4().hex[:8],
+        require_pdf_extension=True,
+    )
+    writer.add_parent(path_parent)
+    writer.add_parent(payload_parent)
+    writer.install()
+
+    with pytest.raises(NodeException):
+        writer.execute()
+
+
+def test_write_pdf_form_writes_checkbox_and_radio_states():
+    path_buf = ListBuffer(id="B_PDFWRITE_PATHS_BTN")
+    path_buf.install()
+    path_buf.push(_test_pdf_file())
+    path_parent = _link_buffer(path_buf)
+
+    payload_buf = DictBuffer(id="B_PDFWRITE_PAYLOAD_BTN")
+    payload_buf.install()
+    payload_buf.push({"answer": ['{"versorgungsbezuege": true, "dienstverh":"nein"}']})
+    payload_parent = _link_buffer(payload_buf)
+
+    writer = PDFWriteFormAction(
+        path_input_keys=["values"],
+        fill_input_keys=["answer"],
+        output_folder=_output_folder(),
+        output_suffix="_ut_btn_"# + uuid.uuid4().hex[:8],
+    )
+    writer.add_parent(path_parent)
+    writer.add_parent(payload_parent)
+    writer.install()
+    writer.execute()
+
+    output_file = writer.get_buffer().data()["output_filepath"][0]
+    values = _normalized_pdf_field_values(output_file)
+    assert values["versorgungsbezuege"].lower() == "ja"
+    assert values["dienstverh"].lower() == "nein"
+
+
+def test_write_pdf_form_fails_fast_for_unknown_fields_by_default():
+    path_buf = ListBuffer(id="B_PDFWRITE_PATHS_UNKNOWN")
+    path_buf.install()
+    path_buf.push(_test_pdf_file())
+    path_parent = _link_buffer(path_buf)
+
+    payload_buf = DictBuffer(id="B_PDFWRITE_PAYLOAD_UNKNOWN")
+    payload_buf.install()
+    payload_buf.push({"answer": ['{"__unknown_field__":"value"}']})
+    payload_parent = _link_buffer(payload_buf)
+
+    writer = PDFWriteFormAction(
+        path_input_keys=["values"],
+        fill_input_keys=["answer"],
+        output_folder=_output_folder(),
+        output_suffix="_ut_unknown_"# + uuid.uuid4().hex[:8],
+    )
+    writer.add_parent(path_parent)
+    writer.add_parent(payload_parent)
+    writer.install()
+
+    with pytest.raises(NodeException):
+        writer.execute()
+
+
+def test_write_pdf_form_per_field_mode_auto_merges_rows_by_filepath():
+    pdf_file = _test_pdf_file()
+
+    path_buf = ListBuffer(id="B_PDFWRITE_PATHS_PERFIELD")
     path_buf.install()
     path_buf.push(pdf_file)
     path_parent = _link_buffer(path_buf)
 
-    fill_buf = ListBuffer(id="B_VALUES_FILL")
-    fill_buf.install()
-    fill_buf.push('{"kasse":"AOK","az-persnr":"12345"}')
-    fill_parent = _link_buffer(fill_buf)
-
-    wpa = WritePDFFormAction(
-        path_input_keys=["values"],
-        fill_input_keys=["values"],
-        output_folder=_test_output_folder(),
+    payload_buf = DictBuffer(id="B_PDFWRITE_PAYLOAD_PERFIELD")
+    payload_buf.install()
+    payload_buf.push(
+        {
+            "filepath": [pdf_file, pdf_file],
+            "answer": ['{"kasse":"AOK"}', '{"az-persnr":"777"}'],
+        }
     )
-    wpa.add_parent(path_parent)
-    wpa.add_parent(fill_parent)
-    wpa.install()
+    payload_parent = _link_buffer(payload_buf)
 
-    with pytest.raises(NodeException):
-        wpa.execute()
+    writer = PDFWriteFormAction(
+        row_mode="per_field",
+        path_input_keys=["values", "filepath"],
+        fill_input_keys=["answer"],
+        output_folder=_output_folder(),
+        output_suffix="_ut_perfield_"# + uuid.uuid4().hex[:8],
+    )
+    writer.add_parent(path_parent)
+    writer.add_parent(payload_parent)
+    writer.install()
+    writer.execute()
+
+    data = writer.get_buffer().data()
+    assert len(data["filepath"]) == 1
+    assert data["written_field_count"][0] == 2
+    output_file = data["output_filepath"][0]
+
+    values = _normalized_pdf_field_values(output_file)
+    assert values["kasse"] == "AOK"
+    assert values["az-persnr"] == "777"
+
+
+def test_roundtrip_read_to_write_preserves_field_values():
+    pdf_file = _test_pdf_file()
+
+    path_buf = ListBuffer(id="B_PDFWRITE_PATHS_ROUNDTRIP")
+    path_buf.install()
+    path_buf.push(pdf_file)
+    path_parent = _link_buffer(path_buf)
+
+    reader = PDFReadFormAction(
+        input_keys=["values"],
+        row_mode="per_pdf",
+        include_bridge_prompt=False,
+    )
+    reader.add_parent(path_parent)
+    reader.install()
+    reader.execute()
+
+    writer = PDFWriteFormAction(
+        path_input_keys=["filepath"],
+        fill_input_keys=["fields"],
+        row_mode="per_pdf",
+        output_folder=_output_folder(),
+        output_suffix="_ut_roundtrip_"# + uuid.uuid4().hex[:8],
+    )
+    writer.add_parent(reader)
+    writer.install()
+    writer.execute()
+
+    output_file = writer.get_buffer().data()["output_filepath"][0]
+    source_values = _normalized_pdf_field_values(pdf_file)
+    output_values = _normalized_pdf_field_values(output_file)
+    assert source_values == output_values

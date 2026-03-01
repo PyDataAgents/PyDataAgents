@@ -17,7 +17,15 @@ from tests.unit.agents.ConfigObject import ConfigObject
 def test_000():
     yaml_file = open(os.path.dirname(__file__) + "\\config.yaml", "r")
     d = yaml.safe_load(yaml_file)
-    print(d)    
+    print(d)
+    
+
+@pytest.mark.skip(reason="not working")    
+def test_010():
+    module = __import__("pydag.adapters.opcua.OpcUaAdapter")
+    clazz = getattr(module, "OpcUaAdapter")
+    instance = clazz()
+    print(instance.id)
 
 def test_011():
     Clazz = getattr(importlib.import_module("pydag.adapters.opcua.OpcUaAdapter"), "OpcUaAdapter")

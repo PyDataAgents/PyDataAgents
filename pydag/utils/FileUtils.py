@@ -107,7 +107,7 @@ class FileUtils:
                 ]
 
             if len(files) == 0:
-                return []
+                return None
             else:   
                 return files
             

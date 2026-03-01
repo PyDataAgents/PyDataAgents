@@ -6,13 +6,11 @@ from pathlib import Path
 import threading
 import time
 import cv2
-from loguru import logger
 
 from ...agents.Agent import Agent
 from ...utils.FileUtils import FileUtils
 from ...services.ServiceException import ServiceException
 from ...services.Service import Service
-from ...agents.AgentStates import ServiceState
 
 
 @dataclass
@@ -51,10 +49,6 @@ class WebcamVideoRollbackService(Service):
         self._codec = cv2.VideoWriter.fourcc(*self.codec)
         if not self._vc.isOpened():
             raise ServiceException("")
-        # check that output folder exists
-        if not FileUtils.exists_folder(self.output_folder):
-            Path(self.output_folder).mkdir(parents=True, exist_ok=True)
-            logger.warning(f"Output folder {self.output_folder} did not exist and was created.")
        
     def _autodetect_resolution(self):
         # Try real frame first
@@ -95,7 +89,7 @@ class WebcamVideoRollbackService(Service):
         return
         
     def _run(self):
-        while self._state == ServiceState.RUNNING:
+        while self._is_running:
             filename = self._new_filename()
             writer = cv2.VideoWriter(
                     filename,
