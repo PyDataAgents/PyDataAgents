@@ -21,12 +21,17 @@ class HttpPutAction(BufferNode, Action):
     
     def _on_execute(self):
         data = self.get_parent_data()
-        json_obj = json.dumps(data)
+        if self.by_rows:
+            for row in data:
+                self._put_request(row)
+        else:
+            self._put_request(data)
         
-        response = requests.put(self.url, headers=self.headers, timeout=self.timeout, json=json_obj)
+    def _put_request(self, data):
+        response = requests.put(self.url, headers=self.headers, timeout=self.timeout, json=data)
         if response.status_code != 200:
-            raise NodeException("Could not PUT to " + self.url)
-        d = response.json()     
+            raise NodeException("Could not PUT to " + self.url + ": " + response.text)
+        d = response.json()
         if self.json_path is not None:
             jsonpath_expression = jsonpath_ng.parse(self.json_path)
             json_obj = jsonpath_expression.find(d)
@@ -36,5 +41,4 @@ class HttpPutAction(BufferNode, Action):
                 json_obj = [match.value for match in json_obj]
             self.add_data(json_obj)
         else:
-            self.add_data(d)        
-        
+            self.add_data(d) 

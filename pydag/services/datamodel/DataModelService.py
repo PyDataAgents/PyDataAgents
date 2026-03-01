@@ -88,7 +88,7 @@ class DataModelService(Service):
         runs all methods over and over again until there is no more updates based on current available model values
         for the given `property_value_pairs`
         """
-        if not model_id in self._model_store:        
+        if not model_id in self._model_store:
             # create a new empty model and its lock, if none is present
             data_model = ClassUtils.load_instance(self.model_path, self.model_name)
             lock : threading.Lock = threading.Lock()
@@ -189,8 +189,17 @@ class DataModelService(Service):
             if not data_model.has_property(prop):
                 raise ServiceException(f"the script calls a property '{prop}', that does not exist in the model")
 
-    def get_data_model(self, model_id) -> 'DataModel':
-        return self._model_store[model_id]
+    def get_data_model(self, model_id) -> DataModel:
+        if model_id in self._model_store:
+            return self._model_store[model_id]
+        else:
+            return None
+    
+    def get_data_models(self) -> dict[str, DataModel]:
+        return self._model_store
+    
+    def get_source(self) -> str:
+        return Path(self.model_path).read_text(encoding="utf-8")
 
 class DataModelReadAccessVisitor(ast.NodeVisitor):
     def __init__(self):
