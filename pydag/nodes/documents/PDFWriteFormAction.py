@@ -18,20 +18,46 @@ from ..NodeException import NodeException
 class PDFWriteFormAction(BufferNode, Action):
     """Write LLM- or user-provided values into PDF AcroForm fields using PyMuPDF."""
 
-    path_input_keys: list[str] = field(default_factory=lambda: ["values", "filepath", "pdf_path"])
+    path_input_keys: list[str] = field(
+        default_factory=lambda: ["values", "filepath", "pdf_path"],
+        metadata={"description": "parent buffer keys to scan for source PDF file paths"},
+    )
     fill_input_keys: list[str] = field(
-        default_factory=lambda: ["answer", "answers", "fields", "field_values", "llm_data", "content"]
+        default_factory=lambda: ["answer", "answers", "fields", "field_values", "llm_data", "content"],
+        metadata={"description": "parent buffer keys to scan for field-value payloads to write into the PDF"},
     )
-    row_mode: str = field(default="per_pdf")
+    row_mode: str = field(
+        default="per_pdf",
+        metadata={"description": "payload interpretation mode: per_pdf expects one payload per file, per_field can merge field-level rows"},
+    )
     output_keys: list[str] = field(
-        default_factory=lambda: ["filepath", "output_filepath", "written_fields", "written_field_count"]
+        default_factory=lambda: ["filepath", "output_filepath", "written_fields", "written_field_count"],
+        metadata={"description": "output columns for source path, written file path, field map, and number of written fields"},
     )
-    output_folder: str | None = field(default="resources/Outputs")
-    output_suffix: str = field(default="_filled")
-    overwrite_source: bool = field(default=False)
-    flatten: bool = field(default=False)
-    strict_unknown_fields: bool = field(default=True)
-    require_pdf_extension: bool = field(default=True)
+    output_folder: str | None = field(
+        default="resources/Outputs",
+        metadata={"description": "target folder for written PDFs; ignored when overwrite_source is True"},
+    )
+    output_suffix: str = field(
+        default="_filled",
+        metadata={"description": "suffix appended to the source filename stem for generated output files"},
+    )
+    overwrite_source: bool = field(
+        default=False,
+        metadata={"description": "whether to overwrite the source PDF in place instead of writing a separate output file"},
+    )
+    flatten: bool = field(
+        default=False,
+        metadata={"description": "whether to flatten form fields after writing values"},
+    )
+    strict_unknown_fields: bool = field(
+        default=True,
+        metadata={"description": "whether to raise an error if payload contains field names that are not present in the PDF"},
+    )
+    require_pdf_extension: bool = field(
+        default=True,
+        metadata={"description": "whether file paths must end with .pdf"},
+    )
 
     def _on_install(self, agent: Agent = None):
         BufferNode._on_install(self, agent)
@@ -392,7 +418,7 @@ class PDFWriteFormAction(BufferNode, Action):
             raise NodeException("could not read pdf file " + str(source_path)) from exc
 
         try:
-            widgets_by_field = self._index_widgets(document)
+            widgets_by_field, _page_refs = self._index_widgets(document)
             unknown_fields = [name for name in field_values.keys() if name not in widgets_by_field]
             if self.strict_unknown_fields and len(unknown_fields) > 0:
                 raise NodeException("unknown PDF field(s): " + ", ".join(sorted(unknown_fields)))
@@ -420,10 +446,12 @@ class PDFWriteFormAction(BufferNode, Action):
         finally:
             document.close()
 
-    def _index_widgets(self, document: Any) -> dict[str, list[Any]]:
+    def _index_widgets(self, document: Any) -> tuple[dict[str, list[Any]], list[Any]]:
         widgets_by_field: dict[str, list[Any]] = {}
+        page_refs: list[Any] = []
         for page_index in range(document.page_count):
             page = document.load_page(page_index)
+            page_refs.append(page)
             widgets = page.widgets()
             if widgets is None:
                 continue
@@ -432,7 +460,7 @@ class PDFWriteFormAction(BufferNode, Action):
                 if field_name == "":
                     continue
                 widgets_by_field.setdefault(field_name, []).append(widget)
-        return widgets_by_field
+        return widgets_by_field, page_refs
 
     def _write_field_to_widgets(self, field_name: str, widgets: list[Any], value: Any, fitz: Any) -> Any:
         if len(widgets) == 0:
@@ -450,13 +478,21 @@ class PDFWriteFormAction(BufferNode, Action):
             raise NodeException("Mixed button/text widget group is unsupported for field " + str(field_name))
 
         text_value = self._to_text_field_value(value)
+        first_written_widget: Any | None = None
         for widget in widgets:
             kind = self._classify_widget_type(widget, fitz)
             if kind not in {"text", "dropdown", "listbox"}:
                 continue
             widget.field_value = text_value
             widget.update()
-        return text_value
+            if first_written_widget is None:
+                first_written_widget = widget
+
+        if first_written_widget is None:
+            return text_value
+
+        persisted_value = getattr(first_written_widget, "field_value", text_value)
+        return self._normalize_write_value(persisted_value)
 
     def _write_button_group(self, widgets: list[Any], value: Any) -> str:
         union_states = self._collect_group_states(widgets)
@@ -499,8 +535,8 @@ class PDFWriteFormAction(BufferNode, Action):
             lowered = cleaned.lower()
             if lowered in state_lookup:
                 return state_lookup[lowered]
-            truthy = {"1", "true", "yes", "on", "x", "checked", "selected", "ja"}
-            falsy = {"0", "false", "no", "off", "unchecked", "none", ""}
+            truthy = {"1", "true", "yes", "on", "x", "checked", "selected", "ja", "Y"}
+            falsy = {"0", "false", "no", "off", "unchecked", "none", "", "nein", "N"}
             if lowered in truthy:
                 if len(on_candidates) == 0:
                     raise NodeException("No ON-state found for button field")
@@ -592,14 +628,18 @@ class PDFWriteFormAction(BufferNode, Action):
 
     def _collect_button_states(self, widget: Any) -> list[str]:
         states: list[str] = []
-        if hasattr(widget, "button_states"):
+        button_states_obj = getattr(widget, "button_states", None)
+        if button_states_obj is not None:
             try:
-                states.extend(self._flatten_state_values(widget.button_states()))
+                raw_button_states = button_states_obj() if callable(button_states_obj) else button_states_obj
+                states.extend(self._flatten_state_values(raw_button_states))
             except Exception:
                 pass
-        if hasattr(widget, "on_state"):
+
+        on_state_obj = getattr(widget, "on_state", None)
+        if on_state_obj is not None:
             try:
-                on_state = widget.on_state()
+                on_state = on_state_obj() if callable(on_state_obj) else on_state_obj
                 if on_state is not None:
                     states.append(str(on_state))
             except Exception:

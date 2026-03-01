@@ -4,7 +4,7 @@ import types
 
 import pytest
 
-pytest.importorskip("fitz")
+#pytest.importorskip("fitz")
 
 # Fallback for environments where graphviz is not installed.
 if "graphviz" not in sys.modules:

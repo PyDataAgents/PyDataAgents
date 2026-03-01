@@ -59,18 +59,46 @@ def generate_llm_prompt(extracted_fields: list[dict[str, Any]]) -> str:
 class PDFReadFormAction(BufferNode, Action):
     """Extract context-rich AcroForm fields from PDF files using PyMuPDF."""
 
-    input_keys: list[str] = field(default_factory=lambda: ["values"])
-    output_keys: list[str] = field(
-        default_factory=lambda: ["filepath", "metadata", "fields", "full_text_content", "llm_prompt"]
+    input_keys: list[str] = field(
+        default_factory=lambda: ["values"],
+        metadata={"description": "parent buffer keys to scan for PDF file paths"},
     )
-    row_mode: str = field(default="per_pdf")
-    include_bridge_prompt: bool = field(default=True)
-    emit_writable_only: bool = field(default=True)
-    require_pdf_extension: bool = field(default=True)
-    label_search_left: float = field(default=90.0)
-    label_search_above: float = field(default=60.0)
-    label_search_right: float = field(default=20.0)
-    context_search_padding: float = field(default=140.0)
+    output_keys: list[str] = field(
+        default_factory=lambda: ["filepath", "metadata", "fields", "full_text_content", "llm_prompt"],
+        metadata={"description": "output columns for source path, metadata, extracted fields, page text and bridge prompt"},
+    )
+    row_mode: str = field(
+        default="per_pdf",
+        metadata={"description": "row shape of emitted data: per_pdf emits one row per file, per_field emits one row per field"},
+    )
+    include_bridge_prompt: bool = field(
+        default=True,
+        metadata={"description": "whether to generate and emit an llm_prompt bridge string for each output row"},
+    )
+    emit_writable_only: bool = field(
+        default=True,
+        metadata={"description": "whether to keep only writable form fields and skip read-only or unsupported widgets"},
+    )
+    require_pdf_extension: bool = field(
+        default=True,
+        metadata={"description": "whether file paths must end with .pdf"},
+    )
+    label_search_left: float = field(
+        default=90.0,
+        metadata={"description": "horizontal label-search range in points to the left of each field rectangle"},
+    )
+    label_search_above: float = field(
+        default=60.0,
+        metadata={"description": "vertical label-search range in points above each field rectangle"},
+    )
+    label_search_right: float = field(
+        default=20.0,
+        metadata={"description": "horizontal label-search range in points to the right of each field rectangle"},
+    )
+    context_search_padding: float = field(
+        default=140.0,
+        metadata={"description": "padding in points around a field rectangle for selecting nearby page context text"},
+    )
 
     def _on_install(self, agent: Agent = None):
         BufferNode._on_install(self, agent)
