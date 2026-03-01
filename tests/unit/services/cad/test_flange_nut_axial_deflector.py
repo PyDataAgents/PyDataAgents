@@ -1,3 +1,5 @@
+import os
+
 import cadquery as cq
 import math
 
@@ -211,4 +213,5 @@ def test_000():
     #show_object(asm)
 
     # export as step
-    asm.export("out.stp", "STEP", mode="fused")
+    out = os.path.dirname(__file__) + os.sep + "test_out.stp"
+    asm.export(out, "STEP", mode="fused")

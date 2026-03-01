@@ -89,6 +89,8 @@ dependencies = [
     "langchain-tavily",
     "langchain[huggingface,openai,all]",
     "sentence-transformers",
+    "langchain_text_splitters",
+    "langchain_community",
 
     # optional core functionality
     "graphviz"

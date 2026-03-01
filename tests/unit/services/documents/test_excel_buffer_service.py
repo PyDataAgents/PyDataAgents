@@ -13,7 +13,7 @@ def test_000():
     
     s.start()
     print(s._named_tables)
-    for buf in ag._buffer_store.values():
+    for buf in ag.buffer_store.values():
         print(buf.data())
         
     s.stop()

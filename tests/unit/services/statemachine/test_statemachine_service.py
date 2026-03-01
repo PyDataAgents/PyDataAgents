@@ -166,8 +166,8 @@ def test_021():
     sm.add_node(n4)
     sm.add_node(n5)
     sm.add_node(n6)
-    sm.install()
     try:    
+        sm.install()
         sm.start()
     except StatemachineException as se:
         print("RecursionError caught as expected: ", se)

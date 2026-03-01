@@ -13,7 +13,7 @@ def test_000():
     
     dms.install()
     
-    dms.update("M1", "a", 1.5) 
+    dms.update("M1", "a", 1.5)
     
     d1 = dms.get_data_model("M1").to_dict()
     assert len(d1) == 2
@@ -29,7 +29,7 @@ def test_001():
     
     dms.install()
     
-    dms.updates("M1", {"a", 1.5}) 
+    dms.updates("M1", {"a": 1.5}) 
     
     d1 = dms.get_data_model("M1").to_dict()
     assert len(d1) == 2

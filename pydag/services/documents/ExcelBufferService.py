@@ -24,7 +24,7 @@ class ExcelBufferService(Service):
         
     def _on_start(self):
         if self._agent is None:
-            raise ServiceException("No " + Agent.cname() + " was specified, make sure to install the " + self.cname() + " before starting!")
+            raise ServiceException("No " + Agent.__name__ + " was specified, make sure to install the " + self.cname() + " before starting!")
         if FileUtils.exists_file(self.excel_file):
             # Load the workbook
             wb = load_workbook(self.excel_file, data_only=True)
@@ -69,3 +69,11 @@ class ExcelBufferService(Service):
             buf = self._agent.get_buffer(name)
             dfs[name] = pd.DataFrame(buf.data())
         return dfs
+    
+    def get_named_tables(self) -> list[str]:
+        """Returns the list of named tables found in the excel file
+
+        Returns:
+            list[str]: list of named tables
+        """
+        return self._named_tables

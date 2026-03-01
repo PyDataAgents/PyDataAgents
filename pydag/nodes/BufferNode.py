@@ -102,6 +102,8 @@ class BufferNode(Node):
                         for dk in self.input_keys:
                             if dk in d:
                                 data[dk] = d[dk]
+                        if len(data) == 0:
+                            raise NodeException("None of the specified input_keys were found in the parent buffer data")
                     else:
                         if d:
                             data = d
@@ -137,6 +139,8 @@ class BufferNode(Node):
                                                 data[key] = [value]
                     else:
                         logger.debug("Parent is not a " + BufferNode.cname())
+                if len(self.input_keys) > 0 and len(data) == 0:
+                    raise NodeException("None of the specified input_keys were found in the parents buffer data")
             for ik in self.ignore_keys:
                 if ik in data:
                     del data[ik]

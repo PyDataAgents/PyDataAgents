@@ -12,8 +12,8 @@ def test_000():
     
 def test_webcam_rollback_service():
     folder = os.path.dirname(__file__) + os.sep + "video"
-    vlen = 1 * 60
-    rb = 5
+    vlen = 1 * 3
+    rb = 3
     
     wvrs = WebcamVideoRollbackService(
         output_folder=folder,

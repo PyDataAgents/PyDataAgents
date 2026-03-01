@@ -4,7 +4,6 @@ import pytest
 from pydag.services.office.MSGraphService import MSGraphService, MSGraphType
 
 
-@pytest.mark.skip("requires user interaction via browser")
 def test_000():
     
     config = configparser.ConfigParser()

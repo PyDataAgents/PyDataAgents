@@ -9,7 +9,7 @@ def test_000():
     buf.capacity = 10
     
     csv_action = ReadCsvAction()
-    csv_action.file_path = os.path.dirname(__file__) + os.sep + "test.csv"
+    csv_action.file_path = os.path.dirname(__file__) + os.sep + "sample-data.csv"
     csv_action.set_buffer(buf)
     csv_action.install()
     

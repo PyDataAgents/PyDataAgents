@@ -64,6 +64,11 @@ def test_001():
     # In a real test, we would want to programmatically create/modify files in the folder to trigger the action and verify the output.
     with open(folder + os.sep + "test_file_trigger.txt", "w", encoding="utf-8") as f:
         f.write("This is a test file to trigger the FileTriggerAction.")
+        
+    FileUtils.create_dir(folder + os.sep + "test_subfolder")
+    # In a real test, we would want to programmatically create/modify files in the folder to trigger the action and verify the output.
+    with open(folder + os.sep + "test_subfolder" + os.sep + "test_file_trigger2.txt", "w", encoding="utf-8") as f:
+        f.write("This is a test file to trigger the FileTriggerAction.")
     
     time.sleep(1.0)
         
@@ -94,7 +99,7 @@ def test_002():
     
     # In a real test, we would want to programmatically create/modify files in the folder to trigger the action and verify the output.
     with open(folder + os.sep + "test_file_trigger.txt", "w", encoding="utf-8") as f:
-        f.write("This is a test file to trigger the FileTriggerAction.")
+        f.write("This is a modified test file to trigger the FileTriggerAction.")
     
     time.sleep(1.0)
         
@@ -123,9 +128,7 @@ def test_003():
     
     time.sleep(1.0)
     
-    # In a real test, we would want to programmatically create/modify files in the folder to trigger the action and verify the output.
-    with open(folder + os.sep + "test_file_trigger.txt", "w", encoding="utf-8") as f:
-        f.write("This is a test file to trigger the FileTriggerAction.")
+    FileUtils.delete_file(folder + os.sep + "test_file_trigger.txt")
     
     time.sleep(1.0)
         
