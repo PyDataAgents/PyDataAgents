@@ -120,8 +120,3 @@ filterwarnings = [
     "ignore:datetime\\.datetime\\.utcfromtimestamp\\(\\) is deprecated and scheduled for removal.*:DeprecationWarning:reactivex\\.internal\\.constants",
     "ignore:'pkgutil\\.find_loader' is deprecated and slated for removal in Python 3\\.14.*:DeprecationWarning:pytesseract\\.pytesseract",
 ]
-
-[project.urls]
-Documentation = "https://github.com/PyDataAgents/PyDataAgents.git"
-Issues = "https://github.com/PyDataAgents/PyDataAgents.git"
-Source = "https://github.com/PyDataAgents/PyDataAgents.git"
