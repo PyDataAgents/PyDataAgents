@@ -30,7 +30,7 @@ def test_pca_returns_last_n_samples():
     chronos.install()
     chronos.add_parent(lba)
 
-    pca = PCADimReduction(dimensions=2, min_learning_samples=10, sample_length=4, min_inference_samples=1, input_keys=["values-feature-amazon-chronos-bolt-mini-1"], persistent=False)
+    pca = PCADimReduction(dimensions=2, min_learning_samples=10, sample_length=4, min_inference_samples=1, input_keys=["ChronosExtractor-feature-0"], persistent=False)
     pca.install()
     pca.add_parent(chronos)
 
@@ -67,12 +67,12 @@ def test_shift_monitoring_with_pca_on_sine():
     chronos.install()
     chronos.add_parent(lba)
 
-    pca = PCADimReduction(dimensions=2, min_learning_samples=10, sample_length=10, min_inference_samples=1, input_keys=["values-feature-amazon-chronos-bolt-mini-0"], persistent=False)
+    pca = PCADimReduction(dimensions=2, min_learning_samples=10, sample_length=10, min_inference_samples=1, input_keys=["CE-feature-1"], output_keys=["PCA-feature-0"], persistent=False)
     pca.install()
     pca.add_parent(chronos)
 
 
-    shift = ShiftMonitoring(min_learning_samples=10, sample_length=2, min_inference_samples=1, input_keys=["values-feature-amazon-chronos-bolt-mini-0-PCA"], persistent=False)
+    shift = ShiftMonitoring(min_learning_samples=10, sample_length=2, min_inference_samples=1, input_keys=["PCA-feature-0"], persistent=False)
     shift.install()
     shift.add_parent(pca)
 

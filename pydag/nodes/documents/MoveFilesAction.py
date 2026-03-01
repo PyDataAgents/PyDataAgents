@@ -27,7 +27,7 @@ class MoveFilesAction(BufferNode, Action):
                 if buf:
                     self._buffer = buf
                 else:
-                    raise NodeException("no buffer_id='" + self.buffer_id + "' was found in " + Agent.cname())
+                    raise NodeException("no buffer_id='" + self.buffer_id + "' was found in " + Agent.__name__)
     
     def _on_execute(self):
         if FileUtils.exists_folder(self.target_folder):
@@ -42,9 +42,11 @@ class MoveFilesAction(BufferNode, Action):
                 if isinstance(self._buffer, ListBuffer):
                     data = self._buffer.data(n = 0, persistent = False)
                     if data is not None:
-                        for file in data[AgentConfig.VALUES]:
-                            logger.debug(f"Moving {file} to {self.target_folder}")
-                            FileUtils.move_file(file, self.target_folder)
+                        for files in data.values():
+                            for file in files:
+                                if FileUtils.exists_file(file):
+                                    logger.debug(f"Moving {file} to {self.target_folder}")
+                                    FileUtils.move_file(file, self.target_folder)
                 else:
                     raise NodeException("Only " +ListBuffer.cname()+ " is supported for this " + self.cname())                      
         else:

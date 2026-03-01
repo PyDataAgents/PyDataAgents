@@ -16,7 +16,7 @@ def test_000():
     buf1.install()
     
     template_path = os.path.dirname(__file__) + os.sep + "template1.docx"
-    output_path = os.path.dirname(__file__) + os.sep + "out1.docx"
+    output_path = os.path.dirname(__file__) + os.sep + "test_out1.docx"
     
     docx_action = DocxTemplateAction(template_path=template_path, output_path=output_path)
     docx_action.set_buffer(buf1)
