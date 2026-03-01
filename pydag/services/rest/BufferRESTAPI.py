@@ -1,5 +1,5 @@
 from typing import Any, Dict, List, Union
-from fastapi import APIRouter, Path, Query
+from fastapi import APIRouter, Body, Path, Query
 from pydantic import BaseModel, Field
 
 from ...buffers.DictBuffer import DictBuffer
@@ -30,7 +30,7 @@ class DictBufferDefinition(BufferDefinition):
 
 class BufferData(BaseModel):
     data: Union[Any, List[Any], Dict[str, Any]]
-        
+       
 class BufferRESTAPI:
     """
     REST API for Buffers using FastAPI.
@@ -146,10 +146,10 @@ class BufferRESTAPI:
             return buffer_def.id
         
         @router.put("/{id}/data")
-        def add_data(id : str = Path(description="unique ID of the buffer"), data : BufferData = None)-> bool:
+        def add_data(id : str = Path(description="unique ID of the buffer"), data : Union[Any, List[Any], Dict[str, Any]] = Body(..., description="data to be added to the buffer"))-> bool:
             if id not in agent.buffer_store:
                 return False
-            agent.get_buffer(id).push(data.data)
+            agent.get_buffer(id).push(data)
             return True
         
         @router.delete("/{id}/data")
