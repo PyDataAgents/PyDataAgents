@@ -152,7 +152,7 @@ def _assert_form_pipeline_result(
 def test_feature_form_filler_agent_end_to_end_local_example():
     """End-to-end local example: real FileEmbeddingService + local OLLAMA RAGService + PDF form fill agent."""
     ollama_endpoint = os.environ.get("OLLAMA_ENDPOINT", "http://localhost:11434")
-    ollama_model = os.environ.get("OLLAMA_MODEL", "deepseek-r1")
+    ollama_model = os.environ.get("OLLAMA_MODEL", "qwen2.5:3b")
 
     embedding_store_name = "form_filler_agent_e2e_local"
     embedding_service = FileEmbeddingService(
