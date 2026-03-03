@@ -81,6 +81,7 @@ def test_read_pdf_form_default_per_pdf_extracts_context_and_prompt():
 
     required_keys = {
         "field_name",
+        "write_target_field_id",
         "field_type",
         "field_value",
         "tooltip",
@@ -95,10 +96,14 @@ def test_read_pdf_form_default_per_pdf_extracts_context_and_prompt():
         assert required_keys.issubset(set(field.keys()))
         assert isinstance(field["field_name"], str)
         assert field["field_name"] != ""
+        assert field["write_target_field_id"] == field["field_name"]
         assert isinstance(field["rect"], list)
         assert len(field["rect"]) == 4
         assert isinstance(field["is_writable"], bool)
         assert isinstance(field["button_states"], list)
+        if field["field_type"] in {"checkbox", "radio"}:
+            assert len(field["button_states"]) > 0
+            assert any(str(item).lower() == "off" for item in field["button_states"])
 
     assert any(str(field["visual_label"]).strip() != "" for field in fields)
     assert any(str(field["page_context"]).strip() != "" for field in fields)
@@ -160,21 +165,28 @@ def test_generate_llm_prompt_includes_exact_json_key_template():
     payload = [
         {
             "field_name": "kasse",
+            "write_target_field_id": "kasse",
             "field_type": "text",
             "tooltip": "Krankenkasse",
             "visual_label": "Krankenkasse",
             "page_context": "Persoenliche Daten",
+            "button_states": [],
         },
         {
-            "field_name": "az-persnr",
-            "field_type": "text",
-            "tooltip": "Personalnummer",
-            "visual_label": "Personalnummer",
+            "field_name": "dienstverh",
+            "write_target_field_id": "dienstverh",
+            "field_type": "radio",
+            "tooltip": "Dienstverhaeltnis",
+            "visual_label": "Dienstverhaeltnis",
             "page_context": "Persoenliche Daten",
+            "button_states": ["nein", "Ja", "Off"],
         },
     ]
     prompt = generate_llm_prompt(payload)
     assert "kasse" in prompt
-    assert "az-persnr" in prompt
+    assert "dienstverh" in prompt
+    assert "write_target_field_id" in prompt
+    assert "button_states" in prompt
     assert "<determined_value>" in prompt
+    assert "Return JSON only" in prompt
     assert "Do not add keys" in prompt

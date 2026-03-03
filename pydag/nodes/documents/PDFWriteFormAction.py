@@ -223,7 +223,16 @@ class PDFWriteFormAction(BufferNode, Action):
         )
         has_value = any(
             key in payload
-            for key in ["determined_value", "field_value", "value", "current_value", "proposed_value", "answer"]
+            for key in [
+                "determined_value",
+                "selected_state",
+                "selected_option",
+                "field_value",
+                "value",
+                "current_value",
+                "proposed_value",
+                "answer",
+            ]
         )
         return has_field and has_value
 
@@ -287,11 +296,24 @@ class PDFWriteFormAction(BufferNode, Action):
                 "rect",
                 "is_writable",
                 "button_states",
+                "write_target_field_id",
             }
             for key, value in payload.items():
                 if key in skip_keys:
                     continue
-                if isinstance(value, (dict, list, tuple)):
+                if isinstance(value, dict):
+                    # Support mappings like {"dienstverh": {"selected_state": "nein"}}.
+                    if self._resolve_field_target(value) is None and self._has_field_value_keys(value):
+                        inline_value = self._resolve_field_value(value)
+                        if inline_value is None:
+                            inline_value = ""
+                        result[str(key)] = self._normalize_write_value(inline_value)
+                        continue
+                    nested = self._normalize_payload(value)
+                    if nested is not None and len(nested) > 0:
+                        result = self._merge_field_values(result, nested)
+                    continue
+                if isinstance(value, (list, tuple)):
                     nested = self._normalize_payload(value)
                     if nested is not None and len(nested) > 0:
                         result = self._merge_field_values(result, nested)
@@ -300,6 +322,21 @@ class PDFWriteFormAction(BufferNode, Action):
             return result if len(result) > 0 else None
 
         return None
+
+    def _has_field_value_keys(self, payload: dict[str, Any]) -> bool:
+        return any(
+            key in payload
+            for key in [
+                "determined_value",
+                "selected_state",
+                "selected_option",
+                "field_value",
+                "value",
+                "current_value",
+                "proposed_value",
+                "answer",
+            ]
+        )
 
     def _normalize_field_list(self, payload: list[dict[str, Any]] | tuple[dict[str, Any], ...]) -> dict[str, Any] | None:
         result: dict[str, Any] = {}
@@ -336,7 +373,16 @@ class PDFWriteFormAction(BufferNode, Action):
         return None
 
     def _resolve_field_value(self, payload: dict[str, Any]) -> Any:
-        for key in ["determined_value", "field_value", "value", "current_value", "proposed_value", "answer"]:
+        for key in [
+            "determined_value",
+            "selected_state",
+            "selected_option",
+            "field_value",
+            "value",
+            "current_value",
+            "proposed_value",
+            "answer",
+        ]:
             if key in payload:
                 return payload.get(key)
         return None
@@ -497,13 +543,13 @@ class PDFWriteFormAction(BufferNode, Action):
     def _write_button_group(self, widgets: list[Any], value: Any) -> str:
         union_states = self._collect_group_states(widgets)
         target_state = self._resolve_target_button_state(value, union_states)
-        target_key = target_state.lower()
+        target_token = self._normalize_state_token(target_state)
 
         for widget in widgets:
             widget_states = self._collect_button_states(widget)
-            lookup = {state.lower(): state for state in widget_states}
+            lookup = {self._normalize_state_token(state): state for state in widget_states}
             off_state = self._resolve_off_state(widget_states)
-            write_state = lookup.get(target_key, off_state)
+            write_state = lookup.get(target_token, off_state)
             widget.field_value = write_state
             widget.update()
         return target_state
@@ -526,46 +572,80 @@ class PDFWriteFormAction(BufferNode, Action):
         if len(available_states) == 0:
             raise NodeException("No button states available")
 
-        state_lookup = {state.lower(): state for state in available_states}
+        state_lookup = {self._clean_text(str(state)).lower(): state for state in available_states}
+        normalized_lookup: dict[str, str] = {}
+        for state in available_states:
+            token = self._normalize_state_token(state)
+            if token == "" or token in normalized_lookup:
+                continue
+            normalized_lookup[token] = state
+
         off_state = self._resolve_off_state(available_states)
         on_candidates = [state for state in available_states if state.lower() != off_state.lower()]
+        available_text = ", ".join(available_states)
 
-        if isinstance(value, str):
-            cleaned = self._normalize_state_name(value)
-            lowered = cleaned.lower()
-            if lowered in state_lookup:
-                return state_lookup[lowered]
-            truthy = {"1", "true", "yes", "on", "x", "checked", "selected", "ja", "Y"}
-            falsy = {"0", "false", "no", "off", "unchecked", "none", "", "nein", "N"}
-            if lowered in truthy:
-                if len(on_candidates) == 0:
-                    raise NodeException("No ON-state found for button field")
-                return on_candidates[0]
-            if lowered in falsy:
-                return off_state
-            raise NodeException("Could not map button value '" + str(value) + "' to available states")
+        raw_clean = "" if value is None else self._clean_text(str(value))
+        raw_lower = raw_clean.lower()
+        if raw_lower in state_lookup:
+            return state_lookup[raw_lower]
 
+        normalized_value = self._normalize_state_token(value)
+        if normalized_value != "" and normalized_value in normalized_lookup:
+            return normalized_lookup[normalized_value]
+
+        truthy = {"1", "true", "yes", "on", "x", "checked", "selected", "ja", "y"}
+        falsy = {"0", "false", "no", "off", "unchecked", "none", "", "nein", "n"}
+
+        semantic_value: bool | None = None
         if isinstance(value, bool):
-            if value:
-                if len(on_candidates) == 0:
-                    raise NodeException("No ON-state found for button field")
-                return on_candidates[0]
-            return off_state
+            semantic_value = value
+        elif isinstance(value, (int, float)):
+            semantic_value = float(value) != 0.0
+        elif value is None:
+            semantic_value = False
+        elif normalized_value in truthy:
+            semantic_value = True
+        elif normalized_value in falsy:
+            semantic_value = False
 
-        if isinstance(value, (int, float)):
-            if float(value) == 0.0:
-                return off_state
-            if len(on_candidates) == 0:
-                raise NodeException("No ON-state found for button field")
+        if semantic_value is not None:
+            return self._resolve_semantic_button_state(
+                semantic_value=semantic_value,
+                on_candidates=on_candidates,
+                off_state=off_state,
+                raw_value=value,
+                available_text=available_text,
+            )
+
+        # Controlled fallback: only choose ON automatically for effectively binary groups.
+        if len(on_candidates) == 1:
             return on_candidates[0]
 
-        if value is None:
-            return off_state
+        raise NodeException(
+            "Could not map button value '"
+            + str(value)
+            + "' to available states: "
+            + available_text
+        )
 
-        normalized = self._normalize_state_name(str(value)).lower()
-        if normalized in state_lookup:
-            return state_lookup[normalized]
-        raise NodeException("Could not map button value '" + str(value) + "' to available states")
+    def _resolve_semantic_button_state(
+        self,
+        semantic_value: bool,
+        on_candidates: list[str],
+        off_state: str,
+        raw_value: Any,
+        available_text: str,
+    ) -> str:
+        if semantic_value is False:
+            return off_state
+        if len(on_candidates) == 1:
+            return on_candidates[0]
+        raise NodeException(
+            "Ambiguous ON-state for button value '"
+            + str(raw_value)
+            + "'. Available states: "
+            + available_text
+        )
 
     def _resolve_off_state(self, states: list[str]) -> str:
         for state in states:
@@ -681,6 +761,11 @@ class PDFWriteFormAction(BufferNode, Action):
         if text.startswith("/"):
             text = text[1:]
         return text
+
+    def _normalize_state_token(self, value: Any) -> str:
+        if value is None:
+            return ""
+        return self._clean_text(self._normalize_state_name(value)).lower()
 
     def _flatten_document(self, document: Any):
         if hasattr(document, "bake"):

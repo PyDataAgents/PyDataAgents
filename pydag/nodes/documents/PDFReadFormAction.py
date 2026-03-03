@@ -26,7 +26,12 @@ def generate_llm_prompt(extracted_fields: list[dict[str, Any]]) -> str:
     lines: list[str] = [
         "You are a form-filling assistant. Use the provided RAG context to determine the value for each PDF field.",
         "Return only a strict JSON object mapping each field_name to its determined_value.",
+        "Return JSON only (no markdown, no code fences, no explanations).",
         "Do not add keys, do not remove keys, and do not use markdown.",
+        "For write-back, field_name is also the write_target_field_id.",
+        "For checkbox/radio fields, choose a value from button_states whenever possible.",
+        "If context implies yes/no and button_states are non-obvious, map to the closest valid state token.",
+        "If uncertain for a button field, return an empty string.",
         "",
         "Fields:",
     ]
@@ -38,9 +43,13 @@ def generate_llm_prompt(extracted_fields: list[dict[str, Any]]) -> str:
         tooltip = str(field_payload.get("tooltip", "")).strip()
         visual_label = str(field_payload.get("visual_label", "")).strip()
         page_context = str(field_payload.get("page_context", "")).strip()
+        write_target_field_id = str(field_payload.get("write_target_field_id", field_name)).strip()
+        button_states_value = field_payload.get("button_states", [])
+        button_states = button_states_value if isinstance(button_states_value, list) else []
         lines.append(
             f'{idx}. field_name="{field_name}" | type="{field_type}" | tooltip="{tooltip}" '
-            f'| visual_label="{visual_label}" | page_context="{page_context}"'
+            f'| visual_label="{visual_label}" | page_context="{page_context}" '
+            f'| write_target_field_id="{write_target_field_id}" | button_states={json.dumps(button_states, ensure_ascii=True)}'
         )
         if field_name != "" and field_name not in template:
             template[field_name] = "<determined_value>"
@@ -256,6 +265,7 @@ class PDFReadFormAction(BufferNode, Action):
 
         return {
             "field_name": field_name,
+            "write_target_field_id": field_name,
             "field_type": field_type,
             "field_value": field_value,
             "tooltip": tooltip,

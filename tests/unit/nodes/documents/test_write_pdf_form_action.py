@@ -366,3 +366,98 @@ def test_roundtrip_read_to_write_preserves_field_values():
     source_values = _normalized_pdf_field_values(pdf_file)
     output_values = _normalized_pdf_field_values(output_file)
     assert source_values == output_values
+
+
+def test_resolve_target_button_state_exact_and_normalized_matches():
+    writer = PDFWriteFormAction()
+    available_states = ["Ja", "Off"]
+
+    assert writer._resolve_target_button_state("ja", available_states) == "Ja"
+    assert writer._resolve_target_button_state("/ Ja ", available_states) == "Ja"
+
+
+def test_resolve_target_button_state_semantic_binary_values():
+    writer = PDFWriteFormAction()
+    available_states = ["Ja", "Off"]
+
+    assert writer._resolve_target_button_state("yes", available_states) == "Ja"
+    assert writer._resolve_target_button_state("y", available_states) == "Ja"
+    assert writer._resolve_target_button_state("checked", available_states) == "Ja"
+    assert writer._resolve_target_button_state("ja", available_states) == "Ja"
+    assert writer._resolve_target_button_state(True, available_states) == "Ja"
+    assert writer._resolve_target_button_state(1, available_states) == "Ja"
+
+    assert writer._resolve_target_button_state("no", available_states) == "Off"
+    assert writer._resolve_target_button_state("n", available_states) == "Off"
+    assert writer._resolve_target_button_state("unchecked", available_states) == "Off"
+    assert writer._resolve_target_button_state("nein", available_states) == "Off"
+    assert writer._resolve_target_button_state(False, available_states) == "Off"
+    assert writer._resolve_target_button_state(0, available_states) == "Off"
+
+
+def test_resolve_target_button_state_binary_fallback_success_for_unknown_token():
+    writer = PDFWriteFormAction()
+    available_states = ["CustomOn", "Off"]
+    assert writer._resolve_target_button_state("something-unmapped", available_states) == "CustomOn"
+
+
+def test_resolve_target_button_state_non_binary_raises_ambiguity_with_states():
+    writer = PDFWriteFormAction()
+    available_states = ["Ja", "nein", "Off"]
+
+    with pytest.raises(NodeException, match="Available states"):
+        writer._resolve_target_button_state("true", available_states)
+
+
+def test_normalize_payload_accepts_selected_state_and_selected_option_aliases():
+    writer = PDFWriteFormAction()
+
+    normalized_list = writer._normalize_payload(
+        [
+            {"write_target_field_id": "dienstverh", "selected_state": "nein"},
+            {"field_name": "versorgungsbezuege", "selected_option": "Ja"},
+        ]
+    )
+    assert normalized_list == {"dienstverh": "nein", "versorgungsbezuege": "Ja"}
+
+    normalized_mapping = writer._normalize_payload(
+        {
+            "dienstverh": {"selected_state": "nein"},
+            "versorgungsbezuege": {"selected_option": "Ja"},
+        }
+    )
+    assert normalized_mapping == {"dienstverh": "nein", "versorgungsbezuege": "Ja"}
+
+
+def test_write_button_group_integration_applies_expected_widget_states():
+    class _FakeButtonWidget:
+        def __init__(self, states):
+            self._states = states
+            self.field_value = None
+            self.update_calls = 0
+
+        def button_states(self):
+            return self._states
+
+        def on_state(self):
+            for raw_state in self._states:
+                state = str(raw_state)
+                if state.startswith("/"):
+                    state = state[1:]
+                if state.lower() != "off":
+                    return raw_state
+            return None
+
+        def update(self):
+            self.update_calls += 1
+
+    writer = PDFWriteFormAction()
+    widget_no = _FakeButtonWidget(["/nein", "/Off"])
+    widget_yes = _FakeButtonWidget(["/Ja", "/Off"])
+
+    applied_state = writer._write_button_group([widget_no, widget_yes], "nein")
+    assert applied_state.lower() == "nein"
+    assert writer._normalize_state_name(widget_no.field_value).lower() == "nein"
+    assert writer._normalize_state_name(widget_yes.field_value).lower() == "off"
+    assert widget_no.update_calls == 1
+    assert widget_yes.update_calls == 1
