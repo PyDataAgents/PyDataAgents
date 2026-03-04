@@ -10,10 +10,11 @@ from .LoadMass import LoadMass
 from .MotorThermal import MotorThermal
 
 
-class BallScrewSimulation:
+class BallscrewSimulation:
 
     def __init__(self, dt):
         self.dt = dt
+        self.t = 0
         # Components
         self.motor = PMSMotor(R = 0.5, Ld = 0.001, Lq = 0.001, psi_f = 0.05, pole_pairs = 4)
         self.inverter = Inverter(300)
@@ -67,10 +68,14 @@ class BallScrewSimulation:
         # Thermal
         self.T_motor = self.thermal.update(np.sqrt(self.i_d**2 + self.i_q**2), self.motor.R, self.dt)
 
+        self.append_data("t", self.t)
         self.append_data("x", self.x)
+        self.append_data("x_err", x_ref - self.x)
         self.append_data("v", self.v)
         self.append_data("i_q", self.i_q)
         self.append_data("T_motor", self.T_motor)
+        
+        self.t = self.t + self.dt
 
     def append_data(self, key, value):
         if key not in self.data:
