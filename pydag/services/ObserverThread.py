@@ -30,6 +30,8 @@ class ObserverThread():
         self._observing_time : Union[int|str] = observing_time
         self._thread_type : str = thread_type
         self._last_time : float = 0.0
+        self._next_time : float = 0.0
+        self._counts : int = 0
         self._week_days : str = week_days
         
         self._scheduler : Union[BlockingScheduler|BackgroundScheduler] = None        
@@ -133,9 +135,10 @@ class ObserverThread():
         #last_time = round(time.time() * 1000) # if this line is uncommented, the first observer notify happens after 1 observing_time, otherwise immediately
         while self._is_running:
             current_time = round(time.time() * 1000)
-            if current_time - self._last_time > self._observing_time - SAFETY_DIFF_TIME_UNITS:
+            if current_time - self._last_time >= self._observing_time - SAFETY_DIFF_TIME_UNITS:
                 try:
                     self.notify_observers()
+                    self._counts += 1
                     self._last_time = round(time.time() * 1000)
                 except ObserverException as e:
                     logger.error(e)
@@ -150,37 +153,44 @@ class ObserverThread():
     
     def _run_microsecond_thread(self):
         self._last_time = 0
-        current_time = 0
+        current_timer = 0
+        last_timer = -1e15
         diff = 0
         #self._last_time = round(time.time() * 1000000.0) # if this line is uncommented, the first observer notify happens after 1 observing_time, otherwise immediately
         while self._is_running:
-            current_time = round(time.time() * 1000000.0)
-            if current_time - self._last_time > self._observing_time - SAFETY_DIFF_TIME_UNITS:
+            current_timer = time.perf_counter_ns() / 1000
+            if current_timer - last_timer >= self._observing_time - SAFETY_DIFF_TIME_UNITS:
                 try:
                     self.notify_observers()
-                    self._last_time = round(time.time() * 1000000.0)
+                    self._counts += 1
+                    self._last_time = time.time_ns() / 1000                    
+                    last_timer = current_timer 
                 except ObserverException as e:
                     logger.error(e)
                     with self._lock:
                         self._is_running = False
-                    self._set_service_state(AgentElementState.ERROR)                    
+                    self._set_service_state(AgentElementState.ERROR)                   
             else:
                 # do nothing and sleep a little
-                diff = self._observing_time - SAFETY_DIFF_TIME_UNITS - (current_time - self._last_time)
-                time.sleep(diff / 1000000.0 * SLEEP_WITH_HOLD_FACTOR)        
+                diff = self._observing_time - SAFETY_DIFF_TIME_UNITS - (current_timer - last_timer)
+                time.sleep(diff / 1000000.0 * SLEEP_WITH_HOLD_FACTOR)       
         logger.info(f"{self.__class__.__name__} [{self._thread.name}] has stopped") 
     
     def _run_nanosecond_thread(self):
         self._last_time = 0
-        current_time = 0
         diff = 0
-        #self._last_time = round(time.time() * 1000000000.0) # if this line is uncommented, the first observer notify happens after 1 observing_time, otherwise immediately
+        last_timer = -1e15
+        c = 0
         while self._is_running:
-            current_time = round(time.time() * 1000000000.0)
-            if current_time - self._last_time > self._observing_time - SAFETY_DIFF_TIME_UNITS:
+            current_timer = time.perf_counter_ns()
+            #print(c)
+            #print(current_timer - last_timer)
+            if current_timer - last_timer >= self._observing_time - SAFETY_DIFF_TIME_UNITS:
                 try:
                     self.notify_observers()
-                    self._last_time = round(time.time() * 1000000000.0)
+                    self._counts += 1
+                    self._last_time = time.time_ns()
+                    last_timer = current_timer
                 except ObserverException as e:
                     logger.error(e)
                     with self._lock:
@@ -188,7 +198,7 @@ class ObserverThread():
                     self._set_service_state(AgentElementState.ERROR)
             else:
                 # do nothing and sleep a little
-                diff = self._observing_time - SAFETY_DIFF_TIME_UNITS - (current_time - self._last_time)
+                diff = self._observing_time - SAFETY_DIFF_TIME_UNITS - (current_timer - last_timer)
                 time.sleep(diff / 1000000000.0 * SLEEP_WITH_HOLD_FACTOR)        
         logger.info(f"{self.__class__.__name__} [{self._thread.name}] has stopped") 
         
@@ -199,9 +209,10 @@ class ObserverThread():
         #self._last_time = time.time() # if this line is uncommented, the first observer notify happens after 1 observing_time, otherwise immediately
         while self._is_running:
             current_time = time.time()
-            if current_time - self._last_time > self._observing_time - SAFETY_DIFF_TIME_UNITS / 10.0:
+            if current_time - self._last_time >= self._observing_time - SAFETY_DIFF_TIME_UNITS / 10.0:
                 try:
                     self.notify_observers()
+                    self._counts += 1
                     self._last_time = time.time()
                 except ObserverException as e:
                     logger.error(e)
@@ -215,11 +226,12 @@ class ObserverThread():
         logger.info(f"{self.__class__.__name__} [{self._thread.name}] has stopped") 
     
     def _run_instant_thread(self):
-        self._last_time = round(time.time() * 1000000.0)
+        self._last_time = time.time_ns()
         while self._is_running:
             try:
                 self.notify_observers()
-                self._last_time = round(time.time() * 1000000.0)    
+                self._counts += 1
+                self._last_time = time.time_ns()   
             except ObserverException as e:
                 logger.error(e)
                 with self._lock:
@@ -230,6 +242,7 @@ class ObserverThread():
     def _run_only_once_thread(self):
         self.notify_observers()
         self._last_time = time.time()
+        self._counts += 1
         with self._lock:
             self._is_running = False
         self._set_service_state(ServiceState.STOPPED)
@@ -267,6 +280,9 @@ class ObserverThread():
     
     def get_last_update(self) -> float:
         return self._last_time
+
+    def get_counts(self) -> int:
+        return self._counts
     
     def _set_service_state(self, state : Union[AgentElementState, ServiceState]):
         self._service.set_state(state)

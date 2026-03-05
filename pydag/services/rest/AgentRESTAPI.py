@@ -23,7 +23,7 @@ class AgentRESTAPI:
     @staticmethod
     def get_api_router(agent : Agent) -> APIRouter:
         
-        router = APIRouter(prefix=ROOT_URL, tags=[Agent.__class__.__name__])
+        router = APIRouter(prefix=ROOT_URL, tags=[Agent.__name__])
         
         @router.get("/")
         def online():

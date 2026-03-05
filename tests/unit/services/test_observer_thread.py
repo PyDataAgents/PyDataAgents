@@ -28,21 +28,29 @@ def test_millisecond_thread():
 
 def test_microsecond_thread():
     service = TestService()
-    ot = ObserverThread(service=service, observing_time=1000, thread_type=ThreadType.MICRO_SECOND.value)
+    t_obs = 1000 # µs
+    t_sleep = 0.01 # s
+    ot = ObserverThread(service=service, observing_time=t_obs, thread_type=ThreadType.MICRO_SECOND.value)
     o = TestObserver()
     ot.add_observer(o)
     ot.run()
-    time.sleep(0.01)
+    time.sleep(t_sleep)
     ot.terminate()
+    print(f"counts: {ot.get_counts()}")
+    assert ot.get_counts() >= t_sleep * 1000000.0 / t_obs - 1
 
 def test_nanosecond_thread():
     service = TestService()
-    ot = ObserverThread(service=service, observing_time=1000000, thread_type=ThreadType.NANO_SECOND.value)
+    t_obs = 1000000 # ns
+    t_sleep = 0.01 # s
+    ot = ObserverThread(service=service, observing_time=t_obs, thread_type=ThreadType.NANO_SECOND.value)
     o = TestObserver()
     ot.add_observer(o)
     ot.run()
-    time.sleep(0.01)
+    time.sleep(t_sleep)    
     ot.terminate()
+    print(f"counts: {ot.get_counts()}")
+    assert ot.get_counts() >= t_sleep * 1000000000.0 / t_obs - 1
 
 def test_instant_thread():
     service = TestService()
