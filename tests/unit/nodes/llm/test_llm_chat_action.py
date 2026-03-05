@@ -336,6 +336,33 @@ def test_retrieval_query_can_be_derived_from_fields_payload():
     }
 
 
+def test_retrieval_query_can_use_nested_generated_question_path():
+    """Ensure retrieval_query_key can target nested fields.0.generated_question values."""
+    service = _new_service()
+    service.next_answer = '{"field_updates":[]}'
+
+    action = LLMChatAction(
+        question_key="llm_prompt",
+        retrieval_query_key="fields.0.generated_question",
+        use_rag_context=True,
+    )
+    action.set_service(service)
+    action.add_parent(
+        _link_parent_with_row(
+            {
+                "llm_prompt": "rich prompt with mapping hints",
+                "fields": [[{"generated_question": "What value should be written into Krankenkasse?"}]],
+            }
+        )
+    )
+    action.install()
+    action.execute()
+
+    assert service.calls[0]["question"] == "rich prompt with mapping hints"
+    assert service.calls[0]["retrieval_query"] == "What value should be written into Krankenkasse?"
+    assert service.calls[0]["input_context"] is None
+
+
 def test_OLLAMA_chat():
     """ Integration test for LLMChatAction using OLLAMA as the model provider."""
     from pydag.services.llm.RAGService import RAGService

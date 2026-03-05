@@ -1,8 +1,6 @@
 from dataclasses import dataclass, field
 from ...utils.DataUtils import DataUtils
-from ...utils.DataUtils import DataUtils
 import os
-import configparser
 from loguru import logger
 
 
@@ -51,6 +49,8 @@ class LLMOCRAction(BufferNode, Action):
 
     api_key : str = field(default=None, metadata={"description": "a mistral ai api key"})
     output_keys : list[str] = field(default_factory=lambda: ["documents", "filepath"])
+    model : str = field(default="mistral-ocr-latest", metadata={"description": "Mistral OCR model name"})
+    include_image_base64 : bool = field(default=False, metadata={"description": "Whether OCR page payloads should include embedded base64 images"})
     
     def __post_init__(self):
         super().__post_init__()
@@ -64,56 +64,70 @@ class LLMOCRAction(BufferNode, Action):
         data = self.get_parent_data()
         rows = DataUtils.dict_to_list(data)
         for row in rows:
-            _image = " ".join([str(x) for x in row.values()])
-            _image_path = None
-            _image_type = _image.split(".")[-1].lower()
-            # check file type
-            # check if _image is a file path
-            if os.path.isfile(_image):
-                _image_path = _image
-                _image = DataUtils.image_to_base64(_image)
-                if _image is None:
-                    continue
-                # Ensure that _image is a valid image MIME type
-                if not _image_type in ["jpg", "jpeg", "png", "bmp", "gif", "tiff"]+["pdf", "docx", "pptx","txt", "odt", "bib", "tex", "rtf", "md", "html", "xlsx", "csv"]:
-                    continue # skip non-text files
-            elif _image.strip() == "":
-                continue # skip empty values        
-            else:
-                # assume it is already a base64 data URL or a file ID
-                # and check for image type if its a base64 string already
-                if "data:image/" in _image:
-                    _image_type = _image.split("data:image/")[1].split(";base64")[0]
-                else:
-                    logger.debug("could not detect data URI for base64 image url")
-                    continue        
-            if _image_type in ["jpg", "jpeg", "png", "bmp", "gif", "tiff"]:
-                resp = self._client.ocr.process(
-                        model="mistral-ocr-latest",
-                        document={
-                            "type": "image_url",
-                            "image_url":  f"{_image}"
-                        },
-                        #table_format="markdown",
-                        # extract_header=True, # default is False
-                        # extract_footer=True, # default is False
-                        include_image_base64=True
-                    )
-            elif _image_type in ["pdf"]:
-                resp = self._client.ocr.process(
-                        model="mistral-ocr-latest",
-                        document={
-                            "type": "document_url",
-                            "document_url": f"{_image}"
-                        },
-                        #table_format="markdown",
-                        # extract_header=True, # default is False
-                        # extract_footer=True, # default is False
-                        include_image_base64=True
-                    )
-            else:
-                continue # skip unsupported file types
-            answer = str([str(p) for p in resp.pages])
-            dic = dict(zip(self.output_keys, [str(answer), _image_path]))
+            image_ref = " ".join([str(x) for x in row.values()]).strip()
+            if image_ref == "":
+                continue
+            document_payload, image_path = self._resolve_document_payload(image_ref)
+            if document_payload is None:
+                continue
+            resp = self._client.ocr.process(
+                model=self.model,
+                document=document_payload,
+                include_image_base64=self.include_image_base64,
+            )
+            answer = self._serialize_ocr_response(resp)
+            dic = dict(zip(self.output_keys, [answer, image_path]))
             self.add_data(dic)
+
+    def _resolve_document_payload(self, image_ref: str):
+        image_path = None
+        image_type = image_ref.split(".")[-1].lower()
+        if os.path.isfile(image_ref):
+            image_path = image_ref
+            image_ref = DataUtils.image_to_base64(image_ref)
+            if image_ref is None:
+                return None, None
+        elif "data:image/" in image_ref:
+            image_type = image_ref.split("data:image/")[1].split(";base64")[0]
+        elif image_ref.startswith("data:application/pdf"):
+            image_type = "pdf"
+        else:
+            logger.debug("could not detect supported OCR input: " + str(image_ref)[:120])
+            return None, None
+
+        if image_type in ["jpg", "jpeg", "png", "bmp", "gif", "tiff"]:
+            return {
+                "type": "image_url",
+                "image_url": str(image_ref),
+            }, image_path
+        if image_type == "pdf":
+            return {
+                "type": "document_url",
+                "document_url": str(image_ref),
+            }, image_path
+        return None, None
+
+    def _serialize_ocr_response(self, response) -> str:
+        pages = getattr(response, "pages", []) or []
+        parts: list[str] = []
+        for page in pages:
+            page_chunks: list[str] = []
+            header = getattr(page, "header", None)
+            markdown = getattr(page, "markdown", None)
+            footer = getattr(page, "footer", None)
+            if header:
+                page_chunks.append(str(header).strip())
+            if markdown:
+                page_chunks.append(str(markdown).strip())
+            if footer:
+                page_chunks.append(str(footer).strip())
+            page_text = "\n".join([chunk for chunk in page_chunks if str(chunk).strip() != ""]).strip()
+            if page_text == "":
+                continue
+            page_index = getattr(page, "index", None)
+            if page_index is None:
+                parts.append(page_text)
+            else:
+                parts.append("Page " + str(page_index) + "\n" + page_text)
+        return "\n\n".join(parts).strip()
 
