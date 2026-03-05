@@ -649,6 +649,7 @@ class _DeterministicQuestionRAGService(RAGService):
         return json.dumps(payload, ensure_ascii=True)
 
 
+@pytest.mark.skip(reason="Test uses LLM")
 def test_question_based_pipeline_read_llm_write_maps_answers_by_internal_field_id():
     _require_fitz_for_pdf_form_tests()
 
