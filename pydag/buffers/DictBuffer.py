@@ -24,8 +24,6 @@ class DictBuffer(Buffer):
         super().__post_init__()
         self._elements = {}
         self._index = 0
-        self._last_timestamp = 0
-        self._last_timer = 0
         
     def _on_push(self, elements: list | dict):
         """

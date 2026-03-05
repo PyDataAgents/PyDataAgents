@@ -3,6 +3,7 @@ from dataclasses import dataclass, field
 import json
 from abc import abstractmethod
 import threading
+import time
 from typing import TYPE_CHECKING, Union
 
 
@@ -34,6 +35,8 @@ class Buffer(AgentElement):
         self._duplicates : dict[str, Buffer] = {}
         self._lock = threading.RLock()
         self._state : Union[BufferState, AgentElementState] = AgentElementState.UNINSTALLED
+        self._last_timestamp : int = 0
+        self._last_timer :int = 0
 
     def _on_install(self, agent: Agent = None):
         if self.initial_values is not None:
@@ -158,5 +161,13 @@ class Buffer(AgentElement):
 
     def get_duplicates(self) -> dict[str, Buffer]:
         return self._duplicates
+    
+    def get_last_access(self) -> int:
+        """ returns the last access time of the `Buffer` in nanoseconds since epoch
+
+        Returns:
+            int: UTC timestamp in ns
+        """
+        return self._last_timestamp
         
         
