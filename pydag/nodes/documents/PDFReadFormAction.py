@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 import json
+import re
 from typing import Any
 
 from ...agents.Agent import Agent
@@ -18,46 +19,61 @@ def generate_llm_prompt(extracted_fields: list[dict[str, Any]]) -> str:
     The prompt enforces JSON-only output and key fidelity to PDF field names.
     """
     if len(extracted_fields) == 0:
-        return (
-            "You are a form-filling assistant. Use the provided RAG context to determine values. "
-            "Return ONLY an empty JSON object: {}"
-        )
+        return "Return only this JSON object: {\"field_updates\": []}"
 
     lines: list[str] = [
-        "You are a form-filling assistant. Use the provided RAG context to determine the value for each PDF field.",
-        "Return only a strict JSON object mapping each field_name to its determined_value.",
+        "You are a form-filling assistant.",
+        "Answer each generated_question using the provided RAG context.",
+        "Do not infer business meaning from internal_field_id alone; generated_question and question_context are authoritative.",
         "Return JSON only (no markdown, no code fences, no explanations).",
-        "Do not add keys, do not remove keys, and do not use markdown.",
-        "For write-back, field_name is also the write_target_field_id.",
-        "For checkbox/radio fields, choose a value from button_states whenever possible.",
+        "Return exactly one object with key field_updates (array).",
+        "Each field update item must contain internal_field_id plus either value (text/list fields) or selected_state (checkbox/radio fields).",
+        "For checkbox/radio, selected_state must be one of button_states.",
         "If context implies yes/no and button_states are non-obvious, map to the closest valid state token.",
-        "If uncertain for a button field, return an empty string.",
+        "If uncertain for a button field, use selected_state as an empty string.",
         "",
         "Fields:",
     ]
 
-    template: dict[str, str] = {}
+    template_updates: list[dict[str, str]] = []
     for idx, field_payload in enumerate(extracted_fields, start=1):
-        field_name = str(field_payload.get("field_name", "")).strip()
+        internal_field_id = str(
+            field_payload.get("internal_field_id", field_payload.get("write_target_field_id", field_payload.get("field_name", "")))
+        ).strip()
         field_type = str(field_payload.get("field_type", "")).strip()
-        tooltip = str(field_payload.get("tooltip", "")).strip()
-        visual_label = str(field_payload.get("visual_label", "")).strip()
-        page_context = str(field_payload.get("page_context", "")).strip()
-        write_target_field_id = str(field_payload.get("write_target_field_id", field_name)).strip()
+        generated_question = str(field_payload.get("generated_question", "")).strip()
+        question_context = str(field_payload.get("question_context", field_payload.get("context_signature", ""))).strip()
         button_states_value = field_payload.get("button_states", [])
         button_states = button_states_value if isinstance(button_states_value, list) else []
+        answer_key = "selected_state" if field_type in {"checkbox", "radio"} else "value"
         lines.append(
-            f'{idx}. field_name="{field_name}" | type="{field_type}" | tooltip="{tooltip}" '
-            f'| visual_label="{visual_label}" | page_context="{page_context}" '
-            f'| write_target_field_id="{write_target_field_id}" | button_states={json.dumps(button_states, ensure_ascii=True)}'
+            f'{idx}. internal_field_id="{internal_field_id}" | type="{field_type}" | answer_key="{answer_key}" '
+            f'| generated_question="{generated_question}" | question_context="{question_context}" '
+            f'| button_states={json.dumps(button_states, ensure_ascii=True)}'
         )
-        if field_name != "" and field_name not in template:
-            template[field_name] = "<determined_value>"
+        if internal_field_id == "":
+            continue
+        if field_type in {"checkbox", "radio"}:
+            template_updates.append(
+                {
+                    "internal_field_id": internal_field_id,
+                    "selected_state": "<one_of_button_states_or_empty>",
+                }
+            )
+        else:
+            template_updates.append(
+                {
+                    "internal_field_id": internal_field_id,
+                    "value": "<determined_value>",
+                }
+            )
+
+    template = {"field_updates": template_updates}
 
     lines.extend(
         [
             "",
-            "Return JSON with exactly these keys and no extras:",
+            "Return JSON with exactly this shape and no extra top-level keys:",
             json.dumps(template, ensure_ascii=True, indent=2),
         ]
     )
@@ -261,16 +277,49 @@ class PDFReadFormAction(BufferNode, Action):
         if visual_label == "" and tooltip != "":
             visual_label = tooltip
         page_context = self._infer_page_context(rect, blocks, fitz)
+        option_text = self._infer_option_text(rect, words, fitz, field_type, visual_label)
+        question_text = self._infer_question_text(rect, blocks, fitz)
+        section_header = self._infer_section_header(rect, blocks, fitz)
+        context_signature = self._build_context_signature(
+            section_header=section_header,
+            question_text=question_text,
+            option_text=option_text,
+            visual_label=visual_label,
+            page_context=page_context,
+            tooltip=tooltip,
+        )
+        context_markers = self._extract_context_markers(context_signature)
         field_value = self._normalize_field_value(getattr(widget, "field_value", None))
+        generated_question = self._synthesize_field_question(
+            internal_field_id=field_name,
+            field_type=field_type,
+            tooltip=tooltip,
+            visual_label=visual_label,
+            option_text=option_text,
+            question_text=question_text,
+            section_header=section_header,
+            page_context=page_context,
+            button_states=button_states,
+        )
+        answer_key = "selected_state" if field_type in {"checkbox", "radio"} else "value"
 
         return {
+            "internal_field_id": field_name,
             "field_name": field_name,
             "write_target_field_id": field_name,
             "field_type": field_type,
+            "answer_key": answer_key,
+            "generated_question": generated_question,
+            "question_context": context_signature,
             "field_value": field_value,
             "tooltip": tooltip,
             "visual_label": visual_label,
             "page_context": page_context,
+            "option_text": option_text,
+            "question_text": question_text,
+            "section_header": section_header,
+            "context_signature": context_signature,
+            "context_markers": context_markers,
             "page_index": int(page_index),
             "rect": [float(rect.x0), float(rect.y0), float(rect.x1), float(rect.y1)],
             "is_writable": bool(is_writable),
@@ -534,6 +583,186 @@ class PDFReadFormAction(BufferNode, Action):
             near_candidates.sort(key=lambda item: float(item["distance"]))
             return self._truncate_context(near_candidates[0]["text"])
         return ""
+
+    def _infer_option_text(
+        self,
+        field_rect: Any,
+        words: list[dict[str, Any]],
+        fitz: Any,
+        field_type: str,
+        fallback_label: str,
+    ) -> str:
+        if field_type not in {"checkbox", "radio"}:
+            return fallback_label
+
+        line_rect = fitz.Rect(
+            field_rect.x0 - 4.0,
+            field_rect.y0 - 6.0,
+            field_rect.x1 + 520.0,
+            field_rect.y1 + 6.0,
+        )
+        target_y = (field_rect.y0 + field_rect.y1) / 2.0
+        line_words: list[dict[str, Any]] = []
+        for word in words:
+            word_rect = word["rect"]
+            if not line_rect.intersects(word_rect):
+                continue
+            if float(word_rect.x1) < float(field_rect.x0) - 4.0:
+                continue
+            center_y = (word_rect.y0 + word_rect.y1) / 2.0
+            if abs(center_y - target_y) > 6.0:
+                continue
+            line_words.append(word)
+
+        if len(line_words) == 0:
+            return fallback_label
+
+        line_words.sort(key=lambda item: float(item["rect"].x0))
+        return self._clean_text(" ".join([item["text"] for item in line_words]))
+
+    def _infer_question_text(self, field_rect: Any, blocks: list[dict[str, Any]], fitz: Any) -> str:
+        left = float(field_rect.x0) - 260.0
+        right = float(field_rect.x1) + 260.0
+        candidates: list[dict[str, Any]] = []
+        for block in blocks:
+            block_rect = block["rect"]
+            if block_rect.y1 > field_rect.y0 + 2.0:
+                continue
+            overlap = min(block_rect.x1, right) - max(block_rect.x0, left)
+            if overlap < -8.0:
+                continue
+            distance = field_rect.y0 - block_rect.y1
+            candidates.append({"text": block["text"], "distance": distance})
+
+        candidates.sort(key=lambda item: float(item["distance"]))
+        for item in candidates:
+            text = self._clean_text(item["text"])
+            if text == "":
+                continue
+            if re.match(r"^\d+\s+\S+", text) and len(text) < 120:
+                continue
+            return self._truncate_context(text, max_len=280)
+        if len(candidates) > 0:
+            return self._truncate_context(str(candidates[0]["text"]), max_len=280)
+        return ""
+
+    def _infer_section_header(self, field_rect: Any, blocks: list[dict[str, Any]], fitz: Any) -> str:
+        left = float(field_rect.x0) - 260.0
+        right = float(field_rect.x1) + 260.0
+        candidates: list[dict[str, Any]] = []
+        for block in blocks:
+            block_rect = block["rect"]
+            if block_rect.y1 > field_rect.y0 + 2.0:
+                continue
+            overlap = min(block_rect.x1, right) - max(block_rect.x0, left)
+            if overlap < -8.0:
+                continue
+            distance = field_rect.y0 - block_rect.y1
+            if distance > 260.0:
+                continue
+            candidates.append({"text": block["text"], "distance": distance})
+
+        candidates.sort(key=lambda item: float(item["distance"]))
+        for item in candidates:
+            text = self._clean_text(item["text"])
+            if text == "":
+                continue
+            if re.match(r"^\d+\s+\S+", text):
+                return self._truncate_context(text, max_len=180)
+        for item in candidates:
+            text = self._clean_text(item["text"])
+            if text == "":
+                continue
+            if len(text) <= 120:
+                return self._truncate_context(text, max_len=180)
+        return ""
+
+    def _build_context_signature(
+        self,
+        section_header: str,
+        question_text: str,
+        option_text: str,
+        visual_label: str,
+        page_context: str,
+        tooltip: str,
+    ) -> str:
+        pieces = [section_header, question_text, option_text, visual_label, page_context, tooltip]
+        signature_parts: list[str] = []
+        seen: set[str] = set()
+        for piece in pieces:
+            cleaned = self._clean_text(piece)
+            if cleaned == "":
+                continue
+            lowered = cleaned.lower()
+            if lowered in seen:
+                continue
+            seen.add(lowered)
+            signature_parts.append(cleaned)
+        return self._truncate_context(" | ".join(signature_parts), max_len=420)
+
+    def _synthesize_field_question(
+        self,
+        internal_field_id: str,
+        field_type: str,
+        tooltip: str,
+        visual_label: str,
+        option_text: str,
+        question_text: str,
+        section_header: str,
+        page_context: str,
+        button_states: list[str],
+    ) -> str:
+        if field_type in {"checkbox", "radio"}:
+            scope = self._first_non_empty(question_text, section_header, page_context, "this section")
+            option = self._first_non_empty(option_text, visual_label, tooltip, internal_field_id)
+            states_text = ", ".join(button_states) if len(button_states) > 0 else "Off"
+            return (
+                'For section "' + self._clean_for_question(scope) + '", which state should be selected for option "'
+                + self._clean_for_question(option)
+                + '"? Return one of: '
+                + states_text
+            )
+
+        subject = self._first_non_empty(tooltip, visual_label, question_text, section_header, internal_field_id)
+        clean_subject = self._clean_for_question(subject)
+        if ":" in clean_subject:
+            clean_subject = self._clean_for_question(clean_subject.split(":")[0])
+        if clean_subject == "":
+            clean_subject = "this field"
+        return 'What value should be written into "' + clean_subject + '"?'
+
+    def _first_non_empty(self, *values: str) -> str:
+        for value in values:
+            cleaned = self._clean_text(str(value))
+            if cleaned != "" and not self._is_placeholder_text(cleaned):
+                return cleaned
+        return ""
+
+    def _clean_for_question(self, text: str) -> str:
+        cleaned = self._clean_text(text)
+        cleaned = cleaned.strip(" -:;,.")
+        return cleaned
+
+    def _is_placeholder_text(self, text: str) -> bool:
+        lowered = self._clean_text(str(text)).strip().lower()
+        return lowered in {"", "null", "none", "nan", "n/a", "na", "off", "-", "--"}
+
+    def _extract_context_markers(self, context_signature: str) -> list[str]:
+        folded = self._ascii_fold(context_signature.lower())
+        tokens = re.findall(r"[a-z0-9]{3,}", folded)
+        markers: list[str] = []
+        seen: set[str] = set()
+        for token in tokens:
+            if token in seen:
+                continue
+            seen.add(token)
+            markers.append(token)
+        return markers[:24]
+
+    def _ascii_fold(self, text: str) -> str:
+        folded = text.replace("ä", "ae").replace("ö", "oe").replace("ü", "ue").replace("ß", "ss")
+        folded = folded.replace("Ä", "ae").replace("Ö", "oe").replace("Ü", "ue")
+        return folded
 
     def _truncate_context(self, text: str, max_len: int = 220) -> str:
         clean = self._clean_text(text)

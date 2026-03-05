@@ -83,8 +83,9 @@ def _normalized_pdf_field_values(pdf_path: str) -> dict[str, str]:
 def _build_instruction() -> str:
     return (
         "Return only a plain JSON object without markdown. "
-        "Use exactly the field_name keys from the bridge prompt. "
-        "Do not add or remove keys."
+        "Return exactly one top-level key field_updates containing an array of update items. "
+        "Each update item must contain internal_field_id and selected_state or value. "
+        "Do not add extra top-level keys."
     )
 
 
@@ -149,6 +150,7 @@ def _assert_form_pipeline_result(
             assert actual_value == expected_value
 
 
+@pytest.mark.skip(reason="Omitted: local OLLAMA e2e regression is too slow for default test runs.")
 def test_feature_form_filler_agent_end_to_end_local_example():
     """End-to-end local example: real FileEmbeddingService + local OLLAMA RAGService + PDF form fill agent."""
     ollama_endpoint = os.environ.get("OLLAMA_ENDPOINT", "http://localhost:11434")

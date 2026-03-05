@@ -80,13 +80,21 @@ def test_read_pdf_form_default_per_pdf_extracts_context_and_prompt():
     assert len(fields) > 0
 
     required_keys = {
+        "internal_field_id",
         "field_name",
-        "write_target_field_id",
+        "answer_key",
+        "generated_question",
+        "question_context",
         "field_type",
         "field_value",
         "tooltip",
         "visual_label",
         "page_context",
+        "option_text",
+        "question_text",
+        "section_header",
+        "context_signature",
+        "context_markers",
         "page_index",
         "rect",
         "is_writable",
@@ -94,16 +102,25 @@ def test_read_pdf_form_default_per_pdf_extracts_context_and_prompt():
     }
     for field in fields:
         assert required_keys.issubset(set(field.keys()))
-        assert isinstance(field["field_name"], str)
-        assert field["field_name"] != ""
-        assert field["write_target_field_id"] == field["field_name"]
+        assert isinstance(field["internal_field_id"], str)
+        assert field["internal_field_id"] != ""
+        assert field["field_name"] == field["internal_field_id"]
+        assert field["answer_key"] in {"value", "selected_state"}
+        assert isinstance(field["generated_question"], str) and str(field["generated_question"]).strip() != ""
+        assert isinstance(field["question_context"], str) and str(field["question_context"]).strip() != ""
         assert isinstance(field["rect"], list)
         assert len(field["rect"]) == 4
         assert isinstance(field["is_writable"], bool)
         assert isinstance(field["button_states"], list)
+        assert isinstance(field["context_markers"], list)
         if field["field_type"] in {"checkbox", "radio"}:
             assert len(field["button_states"]) > 0
             assert any(str(item).lower() == "off" for item in field["button_states"])
+            assert str(field["option_text"]).strip() != ""
+            assert str(field["context_signature"]).strip() != ""
+            assert field["answer_key"] == "selected_state"
+        else:
+            assert field["answer_key"] == "value"
 
     assert any(str(field["visual_label"]).strip() != "" for field in fields)
     assert any(str(field["page_context"]).strip() != "" for field in fields)
@@ -114,8 +131,10 @@ def test_read_pdf_form_default_per_pdf_extracts_context_and_prompt():
     prompt = data["llm_prompt"][0]
     assert isinstance(prompt, str)
     assert prompt.strip() != ""
-    assert "strict JSON object" in prompt
-    assert "field_name" in prompt
+    assert '"field_updates"' in prompt
+    assert "generated_question" in prompt
+    assert "internal_field_id" in prompt
+    assert "Do not infer business meaning from internal_field_id alone" in prompt
 
 
 def test_read_pdf_form_per_field_emits_one_field_per_row():
@@ -129,8 +148,10 @@ def test_read_pdf_form_per_field_emits_one_field_per_row():
     for row_fields, prompt in zip(data["fields"], data["llm_prompt"]):
         assert isinstance(row_fields, list)
         assert len(row_fields) == 1
-        field_name = row_fields[0]["field_name"]
-        assert field_name in prompt
+        internal_field_id = row_fields[0]["internal_field_id"]
+        generated_question = row_fields[0]["generated_question"]
+        assert internal_field_id in prompt
+        assert generated_question in prompt
 
 
 def test_read_pdf_form_keeps_llm_prompt_column_when_disabled():
@@ -164,29 +185,27 @@ def test_read_pdf_form_install_raises_for_invalid_row_mode():
 def test_generate_llm_prompt_includes_exact_json_key_template():
     payload = [
         {
-            "field_name": "kasse",
-            "write_target_field_id": "kasse",
+            "internal_field_id": "kasse",
             "field_type": "text",
-            "tooltip": "Krankenkasse",
-            "visual_label": "Krankenkasse",
-            "page_context": "Persoenliche Daten",
+            "generated_question": "What value should be written into Krankenkasse?",
+            "question_context": "Persoenliche Daten",
             "button_states": [],
         },
         {
-            "field_name": "dienstverh",
-            "write_target_field_id": "dienstverh",
+            "internal_field_id": "dienstverh",
             "field_type": "radio",
-            "tooltip": "Dienstverhaeltnis",
-            "visual_label": "Dienstverhaeltnis",
-            "page_context": "Persoenliche Daten",
+            "generated_question": "For section Persoenliche Daten, which state should be selected?",
+            "question_context": "Persoenliche Daten",
             "button_states": ["nein", "Ja", "Off"],
         },
     ]
     prompt = generate_llm_prompt(payload)
     assert "kasse" in prompt
     assert "dienstverh" in prompt
-    assert "write_target_field_id" in prompt
+    assert "internal_field_id" in prompt
     assert "button_states" in prompt
-    assert "<determined_value>" in prompt
+    assert "generated_question" in prompt
+    assert "field_updates" in prompt
+    assert "selected_state" in prompt
     assert "Return JSON only" in prompt
-    assert "Do not add keys" in prompt
+    assert "no extra top-level keys" in prompt

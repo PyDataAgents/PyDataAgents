@@ -4,6 +4,7 @@ from dataclasses import dataclass, field
 import json
 import os
 from pathlib import Path
+import unicodedata
 from typing import Any
 
 from ...agents.Agent import Agent
@@ -24,7 +25,7 @@ class PDFWriteFormAction(BufferNode, Action):
     )
     fill_input_keys: list[str] = field(
         default_factory=lambda: ["answer", "answers", "fields", "field_values", "llm_data", "content"],
-        metadata={"description": "parent buffer keys to scan for field-value payloads to write into the PDF"},
+        metadata={"description": "parent buffer keys to scan for strict field_updates payloads"},
     )
     row_mode: str = field(
         default="per_pdf",
@@ -197,11 +198,19 @@ class PDFWriteFormAction(BufferNode, Action):
     def _collect_payload_candidates(self, value: Any, target: list[Any]):
         if value is None:
             return
-        if isinstance(value, (str, dict)):
+        if isinstance(value, str):
             target.append(value)
             return
+        if isinstance(value, dict):
+            if "field_updates" in value or self._looks_like_update_item(value):
+                target.append(value)
+                return
+            for wrapper_key in ["answer", "answers", "values", "data", "content", "llm_data", "fields", "field_values"]:
+                if wrapper_key in value:
+                    self._collect_payload_candidates(value[wrapper_key], target)
+            return
         if isinstance(value, (list, tuple)):
-            if self._looks_like_field_list(value):
+            if self._looks_like_update_list(value):
                 target.append(list(value))
                 return
             for item in value:
@@ -209,30 +218,18 @@ class PDFWriteFormAction(BufferNode, Action):
             return
         target.append(value)
 
-    def _looks_like_field_list(self, value: Any) -> bool:
+    def _looks_like_update_list(self, value: Any) -> bool:
         if not isinstance(value, (list, tuple)) or len(value) == 0:
             return False
         if not all(isinstance(item, dict) for item in value):
             return False
-        return any(("field_name" in item or "field_id" in item or "write_target_field_id" in item) for item in value)
+        return all(self._looks_like_update_item(item) for item in value)
 
-    def _looks_like_field_item(self, payload: dict[str, Any]) -> bool:
-        has_field = any(
-            key in payload and str(payload.get(key)).strip() != ""
-            for key in ["field_name", "write_target_field_id", "field_id"]
-        )
+    def _looks_like_update_item(self, payload: dict[str, Any]) -> bool:
+        has_field = "internal_field_id" in payload and str(payload.get("internal_field_id", "")).strip() != ""
         has_value = any(
             key in payload
-            for key in [
-                "determined_value",
-                "selected_state",
-                "selected_option",
-                "field_value",
-                "value",
-                "current_value",
-                "proposed_value",
-                "answer",
-            ]
+            for key in ["selected_state", "value"]
         )
         return has_field and has_value
 
@@ -242,13 +239,11 @@ class PDFWriteFormAction(BufferNode, Action):
 
         if isinstance(payload, str):
             parsed = self._parse_payload_text(payload)
-            if parsed is None:
-                return None
             return self._normalize_payload(parsed)
 
         if isinstance(payload, (list, tuple)):
-            if self._looks_like_field_list(payload):
-                return self._normalize_field_list(payload)
+            if self._looks_like_update_list(payload):
+                return self._normalize_update_list(payload)
             merged: dict[str, Any] = {}
             for item in payload:
                 normalized = self._normalize_payload(item)
@@ -257,140 +252,60 @@ class PDFWriteFormAction(BufferNode, Action):
             return merged if len(merged) > 0 else None
 
         if isinstance(payload, dict):
-            merged_wrappers: dict[str, Any] = {}
-            for wrapper_key in [
-                "fields",
-                "field_values",
-                "llm_data",
-                "content",
-                "answer",
-                "answers",
-                "values",
-                "data",
-            ]:
+            if "field_updates" in payload:
+                return self._normalize_payload(payload["field_updates"])
+
+            if self._looks_like_update_item(payload):
+                return self._normalize_update_item(payload)
+
+            for wrapper_key in ["answer", "answers", "values", "data", "content", "llm_data", "fields", "field_values"]:
                 if wrapper_key in payload:
                     normalized = self._normalize_payload(payload[wrapper_key])
                     if normalized is not None and len(normalized) > 0:
-                        merged_wrappers = self._merge_field_values(merged_wrappers, normalized)
-            if len(merged_wrappers) > 0:
-                return merged_wrappers
-
-            if self._looks_like_field_item(payload):
-                return self._normalize_field_item(payload)
-
-            result: dict[str, Any] = {}
-            skip_keys = {
-                "filepath",
-                "file_path",
-                "pdf_path",
-                "pdf",
-                "metadata",
-                "full_text_content",
-                "llm_prompt",
-                "field_name",
-                "field_type",
-                "tooltip",
-                "visual_label",
-                "page_context",
-                "page_index",
-                "rect",
-                "is_writable",
-                "button_states",
-                "write_target_field_id",
-            }
-            for key, value in payload.items():
-                if key in skip_keys:
-                    continue
-                if isinstance(value, dict):
-                    # Support mappings like {"dienstverh": {"selected_state": "nein"}}.
-                    if self._resolve_field_target(value) is None and self._has_field_value_keys(value):
-                        inline_value = self._resolve_field_value(value)
-                        if inline_value is None:
-                            inline_value = ""
-                        result[str(key)] = self._normalize_write_value(inline_value)
-                        continue
-                    nested = self._normalize_payload(value)
-                    if nested is not None and len(nested) > 0:
-                        result = self._merge_field_values(result, nested)
-                    continue
-                if isinstance(value, (list, tuple)):
-                    nested = self._normalize_payload(value)
-                    if nested is not None and len(nested) > 0:
-                        result = self._merge_field_values(result, nested)
-                    continue
-                result[str(key)] = self._normalize_write_value(value)
-            return result if len(result) > 0 else None
+                        return normalized
+            raise NodeException(
+                "Invalid fill payload object. Expected field_updates list or update item with internal_field_id."
+            )
 
         return None
 
-    def _has_field_value_keys(self, payload: dict[str, Any]) -> bool:
-        return any(
-            key in payload
-            for key in [
-                "determined_value",
-                "selected_state",
-                "selected_option",
-                "field_value",
-                "value",
-                "current_value",
-                "proposed_value",
-                "answer",
-            ]
-        )
-
-    def _normalize_field_list(self, payload: list[dict[str, Any]] | tuple[dict[str, Any], ...]) -> dict[str, Any] | None:
+    def _normalize_update_list(self, payload: list[dict[str, Any]] | tuple[dict[str, Any], ...]) -> dict[str, Any] | None:
         result: dict[str, Any] = {}
         for item in payload:
             if not isinstance(item, dict):
                 continue
-            normalized = self._normalize_field_item(item)
+            normalized = self._normalize_update_item(item)
             if normalized is None:
                 continue
             result = self._merge_field_values(result, normalized)
         return result if len(result) > 0 else None
 
-    def _normalize_field_item(self, payload: dict[str, Any]) -> dict[str, Any] | None:
-        if payload.get("is_writable") is False:
-            return None
+    def _normalize_update_item(self, payload: dict[str, Any]) -> dict[str, Any] | None:
+        target = str(payload.get("internal_field_id", "")).strip()
+        if target == "":
+            raise NodeException("Each field update requires internal_field_id")
 
-        target = self._resolve_field_target(payload)
-        if target is None:
-            return None
-
-        value = self._resolve_field_value(payload)
-        if value is None:
-            value = ""
-        return {target: self._normalize_write_value(value)}
-
-    def _resolve_field_target(self, payload: dict[str, Any]) -> str | None:
-        for key in ["field_name", "write_target_field_id", "field_id"]:
-            value = payload.get(key)
-            if value is None:
-                continue
-            cleaned = str(value).strip()
-            if cleaned != "":
-                return cleaned
-        return None
-
-    def _resolve_field_value(self, payload: dict[str, Any]) -> Any:
-        for key in [
-            "determined_value",
-            "selected_state",
-            "selected_option",
-            "field_value",
-            "value",
-            "current_value",
-            "proposed_value",
-            "answer",
-        ]:
-            if key in payload:
-                return payload.get(key)
-        return None
+        has_selected_state = "selected_state" in payload
+        has_value = "value" in payload
+        if has_selected_state and has_value:
+            raise NodeException(
+                "Field update for "
+                + target
+                + " must contain only one of selected_state or value"
+            )
+        if not has_selected_state and not has_value:
+            raise NodeException(
+                "Field update for "
+                + target
+                + " must contain selected_state or value"
+            )
+        raw_value = payload.get("selected_state") if has_selected_state else payload.get("value")
+        return {target: self._normalize_write_value(raw_value)}
 
     def _parse_payload_text(self, text: str) -> Any:
         clean = str(text).strip()
         if clean == "":
-            return None
+            raise NodeException("Fill payload text is empty")
 
         if clean.startswith("```"):
             lines = clean.splitlines()
@@ -420,7 +335,9 @@ class PDFWriteFormAction(BufferNode, Action):
                 return json.loads(clean[list_start : list_end + 1])
             except Exception:
                 pass
-        return None
+        raise NodeException(
+            "Could not parse fill payload as JSON for strict field_updates contract"
+        )
 
     def _normalize_sequential_payloads(
         self,
@@ -465,11 +382,24 @@ class PDFWriteFormAction(BufferNode, Action):
 
         try:
             widgets_by_field, _page_refs = self._index_widgets(document)
-            unknown_fields = [name for name in field_values.keys() if name not in widgets_by_field]
+            canonical_lookup = self._build_canonical_field_lookup(list(widgets_by_field.keys()))
+            unknown_fields: list[str] = []
+            writable_values: dict[str, Any] = {}
+            for source_name, value in field_values.items():
+                resolved_name = self._resolve_known_field_name(
+                    source_name,
+                    widgets_by_field=widgets_by_field,
+                    canonical_lookup=canonical_lookup,
+                )
+                if resolved_name is None:
+                    unknown_fields.append(str(source_name))
+                    continue
+                writable_values[resolved_name] = value
             if self.strict_unknown_fields and len(unknown_fields) > 0:
-                raise NodeException("unknown PDF field(s): " + ", ".join(sorted(unknown_fields)))
+                raise NodeException(
+                    "unknown PDF field(s): " + ", ".join(sorted(unknown_fields))
+                )
 
-            writable_values = {k: v for k, v in field_values.items() if k in widgets_by_field}
             written_fields: dict[str, Any] = {}
             for field_name, value in writable_values.items():
                 widgets = widgets_by_field.get(field_name, [])
@@ -836,6 +766,44 @@ class PDFWriteFormAction(BufferNode, Action):
             seen.add(path)
             deduped.append(path)
         return deduped
+
+    def _build_canonical_field_lookup(self, field_names: list[str]) -> dict[str, list[str]]:
+        lookup: dict[str, list[str]] = {}
+        for name in field_names:
+            token = self._canonicalize_field_key(name)
+            if token == "":
+                continue
+            lookup.setdefault(token, []).append(name)
+        return lookup
+
+    def _resolve_known_field_name(
+        self,
+        source_name: Any,
+        widgets_by_field: dict[str, list[Any]],
+        canonical_lookup: dict[str, list[str]],
+    ) -> str | None:
+        cleaned = self._clean_text(str(source_name))
+        if cleaned in widgets_by_field:
+            return cleaned
+
+        token = self._canonicalize_field_key(cleaned)
+        if token == "":
+            return None
+        candidates = canonical_lookup.get(token, [])
+        if len(candidates) == 1:
+            return candidates[0]
+        if len(candidates) > 1:
+            raise NodeException(
+                "Ambiguous internal_field_id '" + cleaned + "' matches: " + ", ".join(sorted(candidates))
+            )
+        return None
+
+    def _canonicalize_field_key(self, value: Any) -> str:
+        text = self._clean_text(str(value)).lower()
+        text = text.replace("ä", "ae").replace("ö", "oe").replace("ü", "ue").replace("ß", "ss")
+        text = unicodedata.normalize("NFKD", text)
+        text = text.encode("ascii", "ignore").decode("ascii")
+        return "".join(ch for ch in text if ch.isalnum())
 
     def _clean_text(self, text: str) -> str:
         return " ".join(str(text).split())
