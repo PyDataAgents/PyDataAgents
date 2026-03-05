@@ -25,6 +25,8 @@ def generate_llm_prompt(extracted_fields: list[dict[str, Any]]) -> str:
         "You are a form-filling assistant.",
         "Answer each generated_question using the provided RAG context.",
         "Do not infer business meaning from internal_field_id alone; generated_question and question_context are authoritative.",
+        "Treat current field values and visible example values from the PDF as untrusted local hints only.",
+        "If retrieved context conflicts with prefilled PDF content, prefer the retrieved context.",
         "Return JSON only (no markdown, no code fences, no explanations).",
         "Return exactly one object with key field_updates (array).",
         "Each field update item must contain internal_field_id plus either value (text/list fields) or selected_state (checkbox/radio fields).",
@@ -273,13 +275,16 @@ class PDFReadFormAction(BufferNode, Action):
         field_type = self._classify_widget_type(widget, fitz)
         is_writable = self._is_writable_widget(widget, field_type)
         button_states = self._collect_button_states(widget)
-        visual_label = self._infer_visual_label(rect, words, fitz)
+        if field_type in {"checkbox", "radio"}:
+            visual_label = self._sanitize_label_text(self._infer_visual_label(rect, words, fitz))
+        else:
+            visual_label = self._sanitize_label_text(self._infer_text_visual_label(rect, words, fitz))
         if visual_label == "" and tooltip != "":
-            visual_label = tooltip
-        page_context = self._infer_page_context(rect, blocks, fitz)
-        option_text = self._infer_option_text(rect, words, fitz, field_type, visual_label)
-        question_text = self._infer_question_text(rect, blocks, fitz)
-        section_header = self._infer_section_header(rect, blocks, fitz)
+            visual_label = self._sanitize_label_text(tooltip)
+        page_context = self._sanitize_context_text(self._infer_page_context(rect, blocks, fitz))
+        option_text = self._sanitize_label_text(self._infer_option_text(rect, words, fitz, field_type, visual_label))
+        question_text = self._sanitize_context_text(self._infer_question_text(rect, blocks, fitz))
+        section_header = self._sanitize_context_text(self._infer_section_header(rect, blocks, fitz))
         context_signature = self._build_context_signature(
             section_header=section_header,
             question_text=question_text,
@@ -515,6 +520,113 @@ class PDFReadFormAction(BufferNode, Action):
             return value.decode("utf-8", errors="ignore")
         return self._clean_text(str(value))
 
+    def _infer_text_visual_label(self, field_rect: Any, words: list[dict[str, Any]], fitz: Any) -> str:
+        left_label = self._sanitize_label_text(self._infer_label_left_of_field(field_rect, words, fitz))
+        above_label = self._sanitize_label_text(self._infer_label_above_field(field_rect, words, fitz))
+        legacy_label = self._sanitize_label_text(self._infer_visual_label(field_rect, words, fitz))
+
+        for candidate in [left_label, above_label, legacy_label]:
+            if self._is_specific_field_label(candidate):
+                return candidate
+        for candidate in [left_label, above_label, legacy_label]:
+            if candidate != "":
+                return candidate
+        return ""
+
+    def _infer_label_above_field(self, field_rect: Any, words: list[dict[str, Any]], fitz: Any) -> str:
+        search_rect = fitz.Rect(
+            field_rect.x0 - 8.0,
+            field_rect.y0 - min(float(self.label_search_above), 24.0),
+            field_rect.x1 + 8.0,
+            field_rect.y0 + 2.0,
+        )
+        candidates: list[dict[str, Any]] = []
+        for word in words:
+            word_rect = word["rect"]
+            if not search_rect.intersects(word_rect):
+                continue
+            if self._overlap_ratio(word_rect, field_rect) > 0.15:
+                continue
+            center_x = (word_rect.x0 + word_rect.x1) / 2.0
+            center_y = (word_rect.y0 + word_rect.y1) / 2.0
+            if center_x < field_rect.x0 - 8.0 or center_x > field_rect.x1 + 8.0:
+                continue
+            score = abs(center_y - field_rect.y0) * 3.0
+            candidates.append({"text": word["text"], "rect": word_rect, "score": score})
+
+        if len(candidates) == 0:
+            return ""
+        return self._join_best_line(candidates)
+
+    def _infer_label_left_of_field(self, field_rect: Any, words: list[dict[str, Any]], fitz: Any) -> str:
+        search_rect = fitz.Rect(
+            field_rect.x0 - max(float(self.label_search_left), 220.0),
+            field_rect.y0 - 6.0,
+            field_rect.x0 + 4.0,
+            field_rect.y1 + 6.0,
+        )
+        candidates: list[dict[str, Any]] = []
+        field_center_y = (field_rect.y0 + field_rect.y1) / 2.0
+        for word in words:
+            word_rect = word["rect"]
+            if not search_rect.intersects(word_rect):
+                continue
+            if self._overlap_ratio(word_rect, field_rect) > 0.15:
+                continue
+            if float(word_rect.x1) > float(field_rect.x0) + 12.0:
+                continue
+            center_y = (word_rect.y0 + word_rect.y1) / 2.0
+            if abs(center_y - field_center_y) > 10.0:
+                continue
+            distance = float(field_rect.x0) - float(word_rect.x1)
+            candidates.append({"text": word["text"], "rect": word_rect, "score": distance})
+
+        if len(candidates) == 0:
+            return ""
+
+        candidates.sort(key=lambda item: float(item["rect"].x0))
+        rightmost = candidates[-1]["rect"]
+        line_words = [
+            item
+            for item in candidates
+            if abs(((item["rect"].y0 + item["rect"].y1) / 2.0) - ((rightmost.y0 + rightmost.y1) / 2.0)) <= 4.5
+        ]
+        line_words.sort(key=lambda item: float(item["rect"].x0))
+        tail: list[dict[str, Any]] = []
+        last_x = None
+        for item in reversed(line_words):
+            if last_x is not None and (last_x - float(item["rect"].x1)) > 26.0:
+                break
+            tail.append(item)
+            last_x = float(item["rect"].x0)
+        tail.reverse()
+        return self._clean_text(" ".join([item["text"] for item in tail]))
+
+    def _join_best_line(self, candidates: list[dict[str, Any]]) -> str:
+        ordered = sorted(candidates, key=lambda item: float(item["score"]))
+        anchor_rect = ordered[0]["rect"]
+        anchor_y = (anchor_rect.y0 + anchor_rect.y1) / 2.0
+        line_words = [
+            item for item in ordered if abs(((item["rect"].y0 + item["rect"].y1) / 2.0) - anchor_y) <= 4.5
+        ]
+        line_words.sort(key=lambda item: float(item["rect"].x0))
+        return self._clean_text(" ".join([item["text"] for item in line_words]))
+
+    def _overlap_ratio(self, rect_a: Any, rect_b: Any) -> float:
+        try:
+            intersection = rect_a & rect_b
+        except Exception:
+            return 0.0
+        if intersection is None or getattr(intersection, "is_empty", False):
+            return 0.0
+        try:
+            area_a = max(float(rect_a.width) * float(rect_a.height), 0.0)
+            if area_a <= 0.0:
+                return 0.0
+            return max(float(intersection.width) * float(intersection.height), 0.0) / area_a
+        except Exception:
+            return 0.0
+
     def _infer_visual_label(self, field_rect: Any, words: list[dict[str, Any]], fitz: Any) -> str:
         search_rect = fitz.Rect(
             field_rect.x0 - float(self.label_search_left),
@@ -528,6 +640,8 @@ class PDFReadFormAction(BufferNode, Action):
         for word in words:
             word_rect = word["rect"]
             if not search_rect.intersects(word_rect):
+                continue
+            if self._overlap_ratio(word_rect, field_rect) > 0.25:
                 continue
             center_x = (word_rect.x0 + word_rect.x1) / 2.0
             center_y = (word_rect.y0 + word_rect.y1) / 2.0
@@ -563,18 +677,23 @@ class PDFReadFormAction(BufferNode, Action):
         near_candidates: list[dict[str, Any]] = []
         for block in blocks:
             block_rect = block["rect"]
+            text = self._clean_text(str(block.get("text", "")))
+            if self._is_context_noise(text):
+                continue
+            if self._overlap_ratio(block_rect, field_rect) > 0.20:
+                continue
             if block_rect.y1 <= field_rect.y0 + 2.0:
                 overlap = min(block_rect.x1, field_rect.x1 + padding) - max(block_rect.x0, field_rect.x0 - padding)
                 if overlap >= -2.0:
                     distance = field_rect.y0 - block_rect.y1
-                    above_candidates.append({"text": block["text"], "distance": distance})
+                    above_candidates.append({"text": text, "distance": distance})
             if context_rect.intersects(block_rect):
                 center_x = (block_rect.x0 + block_rect.x1) / 2.0
                 center_y = (block_rect.y0 + block_rect.y1) / 2.0
                 field_center_x = (field_rect.x0 + field_rect.x1) / 2.0
                 field_center_y = (field_rect.y0 + field_rect.y1) / 2.0
                 distance = abs(center_x - field_center_x) + abs(center_y - field_center_y)
-                near_candidates.append({"text": block["text"], "distance": distance})
+                near_candidates.append({"text": text, "distance": distance})
 
         if len(above_candidates) > 0:
             above_candidates.sort(key=lambda item: float(item["distance"]))
@@ -628,11 +747,16 @@ class PDFReadFormAction(BufferNode, Action):
             block_rect = block["rect"]
             if block_rect.y1 > field_rect.y0 + 2.0:
                 continue
+            if self._overlap_ratio(block_rect, field_rect) > 0.20:
+                continue
             overlap = min(block_rect.x1, right) - max(block_rect.x0, left)
             if overlap < -8.0:
                 continue
+            text = self._clean_text(str(block.get("text", "")))
+            if self._is_context_noise(text):
+                continue
             distance = field_rect.y0 - block_rect.y1
-            candidates.append({"text": block["text"], "distance": distance})
+            candidates.append({"text": text, "distance": distance})
 
         candidates.sort(key=lambda item: float(item["distance"]))
         for item in candidates:
@@ -654,20 +778,25 @@ class PDFReadFormAction(BufferNode, Action):
             block_rect = block["rect"]
             if block_rect.y1 > field_rect.y0 + 2.0:
                 continue
+            if self._overlap_ratio(block_rect, field_rect) > 0.20:
+                continue
             overlap = min(block_rect.x1, right) - max(block_rect.x0, left)
             if overlap < -8.0:
                 continue
             distance = field_rect.y0 - block_rect.y1
             if distance > 260.0:
                 continue
-            candidates.append({"text": block["text"], "distance": distance})
+            text = self._clean_text(str(block.get("text", "")))
+            if self._is_context_noise(text):
+                continue
+            candidates.append({"text": text, "distance": distance})
 
         candidates.sort(key=lambda item: float(item["distance"]))
         for item in candidates:
             text = self._clean_text(item["text"])
             if text == "":
                 continue
-            if re.match(r"^\d+\s+\S+", text):
+            if self._looks_like_section_header(text):
                 return self._truncate_context(text, max_len=180)
         for item in candidates:
             text = self._clean_text(item["text"])
@@ -723,6 +852,18 @@ class PDFReadFormAction(BufferNode, Action):
                 + states_text
             )
 
+        semantic_subject = self._infer_semantic_subject(
+            internal_field_id=internal_field_id,
+            tooltip=tooltip,
+            visual_label=visual_label,
+            option_text=option_text,
+            question_text=question_text,
+            section_header=section_header,
+            page_context=page_context,
+        )
+        if semantic_subject != "":
+            return "What is " + semantic_subject + "?"
+
         subject = self._first_non_empty(tooltip, visual_label, question_text, section_header, internal_field_id)
         clean_subject = self._clean_for_question(subject)
         if ":" in clean_subject:
@@ -736,6 +877,107 @@ class PDFReadFormAction(BufferNode, Action):
             cleaned = self._clean_text(str(value))
             if cleaned != "" and not self._is_placeholder_text(cleaned):
                 return cleaned
+        return ""
+
+    def _sanitize_label_text(self, text: str) -> str:
+        clean = self._clean_text(text)
+        if self._is_placeholder_text(clean):
+            return ""
+        clean = clean.strip(" -;,.")
+        clean = re.sub(r"^[>\-\u2022\u25cf\u25ba\u00da]+\s*", "", clean)
+        if ":" in clean:
+            prefix, suffix = clean.split(":", 1)
+            prefix = self._clean_text(prefix)
+            suffix = self._clean_text(suffix)
+            if prefix != "" and self._looks_like_inline_value(suffix):
+                clean = prefix
+        clean = re.sub(r"\s{2,}", " ", clean).strip(" -:;,.")
+        return "" if self._is_placeholder_text(clean) else clean
+
+    def _sanitize_context_text(self, text: str) -> str:
+        clean = self._sanitize_label_text(text)
+        if self._is_context_noise(clean):
+            return ""
+        return clean
+
+    def _is_specific_field_label(self, text: str) -> bool:
+        clean = self._clean_text(text)
+        if clean == "":
+            return False
+        if self._is_context_noise(clean):
+            return False
+        if self._looks_like_section_header(clean):
+            return False
+        return len(clean) <= 80
+
+    def _looks_like_inline_value(self, text: str) -> bool:
+        clean = self._clean_text(text)
+        if clean == "":
+            return False
+        if re.search(r"\d", clean):
+            return True
+        tokens = clean.split()
+        if len(tokens) >= 4 and all(len(token) == 1 for token in tokens if token.isalnum()):
+            return True
+        if len(tokens) >= 2 and any(token.isupper() for token in tokens):
+            return True
+        return False
+
+    def _is_context_noise(self, text: str) -> bool:
+        clean = self._clean_text(text)
+        if self._is_placeholder_text(clean):
+            return True
+        if re.fullmatch(r"[0-9 ]+", clean):
+            return True
+        if clean.startswith(">>>"):
+            return True
+        folded = self._ascii_fold(clean.lower())
+        if folded in {"ja", "nein", "off", "ledig", "verheiratet", "verwitwet", "geschieden", "weitere", "nach"}:
+            return True
+        return False
+
+    def _looks_like_section_header(self, text: str) -> bool:
+        clean = self._clean_text(text)
+        if self._is_placeholder_text(clean):
+            return False
+        folded = self._ascii_fold(clean)
+        if re.match(r"^\d{1,2}\s+[A-Za-z]", folded):
+            return True
+        return False
+
+    def _infer_semantic_subject(
+        self,
+        internal_field_id: str,
+        tooltip: str,
+        visual_label: str,
+        option_text: str,
+        question_text: str,
+        section_header: str,
+        page_context: str,
+    ) -> str:
+        folded_id = self._ascii_fold(str(internal_field_id).lower())
+        primary = self._ascii_fold(
+            " | ".join([str(tooltip), str(visual_label), str(option_text)]).lower()
+        )
+        secondary = self._ascii_fold(
+            " | ".join([str(question_text), str(section_header), str(page_context)]).lower()
+        )
+
+        id_subject = self._match_semantic_subject(folded_id, field_scope=secondary)
+        if id_subject != "":
+            return id_subject
+        primary_subject = self._match_semantic_subject(primary, field_scope=secondary)
+        if primary_subject != "":
+            return primary_subject
+        secondary_subject = self._match_semantic_subject(secondary, field_scope=secondary)
+        if secondary_subject != "":
+            return secondary_subject
+        return ""
+
+    def _match_semantic_subject(self, folded: str, field_scope: str = "") -> str:
+        scope = self._ascii_fold(str(field_scope).lower())
+        if folded == "":
+            return ""
         return ""
 
     def _clean_for_question(self, text: str) -> str:

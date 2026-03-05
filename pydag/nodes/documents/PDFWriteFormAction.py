@@ -4,6 +4,7 @@ from dataclasses import dataclass, field
 import json
 import os
 from pathlib import Path
+import re
 import unicodedata
 from typing import Any
 
@@ -300,7 +301,10 @@ class PDFWriteFormAction(BufferNode, Action):
                 + " must contain selected_state or value"
             )
         raw_value = payload.get("selected_state") if has_selected_state else payload.get("value")
-        return {target: self._normalize_write_value(raw_value)}
+        normalized_value = self._normalize_write_value(raw_value)
+        if has_value:
+            normalized_value = self._normalize_text_update_value(normalized_value)
+        return {target: normalized_value}
 
     def _parse_payload_text(self, text: str) -> Any:
         clean = str(text).strip()
@@ -731,6 +735,44 @@ class PDFWriteFormAction(BufferNode, Action):
         if isinstance(value, dict):
             return {str(k): self._normalize_write_value(v) for k, v in value.items()}
         return str(value)
+
+    def _normalize_text_update_value(self, value: Any) -> Any:
+        if not isinstance(value, str):
+            return value
+        text = self._clean_text(value)
+        if ":" in text:
+            prefix, suffix = text.split(":", 1)
+            suffix = self._clean_text(suffix)
+            if suffix != "" and self._looks_like_structured_identifier(suffix):
+                text = suffix
+            elif suffix != "" and len(prefix.split()) <= 4 and re.search(r"\d", suffix):
+                text = suffix
+        if self._looks_like_spaced_identifier(text):
+            return self._collapse_spaced_identifier(text)
+        return text
+
+    def _looks_like_structured_identifier(self, text: str) -> bool:
+        clean = self._clean_text(text)
+        if clean == "":
+            return False
+        if re.search(r"[A-Z0-9]{6,}", clean.replace(" ", "")):
+            return True
+        if re.search(r"\d", clean):
+            return True
+        return False
+
+    def _looks_like_spaced_identifier(self, text: str) -> bool:
+        clean = self._clean_text(text)
+        tokens = clean.split()
+        if len(tokens) < 6:
+            return False
+        compact = "".join(ch for ch in clean if ch.isalnum())
+        if len(compact) < 8:
+            return False
+        return all(token.isalnum() and len(token) == 1 for token in tokens)
+
+    def _collapse_spaced_identifier(self, text: str) -> str:
+        return "".join(ch for ch in str(text) if ch.isalnum())
 
     def _merge_field_values(self, existing: dict[str, Any], incoming: dict[str, Any]) -> dict[str, Any]:
         merged = dict(existing)
