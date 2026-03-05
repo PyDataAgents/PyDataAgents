@@ -9,6 +9,7 @@ import pytest
 from pypdf import PdfReader
 
 nltk.download("punkt", quiet=True)
+nltk.download("averaged_perceptron_tagger", quiet=True)
 
 # Fallback for environments where graphviz is not installed.
 if "graphviz" not in sys.modules:
@@ -288,7 +289,7 @@ def test_feature_form_filler_agent_end_to_end_openai_example():
         id="LLM_FILL_FORM_OPENAI",
         question_key="llm_prompt",
         instruction_value=_build_instruction(),
-        retrieval_query_key="llm_prompt",
+        retrieval_query_key="fields.0.generated_question",
         use_rag_context=True,
         pass_through_keys=["filepath"],
     )
