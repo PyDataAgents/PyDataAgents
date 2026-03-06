@@ -60,7 +60,7 @@ class MappingService(ObserverService):
         if len(self._buffers) == 0:
             if agent is not None:
                 for buffer_id in self.buffer_ids:
-                        if buffer_id in agent.get_buffer(buffer_id):
+                        if agent.get_buffer(buffer_id):
                             self.add_buffer(agent.get_buffer(buffer_id))
                         else:
                             logger.error("Buffer " + buffer_id + " not found in agent")

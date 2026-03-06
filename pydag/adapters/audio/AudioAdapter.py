@@ -15,7 +15,7 @@ class AudioAdapter(SubscribeAdapter):
     """`Adapter` for subscribing to a system's audio input channels (e.g. from a USB microphone) using the `sounddevice` library.
     """
 
-    sample_rate : int = field(default=44_100, metadata={"description": "sample rate of audio channel, usually 44100 Hz"})
+    sample_rate : int = field(default=44100, metadata={"description": "sample rate of audio channel, usually 44100 Hz"})
     device : int = field(default=None, metadata={"description": "device number to use as input stream, if nothing is specified the default device is used"})
 
     def __post_init__(self):
