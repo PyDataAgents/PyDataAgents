@@ -37,6 +37,7 @@ from pydag.nodes.NodeException import NodeException
 from pydag.nodes.buffers.LinkBufferAction import LinkBufferAction
 from pydag.nodes.documents.PDFReadFormAction import PDFReadFormAction
 from pydag.nodes.documents.PDFWriteFormAction import PDFWriteFormAction
+from pydag.nodes.documents._pdf_utils import normalize_state_name
 from pydag.nodes.llm.LLMChatAction import LLMChatAction
 from pydag.services.llm.RAGService import RAGService
 
@@ -169,7 +170,7 @@ def test_write_pdf_form_writes_text_fields_from_json_mapping():
 
 
 def test_write_pdf_form_wraps_widget_update_runtime_error_as_node_exception(monkeypatch):
-    def _fake_import_fitz(self):
+    def _fake_import_fitz():
         class _FakeDocument:
             def close(self):
                 return
@@ -190,7 +191,7 @@ def test_write_pdf_form_wraps_widget_update_runtime_error_as_node_exception(monk
     def _fake_save_document(self, _document, _source_path, _output_path):
         return
 
-    monkeypatch.setattr(PDFWriteFormAction, "_import_fitz", _fake_import_fitz)
+    monkeypatch.setattr("pydag.nodes.documents.PDFWriteFormAction._pdf_utils.import_fitz", _fake_import_fitz)
     monkeypatch.setattr(PDFWriteFormAction, "_index_widgets", _fake_index_widgets)
     monkeypatch.setattr(PDFWriteFormAction, "_write_field_to_widgets", _fake_write_field_to_widgets)
     monkeypatch.setattr(PDFWriteFormAction, "_save_document", _fake_save_document)
@@ -220,7 +221,7 @@ def test_write_pdf_form_wraps_widget_update_runtime_error_as_node_exception(monk
 
 
 def test_write_pdf_form_non_strict_unknown_fields_ignores_extras(monkeypatch):
-    def _fake_import_fitz(self):
+    def _fake_import_fitz():
         class _FakeDocument:
             def close(self):
                 return
@@ -241,7 +242,7 @@ def test_write_pdf_form_non_strict_unknown_fields_ignores_extras(monkeypatch):
     def _fake_save_document(self, _document, _source_path, _output_path):
         return
 
-    monkeypatch.setattr(PDFWriteFormAction, "_import_fitz", _fake_import_fitz)
+    monkeypatch.setattr("pydag.nodes.documents.PDFWriteFormAction._pdf_utils.import_fitz", _fake_import_fitz)
     monkeypatch.setattr(PDFWriteFormAction, "_index_widgets", _fake_index_widgets)
     monkeypatch.setattr(PDFWriteFormAction, "_write_field_to_widgets", _fake_write_field_to_widgets)
     monkeypatch.setattr(PDFWriteFormAction, "_save_document", _fake_save_document)
@@ -558,8 +559,8 @@ def test_write_button_group_integration_applies_expected_widget_states():
 
     applied_state = writer._write_button_group([widget_no, widget_yes], "nein")
     assert applied_state.lower() == "nein"
-    assert writer._normalize_state_name(widget_no.field_value).lower() == "nein"
-    assert writer._normalize_state_name(widget_yes.field_value).lower() == "off"
+    assert normalize_state_name(widget_no.field_value).lower() == "nein"
+    assert normalize_state_name(widget_yes.field_value).lower() == "off"
     assert widget_no.update_calls == 1
     assert widget_yes.update_calls == 1
 

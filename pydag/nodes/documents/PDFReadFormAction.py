@@ -13,73 +13,20 @@ from ..BufferNode import BufferNode
 from ..NodeException import NodeException
 
 
-def generate_llm_prompt(extracted_fields: list[dict[str, Any]]) -> str:
-    """Build a strict bridge prompt for form-filling LLM calls.
+from __future__ import annotations
 
-    The prompt enforces JSON-only output and key fidelity to PDF field names.
-    """
-    if len(extracted_fields) == 0:
-        return "Return only this JSON object: {\"field_updates\": []}"
+from dataclasses import dataclass, field
+import json
+import re
+from typing import Any
 
-    lines: list[str] = [
-        "You are a form-filling assistant.",
-        "Answer each generated_question using the provided RAG context.",
-        "Do not infer business meaning from internal_field_id alone; generated_question and question_context are authoritative.",
-        "Treat current field values and visible example values from the PDF as untrusted local hints only.",
-        "If retrieved context conflicts with prefilled PDF content, prefer the retrieved context.",
-        "Return JSON only (no markdown, no code fences, no explanations).",
-        "Return exactly one object with key field_updates (array).",
-        "Each field update item must contain internal_field_id plus either value (text/list fields) or selected_state (checkbox/radio fields).",
-        "For checkbox/radio, selected_state must be one of button_states.",
-        "If context implies yes/no and button_states are non-obvious, map to the closest valid state token.",
-        "If uncertain for a button field, use selected_state as an empty string.",
-        "",
-        "Fields:",
-    ]
-
-    template_updates: list[dict[str, str]] = []
-    for idx, field_payload in enumerate(extracted_fields, start=1):
-        internal_field_id = str(
-            field_payload.get("internal_field_id", field_payload.get("write_target_field_id", field_payload.get("field_name", "")))
-        ).strip()
-        field_type = str(field_payload.get("field_type", "")).strip()
-        generated_question = str(field_payload.get("generated_question", "")).strip()
-        question_context = str(field_payload.get("question_context", field_payload.get("context_signature", ""))).strip()
-        button_states_value = field_payload.get("button_states", [])
-        button_states = button_states_value if isinstance(button_states_value, list) else []
-        answer_key = "selected_state" if field_type in {"checkbox", "radio"} else "value"
-        lines.append(
-            f'{idx}. internal_field_id="{internal_field_id}" | type="{field_type}" | answer_key="{answer_key}" '
-            f'| generated_question="{generated_question}" | question_context="{question_context}" '
-            f'| button_states={json.dumps(button_states, ensure_ascii=True)}'
-        )
-        if internal_field_id == "":
-            continue
-        if field_type in {"checkbox", "radio"}:
-            template_updates.append(
-                {
-                    "internal_field_id": internal_field_id,
-                    "selected_state": "<one_of_button_states_or_empty>",
-                }
-            )
-        else:
-            template_updates.append(
-                {
-                    "internal_field_id": internal_field_id,
-                    "value": "<determined_value>",
-                }
-            )
-
-    template = {"field_updates": template_updates}
-
-    lines.extend(
-        [
-            "",
-            "Return JSON with exactly this shape and no extra top-level keys:",
-            json.dumps(template, ensure_ascii=True, indent=2),
-        ]
-    )
-    return "\n".join(lines)
+from ...agents.Agent import Agent
+from ...buffers.DictBuffer import DictBuffer
+from ...utils.FileUtils import FileUtils
+from ..Action import Action
+from ..BufferNode import BufferNode
+from ..NodeException import NodeException
+from . import _pdf_utils
 
 
 @dataclass
@@ -126,6 +73,75 @@ class PDFReadFormAction(BufferNode, Action):
         default=140.0,
         metadata={"description": "padding in points around a field rectangle for selecting nearby page context text"},
     )
+
+    @staticmethod
+    def generate_llm_prompt(extracted_fields: list[dict[str, Any]]) -> str:
+        """Build a strict bridge prompt for form-filling LLM calls.
+    
+        The prompt enforces JSON-only output and key fidelity to PDF field names.
+        """
+        if len(extracted_fields) == 0:
+            return 'Return only this JSON object: {"field_updates": []}'
+    
+        lines: list[str] = [
+            "You are a form-filling assistant.",
+            "Answer each generated_question using the provided RAG context.",
+            "Do not infer business meaning from internal_field_id alone; generated_question and question_context are authoritative.",
+            "Treat current field values and visible example values from the PDF as untrusted local hints only.",
+            "If retrieved context conflicts with prefilled PDF content, prefer the retrieved context.",
+            "Return JSON only (no markdown, no code fences, no explanations).",
+            "Return exactly one object with key field_updates (array).",
+            "Each field update item must contain internal_field_id plus either value (text/list fields) or selected_state (checkbox/radio fields).",
+            "For checkbox/radio, selected_state must be one of button_states.",
+            "If context implies yes/no and button_states are non-obvious, map to the closest valid state token.",
+            "If uncertain for a button field, use selected_state as an empty string.",
+            "",
+            "Fields:",
+        ]
+    
+        template_updates: list[dict[str, str]] = []
+        for idx, field_payload in enumerate(extracted_fields, start=1):
+            internal_field_id = str(
+                field_payload.get("internal_field_id", field_payload.get("write_target_field_id", field_payload.get("field_name", "")))
+            ).strip()
+            field_type = str(field_payload.get("field_type", "")).strip()
+            generated_question = str(field_payload.get("generated_question", "")).strip()
+            question_context = str(field_payload.get("question_context", field_payload.get("context_signature", ""))).strip()
+            button_states_value = field_payload.get("button_states", [])
+            button_states = button_states_value if isinstance(button_states_value, list) else []
+            answer_key = "selected_state" if field_type in {"checkbox", "radio"} else "value"
+            lines.append(
+                f'{idx}. internal_field_id="{internal_field_id}" | type="{field_type}" | answer_key="{answer_key}" '
+                f'| generated_question="{generated_question}" | question_context="{question_context}" '
+                f'| button_states={json.dumps(button_states, ensure_ascii=True)}'
+            )
+            if internal_field_id == "":
+                continue
+            if field_type in {"checkbox", "radio"}:
+                template_updates.append(
+                    {
+                        "internal_field_id": internal_field_id,
+                        "selected_state": "<one_of_button_states_or_empty>",
+                    }
+                )
+            else:
+                template_updates.append(
+                    {
+                        "internal_field_id": internal_field_id,
+                        "value": "<determined_value>",
+                    }
+                )
+    
+        template = {"field_updates": template_updates}
+    
+        lines.extend(
+            [
+                "",
+                "Return JSON with exactly this shape and no extra top-level keys:",
+                json.dumps(template, ensure_ascii=True, indent=2),
+            ]
+        )
+        return "\n".join(lines)
 
     def _on_install(self, agent: Agent = None):
         BufferNode._on_install(self, agent)
@@ -174,7 +190,7 @@ class PDFReadFormAction(BufferNode, Action):
 
         rows: list[dict[str, Any]] = []
         for field_row in row_fields:
-            prompt = generate_llm_prompt(field_row) if self.include_bridge_prompt else ""
+            prompt = self.generate_llm_prompt(field_row) if self.include_bridge_prompt else ""
             row = dict(
                 zip(
                     self.output_keys,
@@ -208,7 +224,7 @@ class PDFReadFormAction(BufferNode, Action):
         raise NodeException("unsupported parent data type for file path extraction: " + str(type(value)))
 
     def _read_pdf(self, file_path: str) -> dict[str, Any]:
-        fitz = self._import_fitz()
+        fitz = _pdf_utils.import_fitz()
         try:
             document = fitz.open(file_path)
         except Exception as exc:
@@ -221,7 +237,7 @@ class PDFReadFormAction(BufferNode, Action):
 
             for page_index in range(document.page_count):
                 page = document.load_page(page_index)
-                page_text = self._clean_text(page.get_text("text"))
+                page_text = _pdf_utils.clean_text(page.get_text("text"))
                 if page_text != "":
                     full_text_parts.append(page_text)
 
@@ -272,9 +288,9 @@ class PDFReadFormAction(BufferNode, Action):
             return None
 
         tooltip = self._resolve_tooltip(document, widget)
-        field_type = self._classify_widget_type(widget, fitz)
+        field_type = _pdf_utils.classify_widget_type(widget, fitz)
         is_writable = self._is_writable_widget(widget, field_type)
-        button_states = self._collect_button_states(widget)
+        button_states = _pdf_utils.collect_button_states(widget)
         if field_type in {"checkbox", "radio"}:
             visual_label = self._sanitize_label_text(self._infer_visual_label(rect, words, fitz))
         else:
@@ -338,7 +354,7 @@ class PDFReadFormAction(BufferNode, Action):
             for key, value in raw.items():
                 if value is None:
                     continue
-                cleaned = self._clean_text(str(value))
+                cleaned = _pdf_utils.clean_text(str(value))
                 if cleaned == "":
                     continue
                 metadata[str(key)] = cleaned
@@ -350,7 +366,7 @@ class PDFReadFormAction(BufferNode, Action):
         for row in words_raw:
             if len(row) < 5:
                 continue
-            text = self._clean_text(str(row[4]))
+            text = _pdf_utils.clean_text(str(row[4]))
             if text == "":
                 continue
             rect = fitz.Rect(float(row[0]), float(row[1]), float(row[2]), float(row[3]))
@@ -363,7 +379,7 @@ class PDFReadFormAction(BufferNode, Action):
         for row in blocks_raw:
             if len(row) < 5:
                 continue
-            text = self._clean_text(str(row[4]))
+            text = _pdf_utils.clean_text(str(row[4]))
             if text == "":
                 continue
             rect = fitz.Rect(float(row[0]), float(row[1]), float(row[2]), float(row[3]))
@@ -371,13 +387,13 @@ class PDFReadFormAction(BufferNode, Action):
         return blocks
 
     def _resolve_field_name(self, document: Any, widget: Any) -> str:
-        direct = self._clean_text(str(getattr(widget, "field_name", "") or ""))
+        direct = _pdf_utils.clean_text(str(getattr(widget, "field_name", "") or ""))
         if direct != "":
             return direct
         return self._read_widget_pdf_key(document, widget, "T")
 
     def _resolve_tooltip(self, document: Any, widget: Any) -> str:
-        label = self._clean_text(str(getattr(widget, "field_label", "") or ""))
+        label = _pdf_utils.clean_text(str(getattr(widget, "field_label", "") or ""))
         if label != "":
             return label
         return self._read_widget_pdf_key(document, widget, "TU")
@@ -395,7 +411,7 @@ class PDFReadFormAction(BufferNode, Action):
         text = str(raw_value).strip()
         if text.startswith("(") and text.endswith(")") and len(text) >= 2:
             text = text[1:-1]
-        return self._clean_text(text)
+        return _pdf_utils.clean_text(text)
 
     def _to_rect(self, widget: Any, fitz: Any) -> Any | None:
         rect = getattr(widget, "rect", None)
@@ -406,107 +422,12 @@ class PDFReadFormAction(BufferNode, Action):
         except Exception:
             return None
 
-    def _classify_widget_type(self, widget: Any, fitz: Any) -> str:
-        code = getattr(widget, "field_type", None)
-        mapping = {
-            getattr(fitz, "PDF_WIDGET_TYPE_TEXT", object()): "text",
-            getattr(fitz, "PDF_WIDGET_TYPE_CHECKBOX", object()): "checkbox",
-            getattr(fitz, "PDF_WIDGET_TYPE_RADIOBUTTON", object()): "radio",
-            getattr(fitz, "PDF_WIDGET_TYPE_COMBOBOX", object()): "dropdown",
-            getattr(fitz, "PDF_WIDGET_TYPE_LISTBOX", object()): "listbox",
-            getattr(fitz, "PDF_WIDGET_TYPE_SIGNATURE", object()): "signature",
-        }
-        if code in mapping:
-            return mapping[code]
-
-        type_string = str(getattr(widget, "field_type_string", "") or "").lower()
-        if "text" in type_string:
-            return "text"
-        if "check" in type_string:
-            return "checkbox"
-        if "radio" in type_string:
-            return "radio"
-        if "combo" in type_string:
-            return "dropdown"
-        if "list" in type_string:
-            return "listbox"
-        if "sign" in type_string:
-            return "signature"
-
-        if code == getattr(fitz, "PDF_WIDGET_TYPE_BUTTON", object()):
-            if self._is_push_button(widget):
-                return "unknown"
-            return "checkbox"
-        return "unknown"
-
-    def _is_push_button(self, widget: Any) -> bool:
-        try:
-            flags = int(getattr(widget, "field_flags", 0) or 0)
-        except Exception:
-            flags = 0
-        return (flags & 65536) != 0
-
     def _is_writable_widget(self, widget: Any, field_type: str) -> bool:
         if field_type in {"text", "checkbox", "radio", "dropdown", "listbox"}:
-            if field_type in {"checkbox", "radio"} and self._is_push_button(widget):
+            if field_type in {"checkbox", "radio"} and _pdf_utils.is_push_button(widget):
                 return False
             return True
         return False
-
-    def _collect_button_states(self, widget: Any) -> list[str]:
-        states: list[str] = []
-
-        if hasattr(widget, "button_states"):
-            try:
-                raw_states = widget.button_states()
-                states.extend(self._flatten_state_values(raw_states))
-            except Exception:
-                pass
-
-        if hasattr(widget, "on_state"):
-            try:
-                on_state = widget.on_state()
-                if on_state is not None:
-                    states.append(str(on_state))
-            except Exception:
-                pass
-
-        normalized: list[str] = []
-        seen: set[str] = set()
-        for state in states:
-            cleaned = self._normalize_state_name(state)
-            if cleaned == "":
-                continue
-            lowered = cleaned.lower()
-            if lowered in seen:
-                continue
-            seen.add(lowered)
-            normalized.append(cleaned)
-
-        if "off" not in {item.lower() for item in normalized}:
-            normalized.append("Off")
-        return normalized
-
-    def _flatten_state_values(self, raw: Any) -> list[str]:
-        if raw is None:
-            return []
-        if isinstance(raw, dict):
-            flat: list[str] = []
-            for value in raw.values():
-                flat.extend(self._flatten_state_values(value))
-            return flat
-        if isinstance(raw, (list, tuple, set)):
-            flat = []
-            for value in raw:
-                flat.extend(self._flatten_state_values(value))
-            return flat
-        return [str(raw)]
-
-    def _normalize_state_name(self, value: Any) -> str:
-        text = self._clean_text(str(value))
-        if text.startswith("/"):
-            text = text[1:]
-        return text
 
     def _normalize_field_value(self, value: Any) -> Any:
         if value is None:
@@ -518,7 +439,7 @@ class PDFReadFormAction(BufferNode, Action):
             return value
         if isinstance(value, bytes):
             return value.decode("utf-8", errors="ignore")
-        return self._clean_text(str(value))
+        return _pdf_utils.clean_text(str(value))
 
     def _infer_text_visual_label(self, field_rect: Any, words: list[dict[str, Any]], fitz: Any) -> str:
         left_label = self._sanitize_label_text(self._infer_label_left_of_field(field_rect, words, fitz))
@@ -600,7 +521,7 @@ class PDFReadFormAction(BufferNode, Action):
             tail.append(item)
             last_x = float(item["rect"].x0)
         tail.reverse()
-        return self._clean_text(" ".join([item["text"] for item in tail]))
+        return _pdf_utils.clean_text(" ".join([item["text"] for item in tail]))
 
     def _join_best_line(self, candidates: list[dict[str, Any]]) -> str:
         ordered = sorted(candidates, key=lambda item: float(item["score"]))
@@ -610,7 +531,7 @@ class PDFReadFormAction(BufferNode, Action):
             item for item in ordered if abs(((item["rect"].y0 + item["rect"].y1) / 2.0) - anchor_y) <= 4.5
         ]
         line_words.sort(key=lambda item: float(item["rect"].x0))
-        return self._clean_text(" ".join([item["text"] for item in line_words]))
+        return _pdf_utils.clean_text(" ".join([item["text"] for item in line_words]))
 
     def _overlap_ratio(self, rect_a: Any, rect_b: Any) -> float:
         try:
@@ -662,7 +583,7 @@ class PDFReadFormAction(BufferNode, Action):
             if abs(((item["rect"].y0 + item["rect"].y1) / 2.0) - ((anchor_rect.y0 + anchor_rect.y1) / 2.0)) <= 4.5
         ]
         line_words.sort(key=lambda item: float(item["rect"].x0))
-        return self._clean_text(" ".join([item["text"] for item in line_words]))
+        return _pdf_utils.clean_text(" ".join([item["text"] for item in line_words]))
 
     def _infer_page_context(self, field_rect: Any, blocks: list[dict[str, Any]], fitz: Any) -> str:
         padding = float(self.context_search_padding)
@@ -677,7 +598,7 @@ class PDFReadFormAction(BufferNode, Action):
         near_candidates: list[dict[str, Any]] = []
         for block in blocks:
             block_rect = block["rect"]
-            text = self._clean_text(str(block.get("text", "")))
+            text = _pdf_utils.clean_text(str(block.get("text", "")))
             if self._is_context_noise(text):
                 continue
             if self._overlap_ratio(block_rect, field_rect) > 0.20:
@@ -737,7 +658,7 @@ class PDFReadFormAction(BufferNode, Action):
             return fallback_label
 
         line_words.sort(key=lambda item: float(item["rect"].x0))
-        return self._clean_text(" ".join([item["text"] for item in line_words]))
+        return _pdf_utils.clean_text(" ".join([item["text"] for item in line_words]))
 
     def _infer_question_text(self, field_rect: Any, blocks: list[dict[str, Any]], fitz: Any) -> str:
         left = float(field_rect.x0) - 260.0
@@ -752,7 +673,7 @@ class PDFReadFormAction(BufferNode, Action):
             overlap = min(block_rect.x1, right) - max(block_rect.x0, left)
             if overlap < -8.0:
                 continue
-            text = self._clean_text(str(block.get("text", "")))
+            text = _pdf_utils.clean_text(str(block.get("text", "")))
             if self._is_context_noise(text):
                 continue
             distance = field_rect.y0 - block_rect.y1
@@ -760,7 +681,7 @@ class PDFReadFormAction(BufferNode, Action):
 
         candidates.sort(key=lambda item: float(item["distance"]))
         for item in candidates:
-            text = self._clean_text(item["text"])
+            text = _pdf_utils.clean_text(item["text"])
             if text == "":
                 continue
             if re.match(r"^\d+\s+\S+", text) and len(text) < 120:
@@ -786,20 +707,20 @@ class PDFReadFormAction(BufferNode, Action):
             distance = field_rect.y0 - block_rect.y1
             if distance > 260.0:
                 continue
-            text = self._clean_text(str(block.get("text", "")))
+            text = _pdf_utils.clean_text(str(block.get("text", "")))
             if self._is_context_noise(text):
                 continue
             candidates.append({"text": text, "distance": distance})
 
         candidates.sort(key=lambda item: float(item["distance"]))
         for item in candidates:
-            text = self._clean_text(item["text"])
+            text = _pdf_utils.clean_text(item["text"])
             if text == "":
                 continue
             if self._looks_like_section_header(text):
                 return self._truncate_context(text, max_len=180)
         for item in candidates:
-            text = self._clean_text(item["text"])
+            text = _pdf_utils.clean_text(item["text"])
             if text == "":
                 continue
             if len(text) <= 120:
@@ -819,7 +740,7 @@ class PDFReadFormAction(BufferNode, Action):
         signature_parts: list[str] = []
         seen: set[str] = set()
         for piece in pieces:
-            cleaned = self._clean_text(piece)
+            cleaned = _pdf_utils.clean_text(piece)
             if cleaned == "":
                 continue
             lowered = cleaned.lower()
@@ -874,21 +795,21 @@ class PDFReadFormAction(BufferNode, Action):
 
     def _first_non_empty(self, *values: str) -> str:
         for value in values:
-            cleaned = self._clean_text(str(value))
+            cleaned = _pdf_utils.clean_text(str(value))
             if cleaned != "" and not self._is_placeholder_text(cleaned):
                 return cleaned
         return ""
 
     def _sanitize_label_text(self, text: str) -> str:
-        clean = self._clean_text(text)
+        clean = _pdf_utils.clean_text(text)
         if self._is_placeholder_text(clean):
             return ""
         clean = clean.strip(" -;,.")
         clean = re.sub(r"^[>\-\u2022\u25cf\u25ba\u00da]+\s*", "", clean)
         if ":" in clean:
             prefix, suffix = clean.split(":", 1)
-            prefix = self._clean_text(prefix)
-            suffix = self._clean_text(suffix)
+            prefix = _pdf_utils.clean_text(prefix)
+            suffix = _pdf_utils.clean_text(suffix)
             if prefix != "" and self._looks_like_inline_value(suffix):
                 clean = prefix
         clean = re.sub(r"\s{2,}", " ", clean).strip(" -:;,.")
@@ -901,7 +822,7 @@ class PDFReadFormAction(BufferNode, Action):
         return clean
 
     def _is_specific_field_label(self, text: str) -> bool:
-        clean = self._clean_text(text)
+        clean = _pdf_utils.clean_text(text)
         if clean == "":
             return False
         if self._is_context_noise(clean):
@@ -911,7 +832,7 @@ class PDFReadFormAction(BufferNode, Action):
         return len(clean) <= 80
 
     def _looks_like_inline_value(self, text: str) -> bool:
-        clean = self._clean_text(text)
+        clean = _pdf_utils.clean_text(text)
         if clean == "":
             return False
         if re.search(r"\d", clean):
@@ -924,23 +845,23 @@ class PDFReadFormAction(BufferNode, Action):
         return False
 
     def _is_context_noise(self, text: str) -> bool:
-        clean = self._clean_text(text)
+        clean = _pdf_utils.clean_text(text)
         if self._is_placeholder_text(clean):
             return True
         if re.fullmatch(r"[0-9 ]+", clean):
             return True
         if clean.startswith(">>>"):
             return True
-        folded = self._ascii_fold(clean.lower())
+        folded = _pdf_utils.ascii_fold(clean.lower())
         if folded in {"ja", "nein", "off", "ledig", "verheiratet", "verwitwet", "geschieden", "weitere", "nach"}:
             return True
         return False
 
     def _looks_like_section_header(self, text: str) -> bool:
-        clean = self._clean_text(text)
+        clean = _pdf_utils.clean_text(text)
         if self._is_placeholder_text(clean):
             return False
-        folded = self._ascii_fold(clean)
+        folded = _pdf_utils.ascii_fold(clean)
         if re.match(r"^\d{1,2}\s+[A-Za-z]", folded):
             return True
         return False
@@ -955,11 +876,11 @@ class PDFReadFormAction(BufferNode, Action):
         section_header: str,
         page_context: str,
     ) -> str:
-        folded_id = self._ascii_fold(str(internal_field_id).lower())
-        primary = self._ascii_fold(
+        folded_id = _pdf_utils.ascii_fold(str(internal_field_id).lower())
+        primary = _pdf_utils.ascii_fold(
             " | ".join([str(tooltip), str(visual_label), str(option_text)]).lower()
         )
-        secondary = self._ascii_fold(
+        secondary = _pdf_utils.ascii_fold(
             " | ".join([str(question_text), str(section_header), str(page_context)]).lower()
         )
 
@@ -975,22 +896,22 @@ class PDFReadFormAction(BufferNode, Action):
         return ""
 
     def _match_semantic_subject(self, folded: str, field_scope: str = "") -> str:
-        scope = self._ascii_fold(str(field_scope).lower())
+        scope = _pdf_utils.ascii_fold(str(field_scope).lower())
         if folded == "":
             return ""
         return ""
 
     def _clean_for_question(self, text: str) -> str:
-        cleaned = self._clean_text(text)
+        cleaned = _pdf_utils.clean_text(text)
         cleaned = cleaned.strip(" -:;,.")
         return cleaned
 
     def _is_placeholder_text(self, text: str) -> bool:
-        lowered = self._clean_text(str(text)).strip().lower()
+        lowered = _pdf_utils.clean_text(str(text)).strip().lower()
         return lowered in {"", "null", "none", "nan", "n/a", "na", "off", "-", "--"}
 
     def _extract_context_markers(self, context_signature: str) -> list[str]:
-        folded = self._ascii_fold(context_signature.lower())
+        folded = _pdf_utils.ascii_fold(context_signature.lower())
         tokens = re.findall(r"[a-z0-9]{3,}", folded)
         markers: list[str] = []
         seen: set[str] = set()
@@ -1001,26 +922,8 @@ class PDFReadFormAction(BufferNode, Action):
             markers.append(token)
         return markers[:24]
 
-    def _ascii_fold(self, text: str) -> str:
-        folded = text.replace("ä", "ae").replace("ö", "oe").replace("ü", "ue").replace("ß", "ss")
-        folded = folded.replace("Ä", "ae").replace("Ö", "oe").replace("Ü", "ue")
-        return folded
-
     def _truncate_context(self, text: str, max_len: int = 220) -> str:
-        clean = self._clean_text(text)
+        clean = _pdf_utils.clean_text(text)
         if len(clean) <= max_len:
             return clean
         return clean[:max_len].rstrip() + "..."
-
-    def _clean_text(self, text: str) -> str:
-        return " ".join(str(text).split())
-
-    def _import_fitz(self):
-        try:
-            import fitz  # type: ignore
-
-            return fitz
-        except Exception as exc:
-            raise NodeException(
-                "PyMuPDF (fitz) is required for PDFReadFormAction. Install dependency 'PyMuPDF'."
-            ) from exc
