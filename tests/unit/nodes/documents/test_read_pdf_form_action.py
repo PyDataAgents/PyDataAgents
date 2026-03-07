@@ -29,7 +29,8 @@ if "graphviz" not in sys.modules:
 from pydag.buffers.ListBuffer import ListBuffer
 from pydag.nodes.NodeException import NodeException
 from pydag.nodes.buffers.LinkBufferAction import LinkBufferAction
-from pydag.nodes.documents.PDFReadFormAction import PDFReadFormAction, generate_llm_prompt
+from pydag.nodes.documents.PDFReadFormAction import PDFReadFormAction
+
 
 
 def _test_pdf_file() -> str:
@@ -199,7 +200,7 @@ def test_generate_llm_prompt_includes_exact_json_key_template():
             "button_states": ["nein", "Ja", "Off"],
         },
     ]
-    prompt = generate_llm_prompt(payload)
+    prompt = PDFReadFormAction.generate_llm_prompt(payload)
     assert "kasse" in prompt
     assert "dienstverh" in prompt
     assert "internal_field_id" in prompt
