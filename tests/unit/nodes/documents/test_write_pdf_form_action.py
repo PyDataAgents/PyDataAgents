@@ -37,9 +37,9 @@ from pydag.nodes.NodeException import NodeException
 from pydag.nodes.buffers.LinkBufferAction import LinkBufferAction
 from pydag.nodes.documents.PDFReadFormAction import PDFReadFormAction
 from pydag.nodes.documents.PDFWriteFormAction import PDFWriteFormAction
-from pydag.nodes.documents._pdf_utils import normalize_state_name
 from pydag.nodes.llm.LLMChatAction import LLMChatAction
 from pydag.services.llm.RAGService import RAGService
+from pydag.utils.PDFUtils import normalize_state_name
 
 
 def _test_pdf_file() -> str:
