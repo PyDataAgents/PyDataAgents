@@ -107,13 +107,13 @@ class FileUtils:
                 ]
 
             if len(files) == 0:
-                return None
+                return []
             else:   
                 return files
             
         else:
             logger.error("Folder " + folder + " does not exist")
-            return None
+            return []
         
     @staticmethod
     def get_folder_bytes(folder : str) -> float:

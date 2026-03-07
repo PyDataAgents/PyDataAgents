@@ -11,3 +11,4 @@ class ThreadType(str, enum.Enum):
     TRIGGERED = "TRIGGERED"
     DATETIME = "DATETIME"
     DAYTIME = "DAYTIME"
+    EXPONENTIAL_SECOND = "EXPONENTIAL_SECOND"   # interval is doubling every time, starting with 1 second by default

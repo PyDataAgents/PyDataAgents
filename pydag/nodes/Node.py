@@ -17,6 +17,7 @@ class Node(AgentElement):
         self._children : list[Node] = list()
         self._is_active : bool = True
         self._state : Union[AgentElementState, NodeState] = AgentElementState.UNINSTALLED
+        self._last_activation : int = 0
       
     def add_child(self, child : Node):
         self._children.append(child)
@@ -69,3 +70,6 @@ class Node(AgentElement):
             if node.id == id:
                 return True
         return False
+    
+    def get_last_activation(self) -> int:
+        return self._last_activation

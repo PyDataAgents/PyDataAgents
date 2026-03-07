@@ -1,8 +1,8 @@
 from abc import abstractmethod
+import time
 
-from pydag.agents.AgentStates import NodeState
 
-
+from ..agents.AgentStates import NodeState
 from .Node import Node
 
 
@@ -15,6 +15,7 @@ class Action(Node):
         self._state = NodeState.EXECUTING
         self._on_execute()
         self._state = NodeState.IDLE
+        self._last_activation = time.time_ns()
         
         
     @abstractmethod
