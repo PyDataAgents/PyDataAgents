@@ -309,6 +309,73 @@ def test_write_pdf_form_rejects_non_pdf_input_when_extension_required(tmp_path):
         writer.execute()
 
 
+def test_write_pdf_form_install_rejects_duplicate_fill_input_keys():
+    writer = PDFWriteFormAction(fill_input_keys=["answer", "answer"])
+    with pytest.raises(NodeException, match="fill_input_keys must contain unique entries"):
+        writer.install()
+
+
+def test_write_pdf_form_install_rejects_duplicate_output_keys():
+    writer = PDFWriteFormAction(output_keys=["filepath", "filepath", "written_fields", "written_field_count"])
+    with pytest.raises(NodeException, match="output_keys must contain unique entries"):
+        writer.install()
+
+
+def test_write_pdf_form_rejects_output_path_that_matches_source_pdf():
+    path_buf = ListBuffer(id="B_PDFWRITE_PATHS_SAME_OUT")
+    path_buf.install()
+    path_buf.push(_test_pdf_file())
+    path_parent = _link_buffer(path_buf)
+
+    payload_buf = DictBuffer(id="B_PDFWRITE_PAYLOAD_SAME_OUT")
+    payload_buf.install()
+    payload_buf.push({"answer": ['{"field_updates":[{"internal_field_id":"kasse","value":"DAK"}]}']})
+    payload_parent = _link_buffer(payload_buf)
+
+    writer = PDFWriteFormAction(
+        path_input_keys=["values"],
+        fill_input_keys=["answer"],
+        output_folder=None,
+        output_suffix="",
+    )
+    writer.add_parent(path_parent)
+    writer.add_parent(payload_parent)
+    writer.install()
+
+    with pytest.raises(NodeException, match="output path resolves to the source PDF"):
+        writer.execute()
+
+
+def test_write_pdf_form_rejects_non_mapping_field_values_after_resolution(monkeypatch):
+    pdf_file = _test_pdf_file()
+
+    path_buf = ListBuffer(id="B_PDFWRITE_PATHS_BAD_PAYLOAD")
+    path_buf.install()
+    path_buf.push(pdf_file)
+    path_parent = _link_buffer(path_buf)
+
+    payload_buf = DictBuffer(id="B_PDFWRITE_PAYLOAD_BAD_PAYLOAD")
+    payload_buf.install()
+    payload_buf.push({"answer": ['{"field_updates":[{"internal_field_id":"kasse","value":"DAK"}]}']})
+    payload_parent = _link_buffer(payload_buf)
+
+    monkeypatch.setattr(PDFWriteFormAction, "_extract_payloads_by_path", lambda self, _data: {pdf_file: ["bad"]})
+    monkeypatch.setattr(PDFWriteFormAction, "_extract_fill_payloads", lambda self, _data: [])
+
+    writer = PDFWriteFormAction(
+        path_input_keys=["values"],
+        fill_input_keys=["answer"],
+        output_folder=_output_folder(),
+        output_suffix="_ut_bad_payload_",
+    )
+    writer.add_parent(path_parent)
+    writer.add_parent(payload_parent)
+    writer.install()
+
+    with pytest.raises(NodeException, match="field_values must be a mapping"):
+        writer.execute()
+
+
 def test_write_pdf_form_writes_checkbox_and_radio_states():
     path_buf = ListBuffer(id="B_PDFWRITE_PATHS_BTN")
     path_buf.install()
