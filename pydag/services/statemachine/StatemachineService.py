@@ -2,7 +2,6 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import TYPE_CHECKING
-from graphviz import Digraph
 from loguru import logger
 
 
@@ -100,6 +99,12 @@ class StatemachineService(ObserverService):
             icon_dir: Folder containing icon images named after node class
         """
         if FileUtils.check_path("dot"):
+            try:
+                from graphviz import Digraph
+            except ModuleNotFoundError:
+                logger.error("The Python package 'graphviz' is not installed. Node graph cannot be rendered.")
+                return
+
             icon_dir = Path(icon_dir)
             dot = Digraph(
                 name="ServiceGraph",

@@ -2,7 +2,6 @@ from dataclasses import dataclass, field
 from typing import Dict, Tuple
 import os
 import torch
-from tirex import load_model, ForecastModel
 
 
 from ...agents.Agent import Agent
@@ -22,7 +21,7 @@ class TirexExtractor(LearningNode):
     
     def __post_init__(self):
         super().__post_init__()
-        self._models : ForecastModel = None
+        self._models = None
         if torch.cuda.is_available():
             os.environ["TIREX_NO_CUDA"] = "0"
         else: 
@@ -30,7 +29,9 @@ class TirexExtractor(LearningNode):
         
     def _on_install(self, agent : Agent = None):
         super()._on_install(agent)
-        self._models : ForecastModel = load_model("NX-AI/TiRex", device="cuda" if torch.cuda.is_available() else "cpu")
+        from tirex import load_model
+
+        self._models = load_model("NX-AI/TiRex", device="cuda" if torch.cuda.is_available() else "cpu")
         
     def learn(self, data : dict, meta : dict = None) -> bool:
         return False

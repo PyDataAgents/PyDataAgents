@@ -115,6 +115,7 @@ Source = "https://github.com/PyDataAgents/PyDataAgents.git"
 [tool.pytest.ini_options]
 pythonpath = ["."]
 testpaths = ["tests"]
+addopts = "--import-mode=importlib"
 filterwarnings = [
     "ignore:Failed to initialize NumPy.*_ARRAY_API not found.*:UserWarning:transformers\\.cache_utils",
     "ignore:datetime\\.datetime\\.utcfromtimestamp\\(\\) is deprecated and scheduled for removal.*:DeprecationWarning:reactivex\\.internal\\.constants",

@@ -2,16 +2,6 @@ from dataclasses import dataclass, field
 import os
 from loguru import logger
 
-
-from unstructured.partition.xlsx import partition_xlsx
-from unstructured.partition.docx import partition_docx
-from unstructured.partition.html import partition_html
-from unstructured.partition.pdf import partition_pdf
-from unstructured.partition.email import partition_email
-from unstructured.partition.text import partition_text
-from unstructured.partition.pptx import partition_pptx
-from unstructured.partition.image import partition_image
-
 from ...adapters.AdapterException import AdapterException
 from ...adapters.ReadAdapter import ReadAdapter
 from ...agents.Agent import Agent
@@ -62,20 +52,36 @@ class DocumentTextAdapter(ReadAdapter):
             ext = ext.lower().replace(".", "")
             match ext:
                 case "xlsx":
-                    elements = partition_xlsx(file)                                
+                    from unstructured.partition.xlsx import partition_xlsx
+
+                    elements = partition_xlsx(file)
                 case "docx":
+                    from unstructured.partition.docx import partition_docx
+
                     elements = partition_docx(file)
                 case "txt" | "csv" | "json":
+                    from unstructured.partition.text import partition_text
+
                     elements = partition_text(file)
                 case "pptx":
+                    from unstructured.partition.pptx import partition_pptx
+
                     elements = partition_pptx(file)
                 case "pdf":
+                    from unstructured.partition.pdf import partition_pdf
+
                     elements = partition_pdf(file)
                 case "html":
+                    from unstructured.partition.html import partition_html
+
                     elements = partition_html(file)
                 case "msg":
+                    from unstructured.partition.email import partition_email
+
                     elements = partition_email(file)
                 case "jpg" | "jpeg" | "png":
+                    from unstructured.partition.image import partition_image
+
                     elements = partition_image(file)
                 case _:
                     logger.warning("File Extension " + ext + " is not supported")

@@ -2,7 +2,6 @@ from dataclasses import dataclass, field
 from typing import Dict, Tuple
 import numpy as np
 from scipy.stats import iqr
-from sktime.transformations.panel.summarize import RandomIntervalFeatureExtractor
 
 from ...agents.Agent import Agent
 from ..LearningNode import LearningNode
@@ -50,6 +49,8 @@ class RIFEExtractor(LearningNode):
             self.sample_length = self.MIN_SERIES_LENGTH
         super().__post_init__()
         self.learning_required = False  # No learning step
+        from sktime.transformations.panel.summarize import RandomIntervalFeatureExtractor
+
         self._ri_fe = RandomIntervalFeatureExtractor(
             n_intervals=64,
             features=[np.median, np.std, iqr, np.min, np.max],

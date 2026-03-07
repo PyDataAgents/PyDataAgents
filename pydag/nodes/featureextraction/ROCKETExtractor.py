@@ -1,6 +1,5 @@
 from dataclasses import dataclass, field
 from typing import Dict, Tuple
-from sktime.transformations.panel.rocket import Rocket
 import numpy as np
 
 from pydag.nodes.NodeException import NodeException
@@ -30,6 +29,8 @@ class ROCKETExtractor(LearningNode):
                 
     def _on_install(self, agent : Agent = None):
         super()._on_install(agent)
+        from sktime.transformations.panel.rocket import Rocket
+
         self._models = Rocket(num_kernels = self.num_of_kernels, n_jobs=-1, normalise=False, random_state=42) # We normalize the data in the LearningNode if required.
         
     

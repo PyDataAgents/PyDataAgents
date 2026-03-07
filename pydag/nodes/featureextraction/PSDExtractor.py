@@ -1,6 +1,5 @@
 from dataclasses import dataclass, field
 from typing import Dict, Tuple
-from chronos import ChronosPipeline, ChronosBoltPipeline
 import torch
 import os
 

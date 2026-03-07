@@ -1,6 +1,5 @@
 from dataclasses import dataclass, field
 from typing import Dict, Tuple
-from chronos import ChronosPipeline, ChronosBoltPipeline
 import torch
 import os
 
@@ -31,13 +30,15 @@ class ChronosExtractor(LearningNode):
 
     
     def _on_install(self, agent : Agent = None):
-        super()._on_install(agent)    
+        super()._on_install(agent)
+        from chronos import ChronosBoltPipeline, ChronosPipeline
+
         if "bolt" in self.model_name:
-            self._models : ChronosBoltPipeline = ChronosBoltPipeline.from_pretrained(self.model_name,
+            self._models = ChronosBoltPipeline.from_pretrained(self.model_name,
                                                                        device_map="cuda" if torch.cuda.is_available() else "cpu",
                                                                        torch_dtype=torch.bfloat16)
         else:
-            self._models : ChronosPipeline = ChronosPipeline.from_pretrained(self.model_name,
+            self._models = ChronosPipeline.from_pretrained(self.model_name,
                                                                        device_map="cuda" if torch.cuda.is_available() else "cpu",
                                                                        torch_dtype=torch.bfloat16)
 
