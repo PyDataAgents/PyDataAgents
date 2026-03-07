@@ -27,7 +27,7 @@ class PDFReadFormAction(BufferNode, Action):
     )
     output_keys: list[str] = field(
         default_factory=lambda: ["filepath", "metadata", "fields", "full_text_content", "llm_prompt"],
-        metadata={"description": "output columns for source path, metadata, extracted fields, page text and bridge prompt"},
+        metadata={"description": "output columns for source path, metadata, extracted fields, page text, and the llm_prompt bridge column used by downstream form-filling LLM steps; exactly 5 output_keys are mandatory, and llm_prompt must remain present even when include_bridge_prompt=False (it is then emitted as an empty string)"},
     )
     row_mode: str = field(
         default="per_pdf",

@@ -34,7 +34,7 @@ class PDFWriteFormAction(BufferNode, Action):
     )
     fill_input_keys: list[str] = field(
         default_factory=lambda: ["answer", "answers", "fields", "field_values", "llm_data", "content"],
-        metadata={"description": "parent buffer keys to scan for strict field_updates payloads"},
+        metadata={"description": "parent buffer keys to scan for strict field_updates payloads whose field values are the final PDF write instructions: each update uses internal_field_id plus either value for text/dropdown/list fields or selected_state for checkbox/radio fields"},
     )
     row_mode: str = field(
         default="per_pdf",
