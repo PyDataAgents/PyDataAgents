@@ -85,3 +85,11 @@ def test_050_empty_dict_parent_data():
     with pytest.raises(NodeException):
         sa.execute()
         assert sa.get_buffer().data() == {}, "Expected empty dict output when parent buffer returns empty dict, but got: " + str(sa.get_buffer().data())
+
+
+def test_install_rejects_duplicate_output_keys():
+    script_path = os.path.dirname(__file__) + os.sep + "script1.py"
+    sa = ScriptAction(script_path=script_path, input_keys=["values"], output_keys=["rms", "rms"])
+
+    with pytest.raises(NodeException, match="output_keys must contain unique entries"):
+        sa.install()

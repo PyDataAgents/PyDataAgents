@@ -24,7 +24,7 @@ class BufferNode(Node):
     def __post_init__(self):
         super().__post_init__()
         self._buffer : Buffer = None  # private property for the linked buffer instance
-        
+
     def _on_install(self, agent : Agent = None):
         """this `install` method connects a `Buffer` instance from specified `agent` based on given `buffer_id`
 

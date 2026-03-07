@@ -183,6 +183,56 @@ def test_read_pdf_form_install_raises_for_invalid_row_mode():
         reader.install()
 
 
+def test_read_pdf_form_install_rejects_duplicate_input_keys():
+    reader = PDFReadFormAction(input_keys=["values", "values"])
+    with pytest.raises(NodeException, match="input_keys must contain unique entries"):
+        reader.install()
+
+
+def test_read_pdf_form_install_rejects_duplicate_output_keys():
+    reader = PDFReadFormAction(output_keys=["filepath", "metadata", "fields", "fields", "llm_prompt"])
+    with pytest.raises(NodeException, match="output_keys must contain unique entries"):
+        reader.install()
+
+
+def test_read_pdf_form_wraps_runtime_processing_errors_as_node_exception(monkeypatch):
+    def _fake_import_fitz():
+        class _FakePage:
+            def get_text(self, _mode):
+                raise RuntimeError("page text extraction failed")
+
+        class _FakeDocument:
+            page_count = 1
+            metadata = {}
+
+            def load_page(self, _page_index):
+                return _FakePage()
+
+            def close(self):
+                return
+
+        class _FakeFitz:
+            @staticmethod
+            def open(_path):
+                return _FakeDocument()
+
+        return _FakeFitz()
+
+    monkeypatch.setattr("pydag.nodes.documents.PDFReadFormAction._pdf_utils.import_fitz", _fake_import_fitz)
+
+    path_buffer = ListBuffer(id="B_PDFREAD_RUNTIME_ERR")
+    path_buffer.install()
+    path_buffer.push(_test_pdf_file())
+
+    path_parent = _link_buffer(path_buffer)
+    reader = PDFReadFormAction(input_keys=["values"])
+    reader.add_parent(path_parent)
+    reader.install()
+
+    with pytest.raises(NodeException, match="could not read pdf file"):
+        reader.execute()
+
+
 def test_generate_llm_prompt_includes_exact_json_key_template():
     payload = [
         {

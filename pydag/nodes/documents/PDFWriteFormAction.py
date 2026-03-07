@@ -10,6 +10,7 @@ from typing import Any
 from ...agents.Agent import Agent
 from ...buffers.DictBuffer import DictBuffer
 from ...utils.FileUtils import FileUtils
+from ...utils.NodeUtils import NodeUtils
 from ...utils.PDFUtils import PDFUtils as _pdf_utils
 from ..Action import Action
 from ..BufferNode import BufferNode
@@ -73,16 +74,15 @@ class PDFWriteFormAction(BufferNode, Action):
         BufferNode._on_install(self, agent)
         if not isinstance(self._buffer, DictBuffer):
             raise NodeException("Only DictBuffer is supported for " + self.cname())
+        NodeUtils.validate_key_names("path_input_keys", self.path_input_keys)
+        NodeUtils.validate_key_names("fill_input_keys", self.fill_input_keys)
+        NodeUtils.validate_key_names("output_keys", self.output_keys)
         if len(self.output_keys) != 4:
             raise NodeException(f"{self.cname()} requires exactly 4 output_keys, got {len(self.output_keys)}")
         if self.row_mode not in {"per_pdf", "per_field"}:
             raise NodeException("row_mode must be either 'per_pdf' or 'per_field'")
         if self.overwrite_source and self.output_folder is not None:
             raise NodeException("output_folder cannot be set when overwrite_source=True")
-        if len(self.path_input_keys) == 0:
-            raise NodeException("path_input_keys must not be empty")
-        if len(self.fill_input_keys) == 0:
-            raise NodeException("fill_input_keys must not be empty")
 
     def _on_execute(self):
         parent_data = self.get_parent_data()
@@ -371,7 +371,12 @@ class PDFWriteFormAction(BufferNode, Action):
         source = Path(source_path)
         folder = source.parent if self.output_folder is None else Path(self.output_folder)
         output_name = source.stem + self.output_suffix + source.suffix
-        return str(folder / output_name)
+        output_path = str(folder / output_name)
+        if os.path.normcase(os.path.abspath(output_path)) == os.path.normcase(os.path.abspath(source_path)):
+            raise NodeException(
+                "output path resolves to the source PDF; set overwrite_source=True or change output_folder/output_suffix"
+            )
+        return output_path
 
     def _resolve_writable_field_values(
         self,
@@ -394,6 +399,8 @@ class PDFWriteFormAction(BufferNode, Action):
         return writable_values, unknown_fields
 
     def _write_pdf(self, source_path: str, output_path: str, field_values: dict[str, Any]) -> dict[str, Any]:
+        if not isinstance(field_values, dict):
+            raise NodeException("field_values must be a mapping of PDF field names to values")
         fitz = _pdf_utils.import_fitz()
         try:
             document = fitz.open(source_path)
@@ -433,7 +440,10 @@ class PDFWriteFormAction(BufferNode, Action):
         except Exception as exc:
             raise NodeException("could not write pdf file " + str(output_path)) from exc
         finally:
-            document.close()
+            try:
+                document.close()
+            except Exception:
+                pass
 
     def _index_widgets(self, document: Any) -> tuple[dict[str, list[Any]], list[Any]]:
         widgets_by_field: dict[str, list[Any]] = {}

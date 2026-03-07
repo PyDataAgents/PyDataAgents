@@ -1,4 +1,7 @@
+import pytest
+
 from pydag.buffers.DictBuffer import DictBuffer
+from pydag.nodes.NodeException import NodeException
 from pydag.nodes.buffers.FormattedStringAction import FormattedStringAction
 from pydag.nodes.buffers.LinkBufferAction import LinkBufferAction
 
@@ -96,4 +99,13 @@ def test_022():
     fsa.execute()
     
     print(fsa.get_buffer().data())
+
+
+def test_install_rejects_duplicate_input_keys():
+    fsa = FormattedStringAction()
+    fsa.input_keys = ["name", "name"]
+    fsa.template = "Hi {}, are you from {}"
+
+    with pytest.raises(NodeException, match="input_keys must contain unique entries"):
+        fsa.install()
     

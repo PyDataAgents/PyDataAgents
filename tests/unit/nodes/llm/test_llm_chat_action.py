@@ -120,6 +120,15 @@ def test_install_enforces_rag_service_only():
         action.install()
 
 
+def test_install_rejects_duplicate_output_keys():
+    service = _new_service()
+    action = LLMChatAction(output_keys=["question", "question"])
+    action.set_service(service)
+
+    with pytest.raises(NodeException, match="output_keys must contain unique entries"):
+        action.install()
+
+
 def test_execute_resolves_literals_for_all_runtime_arguments():
     """Ensure key-or-literal resolution supports literal question/instruction/retrieval_query/input_context."""
     service = _new_service()
