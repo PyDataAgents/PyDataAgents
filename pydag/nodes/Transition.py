@@ -1,4 +1,5 @@
 from abc import abstractmethod
+import time
 
 
 from ..agents.Agent import Agent
@@ -19,7 +20,8 @@ class Transition(Node):
     def check(self) -> bool:
         self._state = NodeState.EXECUTING
         result = self._on_check()
-        self._state = NodeState.IDLE    
+        self._state = NodeState.IDLE
+        self._last_activation = time.time_ns()    
         return result
       
     @abstractmethod

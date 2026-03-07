@@ -82,8 +82,8 @@ class ObserverThread():
         if len(self._observers) > 0:
             if not self._is_running:
                 # exclude TRIGGERED threads from being started
-                if self._thread_type is not ThreadType.TRIGGERED.value:
-                    with self._lock:                
+                if self._thread_type != ThreadType.TRIGGERED.value:
+                    with self._lock:
                         # important set running to True , so that the timed thread loops start running         
                         self._is_running = True                
                     if self._scheduler is not None:
