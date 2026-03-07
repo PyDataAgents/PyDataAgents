@@ -15,7 +15,7 @@ urllib3
 jsonpath-ng
 #python-snap7
 websocket-client
-#pyserial
+pyserial
 influxdb-client
 #pyodbc
 openpyxl
@@ -23,27 +23,28 @@ pypdf
 PyMuPDF
 unstructured[all-docs]
 watchdog
-#cadquery
+cadquery
 #cq-editor
-#vobject
+vobject
 psutil
 docxtpl
 bs4
 lxml
 selenium
-#msal
+msal
 #pdf2image
-#pytesseract
+pytesseract
 pillow
-#mistralai
+mistralai
 numba
 torch
 sktime
 seaborn
-#tirex-ts @ git+https://github.com/NX-AI/tirex
+tirex-ts @ git+https://github.com/NX-AI/tirex
 chronos-forecasting
 librosa
-#ross-rotordynamics
+ross-rotordynamics
+langgraph<1
 langchain-ollama
 langchain-chroma
 langchain-unstructured

@@ -1,5 +1,4 @@
 from dataclasses import dataclass, field
-from docxtpl import DocxTemplate
 
 from ...agents.Agent import Agent
 from ...utils.FileUtils import FileUtils
@@ -26,6 +25,8 @@ class DocxTemplateAction(BufferNode, Action):
     
     def _on_execute(self):
         if FileUtils.exists_file(self.template_path):
+            from docxtpl import DocxTemplate
+
             doc = DocxTemplate(self.template_path)
             context = {}
             if self._buffer is not None:

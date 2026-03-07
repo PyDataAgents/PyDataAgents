@@ -3,7 +3,6 @@ from datetime import datetime, timezone
 import uuid
 from zoneinfo import ZoneInfo
 import pytz
-import vobject
 
 from ..NodeException import NodeException
 from ...utils.FileUtils import FileUtils
@@ -31,6 +30,8 @@ class ICalAction(BufferNode, Action):
         data = self._buffer.data(persistent=False)
         
         if self.name_key in data and self.start_key in data and self.end_key in data:
+            import vobject
+
             calendar = vobject.iCalendar()
             e = len(data[self.name_key])
             for i in range(0, e):

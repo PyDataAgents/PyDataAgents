@@ -3,7 +3,6 @@ import enum
 import time
 import webbrowser
 
-import msal
 import requests
 
 from ...services.documents.HttpHTMLService import HttpHTMLService
@@ -46,6 +45,8 @@ class MSGraphService(Service):
         self._scope = [GRAPH_DEFAULT_SCOPE_URL] if self.msgraph_type == MSGraphType.CLIENT.value else ["User.Read"]
         if self.msgraph_type == MSGraphType.CLIENT.value and not self.client_secret:
             raise ServiceException("Client secret is required for client credentials flow")
+        import msal
+
         if self.msgraph_type == MSGraphType.CLIENT.value:
             self._app = msal.ConfidentialClientApplication(
                 self.client_id,

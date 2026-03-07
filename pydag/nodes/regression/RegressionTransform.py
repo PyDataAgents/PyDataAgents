@@ -2,10 +2,7 @@ from dataclasses import dataclass, field
 from typing import Dict, Tuple
 import os
 import numpy as np
-from tirex import load_model, ForecastModel
 import torch
-from sktime.forecasting.chronos import ChronosForecaster
-from sktime.forecasting.base import ForecastingHorizon
 
 
 from ...utils.DataUtils import DataUtils
@@ -25,7 +22,7 @@ class RegressionTransform(LearningNode):
 
     def __post_init__(self):
         super().__post_init__()
-        self._models: ForecastModel = None
+        self._models = None
         if torch.cuda.is_available():
                 print(torch.cuda.get_device_name(0))
                 os.environ["TIREX_NO_CUDA"] = "0"
@@ -36,9 +33,17 @@ class RegressionTransform(LearningNode):
     def _on_install(self, agent : Agent = None):
         super()._on_install(agent)
         if self.model_name == "Tirex":
+            from tirex import load_model
+
             self._models = load_model("NX-AI/TiRex", device="cuda" if torch.cuda.is_available() else "cpu")
         elif self.model_name == "CHRONOS":
-            self._models : ChronosForecaster = ChronosForecaster(model_path="amazon/chronos-t5-tiny")
+            from chronos import ChronosPipeline
+
+            self._models = ChronosPipeline.from_pretrained(
+                "amazon/chronos-t5-tiny",
+                device_map="cuda" if torch.cuda.is_available() else "cpu",
+                torch_dtype=torch.bfloat16,
+            )
 
     def learn(self, data : dict, meta : dict = None) -> bool:
             self.learning_required = False
@@ -54,17 +59,25 @@ class RegressionTransform(LearningNode):
                 for i in range(fc.shape[0]):
                     forecast[self.__class__.__name__ + "-" + AgentConfig.FEATURE + "-" + f"{i}"] = fc[i].tolist()  #convert to list
             return forecast, None
-        
+
 
         elif self.model_name == "CHRONOS":
             forecast = {}
-            np_data = DataUtils.dict_to_ndarray(data)
-            data_len = np_data.shape[-1] # Assuming the last dimension is the time dimension
-            fh = ForecastingHorizon(np.arange(data_len, data_len+self.prediction_length), is_relative=False)
             for i, key in enumerate(data.keys()):
-                self._models.fit(y=np_data[i], fh=fh)
-                y_pred = self._models.predict()
-                forecast[key + "-" + AgentConfig.FEATURE + f"-{self.model_name}-{i}"] = y_pred.tolist()  #convert to list
+                context = torch.tensor(np.asarray(data[key]), dtype=torch.float32).view(1, -1)
+                y_pred = self._models.predict(
+                    context=context,
+                    prediction_length=self.prediction_length,
+                    limit_prediction_length=False,
+                )
+                if isinstance(y_pred, torch.Tensor):
+                    # Chronos returns samples; reduce to a single forecast vector.
+                    if y_pred.ndim >= 3:
+                        y_pred = y_pred.mean(dim=1)
+                    y_pred = y_pred.reshape(-1).cpu().tolist()
+                else:
+                    y_pred = np.asarray(y_pred).reshape(-1).tolist()
+                forecast[key + "-" + AgentConfig.FEATURE + f"-{self.model_name}-{i}"] = y_pred
             return forecast, None
 
     
