@@ -1,4 +1,5 @@
 import configparser
+import pytest
 from pydag.buffers.ListBuffer import ListBuffer
 from pydag.nodes.buffers.LinkBufferAction import LinkBufferAction
 from pydag.services.llm.LLMService import LLMService
@@ -11,6 +12,8 @@ def test_correctly_extract_value_from_pdf():
     # Test if the number 302689 of the Fertigungsauftrag is correctly extracted.
     config = configparser.ConfigParser()
     config.read("config.ini")
+    if not config.has_section("MISTRAL") or not config.has_option("MISTRAL", "MISTRAL_API_KEY"):
+        pytest.skip("Skipping LLM OCR test: missing MISTRAL_API_KEY in [MISTRAL] of config.ini")
     
     #ls = LLMService(id="S1", api_key=config["OPENAI"]["OPENAI_API_KEY"], model="gpt-4.1-mini", model_provider="OPENAI")
     #ls.install()
@@ -46,6 +49,8 @@ def test_correctly_extract_value_from_pdf_different_output_keys():
     # Test if the number 302689 of the Fertigungsauftrag is correctly extracted when different output keys are used.
     config = configparser.ConfigParser()
     config.read("config.ini")
+    if not config.has_section("MISTRAL") or not config.has_option("MISTRAL", "MISTRAL_API_KEY"):
+        pytest.skip("Skipping LLM OCR test: missing MISTRAL_API_KEY in [MISTRAL] of config.ini")
     
     #ls = LLMService(id="S1", api_key=config["OPENAI"]["OPENAI_API_KEY"], model="gpt-4.1-mini", model_provider="OPENAI")
     #ls.install()
@@ -85,6 +90,8 @@ def test_correctly_extract_value_from_image():
     # Test if the number 302689 of the Fertigungsauftrag is correctly extracted.
     config = configparser.ConfigParser()
     config.read("config.ini")
+    if not config.has_section("MISTRAL") or not config.has_option("MISTRAL", "MISTRAL_API_KEY"):
+        pytest.skip("Skipping LLM OCR test: missing MISTRAL_API_KEY in [MISTRAL] of config.ini")
     
     #ls = LLMService(id="S1", api_key=config["OPENAI"]["OPENAI_API_KEY"], model="gpt-4.1-mini", model_provider="OPENAI")
     #ls.install()
@@ -119,6 +126,8 @@ def test_no_value_parent_buffer():
     # Test no value in Parent buffer.
     config = configparser.ConfigParser()
     config.read("config.ini")
+    if not config.has_section("MISTRAL") or not config.has_option("MISTRAL", "MISTRAL_API_KEY"):
+        pytest.skip("Skipping LLM OCR test: missing MISTRAL_API_KEY in [MISTRAL] of config.ini")
     
     #ls = LLMService(id="S1", api_key=config["OPENAI"]["OPENAI_API_KEY"], model="gpt-4.1-mini", model_provider="OPENAI")
     #ls.install()
@@ -148,6 +157,8 @@ def test_multiple_files_same_type():
     # Test multiple files in parent buffer.
     config = configparser.ConfigParser()
     config.read("config.ini")
+    if not config.has_section("MISTRAL") or not config.has_option("MISTRAL", "MISTRAL_API_KEY"):
+        pytest.skip("Skipping LLM OCR test: missing MISTRAL_API_KEY in [MISTRAL] of config.ini")
     
     buf = ListBuffer(id="BUF1")
     buf.install()
@@ -178,6 +189,8 @@ def test_multiple_files_different_type():
     # Test multiple files in parent buffer.
     config = configparser.ConfigParser()
     config.read("config.ini")
+    if not config.has_section("MISTRAL") or not config.has_option("MISTRAL", "MISTRAL_API_KEY"):
+        pytest.skip("Skipping LLM OCR test: missing MISTRAL_API_KEY in [MISTRAL] of config.ini")
     
     buf = ListBuffer(id="BUF1")
     buf.install()
@@ -209,6 +222,8 @@ def test_empty_file():
     # Test empty file.
     config = configparser.ConfigParser()
     config.read("config.ini")
+    if not config.has_section("MISTRAL") or not config.has_option("MISTRAL", "MISTRAL_API_KEY"):
+        pytest.skip("Skipping LLM OCR test: missing MISTRAL_API_KEY in [MISTRAL] of config.ini")
     
     buf = ListBuffer(id="BUF1", capacity=10)
     buf.install()

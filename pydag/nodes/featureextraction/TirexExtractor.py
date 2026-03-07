@@ -38,14 +38,19 @@ class TirexExtractor(LearningNode):
     
     def infer(self, data : dict, meta : dict = None) -> Tuple[Dict, Dict]:
         forecast = {}
-        for key, d in data.items():
-            x = torch.tensor(d)
-            x_shape = x.shape
+        forecast_index = 0
+        for d in data.values():
+            x = torch.as_tensor(d, dtype=torch.float32)
             x = x.view(-1, x.shape[-1])
-            fc = self._models.forecast(context=x, prediction_length=self.prediction_length, output_type="numpy")[1] # mean - the output is flattened and converted to list
-            for i in range(fc.shape[0]):
+            _, fc = self._models.forecast(
+                context=x,
+                prediction_length=self.prediction_length,
+                output_type="torch",
+            )
+            for row in fc:
                 if len(data.keys()) == len(self.output_keys):
-                    forecast[self.output_keys[i]] = fc[i].tolist()  #convert to list
+                    forecast[self.output_keys[forecast_index]] = row.reshape(-1).cpu().tolist()
                 else:
-                    forecast[self.__class__.__name__ + "-" + AgentConfig.FEATURE + "-" + f"{i}"] = fc[i].tolist()  #convert to list
+                    forecast[f"{self.cname()}-{AgentConfig.FEATURE}-{forecast_index}"] = row.reshape(-1).cpu().tolist()
+                forecast_index += 1
         return forecast, None

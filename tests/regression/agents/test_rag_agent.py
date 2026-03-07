@@ -15,6 +15,8 @@ def test_010():
     
     config = configparser.ConfigParser()
     config.read("config.ini")
+    if not config.has_section("OPENAI") or not config.has_option("OPENAI", "OPENAI_API_KEY"):
+        pytest.skip("Skipping RAG regression test: missing OPENAI_API_KEY in [OPENAI] of config.ini")
     
     g = Agent()
     
@@ -48,6 +50,8 @@ def test_020():
     
     config = configparser.ConfigParser()
     config.read("config.ini")
+    if not config.has_section("OPENAI") or not config.has_option("OPENAI", "OPENAI_API_KEY"):
+        pytest.skip("Skipping RAG regression test: missing OPENAI_API_KEY in [OPENAI] of config.ini")
     
     g = Agent()
     

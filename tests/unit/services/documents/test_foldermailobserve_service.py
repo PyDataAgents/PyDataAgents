@@ -1,6 +1,7 @@
 import configparser
 import time
 from pathlib import Path
+import pytest
 from pydag.services.documents.FolderObserveMailService import FolderObserveMailService
 from pydag.nodes.utils.MailAction import MailAction
 
@@ -9,6 +10,11 @@ def test_000():
     
     config = configparser.ConfigParser()
     config.read("config.ini")
+    if not config.has_section("GMX"):
+        pytest.skip("Skipping folder observe mail service test: missing [GMX] in config.ini")
+    for key in ("smtp_server", "smtp_port", "watchdog_mail", "watchdog_pw", "test_mail"):
+        if not config.has_option("GMX", key):
+            pytest.skip(f"Skipping folder observe mail service test: missing {key} in [GMX] of config.ini")
     
     mail_action = MailAction()
     mail_action.id = "TestMailAction"
