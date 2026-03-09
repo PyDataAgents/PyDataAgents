@@ -21,7 +21,7 @@ class Transition(Node):
         self._state = NodeState.EXECUTING
         result = self._on_check()
         self._state = NodeState.IDLE
-        self._last_activation = time.time_ns()    
+        self._last_timestamp = time.time_ns()    
         return result
       
     @abstractmethod

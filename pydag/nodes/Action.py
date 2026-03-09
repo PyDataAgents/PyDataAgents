@@ -15,7 +15,7 @@ class Action(Node):
         self._state = NodeState.EXECUTING
         self._on_execute()
         self._state = NodeState.IDLE
-        self._last_activation = time.time_ns()
+        self._last_timestamp = time.time_ns()
         
         
     @abstractmethod
