@@ -161,7 +161,7 @@ class BufferNode(Node):
                                                 if isinstance(d[dk], list):
                                                     data[dk] = d[dk]
                                                 else:
-                                                    data[dk] = [d[dk]] 
+                                                    data[dk] = [d[dk]]
                                 else:
                                     for key, value in d.items():
                                         if key in data:

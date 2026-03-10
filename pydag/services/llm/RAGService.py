@@ -28,7 +28,7 @@ class RAGService(LLMService):
     MODEL_RESOURCE_FOLDER = Path(AgentConfig.MODEL_RESOURCE_FOLDER)
     CHROMA_DB_FILENAMES = {"chroma.db", "chroma.sqlite3"}
 
-    document_links: list[str] = field(default_factory=list, metadata={"description": "list of document links to load into embedded store on startup"})
+    document_links : list[str] = field(default_factory=list, metadata={"description": "list of document links to load into embedded store on startup"})
     ignore_invalid_documents: bool = field(default=False, metadata={"description": "deprecated compatibility field (no-op)"})
     embedding_model_name: str = field(default="all-MiniLM-L6-v2", metadata={"description": "name of the embedding model to use for embedding store"})
     persist_directory: str = field(default=None, metadata={"description": "directory for persisting the embedded store"})
