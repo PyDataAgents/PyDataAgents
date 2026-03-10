@@ -151,6 +151,7 @@ class Agent():
         self._start_services()
         self._stop_event.clear()
         self._is_running = True
+        logger.info(f"Started {self.__class__.__name__} application (id='{self.id}')")
         if blocking:
             self._stop_event.wait()  # blocks efficiently until the event is set (for example by terminate)
                 
