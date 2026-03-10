@@ -123,6 +123,8 @@ class BufferNode(Node):
             if len(self._parents) == 1:
                 parent = next(iter(self._parents))
                 if isinstance(parent, BufferNode):
+                    if parent.get_buffer() is None:
+                        raise NodeException(f"{Buffer.__name__} not initialized in parent {parent.id}")                        
                     d = parent.get_buffer().data(n = self.n, persistent = self.persistent)
                     if len(self.input_keys) > 0 and d is not None:
                         for dk in self.input_keys:
@@ -145,6 +147,8 @@ class BufferNode(Node):
                 data = {}
                 for parent in self._parents:
                     if isinstance(parent, BufferNode):
+                        if parent.get_buffer() is None:
+                            raise NodeException(f"{Buffer.__name__} not initialized in parent {parent.id}")
                         d = parent.get_buffer().data(n = self.n, persistent = self.persistent)
                         if d is not None:
                             if len(d) > 0:
