@@ -20,6 +20,7 @@ class BufferNode(Node):
     output_keys : list[str] = field(default_factory=list, metadata={"description": "optional explicit output keys; if empty, default naming is used"})
     ignore_keys : list[str] = field(default_factory=list, metadata={"description": "list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys"})        
     by_rows : bool = field(default=False, metadata={"description": "specifies whether data is retrieved by rows (True) or as columns (False)"})
+    ignore_empty_parents : bool = field(default=True, metadata={"description": "if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True)"})
          
     def __post_init__(self):
         super().__post_init__()
@@ -127,13 +128,17 @@ class BufferNode(Node):
                         for dk in self.input_keys:
                             if dk in d:
                                 data[dk] = d[dk]
-                        if len(data) == 0:
-                            raise NodeException("None of the specified input_keys were found in the parent buffer data")
+                        if len(data) == 0 and len(d) > 0:
+                            if not self.ignore_empty_parents:
+                                raise NodeException("None of the specified input_keys were found in the parent buffer data")
                     else:
                         if d:
                             data = d
                         else:
-                            data = {}
+                            if not self.ignore_empty_parents and len(data) == 0:
+                                raise NodeException("No data was found in the parent buffer")
+                            else:
+                                data = {}
                 else:
                     raise NodeException("Parent is not a " + BufferNode.cname())
             else:
@@ -164,8 +169,12 @@ class BufferNode(Node):
                                                 data[key] = [value]
                     else:
                         logger.debug("Parent is not a " + BufferNode.cname())
-                if len(self.input_keys) > 0 and len(data) == 0:
-                    raise NodeException("None of the specified input_keys were found in the parents buffer data")
+                if len(data) == 0:
+                    if not self.ignore_empty_parents:
+                        if len(self.input_keys) > 0:
+                            raise NodeException("None of the specified input_keys were found in the parent buffers data")                            
+                        else:
+                            raise NodeException("No data was found in the parent buffer data")
             for ik in self.ignore_keys:
                 if ik in data:
                     del data[ik]

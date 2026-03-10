@@ -71,10 +71,10 @@ def test_050_empty_dict_parent_data():
 
     buf = ssa.get_buffer()
 
-    def empty_dict(n=0, persistent=True):
-        return {}
+    def wrong_key_dict(n=0, persistent=True):
+        return {"VALOOS": [1]}
 
-    buf.data = empty_dict
+    buf.data = wrong_key_dict
 
     script_path = os.path.dirname(__file__) + os.sep + "script1.py"
     sa = ScriptAction(script_path=script_path, input_keys=[AgentConfig.VALUES], output_keys=["rms", "mean"])
@@ -84,7 +84,7 @@ def test_050_empty_dict_parent_data():
     # Execute; empty dict should be treated as empty data
     with pytest.raises(NodeException):
         sa.execute()
-        assert sa.get_buffer().data() == {}, "Expected empty dict output when parent buffer returns empty dict, but got: " + str(sa.get_buffer().data())
+        assert sa.get_buffer().data() == {}, "Expected wrong input dict output when parent buffer returns empty dict, but got: " + str(sa.get_buffer().data())
 
 
 def test_install_rejects_duplicate_output_keys():
