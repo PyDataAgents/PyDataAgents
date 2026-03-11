@@ -64,6 +64,9 @@ class ObserverThread():
                 
             case ThreadType.DAYTIME.value:
                 self._create_daytime_schedule()
+                
+            case ThreadType.EXPONENTIAL_SECOND.value:
+                self._thread = threading.Thread(target = self._run_exponential_thread, name=name)
                     
             case _:
                 self._thread = threading.Thread(target = self._run_millisecond_thread, name=name)
@@ -273,6 +276,30 @@ class ObserverThread():
             self._scheduler.add_job(self.notify_observers, trigger='cron', day_of_week=self._week_days, hour=hour, minute=minute, second=second, id = "Scheduled-Job " + self._service.id)
         else:
             raise ObserverException("Wrong dateformat in observingtime " + self._observing_time)       
+    
+    def _run_exponential_thread(self):
+        self._last_time = 0
+        current_time = 0
+        diff = 0
+        #self._last_time = time.time() # if this line is uncommented, the first observer notify happens after 1 observing_time, otherwise immediately
+        while self._is_running:
+            current_time = time.time()
+            if current_time - self._last_time >= self._observing_time - SAFETY_DIFF_TIME_UNITS / 10.0:
+                try:
+                    self.notify_observers()
+                    self._counts += 1
+                    self._last_time = time.time()                    
+                    self._observing_time = 2 * self._observing_time
+                except ObserverException as e:
+                    logger.error(e)
+                    with self._lock:
+                        self._is_running = False
+                    self._set_service_state(AgentElementState.ERROR)
+            else:
+                # do nothing and sleep a little
+                diff = self._observing_time - SAFETY_DIFF_TIME_UNITS / 10.0 - (current_time - self._last_time)
+                time.sleep(diff * SLEEP_WITH_HOLD_FACTOR)        
+        logger.info(f"{self.__class__.__name__} [{self._thread.name}] has stopped")
             
     def is_running(self) -> bool:
         with self._lock:

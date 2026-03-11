@@ -93,7 +93,7 @@ class AgentElement(ABC):
     def load(self):
         file = self.id + ".json"
         if FileUtils.exists_file(file):
-            with open(file, "r") as json_file:
+            with open(file, "r", encoding="utf-8") as json_file:
                 d = json.load(json_file)
                 ClassUtils.set_properties(self, d)
         else:
@@ -102,7 +102,7 @@ class AgentElement(ABC):
     def save(self):
         # Write config options to JSON file
         d = self.config_options()
-        with open(self.id + ".json", "w") as json_file:
+        with open(self.id + ".json", "w", encoding="utf-8") as json_file:
             json.dump(d, json_file, indent = 4)  # "indent" makes the output more readable
             
     def get_state(self) -> AgentElementState:

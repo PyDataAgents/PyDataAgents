@@ -49,6 +49,9 @@ class AgentConfig:
     FEATURE = "feature"
     FEATURES = "features"
     Y_HAT = "y_hat"
+    
+    # Service Config Keywords
+    MAX_EXPONENTIAL_SECONDS = 60 * 60 * 24 * 7
 
 
     # resource folder
