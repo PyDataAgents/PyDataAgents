@@ -100,6 +100,15 @@ def test_triggered_thread():
     ot.run()    
     ot.notify_observers()     
     ot.terminate()
+    
+def test_exponential_thread():
+    service = TestService()
+    ot = ObserverThread(service=service, observing_time=1, thread_type=ThreadType.EXPONENTIAL_SECOND.value)
+    o = TestObserver()
+    ot.add_observer(o)
+    ot.run()    
+    time.sleep(32)    
+    ot.terminate()
 
 class TestObserver(Observer):
     def observe(self):
