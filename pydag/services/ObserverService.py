@@ -41,4 +41,16 @@ class ObserverService(Service):
             
     def get_observer_thread(self) -> ObserverThread:
         return self._observer_thread
+
+    def snapshot_state(self) -> dict:
+        payload = super().snapshot_state()
+        if self._observer_thread is not None:
+            payload.update(
+                {
+                    "observer_counts": self._observer_thread.get_counts(),
+                    "observer_last_update": self._observer_thread.get_last_update(),
+                    "observer_running": self._observer_thread.is_running(),
+                }
+            )
+        return payload
     

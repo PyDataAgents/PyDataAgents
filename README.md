@@ -51,6 +51,10 @@ Extract relevant features from vibration/temperature/current signals, update a p
 - `StatemachineService` for workflows:
   Complex automation flows are built from small `Action` and `Transition` nodes.
 
+## Technical Reference
+For detailed low-level mechanics of runtime persistence, checkpoints, restart behavior, cleanup, and the current resilient single-agent lifecycle, see [TECHNICAL_REFERENCE.md](TECHNICAL_REFERENCE.md).
+
+This reference is intended as a living engineering document for both humans and LLM-based tooling that need a deeper understanding of the repository than the high-level README provides.
 
 ## How to Contribute?
 Have a look at [Contribute.md](Contribute.md)
@@ -112,6 +116,7 @@ All elements within an `Agent` application are derived from `AgentElement`.
 
 The parent class also ensures a unique identifier for each `AgentElement` and the type declaration (fully qualified class path).
 All `AgentElement` classes are supposed to be annotated with `@dataclass` and `field` declarations for their respective configuration properties. If these are used correctly, properties can be set via configuration files or API and the method `config_options()` exports the configuration properties where needed. These properties are also used for auto-generated documentation.
+<br>The newer runtime persistence and restart details, including checkpoints, runtime storage paths, cleanup policies, and per-element snapshot responsibilities, are documented in [TECHNICAL_REFERENCE.md](TECHNICAL_REFERENCE.md).
 
 In addition to defining basic interface methods, `AgentElement` classes can also include a `__post_init__()` method that is called after dataclass initialization. This method can be used to initialize internal objects. By convention, `__post_init__()` should contain internal objects required for the specific `AgentElement` but not part of its configuration properties. By convention, all configuration properties should be defined as dataclass fields and internal objects should be initialized in `__post_init__()` with a leading `_`.
 

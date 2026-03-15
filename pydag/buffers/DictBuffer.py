@@ -2,6 +2,7 @@ from __future__ import annotations
 import copy
 from dataclasses import dataclass, field
 import time
+from typing import ClassVar
 
 
 from ..buffers.BufferException import BufferException
@@ -15,6 +16,8 @@ class DictBuffer(Buffer):
     """
     Buffer that stores its values in a dictionary column-wise (each key -> list).
     """
+    SNAPSHOT_NEXT_INDEX_KEY: ClassVar[str] = "next_index"
+    LEGACY_SNAPSHOT_INDEX_KEY: ClassVar[str] = "index"
     timestamps_enabled : bool = field(default=False, metadata={"description": "Whether timestamps are enabled for this buffer. If the parent buffer has a timestamps column which is named in the same way as this buffer's timestamps_key, those timestamps will be copied over. If set to False and a timestamp column is present in the input data, it will be ignored."})
     timestamps_key  : str = field(default="timestamps", metadata={"description": "Key under which timestamps are exposed."})
     index_enabled : bool = field(default=False, metadata={"description": "Whether an index column is enabled for this buffer. The index column is a simple integer sequence starting from 0 and adds +1 per point. If the parent buffer has an index column which is named in the same way as this buffer's index_key, those indices will be copied over. If set to False and an index column is present in the input data, it will be ignored."})
@@ -265,6 +268,20 @@ class DictBuffer(Buffer):
                 return len(v)
         # Fallback: only timestamps present
         return len(next(iter(self._elements.values())))
+
+    def snapshot_state(self) -> dict:
+        payload = super().snapshot_state()
+        payload[self.SNAPSHOT_NEXT_INDEX_KEY] = self._index
+        return payload
+
+    def restore_state(self, payload: dict | None):
+        super().restore_state(payload)
+        if payload is None:
+            return
+        self._index = payload.get(
+            self.SNAPSHOT_NEXT_INDEX_KEY,
+            payload.get(self.LEGACY_SNAPSHOT_INDEX_KEY, 0),
+        )
         
     def to_html(self) -> str:
         DEFAULT_CELL_STYLE : str = "border: 1px solid black; border-collapse: collapse; padding: 5px"

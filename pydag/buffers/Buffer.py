@@ -1,5 +1,6 @@
 from __future__ import annotations
 from dataclasses import dataclass, field
+import copy
 import json
 from abc import abstractmethod
 import threading
@@ -169,5 +170,24 @@ class Buffer(AgentElement):
             int: UTC timestamp in ns
         """
         return self._last_timestamp
+
+    def snapshot_state(self) -> dict:
+        payload = super().snapshot_state()
+        payload.update(
+            {
+                "elements": copy.deepcopy(self._elements),
+                "last_timestamp": self._last_timestamp,
+                "last_timer": self._last_timer,
+            }
+        )
+        return payload
+
+    def restore_state(self, payload: dict | None):
+        super().restore_state(payload)
+        if payload is None:
+            return
+        self._elements = copy.deepcopy(payload.get("elements", self._elements))
+        self._last_timestamp = payload.get("last_timestamp", 0)
+        self._last_timer = payload.get("last_timer", 0)
         
         

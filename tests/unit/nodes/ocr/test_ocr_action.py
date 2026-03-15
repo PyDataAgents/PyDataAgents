@@ -5,7 +5,7 @@ from pdf2image import convert_from_path
 
 from pydag.buffers.ListBuffer import ListBuffer
 from pydag.nodes.buffers.LinkBufferAction import LinkBufferAction
-from pydag.nodes.vision.OCRAction import OCRAction
+from pydag.nodes.documents.OCRAction import OCRAction
 
 def test_000():
     # make sure poopler is installed and on PATH (in windows)

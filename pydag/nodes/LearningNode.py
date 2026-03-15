@@ -26,6 +26,7 @@ class LearningNode(TransformNode):
     def __post_init__(self):
         super().__post_init__()
         self._models : dict | Any = {} # Placeholder for the model, to be defined in subclasses.
+        self._model_descriptors : dict | Any = {}
         self._requires_learning : bool = True   # Flag indicating if learning is required. Can be overwritten in subclasses.
         self._state : Union[LearningState, NodeState, AgentElementState] = AgentElementState.UNINSTALLED
          
@@ -112,3 +113,33 @@ class LearningNode(TransformNode):
             bool: True if learning is required, False otherwise.
         """
         return self._requires_learning
+
+    def snapshot_state(self) -> dict:
+        payload = super().snapshot_state()
+        payload["requires_learning"] = self._requires_learning
+        payload["model_descriptors"] = self._serialize_models()
+        return payload
+
+    def restore_state(self, payload: dict | None):
+        super().restore_state(payload)
+        if payload is None:
+            return
+        self._requires_learning = payload.get("requires_learning", True)
+        self._model_descriptors = payload.get("model_descriptors", {})
+
+    def _serialize_models(self):
+        if hasattr(self._models, "to_dict"):
+            return self._models.to_dict()
+        if isinstance(self._models, dict):
+            descriptors = {}
+            for key, value in self._models.items():
+                if hasattr(value, "to_dict"):
+                    descriptors[key] = value.to_dict()
+                elif isinstance(value, (str, int, float, bool, list, dict)) or value is None:
+                    descriptors[key] = value
+                else:
+                    descriptors[key] = str(type(value).__name__)
+            return descriptors
+        if isinstance(self._models, (str, int, float, bool, list, dict)) or self._models is None:
+            return self._models
+        return str(type(self._models).__name__)

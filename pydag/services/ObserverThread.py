@@ -24,6 +24,8 @@ class ObserverThread():
     def __init__(self, service : Service, observing_time : Union[int|str] = 0, thread_type : str = ThreadType.INSTANT.value, week_days : str = None):
         self._service : Service = service
         self._thread : threading.Thread = None
+        self._thread_target = None
+        self._thread_name = "Thread " + self._service.id
         self._lock : threading.RLock = threading.RLock()
         self._observers : list[Observer] = list()
         self._is_running : bool = False
@@ -36,28 +38,27 @@ class ObserverThread():
         
         self._scheduler : Union[BlockingScheduler|BackgroundScheduler] = None        
                
-        name = "Thread " + self._service.id
         match self._thread_type:
             case ThreadType.MILLI_SECOND.value:                    
-                self._thread = threading.Thread(target = self._run_millisecond_thread, name=name)
+                self._thread_target = self._run_millisecond_thread
             
             case ThreadType.MICRO_SECOND.value:
-                self._thread = threading.Thread(target = self._run_microsecond_thread, name=name)
+                self._thread_target = self._run_microsecond_thread
                 
             case ThreadType.ONLY_ONCE.value:
-                self._thread = threading.Thread(target = self._run_only_once_thread, name=name)
+                self._thread_target = self._run_only_once_thread
             
             case ThreadType.NANO_SECOND.value:
-                self._thread = threading.Thread(target = self._run_nanosecond_thread, name=name)
+                self._thread_target = self._run_nanosecond_thread
                 
             case ThreadType.SECOND.value:
-                self._thread = threading.Thread(target = self._run_second_thread, name=name)
+                self._thread_target = self._run_second_thread
                                     
             case ThreadType.INSTANT.value:
-                self._thread = threading.Thread(target = self._run_instant_thread, name=name)
+                self._thread_target = self._run_instant_thread
                                 
             case ThreadType.TRIGGERED.value:
-                self._thread = threading.Thread(target = self._run_triggered_thread, name=name)
+                self._thread_target = self._run_triggered_thread
             
             case ThreadType.DATETIME.value:
                 self._create_datetime_schedule()
@@ -66,10 +67,10 @@ class ObserverThread():
                 self._create_daytime_schedule()
                 
             case ThreadType.EXPONENTIAL_SECOND.value:
-                self._thread = threading.Thread(target = self._run_exponential_thread, name=name)
+                self._thread_target = self._run_exponential_thread
                     
             case _:
-                self._thread = threading.Thread(target = self._run_millisecond_thread, name=name)
+                self._thread_target = self._run_millisecond_thread
     
     def add_observer(self, observer : Observer):
         """ adds a new `Observer` to `ObserverThread`        
@@ -91,7 +92,8 @@ class ObserverThread():
                         self._is_running = True                
                     if self._scheduler is not None:
                         self._scheduler.start()
-                    elif self._thread is not None:
+                    elif self._thread_target is not None:
+                        self._thread = threading.Thread(target=self._thread_target, name=self._thread_name, daemon=True)
                         self._thread.start()
                     else:
                         raise ObserverException(f"could not start {self.__class__.__name__} for {self._service.__class__.__name__}, because no thread or scheduler was defined for thread type {self._thread_type}")
@@ -107,6 +109,8 @@ class ObserverThread():
             self._is_running = False
             if self._scheduler is not None:
                 self._scheduler.shutdown()
+        if self._thread is not None and self._thread.is_alive():
+            self._thread.join(timeout=1.0)
         self.denotify_observers()
     
     def notify_observers(self):
@@ -116,6 +120,11 @@ class ObserverThread():
         Raises:
             ObserverException: if an error during observe occurs
         """        
+        if hasattr(self._service, "is_paused") and self._service.is_paused():
+            time.sleep(0.05)
+            return
+        if hasattr(self._service, "heartbeat"):
+            self._service.heartbeat()
         for observer in self._observers:
             observer.observe()
     

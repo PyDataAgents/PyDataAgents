@@ -8,6 +8,20 @@ class AgentElementState(Enum):
     INSTALLED = "INSTALLED"
     UNINSTALLED = "UNINSTALLED"
     ERROR = "ERROR"
+
+
+class AgentLifecycleState(Enum):
+    CREATED = "CREATED"
+    READY = "READY"
+    RUNNING = "RUNNING"
+    PAUSING = "PAUSING"
+    PAUSED = "PAUSED"
+    QUIESCING = "QUIESCING"
+    CHECKPOINTING = "CHECKPOINTING"
+    RESTORING = "RESTORING"
+    STOPPING = "STOPPING"
+    STOPPED = "STOPPED"
+    FAILED = "FAILED"
  
 class BufferState(Enum):
     RETRIEVING = "RETRIEVING"

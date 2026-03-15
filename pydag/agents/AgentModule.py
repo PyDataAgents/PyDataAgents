@@ -92,7 +92,7 @@ class AgentModule:
         import pydag.services.vision.WebcamVideoRollbackService
         
         # nodes
-        import pydag.nodes.vision.OCRAction
+        import pydag.nodes.documents.OCRAction
         
         return
     

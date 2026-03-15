@@ -9,6 +9,7 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 from sentence_transformers import SentenceTransformer
 from langchain_community.vectorstores.utils import filter_complex_metadata
 from ...agents.AgentConfig import AgentConfig
+from ...agents.RuntimeStorage import ArtifactPolicy
 from ..Service import Service
 from ..ServiceException import ServiceException
 
@@ -30,6 +31,7 @@ class FileEmbeddingService(Service):
         self._embedding_store = None
         self._embedding_model = None
         self._retriever = None
+        self._resolved_store_directory : str = None
         self._non_text_extensions = {
             # Images (The most common cause of unwanted OCR/Tesseract triggers)
             ".jpg", ".jpeg", ".png", ".gif", ".bmp", ".tiff", ".webp", ".heic", ".ico", ".svg",
@@ -48,7 +50,7 @@ class FileEmbeddingService(Service):
             ".psd", ".ai", ".indd", ".eps", ".sketch", ".fig",
             
             # Font Files
-            ".ttf", ".otf", ".woff", ".woff2"
+            ".ttf", ".otf", ".woff", ".woff2",
 
             # Chroma db files
             ".db"
@@ -71,7 +73,16 @@ class FileEmbeddingService(Service):
         if self.store_name is None:
             self._embedding_store = Chroma(embedding_function=self._embedding_model)                       
         else:
-            self._embedding_store = Chroma(persist_directory=os.path.join(FileEmbeddingService.EMBEDDINGS_RESOURCE_FOLDER, self.store_name), embedding_function=self._embedding_model)
+            self._resolved_store_directory = self._resolve_store_directory()
+            self.clear_registered_artifacts()
+            self.register_artifact(
+                name="embedding_store",
+                path=self._resolved_store_directory,
+                kind="vector_store",
+                policy=ArtifactPolicy.DURABLE.value,
+                metadata={"embedding_model_name": self.embedding_model_name, "store_name": self.store_name},
+            )
+            self._embedding_store = Chroma(persist_directory=self._resolved_store_directory, embedding_function=self._embedding_model)
         logger.debug("created embedding store with embedding model " + self.embedding_model_name)
         if isinstance(self.docs_folder, str):
             self.docs_folder = [self.docs_folder]
@@ -116,11 +127,29 @@ class FileEmbeddingService(Service):
         # Split into chunks
         # This is generally more "intelligent" than CharacterTextSplitter
         text_splitter = RecursiveCharacterTextSplitter(
-            chunk_size=500,
-            chunk_overlap=100,
+            chunk_size=1000,
+            chunk_overlap=250,
             separators=["\n\n", "\n", " ", ""]
         )
         split_docs = text_splitter.split_documents(filtered_docs)
         self._embedding_store.add_documents(split_docs, ids=[document_link + "_" + str(i) for i in range(len(split_docs))]) # add document link as prefix to the id of the embedded document to ensure uniqueness and to be able to identify the source document of the embedded chunk later on when retrieving relevant documents from the embedding store
         logger.debug("embedded document " + document_link + " into embedding store")
+
+    def _resolve_store_directory(self) -> str:
+        if self.store_name is None:
+            return None
+        if getattr(self, "_agent", None) is not None:
+            return str(self.get_artifact_root(self._agent) / "vector_store")
+        return os.path.join(FileEmbeddingService.EMBEDDINGS_RESOURCE_FOLDER, self.store_name)
+
+    def snapshot_state(self) -> dict:
+        payload = super().snapshot_state()
+        payload["resolved_store_directory"] = self._resolved_store_directory
+        return payload
+
+    def restore_state(self, payload: dict | None):
+        super().restore_state(payload)
+        if payload is None:
+            return
+        self._resolved_store_directory = payload.get("resolved_store_directory")
     

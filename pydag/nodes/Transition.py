@@ -18,11 +18,17 @@ class Transition(Node):
         return
         
     def check(self) -> bool:
-        self._state = NodeState.EXECUTING
-        result = self._on_check()
-        self._state = NodeState.IDLE
-        self._last_timestamp = time.time_ns()    
-        return result
+        self.begin_execution()
+        try:
+            result = self._on_check()
+            if result:
+                self.mark_transition()
+            return result
+        except Exception:
+            self.mark_interrupted()
+            raise
+        finally:
+            self.end_execution()
       
     @abstractmethod
     def _on_check(self) -> bool:

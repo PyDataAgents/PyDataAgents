@@ -1,7 +1,9 @@
 from __future__ import annotations
+import json
 import threading
 from typing import TYPE_CHECKING, Type, cast
 from dataclasses import dataclass, field
+from pathlib import Path
 import uuid
 from loguru import logger
 
@@ -9,6 +11,11 @@ from loguru import logger
 from ..nodes.Node import Node
 from .AgentElement import AgentElement
 from .AgentConfig import AgentConfig
+from .AgentStates import AgentLifecycleState
+from .RuntimeStorage import CheckpointManifest, CleanupReport, CleanupScope, RuntimeStorage
+from ..utils.ClassUtils import ClassUtils
+from ..utils.FileUtils import FileUtils
+from ..utils.TimeUtils import TimeUtils
 from ..services.statemachine.StatemachineService import StatemachineService
 
 
@@ -26,6 +33,7 @@ class Agent():
     buffer_store : dict[str, Buffer] = field(default_factory=dict, metadata={"description": "dictionary of Buffers in the Agent"})
     adapter_store : dict[str, Adapter] = field(default_factory=dict, metadata={"description": "dictionary of Adapters in the Agent"})
     service_store : dict[str, Service] = field(default_factory=dict, metadata={"description": "dictionary of Services in the Agent"})
+    uid : str = field(default=None)
 
     def __post_init__(self):
         """ initialize `Agent` instance after dataclass initialization.
@@ -35,8 +43,15 @@ class Agent():
         """
         if self.id is None: 
             self.id = f"{self.__class__.__name__} [{uuid.uuid4()}]"
+        if self.uid is None:
+            self.uid = uuid.uuid4().hex
         self._is_running = False
         self._stop_event = threading.Event()
+        self._lifecycle_state = AgentLifecycleState.CREATED
+        self._run_id : str = None
+        self._runtime_storage = RuntimeStorage(self.uid)
+        self._runtime_storage.ensure_layout()
+        self._runtime_storage.set_lifecycle_state(self._lifecycle_state.value)
     
     def _install_elements(self):
         """ install all `Adapter`s, `Buffer`s, and `Service`s in the `Agent`.
@@ -50,6 +65,7 @@ class Agent():
             buffer.install(self)
         for service in list(self.service_store.values()):
             service.install(self)
+        self._set_lifecycle_state(AgentLifecycleState.READY)
         
     def _uninstall_elements(self):
         """ uninstall all `Adapter`s, `Buffer`s, and `Service`s from the `Agent`.
@@ -63,6 +79,7 @@ class Agent():
             buffer.uninstall(self)
         for service in list(self.service_store.values()):
             service.uninstall(self)
+        self._set_lifecycle_state(AgentLifecycleState.STOPPED)
     
     def add_buffer(self, buffer : Buffer):
         """Add a `Buffer` to the `Agent`'s buffer store.
@@ -122,6 +139,21 @@ class Agent():
         """
         for service in self.service_store.values():
             service.stop()
+
+    def _pause_services(self):
+        for service in self.service_store.values():
+            if hasattr(service, "pause"):
+                service.pause()
+
+    def _resume_services(self):
+        for service in self.service_store.values():
+            if hasattr(service, "resume"):
+                service.resume()
+
+    def _quiesce_services(self):
+        for service in self.service_store.values():
+            if hasattr(service, "quiesce"):
+                service.quiesce()
                    
     def _connect_adapters(self):
         """ Connect all `Adapter`s in the `Agent`.        
@@ -146,11 +178,16 @@ class Agent():
         Args:
             blocking (bool, optional): Whether to block until Agent is terminated. Defaults to True.
         """
+        self._runtime_storage.ensure_layout()
+        self.save_config()
+        self._set_lifecycle_state(AgentLifecycleState.CREATED)
         self._install_elements()
         self._connect_adapters()
         self._start_services()
         self._stop_event.clear()
         self._is_running = True
+        self._run_id = self._runtime_storage.start_run()
+        self._set_lifecycle_state(AgentLifecycleState.RUNNING)
         logger.info(f"Started {self.__class__.__name__} application (id='{self.id}')")
         if blocking:
             self._stop_event.wait()  # blocks efficiently until the event is set (for example by terminate)
@@ -161,11 +198,181 @@ class Agent():
         Stops all services, disconnects adapters, and uninstalls elements.
         Signals the stop event to unblock any waiting release() call.
         """
+        self._set_lifecycle_state(AgentLifecycleState.STOPPING)
         self._stop_services()
         self._disconnect_adapters()
         self._uninstall_elements()
         self._is_running = False
+        self._runtime_storage.stop_run(self._run_id)
+        self._run_id = None
         self._stop_event.set()
+        self._set_lifecycle_state(AgentLifecycleState.STOPPED)
+
+    def pause(self):
+        if not self._is_running:
+            return
+        self._set_lifecycle_state(AgentLifecycleState.PAUSING)
+        self._pause_services()
+        self._set_lifecycle_state(AgentLifecycleState.PAUSED)
+
+    def resume(self):
+        if not self._is_running:
+            return
+        self._resume_services()
+        self._set_lifecycle_state(AgentLifecycleState.RUNNING)
+
+    def quiesce(self):
+        if not self._is_running:
+            return
+        self._set_lifecycle_state(AgentLifecycleState.QUIESCING)
+        self._quiesce_services()
+
+    def checkpoint(self, checkpoint_id: str = None) -> dict:
+        self._runtime_storage.ensure_layout()
+        self.save_config()
+        checkpoint_id = checkpoint_id or self._runtime_storage.create_checkpoint_id()
+        prior_state = self._lifecycle_state
+        should_resume = self._is_running and prior_state == AgentLifecycleState.RUNNING
+        if self._is_running:
+            self.quiesce()
+        self._set_lifecycle_state(AgentLifecycleState.CHECKPOINTING)
+        self._runtime_storage.create_checkpoint_dir(checkpoint_id)
+        element_files : dict[str, str] = {}
+        for element in self.get_all_elements():
+            snapshot = element.checkpoint(agent=self)
+            path = self._runtime_storage.write_element_snapshot(checkpoint_id, snapshot)
+            element_files[element.uid] = str(path)
+        manifest = CheckpointManifest(
+            checkpoint_id=checkpoint_id,
+            agent_uid=self.uid,
+            agent_id=self.id,
+            created_at=TimeUtils.utc_ms(),
+            lifecycle_state=prior_state.value,
+            run_id=self._run_id,
+            element_files=element_files,
+            metadata={
+                "service_ids": list(self.service_store.keys()),
+                "buffer_ids": list(self.buffer_store.keys()),
+                "adapter_ids": list(self.adapter_store.keys()),
+            },
+        )
+        self._runtime_storage.write_manifest(manifest)
+        if should_resume:
+            self.resume()
+        else:
+            self._set_lifecycle_state(prior_state)
+        return manifest.to_dict()
+
+    def restore(self, checkpoint_id: str = None) -> bool:
+        checkpoint_id = checkpoint_id or self._runtime_storage.get_current_checkpoint()
+        if checkpoint_id is None:
+            return False
+        manifest = self._runtime_storage.load_manifest(checkpoint_id)
+        if manifest is None:
+            return False
+        prior_state = self._lifecycle_state
+        should_resume = self._is_running and prior_state == AgentLifecycleState.RUNNING
+        if self._is_running:
+            self.quiesce()
+        self._set_lifecycle_state(AgentLifecycleState.RESTORING)
+        for element in self.get_all_elements():
+            snapshot = self._runtime_storage.load_element_snapshot(checkpoint_id, element.uid)
+            if snapshot is not None:
+                element.restore(snapshot=snapshot, agent=self)
+        if should_resume:
+            self.resume()
+        else:
+            restored_state = manifest.get("lifecycle_state", prior_state.value if hasattr(prior_state, "value") else str(prior_state))
+            self._set_lifecycle_state(AgentLifecycleState(restored_state))
+        return True
+
+    def reload_current(self) -> bool:
+        manifest = self.checkpoint()
+        checkpoint_id = manifest["checkpoint_id"]
+        return self.restore(checkpoint_id=checkpoint_id)
+
+    def save_config(self, file_path: str | Path = None) -> Path:
+        payload = self.config_options()
+        payload["uid"] = self.uid
+        target = Path(file_path) if file_path is not None else self._runtime_storage.config_root / "agent.json"
+        FileUtils.create_dir(str(target.parent))
+        with open(target, "w", encoding="utf-8") as handle:
+            json.dump(payload, handle, indent=4)
+        return target
+
+    def load_config(self, file_path: str | Path = None) -> bool:
+        target = Path(file_path) if file_path is not None else self._runtime_storage.config_root / "agent.json"
+        if not target.exists():
+            return False
+        with open(target, "r", encoding="utf-8") as handle:
+            payload = json.load(handle)
+        for property_name, value in payload.items():
+            if isinstance(value, dict) and len(value) == 0:
+                setattr(self, property_name, {})
+            elif isinstance(value, list) and len(value) == 0:
+                setattr(self, property_name, [])
+            else:
+                ClassUtils.set_property(self, property_name, value)
+        if self._runtime_storage.agent_uid != self.uid:
+            self._runtime_storage = RuntimeStorage(self.uid)
+            self._runtime_storage.ensure_layout()
+        return True
+
+    def cleanup(self, scope: str = CleanupScope.REBUILDABLE_OWNER_CACHE.value, dry_run: bool = False, keep_last_n_checkpoints: int = 3) -> dict:
+        deleted : list[str] = []
+        skipped : list[str] = []
+        candidates : list[str] = []
+        for element in self.get_all_elements():
+            report : CleanupReport = element.cleanup(scope=scope, dry_run=dry_run)
+            deleted.extend(report.deleted)
+            skipped.extend(report.skipped)
+            candidates.extend(report.candidates)
+        if scope == CleanupScope.TMP_ONLY.value:
+            for path in self._runtime_storage.runtime_tmp_paths():
+                candidates.append(str(path))
+                if dry_run:
+                    continue
+                if path.is_dir():
+                    import shutil
+                    shutil.rmtree(path, ignore_errors=True)
+                else:
+                    path.unlink(missing_ok=True)
+                deleted.append(str(path))
+        if scope == CleanupScope.CHECKPOINT_RETENTION_PRUNING.value:
+            checkpoints = self._runtime_storage.list_checkpoints()
+            current_checkpoint = self._runtime_storage.get_current_checkpoint()
+            for checkpoint_id in checkpoints[keep_last_n_checkpoints:]:
+                if checkpoint_id == current_checkpoint:
+                    skipped.append(checkpoint_id)
+                    continue
+                checkpoint_dir = self._runtime_storage.checkpoints_root / checkpoint_id
+                candidates.append(str(checkpoint_dir))
+                if dry_run:
+                    continue
+                import shutil
+                shutil.rmtree(checkpoint_dir, ignore_errors=True)
+                deleted.append(str(checkpoint_dir))
+        return {
+            "scope": scope,
+            "dry_run": dry_run,
+            "deleted": deleted,
+            "skipped": skipped,
+            "candidates": candidates,
+        }
+
+    def status(self) -> dict:
+        return {
+            "id": self.id,
+            "uid": self.uid,
+            "description": self.description,
+            "is_running": self._is_running,
+            "lifecycle_state": self._lifecycle_state.value,
+            "run_id": self._run_id,
+            "current_checkpoint_id": self._runtime_storage.get_current_checkpoint(),
+            "buffers": {buffer.id: str(buffer.get_state().value if hasattr(buffer.get_state(), "value") else buffer.get_state()) for buffer in self.buffer_store.values()},
+            "adapters": {adapter.id: str(adapter.get_state().value if hasattr(adapter.get_state(), "value") else adapter.get_state()) for adapter in self.adapter_store.values()},
+            "services": {service.id: str(service.get_state().value if hasattr(service.get_state(), "value") else service.get_state()) for service in self.service_store.values()},
+        }
             
     def get_adapter(self, id : str) -> Adapter:
         """ return the `Adapter` specified by `id`
@@ -306,6 +513,16 @@ class Agent():
                     if cast(Node, node).id == id:
                         return node
         return None
+
+    def get_all_elements(self) -> list[AgentElement]:
+        elements : list[AgentElement] = []
+        elements.extend(self.adapter_store.values())
+        elements.extend(self.buffer_store.values())
+        elements.extend(self.service_store.values())
+        for service in self.service_store.values():
+            if isinstance(service, StatemachineService):
+                elements.extend(service.nodes.values())
+        return elements
     
     def is_running(self) -> bool:
         """Check if the Agent is currently running.
@@ -314,4 +531,11 @@ class Agent():
             bool: True if the Agent is running, False otherwise.
         """
         return self._is_running
+
+    def get_lifecycle_state(self) -> AgentLifecycleState:
+        return self._lifecycle_state
+
+    def _set_lifecycle_state(self, state: AgentLifecycleState):
+        self._lifecycle_state = state
+        self._runtime_storage.set_lifecycle_state(state.value)
      

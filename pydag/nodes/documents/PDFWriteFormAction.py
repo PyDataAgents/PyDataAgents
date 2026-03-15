@@ -85,6 +85,7 @@ class PDFWriteFormAction(BufferNode, Action):
             raise NodeException("output_folder cannot be set when overwrite_source=True")
 
     def _on_execute(self):
+        self.clear_registered_artifacts()
         parent_data = self.get_parent_data()
         if not parent_data:
             raise NodeException("No parent data was found")
@@ -136,6 +137,7 @@ class PDFWriteFormAction(BufferNode, Action):
                 )
             )
             self.add_data({key: [value] for key, value in row.items()})
+            self.record_output_artifact(output_path, name=Path(output_path).name, managed=False)
 
     def _validate_pdf_path(self, file_path: str):
         if not FileUtils.exists_file(file_path):

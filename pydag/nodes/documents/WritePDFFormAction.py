@@ -67,6 +67,7 @@ class WritePDFFormAction(BufferNode, Action):
 
     def _on_execute(self):
         """Extract file paths + fill payloads from parents and write one output PDF per input path."""
+        self.clear_registered_artifacts()
         if self.require_two_parents and len(self.get_parents()) < 2:
             raise NodeException(
                 f"{self.cname()} requires at least two parents: one for file paths and one for filled form values"
@@ -112,6 +113,7 @@ class WritePDFFormAction(BufferNode, Action):
                 )
             )
             self.add_data({key: [value] for key, value in row.items()})
+            self.record_output_artifact(output_path, name=Path(output_path).name, managed=False)
 
     def _validate_file_path(self, file_path: str):
         """Fail fast for missing or invalid source paths."""

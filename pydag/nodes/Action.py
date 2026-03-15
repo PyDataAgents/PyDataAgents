@@ -12,10 +12,14 @@ class Action(Node):
         """
         method for execution of the `Action`
         """
-        self._state = NodeState.EXECUTING
-        self._on_execute()
-        self._state = NodeState.IDLE
-        self._last_timestamp = time.time_ns()
+        self.begin_execution()
+        try:
+            self._on_execute()
+        except Exception:
+            self.mark_interrupted()
+            raise
+        finally:
+            self.end_execution()
         
         
     @abstractmethod

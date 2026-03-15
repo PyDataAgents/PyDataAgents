@@ -201,6 +201,27 @@ class DataModelService(Service):
     def get_source(self) -> str:
         return Path(self.model_path).read_text(encoding="utf-8")
 
+    def snapshot_state(self) -> dict:
+        payload = super().snapshot_state()
+        payload["model_store"] = {
+            model_id: model.to_dict(with_hidden=True)
+            for model_id, model in self._model_store.items()
+        }
+        return payload
+
+    def restore_state(self, payload: dict | None):
+        super().restore_state(payload)
+        if payload is None:
+            return
+        restored_models = payload.get("model_store", {})
+        self._model_store = {}
+        self._model_locks = {}
+        for model_id, values in restored_models.items():
+            data_model = ClassUtils.load_instance(self.model_path, self.model_name)
+            data_model.set_properties(values)
+            self._model_store[model_id] = data_model
+            self._model_locks[model_id] = threading.Lock()
+
 class DataModelReadAccessVisitor(ast.NodeVisitor):
     def __init__(self):
         self.read_accesses = {}   # function_name -> set of property names

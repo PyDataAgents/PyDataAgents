@@ -15,6 +15,7 @@ from sentence_transformers import SentenceTransformer
 from langchain_community.vectorstores.utils import filter_complex_metadata
 from langchain_core.runnables import RunnableMap
 from pydag.agents.AgentConfig import AgentConfig
+from pydag.agents.RuntimeStorage import ArtifactPolicy
 
 from ..llm.LLMService import LLMService
 from ...services.ServiceException import ServiceException
@@ -39,6 +40,7 @@ class RAGService(LLMService):
         self._embedding_store = None
         self._embedding_model = None
         self._retriever = None
+        self._resolved_vector_store_directory : str = None
         self._non_text_extensions = {
             # Images (The most common cause of unwanted OCR/Tesseract triggers)
             ".jpg", ".jpeg", ".png", ".gif", ".bmp", ".tiff", ".webp", ".heic", ".ico", ".svg",
@@ -78,6 +80,16 @@ class RAGService(LLMService):
         )
 
         resolved_directory = self._resolve_vector_store_directory()
+        self._resolved_vector_store_directory = resolved_directory
+        self.clear_registered_artifacts()
+        if resolved_directory is not None:
+            self.register_artifact(
+                name="vector_store",
+                path=resolved_directory,
+                kind="vector_store",
+                policy=ArtifactPolicy.DURABLE.value,
+                metadata={"embedding_model_name": self.embedding_model_name},
+            )
         if resolved_directory is None:
             self._embedding_store = Chroma(embedding_function=self._embedding_model)
         else:
@@ -196,6 +208,8 @@ class RAGService(LLMService):
             logger.warning("Both vector_store_path and persist_directory are configured. vector_store_path takes precedence.")
         if configured_path is None:
             configured_path = self.persist_directory
+        if configured_path is None and getattr(self, "_agent", None) is not None:
+            configured_path = str(self.get_artifact_root(self._agent) / "vector_store")
         if configured_path is None:
             return None
 
@@ -213,6 +227,23 @@ class RAGService(LLMService):
 
         # Non-existing path -> treat as target directory path
         return configured_path
+
+    def snapshot_state(self) -> dict:
+        payload = super().snapshot_state()
+        payload.update(
+            {
+                "document_links": list(self.document_links),
+                "resolved_vector_store_directory": self._resolved_vector_store_directory,
+            }
+        )
+        return payload
+
+    def restore_state(self, payload: dict | None):
+        super().restore_state(payload)
+        if payload is None:
+            return
+        self.document_links = list(payload.get("document_links", self.document_links))
+        self._resolved_vector_store_directory = payload.get("resolved_vector_store_directory")
 
     def _is_document_link_url(self, document_link: str) -> bool:
         parsed = urlparse(document_link)

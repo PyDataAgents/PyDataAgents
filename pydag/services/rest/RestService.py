@@ -1,5 +1,4 @@
 from dataclasses import dataclass, field
-import multiprocessing
 import threading
 from loguru import logger
 from fastapi import APIRouter, FastAPI
@@ -27,6 +26,7 @@ class RestService(Service):
         super().__post_init__()
         self._app : FastAPI = None
         self._service_thread : threading.Thread = None
+        self._server : uvicorn.Server = None
         
     def _on_install(self, agent : Agent = None):
         super()._on_install(agent)
@@ -58,21 +58,22 @@ class RestService(Service):
         self._app.include_router(router)
     
     def _on_start(self):
-        multiprocessing.freeze_support()  # For Windows support
-        # Start server in a background thread
+        if self._server is not None and not getattr(self._server, "should_exit", False):
+            return
+        config = uvicorn.Config(self._app, host="0.0.0.0", port=self.port, reload=False, workers=1, log_level="warning")
+        self._server = uvicorn.Server(config)
         self._service_thread = threading.Thread(target=self.__run_uvicorn, daemon=True)
         self._service_thread.start()
 
     def __run_uvicorn(self):
-        uvicorn.run(self._app, host="0.0.0.0", port=self.port, reload=False, workers=1)
+        if self._server is not None:
+            self._server.run()
 
     def _on_stop(self):
-        #process = subprocess.Popen(
-        #    ["uvicorn", "main:app", "--host", "127.0.0.1", "--port", self.port],
-        #    stdout=subprocess.PIPE,
-        #    stderr=subprocess.PIPE
-        #)
-        #process.terminate()
-        #self.service_thread.join()
-        logger.warning("FastAPI Server (uvicorn) shutsdown with application only")
-        return
+        if self._server is not None:
+            self._server.should_exit = True
+        if self._service_thread is not None and self._service_thread.is_alive():
+            self._service_thread.join(timeout=2.0)
+        self._service_thread = None
+        self._server = None
+        logger.debug("FastAPI server stopped")

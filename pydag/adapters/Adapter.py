@@ -1,5 +1,6 @@
 from __future__ import annotations
 from abc import abstractmethod
+from typing import Any
 from typing import Union
 
 from ..agents.AgentStates import AdapterState, AgentElementState
@@ -13,6 +14,7 @@ class Adapter(AgentElement):
     def __post_init__(self):
         super().__post_init__()
         self._state : Union[AdapterState, AgentElementState] = AgentElementState.UNINSTALLED
+        self._side_effect_receipts : list[dict[str, Any]] = []
     
     def connect(self) -> bool:
         """
@@ -47,4 +49,18 @@ class Adapter(AgentElement):
         """
         disconnect logic specific to each `Adapter`implementation
         """
+
+    def snapshot_state(self) -> dict:
+        payload = super().snapshot_state()
+        payload["side_effect_receipts"] = list(self._side_effect_receipts)
+        return payload
+
+    def restore_state(self, payload: dict | None):
+        super().restore_state(payload)
+        if payload is None:
+            return
+        self._side_effect_receipts = list(payload.get("side_effect_receipts", []))
+
+    def record_side_effect_receipt(self, receipt: dict[str, Any]):
+        self._side_effect_receipts.append(receipt)
         
