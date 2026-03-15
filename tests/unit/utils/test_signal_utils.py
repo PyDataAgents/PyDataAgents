@@ -8,6 +8,8 @@ from scipy.signal import butter, filtfilt
 import librosa
 import librosa.display
 
+from pydag.utils.SignalUtils import SignalUtils
+
 def test_000():
     # Tiefpass definieren
     def butter_lowpass_filter(data, cutoff, fs, order=4):
@@ -51,3 +53,12 @@ def test_010():
     plt.title("Spectrogram")
     plt.tight_layout()
     plt.show()
+    
+    
+def test_020():    
+    ts = [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60]
+    n = 5
+    nts, i = SignalUtils.timeseries_thinning(ts, n)
+    print(str(nts) + ", " + str(i))
+    assert len(nts) == n, f"array was not thinned down to {n} elements"
+    
