@@ -59,20 +59,21 @@ class ClassUtils:
                     raise AgentException(f"Expected a dictionary for property '{property_name}' of {obj}, but got {type(value).__name__}.")
             elif isinstance(attr, dict):
                 if isinstance(value, dict):
-                    key = next(iter(value))
-                    if isinstance(value[key], dict):
-                        if AgentConfig.TYPE in value[key]:
-                            element_dic = {}
-                            for k, v in value.items():
-                                sub_obj = ClassUtils.create_instance(v[AgentConfig.TYPE])
-                                ClassUtils.set_properties(sub_obj, v)
-                                element_dic[k] = sub_obj
-                            setattr(obj, property_name, element_dic)
+                    if len(value) > 0:
+                        key = next(iter(value))
+                        if isinstance(value[key], dict):
+                            if AgentConfig.TYPE in value[key]:
+                                element_dic = {}
+                                for k, v in value.items():
+                                    sub_obj = ClassUtils.create_instance(v[AgentConfig.TYPE])
+                                    ClassUtils.set_properties(sub_obj, v)
+                                    element_dic[k] = sub_obj
+                                setattr(obj, property_name, element_dic)
+                            else:
+                                raise AgentException(f"No '{AgentConfig.TYPE}' property was specified in dict of object properties {value} for property '{property_name}' of {obj}")
                         else:
-                            raise AgentException(f"No '{AgentConfig.TYPE}' property was specified in dict of object properties {value} for property '{property_name}' of {obj}")
-                    else:
-                        # just set the content of the dictionary, this should only be content, that can be serialized
-                        setattr(obj, property_name, value)
+                            # just set the content of the dictionary, this should only be content, that can be serialized
+                            setattr(obj, property_name, value)
                 else:
                     raise AgentException(f"Expected a dictionary for property '{property_name}' of {obj}")
             elif isinstance(attr, list):

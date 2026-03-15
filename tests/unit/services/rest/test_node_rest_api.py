@@ -1,3 +1,5 @@
+import time
+
 from pydag.agents.Agent import Agent
 from pydag.buffers.ListBuffer import ListBuffer
 from pydag.services.rest.RestService import RestService
@@ -12,7 +14,11 @@ def test_000():
     rs = RestService(port=10019)
     agent.add_service(rs)
     
-    agent.release()
+    agent.release(blocking=False)
+    
+    time.sleep(5)
+    
+    agent.terminate()
     
     
     
