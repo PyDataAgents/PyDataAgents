@@ -154,7 +154,7 @@ class SignalUtils:
         return f, a
     
     @staticmethod
-    def timeseries_thinning(timestamps : list | np.ndarray, n : int) ->  Tuple[Union[List[float], np.ndarray], Union[List[float], np.ndarray]]: 
+    def timeseries_thinning(timestamps : list | np.ndarray, n : int) ->  Tuple[Union[List[float], np.ndarray], Union[List[int], np.ndarray]]: 
         """
         Reduces the number of timestamps in a time series to a specified number `n` by iteratively removing points that form the tightest clusters, preserving the overall distribution as much as possible.
         
@@ -168,8 +168,8 @@ class SignalUtils:
                     - The thinned list or array of timestamps.
                     - The corresponding indices of the retained timestamps in the original sequence.
         """
-        indices : np.ndarray = np.linspace(0, len(timestamps) - 1, len(timestamps))
-        indices : list = indices.tolist()
+        indices : np.ndarray = np.linspace(0, len(timestamps) - 1, len(timestamps)).astype(int)
+        indices : list[int] = indices.tolist()
         if len(timestamps) <= n:
             if isinstance(timestamps, list):
                 return timestamps, indices

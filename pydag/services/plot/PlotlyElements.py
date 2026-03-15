@@ -1,9 +1,10 @@
 from dataclasses import dataclass
 from enum import Enum
 import json
+import math
 import os
 from pathlib import Path
-from typing import Optional, Union, List
+from typing import Optional, Tuple, Union, List
 from bs4 import BeautifulSoup
 from loguru import logger
 import numpy as np
@@ -119,7 +120,7 @@ class Color:
     
     def __str__(self) -> str:
         return f'rgba({self.r}, {self.g}, {self.b}, {self.alpha})'
-            
+           
 # Predefined constants (class attributes)
 Color.RED = Color(255, 0, 0)
 Color.GREEN = Color(0, 255, 0)
@@ -177,6 +178,54 @@ class ColorNames(str, Enum):
     TOMATO = "tomato"
     ROYAL_BLUE = "royalblue"
     LIME_GREEN = "limegreen"    
+
+class ColorGradient():
+    
+    @staticmethod
+    def red(n : int) -> list[str]:
+        """
+        interpolate light red → dark red
+        """
+        colors = []
+        for i in range(0, n):
+            t = i / (n - 1)
+            r = 255
+            g = int(200 * (1 - t))
+            b = int(200 * (1 - t))
+            color = f"rgb({r},{g},{b})"
+            colors.append(color)
+        return colors
+    
+    @staticmethod
+    def green(n : int) -> list[str]:
+        """
+        interpolate light green → dark green
+        """
+        colors = []
+        for i in range(0, n):
+            t = i / (n - 1)
+            r = int(200 * (1 - t))
+            g = 255
+            b = int(200 * (1 - t))
+            color = f"rgb({r},{g},{b})"
+            colors.append(color)
+        return colors
+    
+    @staticmethod
+    def blue(n : int) -> list[str]:
+        """
+        interpolate light blue → dark blue
+        """
+        colors = []
+        for i in range(0, n):
+            t = i / (n - 1)
+            r = int(200 * (1 - t))
+            g = int(200 * (1 - t))
+            b = 255
+            color = f"rgb({r},{g},{b})"
+            colors.append(color)
+        return colors
+            
     
 class DashType(str, Enum):
     DASH = "dash"
@@ -1140,7 +1189,7 @@ class PlotlyDocument:
     PRECISION = -1
 
     def __init__(self, plotly=None):
-        self.doc = None
+        self.doc : BeautifulSoup = None
         self.plotlys : List[Plotly] = []
         self.animation = None
 
@@ -1152,7 +1201,12 @@ class PlotlyDocument:
             raise ValueError("Specified plotly was None")
         self.plotlys.append(plotly)
 
-    def _generate_doc(self):
+    def generate_doc(self):
+        """ generates the HTML document for this `PlotlyDocument` in the dedicated class property `doc`
+
+        Raises:
+            IOError: _description_
+        """
         # load template
         if self.animation:
             with open(PlotlyDocument.PLOTLY_ANIMATION_TEMPLATE, "r", encoding="utf-8") as f:
@@ -1216,9 +1270,31 @@ class PlotlyDocument:
         except IOError:
             logger.error(f"Could not read plotly file under {file_path}")
             return None
+        
+    def auto_refresh(self, interval : int = 5):
+        """ adds a meta auto refresh tag to html for interval based page reload
 
-    def to_file(self, file_path="plotly.html", open_in_browser=True):
-        self._generate_doc()
+        Args:
+            interval (int, optional): _description_. Defaults to 5.
+        """
+        meta = self.doc.new_tag(
+            "meta",
+            attrs={
+                "http-equiv": "refresh",
+                "content": interval
+            }
+        )
+        self.doc.head.append(meta)           
+
+    def to_file(self, file_path : str = "plotly.html", open_in_browser: bool = True):
+        """ creates a plotly html to the specified `file_path`
+
+        Args:
+            file_path (str, optional): _description_. Defaults to "plotly.html".
+            open_in_browser (bool, optional): _description_. Defaults to True.
+        """
+        if self.doc is None:
+            self.generate_doc()
         Path(file_path).write_text(self.doc.prettify(), encoding="utf-8")
 
         if open_in_browser:
@@ -1226,7 +1302,7 @@ class PlotlyDocument:
 
     def __str__(self):
         try:
-            self._generate_doc()
+            self.generate_doc()
             return str(self.doc)
         except IOError as e:
             logger.error(f"Could not generate {self.__class__.__name__}", exc_info=e)
