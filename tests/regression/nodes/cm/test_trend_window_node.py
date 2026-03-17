@@ -23,7 +23,7 @@ def test_000():
     lba.set_buffer(sb)
     
     buf = DictBuffer(timestamps_enabled=False, index_enabled=False)
-    twn = TrendWindowNode(max_windows=10, input_keys=["values"], n=100)
+    twn = TrendWindowNode(max_windows=8, input_keys=["values"], n=50)
     twn.set_buffer(buf)
     twn.add_parent(lba)
     twn.install()
@@ -40,7 +40,7 @@ def test_000():
     }
     
     colors = ColorGradient.red(twn.max_windows)
-    pa = PlotlifyAction(plot_path=FileUtils.parent_folder(__file__) + os.sep + "plotly_test_000.html", layout=layout, open_in_browser=True, auto_refresh=5, colors=colors)
+    pa = PlotlifyAction(plot_path=FileUtils.parent_folder(__file__) + os.sep + "plotly_test_000.html", layout=layout, open_in_browser=True, auto_refresh=2, colors=colors)
     pa.add_parent(twn)
     pa.install()
     
@@ -50,7 +50,7 @@ def test_000():
     pa.open_in_browser = False
     
     while True:
-        time.sleep(5)
+        time.sleep(2)
         twn.execute()
         pa.execute()
         
