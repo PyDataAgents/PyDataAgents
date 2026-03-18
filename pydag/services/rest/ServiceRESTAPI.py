@@ -77,6 +77,24 @@ class ServiceRESTAPI:
                 return service.id
             else:                
                 return {"error" : "No " + Service.cname() + " with type=" + type + " could be created"}
-               
+        
+        @router.get("/{id}/start")
+        def start_service(id : str = Path(..., description="unique ID of the service")) -> dict:
+            service : Service = agent.get_service(id)
+            if service is None:
+                return {"error": "service not found"}
+            else:
+                service.start()
+                return {"success": True}
+        
+        @router.get("/{id}/stop")
+        def stop_service(id : str = Path(..., description="unique ID of the service")) -> dict:
+            service : Service = agent.get_service(id)
+            if service is None:
+                return {"error": "service not found"}
+            else:
+                service.stop()
+                return {"success": True}
+                   
         return router
    
