@@ -14,6 +14,7 @@ from .ObserverException import ObserverException
 from .Observer import Observer
 from .ThreadType import ThreadType
 from .Service import Service
+from ..agents.AgentConfig import AgentConfig
 
 
 SAFETY_DIFF_TIME_UNITS : float = 1.0
@@ -290,6 +291,8 @@ class ObserverThread():
                     self._counts += 1
                     self._last_time = time.time()                    
                     self._observing_time = 2 * self._observing_time
+                    if self._observing_time > AgentConfig.MAX_EXPONENTIAL_SECONDS:
+                        self._observing_time = AgentConfig.MAX_EXPONENTIAL_SECONDS
                 except ObserverException as e:
                     logger.error(e)
                     with self._lock:
