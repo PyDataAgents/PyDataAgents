@@ -3,7 +3,7 @@ import inspect
 from pathlib import Path
 from dataclasses import dataclass, field
 import threading
-from typing import TYPE_CHECKING, Any
+from typing import Any
 import pandas as pd
 
 
@@ -12,6 +12,7 @@ from ...utils.ClassUtils import ClassUtils
 from ..ServiceException import ServiceException
 from ...utils.FileUtils import FileUtils
 from ...agents.Agent import Agent
+from ...agents.AgentElement import persisted_field, runtime_handle_field
 from ..Service import Service
 from .DataModel import DataModel
 
@@ -57,16 +58,14 @@ class DataModelService(Service):
     
     model_path : str = field(default=None, metadata={"description": "path of the model.py file"})
     model_name : str = field(default=None, metadata={"description": "name of the class to load from the model.py file"})
-        
-    def __post_init__(self):
-        super().__post_init__()
-        self._lock : threading.Lock = threading.Lock()
-        self._model_locks : dict[str, threading.Lock] = dict()
-        self._model_store : dict[str, DataModel] = dict()
-        self._methods : dict = None
-        self._method_input_vars : dict[str, list[str]] = None
-        self._method_output_vars : dict[str, list[str]] = None
-        self._method_arguments : dict[str, int] = {}
+    _model_payloads : dict[str, dict] = persisted_field(default_factory=dict, init=False, repr=False)
+    _lock : threading.Lock = runtime_handle_field(default_factory=threading.Lock, init=False, repr=False)
+    _model_locks : dict[str, threading.Lock] = runtime_handle_field(default_factory=dict, init=False, repr=False)
+    _model_store : dict[str, DataModel] = runtime_handle_field(default_factory=dict, init=False, repr=False)
+    _methods : dict = runtime_handle_field(default=None, init=False, repr=False)
+    _method_input_vars : dict[str, list[str]] = runtime_handle_field(default=None, init=False, repr=False)
+    _method_output_vars : dict[str, list[str]] = runtime_handle_field(default=None, init=False, repr=False)
+    _method_arguments : dict[str, int] = runtime_handle_field(default_factory=dict, init=False, repr=False)
         
     def _on_install(self, agent : Agent = None):
         super()._on_install(agent)
@@ -201,22 +200,18 @@ class DataModelService(Service):
     def get_source(self) -> str:
         return Path(self.model_path).read_text(encoding="utf-8")
 
-    def snapshot_state(self) -> dict:
-        payload = super().snapshot_state()
-        payload["model_store"] = {
+    def prepare_checkpoint(self, agent=None):
+        super().prepare_checkpoint(agent)
+        self._model_payloads = {
             model_id: model.to_dict(with_hidden=True)
             for model_id, model in self._model_store.items()
         }
-        return payload
 
-    def restore_state(self, payload: dict | None):
-        super().restore_state(payload)
-        if payload is None:
-            return
-        restored_models = payload.get("model_store", {})
+    def rebuild_runtime_handles(self, agent=None):
         self._model_store = {}
         self._model_locks = {}
-        for model_id, values in restored_models.items():
+        self._lock = threading.Lock()
+        for model_id, values in self._model_payloads.items():
             data_model = ClassUtils.load_instance(self.model_path, self.model_name)
             data_model.set_properties(values)
             self._model_store[model_id] = data_model

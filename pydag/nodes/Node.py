@@ -2,30 +2,23 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 import time
 import uuid
-from typing import Union
 
 
-from ..agents.AgentStates import AgentElementState, NodeState
-from ..agents.RuntimeStorage import ArtifactPolicy
-from ..agents.AgentElement import AgentElement
+from ..agents.AgentStates import NodeState
+from ..agents.RuntimeStorage import ArtifactPolicy, stable_fingerprint
+from ..agents.AgentElement import AgentElement, persisted_field, runtime_handle_field
 
 @dataclass
 class Node(AgentElement):
-    
     child_ids : list[str] = field(default_factory=list, metadata={"description" : "List of child node IDs"})
-    
-    def __post_init__(self):
-        super().__post_init__()
-        self._parents : list[Node] = list()
-        self._children : list[Node] = list()
-        self._is_active : bool = True
-        self._state : Union[AgentElementState, NodeState] = AgentElementState.UNINSTALLED
-        self._last_timestamp : int = 0
-        self._execution_id : str = None
-        self._last_transition_timestamp : int = 0
-        self._retry_marker : int = 0
-        self._interrupted : bool = False
-      
+    _parents : list["Node"] = runtime_handle_field(default_factory=list, init=False, repr=False)
+    _children : list["Node"] = runtime_handle_field(default_factory=list, init=False, repr=False)
+    _is_active : bool = persisted_field(default=True, init=False, repr=False)
+    _last_timestamp : int = persisted_field(default=0, init=False, repr=False)
+    _execution_id : str = persisted_field(default=None, init=False, repr=False)
+    _last_transition_timestamp : int = persisted_field(default=0, init=False, repr=False)
+    _retry_marker : int = persisted_field(default=0, init=False, repr=False)
+    _interrupted : bool = persisted_field(default=False, init=False, repr=False)
     def add_child(self, child : Node):
         self._children.append(child)
         if child.id not in self.child_ids:
@@ -110,27 +103,13 @@ class Node(AgentElement):
             metadata={"node_id": self.id, "execution_id": self._execution_id},
         )
 
-    def snapshot_state(self) -> dict:
-        payload = super().snapshot_state()
-        payload.update(
-            {
-                "is_active": self._is_active,
-                "last_timestamp": self._last_timestamp,
-                "execution_id": self._execution_id,
-                "last_transition_timestamp": self._last_transition_timestamp,
-                "retry_marker": self._retry_marker,
-                "interrupted": self._interrupted,
-            }
-        )
-        return payload
+    def get_topology_fingerprint(self, agent=None) -> str | None:
+        payload = {
+            "parents": sorted([parent.uid for parent in self._parents]),
+            "children": sorted([child.uid for child in self._children]),
+            "child_ids": sorted(self.child_ids),
+        }
+        return stable_fingerprint(payload)
 
-    def restore_state(self, payload: dict | None):
-        super().restore_state(payload)
-        if payload is None:
-            return
-        self._is_active = payload.get("is_active", True)
-        self._last_timestamp = payload.get("last_timestamp", 0)
-        self._execution_id = payload.get("execution_id")
-        self._last_transition_timestamp = payload.get("last_transition_timestamp", 0)
-        self._retry_marker = payload.get("retry_marker", 0)
-        self._interrupted = payload.get("interrupted", False)
+    def _default_uid_prefix(self) -> str:
+        return "node"

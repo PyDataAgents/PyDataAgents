@@ -1,88 +1,71 @@
 from dataclasses import dataclass, field
 import os
 from pathlib import Path
+from typing import ClassVar
 from loguru import logger
 from langchain_chroma import Chroma
-from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_unstructured import UnstructuredLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from sentence_transformers import SentenceTransformer
 from langchain_community.vectorstores.utils import filter_complex_metadata
 from ...agents.AgentConfig import AgentConfig
-from ...agents.RuntimeStorage import ArtifactPolicy
+from ...agents.AgentElement import artifact_descriptor_field, runtime_handle_field
+from ...agents.RuntimeStorage import ArtifactPolicy, normalize_runtime_key
 from ..Service import Service
 from ..ServiceException import ServiceException
+from ...utils.FileUtils import FileUtils
+from ...utils.ModelUtils import ModelUtils
 
 @dataclass
 class FileEmbeddingService(Service):
     """File Embedding Service to embed documents from file links into an embedding store. Only text-based documents are embedded.
     """
-    
-    # Constants
-    MODEL_RESOURCE_FOLDER = Path(AgentConfig.MODEL_RESOURCE_FOLDER)
-    EMBEDDINGS_RESOURCE_FOLDER = Path(AgentConfig.EMBEDDINGS_RESOURCE_FOLDER)
+    NON_TEXT_EXTENSIONS: ClassVar[set[str]] = FileUtils.COMMON_NON_TEXT_EXTENSIONS | {".db"}
     
     docs_folder : list[str] | str = field(default=None, metadata={"description": "Folder links to load documents from into embedded store on startup"})
     embedding_model_name : str = field(default="all-MiniLM-L6-v2", metadata={"description": "name of the embedding model to use for embedding store. Currently, only sentence transformer models are supported, e.g. all-MiniLM-L6-v2. See "})
     store_name : str = field(default=None, metadata={"description": "name of the embedded store"})
-    
-    def __post_init__(self):
-        super().__post_init__()
-        self._embedding_store = None
-        self._embedding_model = None
-        self._retriever = None
-        self._resolved_store_directory : str = None
-        self._non_text_extensions = {
-            # Images (The most common cause of unwanted OCR/Tesseract triggers)
-            ".jpg", ".jpeg", ".png", ".gif", ".bmp", ".tiff", ".webp", ".heic", ".ico", ".svg",
-            
-            # Video & Audio
-            ".mp4", ".mov", ".avi", ".mkv", ".wmv", ".flv", ".webm",
-            ".mp3", ".wav", ".flac", ".m4a", ".aac", ".ogg",
-            
-            # Executables, Binaries & System Files
-            ".exe", ".dll", ".bin", ".dat", ".iso", ".sys", ".so", ".dylib", ".msi", ".bat",
-            
-            # Compressed & Archive Files
-            ".zip", ".rar", ".7z", ".tar", ".gz", ".bz2", ".xz",
-            
-            # Design & Adobe Proprietary
-            ".psd", ".ai", ".indd", ".eps", ".sketch", ".fig",
-            
-            # Font Files
-            ".ttf", ".otf", ".woff", ".woff2",
-
-            # Chroma db files
-            ".db"
-
-        }
+    _embedding_store : object = runtime_handle_field(default=None, init=False, repr=False)
+    _embedding_model : object = runtime_handle_field(default=None, init=False, repr=False)
+    _retriever : object = runtime_handle_field(default=None, init=False, repr=False)
+    _resolved_store_directory : str | None = artifact_descriptor_field(
+        default=None,
+        init=False,
+        repr=False,
+        name="embedding_store",
+        kind="vector_store",
+        policy=ArtifactPolicy.DURABLE.value,
+    )
             
     def _on_start(self):
-        # attempt local download of embedding model
-        if not os.path.exists(FileEmbeddingService.MODEL_RESOURCE_FOLDER / self.embedding_model_name):    
-            model = SentenceTransformer(self.embedding_model_name)
-            model.save(str(FileEmbeddingService.MODEL_RESOURCE_FOLDER / self.embedding_model_name))
-            logger.debug("downloaded embedding model " + self.embedding_model_name + " to " + str(FileEmbeddingService.MODEL_RESOURCE_FOLDER / self.embedding_model_name))
-        # Return tensors directly to avoid NumPy conversion issues and keep
-        # compatibility with sentence-transformers versions that return lists
-        # when only convert_to_numpy=False is set.
-        self._embedding_model = HuggingFaceEmbeddings(
-            model_name=os.path.join(str(FileEmbeddingService.MODEL_RESOURCE_FOLDER), self.embedding_model_name),
-            encode_kwargs={"convert_to_tensor": True},
+        self.rebuild_runtime_handles()
+
+    def rebuild_runtime_handles(self, agent=None):
+        if self._embedding_model is not None and self._embedding_store is not None:
+            return
+        runtime_agent = agent if agent is not None else getattr(self, "_agent", None)
+        model_resource_root = self._resolve_model_resource_root(runtime_agent)
+        model_artifact_path = self._resolve_model_artifact_path(runtime_agent)
+        self._resolved_store_directory = self._resolve_store_directory(runtime_agent)
+        self.clear_registered_artifacts()
+        self.register_artifact(
+            name="embedding_model",
+            path=str(model_artifact_path),
+            kind="model_cache",
+            policy=ArtifactPolicy.SHARED.value,
+            metadata={"embedding_model_name": self.embedding_model_name},
         )
-        if self.store_name is None:
-            self._embedding_store = Chroma(embedding_function=self._embedding_model)                       
-        else:
-            self._resolved_store_directory = self._resolve_store_directory()
-            self.clear_registered_artifacts()
-            self.register_artifact(
-                name="embedding_store",
-                path=self._resolved_store_directory,
-                kind="vector_store",
-                policy=ArtifactPolicy.DURABLE.value,
-                metadata={"embedding_model_name": self.embedding_model_name, "store_name": self.store_name},
-            )
-            self._embedding_store = Chroma(persist_directory=self._resolved_store_directory, embedding_function=self._embedding_model)
+        self.register_artifact(
+            name="embedding_store",
+            path=self._resolved_store_directory,
+            kind="vector_store",
+            policy=ArtifactPolicy.DURABLE.value,
+            metadata={"embedding_model_name": self.embedding_model_name, "store_name": self.store_name},
+        )
+        self._embedding_model = ModelUtils.build_huggingface_embeddings(model_resource_root, self.embedding_model_name)
+        self._embedding_store = Chroma(
+            persist_directory=self._resolved_store_directory,
+            embedding_function=self._embedding_model,
+        )
         logger.debug("created embedding store with embedding model " + self.embedding_model_name)
         if isinstance(self.docs_folder, str):
             self.docs_folder = [self.docs_folder]
@@ -110,6 +93,13 @@ class FileEmbeddingService(Service):
         self._embedding_store = None
         self._embedding_model = None
         self._retriever = None
+
+    def _resolve_model_resource_root(self, agent=None) -> Path:
+        AgentConfig.ensure_resource_layout()
+        return AgentConfig.MODEL_RESOURCE_ROOT
+
+    def _resolve_model_artifact_path(self, agent=None) -> Path:
+        return self._resolve_model_resource_root(agent) / self.embedding_model_name
     
     def add_document(self, document_link):
         # Check if document already in embedding store
@@ -117,7 +107,7 @@ class FileEmbeddingService(Service):
             logger.debug("document " + document_link + " already embedded in embedding store, skipping embedding for this document")
             return
         # Only allow embedding of text-based documents, skip non-text files based on file extension to avoid unwanted OCR/Tesseract triggers and to save resources. This is a simple heuristic and can be further improved by actually checking the file type or content instead of just relying on the file extension, but it should work well in most cases and is much more efficient than trying to load every file and checking its content.
-        if os.path.splitext(document_link)[1].lower() in self._non_text_extensions:
+        if os.path.splitext(document_link)[1].lower() in self.NON_TEXT_EXTENSIONS:
             logger.warning("skipping non-text file " + document_link + " for embedding")
             return
         loader = UnstructuredLoader(document_link, strategy="auto") 
@@ -135,21 +125,17 @@ class FileEmbeddingService(Service):
         self._embedding_store.add_documents(split_docs, ids=[document_link + "_" + str(i) for i in range(len(split_docs))]) # add document link as prefix to the id of the embedded document to ensure uniqueness and to be able to identify the source document of the embedded chunk later on when retrieving relevant documents from the embedding store
         logger.debug("embedded document " + document_link + " into embedding store")
 
-    def _resolve_store_directory(self) -> str:
+    def _resolve_store_directory(self, agent=None) -> str:
+        if self._resolved_store_directory:
+            return self._resolved_store_directory
+        AgentConfig.ensure_resource_layout()
         if self.store_name is None:
-            return None
-        if getattr(self, "_agent", None) is not None:
-            return str(self.get_artifact_root(self._agent) / "vector_store")
-        return os.path.join(FileEmbeddingService.EMBEDDINGS_RESOURCE_FOLDER, self.store_name)
-
-    def snapshot_state(self) -> dict:
-        payload = super().snapshot_state()
-        payload["resolved_store_directory"] = self._resolved_store_directory
-        return payload
-
-    def restore_state(self, payload: dict | None):
-        super().restore_state(payload)
-        if payload is None:
-            return
-        self._resolved_store_directory = payload.get("resolved_store_directory")
-    
+            store_root = AgentConfig.EMBEDDING_RESOURCE_ROOT / normalize_runtime_key(
+                self.uid, fallback="embedding-store"
+            )
+            FileUtils.create_dir(str(store_root))
+            return str(store_root)
+        store_key = normalize_runtime_key(self.store_name, fallback="embedding-store")
+        store_root = AgentConfig.EMBEDDING_RESOURCE_ROOT / store_key
+        FileUtils.create_dir(str(store_root))
+        return str(store_root)

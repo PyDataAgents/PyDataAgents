@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING, Optional, Union
 
 from .Service import Service
 from .ObserverThread import ObserverThread
+from ..agents.AgentElement import persisted_field, runtime_handle_field
 
 
 if TYPE_CHECKING:
@@ -14,14 +15,13 @@ if TYPE_CHECKING:
 class ObserverService(Service):
     """abstract base class for Services with ObserverThreads
     """
-    
-    thread_type : str = field(default=None, metadata={"description": "type of thread, e.g. MILLI_SECONDS, MICRO_SECONDS, INSTANT, ONLY_ONCE, DAYTIME, DATE, ..."})    
+    thread_type : str = field(default=None, metadata={"description": "type of thread, e.g. MILLI_SECONDS, MICRO_SECONDS, INSTANT, ONLY_ONCE, DAYTIME, DATE, ..."})
     observing_time : Union[int|str] = field(default=None, metadata={"description": "observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for DAYTIME in %H:%M or %H:%M:%S, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ..."})    
     week_days : Optional[str] = field(default=None, metadata={"description": "specifies the week days the observer thread should run on, e.g. 'mon, fri, sun', 'mon - thu' or by numbers '0, 2, 4', where Monday = 0 and Sunday = 6"})
-       
-    def __post_init__(self):
-        super().__post_init__()
-        self._observer_thread : ObserverThread = None
+    _observer_counts : int = persisted_field(default=0, init=False, repr=False)
+    _observer_last_update : int = persisted_field(default=0, init=False, repr=False)
+    _observer_running : bool = persisted_field(default=False, init=False, repr=False)
+    _observer_thread : ObserverThread = runtime_handle_field(default=None, init=False, repr=False)
     
     def _on_install(self, agent : Agent = None):
         super()._on_install(agent)
@@ -42,15 +42,9 @@ class ObserverService(Service):
     def get_observer_thread(self) -> ObserverThread:
         return self._observer_thread
 
-    def snapshot_state(self) -> dict:
-        payload = super().snapshot_state()
+    def prepare_checkpoint(self, agent=None):
+        super().prepare_checkpoint(agent)
         if self._observer_thread is not None:
-            payload.update(
-                {
-                    "observer_counts": self._observer_thread.get_counts(),
-                    "observer_last_update": self._observer_thread.get_last_update(),
-                    "observer_running": self._observer_thread.is_running(),
-                }
-            )
-        return payload
-    
+            self._observer_counts = self._observer_thread.get_counts()
+            self._observer_last_update = self._observer_thread.get_last_update()
+            self._observer_running = self._observer_thread.is_running()

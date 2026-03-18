@@ -336,27 +336,27 @@ def test_timestamps_mixed_provided_then_missing():
     assert all(ts[len(ts)-i-1] > ts[len(ts)-i-2] for i in range(4)), "Timestamps must be strictly increasing across mixed pushes"
 
 
-def test_snapshot_state_uses_next_index_key_for_internal_cursor():
+def test_snapshot_state_uses_internal_field_names_for_checkpoint_payload():
     buf = DictBuffer(index_enabled=True)
     buf.push({"a": [1, 2]})
 
     payload = buf.snapshot_state()
 
-    assert DictBuffer.SNAPSHOT_NEXT_INDEX_KEY in payload
-    assert payload[DictBuffer.SNAPSHOT_NEXT_INDEX_KEY] == 2
-    assert DictBuffer.LEGACY_SNAPSHOT_INDEX_KEY not in payload
-    assert payload["elements"][buf.index_key] == [0, 1]
+    assert "_index" in payload
+    assert payload["_index"] == 2
+    assert "_elements" in payload
+    assert payload["_elements"][buf.index_key] == [0, 1]
 
 
-def test_restore_state_accepts_legacy_index_snapshot_key():
+def test_restore_state_requires_current_internal_snapshot_keys():
     buf = DictBuffer(index_enabled=True)
 
     buf.restore_state(
         {
-            "elements": {},
-            "last_timestamp": 0,
-            "last_timer": 0,
-            DictBuffer.LEGACY_SNAPSHOT_INDEX_KEY: 5,
+            "_elements": {},
+            "_last_timestamp": 0,
+            "_last_timer": 0,
+            "_index": 5,
         }
     )
     buf.push({"a": 10})

@@ -1,9 +1,10 @@
 from abc import abstractmethod
 from dataclasses import dataclass, field
-from typing import Any, Dict, Tuple, Union
+from typing import Any, Dict, Tuple
 
 
-from ..agents.AgentStates import AgentElementState, LearningState, NodeState
+from ..agents.AgentStates import LearningState
+from ..agents.AgentElement import persisted_field, runtime_handle_field
 from .TransformNode import TransformNode
 from .transforms.utils.ReshapeTransform import ReshapeTransform
 from .transforms.statistics.ZScore import ZScore
@@ -16,19 +17,14 @@ class LearningNode(TransformNode):
     LearningNode is a base class for elements that require a learning step in their pipeline execution.
     It extends the TransformNode class and provides additional functionality specific to learning tasks.
     """
-
     min_learning_samples : int = field(default=0, metadata={"description": "Minimum number of samples required for learning."})
     min_inference_samples : int = field(default=0, metadata={"description": "Number of Samples to do inference on."})
     sample_length : int = field(default=0, metadata={"description": "Expected length of each sample. If 0, a sample with shape (1, min_learning_samples) is assumed. Otherwise, (1, sample_length) is assumed."})
     normalize : bool = field(default=False, metadata={"description": "Flag to indicate whether to normalize the input data using z-score normalization on the input batch."})
     nan_to_num : bool = field(default=False, metadata={"description": "If True, replace NaN/Inf values with finite numbers (0.0)."})
-
-    def __post_init__(self):
-        super().__post_init__()
-        self._models : dict | Any = {} # Placeholder for the model, to be defined in subclasses.
-        self._model_descriptors : dict | Any = {}
-        self._requires_learning : bool = True   # Flag indicating if learning is required. Can be overwritten in subclasses.
-        self._state : Union[LearningState, NodeState, AgentElementState] = AgentElementState.UNINSTALLED
+    _models : dict | Any = runtime_handle_field(default_factory=dict, init=False, repr=False)
+    _model_descriptors : dict | Any = persisted_field(default_factory=dict, init=False, repr=False)
+    _requires_learning : bool = persisted_field(default=True, init=False, repr=False)
          
     @abstractmethod
     def learn(self, data : dict, meta : dict = None) -> bool:
@@ -92,7 +88,7 @@ class LearningNode(TransformNode):
             # We can do that here, or in the respective learn method of the subclass.
             # For now, we do that in the learning subclass and train a single model per key.
             self._state = LearningState.LEARNING
-            self._requires_learning = self.learn(preprocessed_data, meta)        
+            self._requires_learning = self.learn(preprocessed_data, meta)
         elif not self._requires_learning and size >= max(1,self.sample_length)*self.min_inference_samples:            
             self.n = max(1,self.sample_length)*self.min_inference_samples
             data = self.get_parent_data()
@@ -114,18 +110,13 @@ class LearningNode(TransformNode):
         """
         return self._requires_learning
 
-    def snapshot_state(self) -> dict:
-        payload = super().snapshot_state()
-        payload["requires_learning"] = self._requires_learning
-        payload["model_descriptors"] = self._serialize_models()
-        return payload
+    def prepare_checkpoint(self, agent=None):
+        super().prepare_checkpoint(agent)
+        self._model_descriptors = self._serialize_models()
 
-    def restore_state(self, payload: dict | None):
-        super().restore_state(payload)
-        if payload is None:
-            return
-        self._requires_learning = payload.get("requires_learning", True)
-        self._model_descriptors = payload.get("model_descriptors", {})
+    def rebuild_runtime_handles(self, agent=None):
+        if self._models in (None, {}):
+            self._models = self._restore_models_from_descriptors(self._model_descriptors)
 
     def _serialize_models(self):
         if hasattr(self._models, "to_dict"):
@@ -143,3 +134,6 @@ class LearningNode(TransformNode):
         if isinstance(self._models, (str, int, float, bool, list, dict)) or self._models is None:
             return self._models
         return str(type(self._models).__name__)
+
+    def _restore_models_from_descriptors(self, descriptors):
+        return self._snapshot_copy(descriptors)

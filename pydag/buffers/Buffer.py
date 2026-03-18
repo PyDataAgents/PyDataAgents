@@ -1,18 +1,17 @@
 from __future__ import annotations
 from dataclasses import dataclass, field
-import copy
 import json
 from abc import abstractmethod
 import threading
 import time
-from typing import TYPE_CHECKING, Union
+from typing import TYPE_CHECKING
 
 
 from ..agents.AgentConfig import AgentConfig
-from ..agents.AgentStates import AgentElementState, BufferState
+from ..agents.AgentStates import BufferState
 from ..utils.ClassUtils import ClassUtils
 from .DataType import DataType
-from ..agents.AgentElement import AgentElement
+from ..agents.AgentElement import AgentElement, persisted_field, runtime_handle_field
 
 if TYPE_CHECKING:
     from ..agents.Agent import Agent
@@ -21,7 +20,7 @@ if TYPE_CHECKING:
 class Buffer(AgentElement):
     """
     Abstract base class for buffers.
-    """    
+    """
     
     capacity : int = field(default=AgentConfig.INFINITE_CAPACITY, metadata={"description": "Number of elements that can be stored in buffer before being discarded in FiFo fashion. If set to -1, then there is no capacity for this buffer."})
     data_type : str = field(default=DataType.FLOAT.value, metadata={"description": "datatype to expect from buffer elements, can be DataType enum or list of enums"})
@@ -29,15 +28,16 @@ class Buffer(AgentElement):
     unit : any = field(default=None, metadata={"description": "unit of element values in this buffer, can be string or list of strings"})
     description : str = field(default=None, metadata={"description": "buffer description"})
     duplicate_ids : list = field(default_factory = list, metadata={"description": "id's of the other buffers used for duplicating the data"})
+    _elements : any = persisted_field(default=None, init=False, repr=False)
+    _duplicates : dict[str, "Buffer"] = runtime_handle_field(default_factory=dict, init=False, repr=False)
+    _lock : threading.RLock = runtime_handle_field(default_factory=threading.RLock, init=False, repr=False)
+    _last_timestamp : int = persisted_field(default=0, init=False, repr=False)
+    _last_timer : int = persisted_field(default=0, init=False, repr=False)
     
     def __post_init__(self):
         super().__post_init__()
-        self._elements = list | dict
-        self._duplicates : dict[str, Buffer] = {}
-        self._lock = threading.RLock()
-        self._state : Union[BufferState, AgentElementState] = AgentElementState.UNINSTALLED
-        self._last_timestamp : int = 0
-        self._last_timer :int = 0
+        if self._elements is None:
+            self._elements = []
 
     def _on_install(self, agent: Agent = None):
         if self.initial_values is not None:
@@ -171,23 +171,7 @@ class Buffer(AgentElement):
         """
         return self._last_timestamp
 
-    def snapshot_state(self) -> dict:
-        payload = super().snapshot_state()
-        payload.update(
-            {
-                "elements": copy.deepcopy(self._elements),
-                "last_timestamp": self._last_timestamp,
-                "last_timer": self._last_timer,
-            }
-        )
-        return payload
-
-    def restore_state(self, payload: dict | None):
-        super().restore_state(payload)
-        if payload is None:
-            return
-        self._elements = copy.deepcopy(payload.get("elements", self._elements))
-        self._last_timestamp = payload.get("last_timestamp", 0)
-        self._last_timer = payload.get("last_timer", 0)
+    def _default_uid_prefix(self) -> str:
+        return "buffer"
         
         

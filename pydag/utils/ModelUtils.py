@@ -1,5 +1,9 @@
-import ollama
+from pathlib import Path
 
+from langchain_huggingface import HuggingFaceEmbeddings
+from loguru import logger
+import ollama
+from sentence_transformers import SentenceTransformer
 
 class ModelUtils:
     @staticmethod
@@ -106,4 +110,18 @@ class ModelUtils:
             + ". Manual command: "
             + install_cmd
             + "."
+        )
+
+    @staticmethod
+    def build_huggingface_embeddings(model_resource_folder: Path, embedding_model_name: str) -> HuggingFaceEmbeddings:
+        model_resource_folder = Path(model_resource_folder)
+        model_resource_folder.mkdir(parents=True, exist_ok=True)
+        model_path = model_resource_folder / embedding_model_name
+        if not model_path.exists():
+            model = SentenceTransformer(embedding_model_name)
+            model.save(str(model_path))
+            logger.debug(f"downloaded embedding model {embedding_model_name} to {model_path}")
+        return HuggingFaceEmbeddings(
+            model_name=str(model_path),
+            encode_kwargs={"convert_to_tensor": True},
         )

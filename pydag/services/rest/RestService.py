@@ -7,6 +7,7 @@ import uvicorn
 
 
 from ...agents.Agent import Agent
+from ...agents.AgentElement import runtime_handle_field
 from ..Service import Service
 from .BufferRESTAPI import BufferRESTAPI
 from .AgentRESTAPI import AgentRESTAPI
@@ -21,12 +22,9 @@ class RestService(Service):
     """
     
     port : int = field(default=8001, metadata={"description": "port of the REST API endpoint"})
-            
-    def __post_init__(self):
-        super().__post_init__()
-        self._app : FastAPI = None
-        self._service_thread : threading.Thread = None
-        self._server : uvicorn.Server = None
+    _app : FastAPI = runtime_handle_field(default=None, init=False, repr=False)
+    _service_thread : threading.Thread = runtime_handle_field(default=None, init=False, repr=False)
+    _server : uvicorn.Server = runtime_handle_field(default=None, init=False, repr=False)
         
     def _on_install(self, agent : Agent = None):
         super()._on_install(agent)
@@ -53,6 +51,10 @@ class RestService(Service):
     def _on_uninstall(self, agent : Agent = None):
         super()._on_uninstall(agent)
         self._app = None
+
+    def rebuild_runtime_handles(self, agent=None):
+        if self._app is None and self._agent is not None:
+            self._on_install(self._agent)
         
     def add_router(self, router : APIRouter):
         self._app.include_router(router)

@@ -1,5 +1,6 @@
 from dataclasses import fields
 import json
+from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 
@@ -54,10 +55,26 @@ class AgentConfig:
     MAX_EXPONENTIAL_SECONDS = 60 * 60 * 24 * 7
 
 
-    # resource folder
-    RESOURCE_FOLDER = "./resources/"
-    MODEL_RESOURCE_FOLDER = RESOURCE_FOLDER + "models/"
-    EMBEDDINGS_RESOURCE_FOLDER = RESOURCE_FOLDER + "embeddings/"
+    # Structured resource layout
+    RESOURCE_ROOT = Path("./resources")
+    RUNTIME_RESOURCE_ROOT = RESOURCE_ROOT / "runtime"
+    INPUT_RESOURCE_ROOT = RESOURCE_ROOT / "inputs"
+    MODEL_RESOURCE_ROOT = RESOURCE_ROOT / "models"
+    EMBEDDING_RESOURCE_ROOT = RESOURCE_ROOT / "embeddings"
+    OUTPUT_RESOURCE_ROOT = RESOURCE_ROOT / "outputs"
+    SCRIPT_RESOURCE_ROOT = RESOURCE_ROOT / "scripts"
+
+    def ensure_resource_layout() -> None:
+        for path in (
+            AgentConfig.RESOURCE_ROOT,
+            AgentConfig.RUNTIME_RESOURCE_ROOT,
+            AgentConfig.INPUT_RESOURCE_ROOT,
+            AgentConfig.MODEL_RESOURCE_ROOT,
+            AgentConfig.EMBEDDING_RESOURCE_ROOT,
+            AgentConfig.OUTPUT_RESOURCE_ROOT,
+            AgentConfig.SCRIPT_RESOURCE_ROOT,
+        ):
+            path.mkdir(parents=True, exist_ok=True)
 
     @staticmethod
     def config_options(obj : Any, with_descriptions = False) -> dict:
@@ -72,8 +89,10 @@ class AgentConfig:
         """
         result = {}
         for f in fields(obj):
-            # check for fields with metadata only
-            if len(f.metadata) > 0:
+            include_in_config = f.metadata.get("config")
+            if include_in_config is None:
+                include_in_config = "description" in f.metadata
+            if include_in_config:
                 value = getattr(obj, f.name)
                 if with_descriptions:
                     result[f.name] = {

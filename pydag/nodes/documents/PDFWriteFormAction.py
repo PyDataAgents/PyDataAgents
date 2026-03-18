@@ -8,6 +8,7 @@ import re
 from typing import Any
 
 from ...agents.Agent import Agent
+from ...agents.AgentConfig import AgentConfig
 from ...buffers.DictBuffer import DictBuffer
 from ...utils.FileUtils import FileUtils
 from ...utils.NodeUtils import NodeUtils
@@ -46,7 +47,7 @@ class PDFWriteFormAction(BufferNode, Action):
         metadata={"description": "output columns for source path, written file path, field map, and number of written fields"},
     )
     output_folder: str | None = field(
-        default="resources/outputs",
+        default=str(AgentConfig.OUTPUT_RESOURCE_ROOT),
         metadata={"description": "target folder for written PDFs; ignored when overwrite_source is True"},
     )
     output_suffix: str = field(

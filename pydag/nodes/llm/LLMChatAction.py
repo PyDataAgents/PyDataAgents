@@ -30,7 +30,7 @@ class LLMChatAction(BufferNode, ServiceNode, Action):
         default=None,
         metadata={
             "description": """
-            Legacy question template fallback when question_key/question_value are not configured.
+            Question template fallback when question_key/question_value are not configured.
             For example: 'How much costs the article number {}?' or
             'Summarize the following text: {0}. And answer the following question: {1}'.
             """,
@@ -116,7 +116,7 @@ class LLMChatAction(BufferNode, ServiceNode, Action):
 
     def _on_execute(self):
         self._validate_key_value_conflicts()
-        if self._uses_legacy_template_question():
+        if self._uses_template_question_fallback():
             self._validate_template_alignment()
 
         data = self.get_parent_data()
@@ -191,11 +191,11 @@ class LLMChatAction(BufferNode, ServiceNode, Action):
                 self.retrieval_query_key is not None,
                 len(self.input_context_keys) > 0,
                 len(self.pass_through_keys) > 0,
-                self._uses_legacy_template_question(),
+                self._uses_template_question_fallback(),
             ]
         )
 
-    def _uses_legacy_template_question(self) -> bool:
+    def _uses_template_question_fallback(self) -> bool:
         return self.question_key is None and self.question_value is None and self.template is not None
 
     def _validate_template_alignment(self):

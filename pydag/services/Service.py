@@ -2,12 +2,11 @@ from __future__ import annotations
 from abc import abstractmethod
 from dataclasses import dataclass, field
 import threading
-from typing import Any
-from typing import TYPE_CHECKING, Union
+from typing import TYPE_CHECKING
 
 
-from ..agents.AgentStates import AgentElementState, ServiceState
-from ..agents.AgentElement import AgentElement
+from ..agents.AgentStates import ServiceState
+from ..agents.AgentElement import AgentElement, persisted_field, runtime_handle_field, transient_field
 
 
 if TYPE_CHECKING:
@@ -19,15 +18,18 @@ class Service(AgentElement):
     """
     
     auto_start : bool = field(default=True, metadata={"description": "specifies whether to start the mapping with agent start"})
+    _agent : "Agent" = transient_field(default=None, init=False, repr=False)
+    _pause_event : threading.Event = runtime_handle_field(default_factory=threading.Event, init=False, repr=False)
+    _quiesce_event : threading.Event = runtime_handle_field(default_factory=threading.Event, init=False, repr=False)
+    _stop_event : threading.Event = runtime_handle_field(default_factory=threading.Event, init=False, repr=False)
+    _heartbeat_ts : int = persisted_field(default=0, init=False, repr=False)
+    _paused_state : bool = persisted_field(default=False, init=False, repr=False)
+    _quiescing_state : bool = persisted_field(default=False, init=False, repr=False)
+    _stopping_state : bool = persisted_field(default=False, init=False, repr=False)
         
     def __post_init__(self):
         super().__post_init__()
-        self._agent : "Agent" = None
-        self._state : Union[ServiceState, AgentElementState] = AgentElementState.UNINSTALLED
-        self._pause_event = threading.Event()
-        self._quiesce_event = threading.Event()
-        self._stop_event = threading.Event()
-        self._heartbeat_ts : int = 0
+        self._sync_control_events()
     
     def _on_install(self, agent : "Agent" = None):
         self._agent = agent
@@ -41,9 +43,10 @@ class Service(AgentElement):
 
         Implementations should perform any startup tasks required by the service.
         """
-        self._pause_event.clear()
-        self._quiesce_event.clear()
-        self._stop_event.clear()
+        self._paused_state = False
+        self._quiescing_state = False
+        self._stopping_state = False
+        self._sync_control_events()
         self._state = ServiceState.RUNNING
         self._on_start()
         self.heartbeat()
@@ -63,23 +66,29 @@ class Service(AgentElement):
         service. Subclasses shall call `super().stop()` to ensure the internal
         `_is_running` flag is cleared (set to False) once the service has stopped.
         """
-        self._stop_event.set()
+        self._stopping_state = True
+        self._sync_control_events()
         self._on_stop()
         self._state = ServiceState.STOPPED
 
     def pause(self):
-        self._pause_event.set()
+        self._paused_state = True
+        self._sync_control_events()
 
     def resume(self):
-        self._pause_event.clear()
+        self._paused_state = False
+        self._quiescing_state = False
+        self._stopping_state = False
+        self._sync_control_events()
         if self._state == ServiceState.STOPPED:
             self.start()
         else:
             self._state = ServiceState.RUNNING
 
     def quiesce(self):
-        self._quiesce_event.set()
-        self.pause()
+        self._quiescing_state = True
+        self._paused_state = True
+        self._sync_control_events()
 
     def is_paused(self) -> bool:
         return self._pause_event.is_set()
@@ -95,35 +104,15 @@ class Service(AgentElement):
 
         self._heartbeat_ts = TimeUtils.utc_ms()
 
-    def snapshot_state(self) -> dict[str, Any]:
-        payload = super().snapshot_state()
-        payload.update(
-            {
-                "heartbeat_ts": self._heartbeat_ts,
-                "paused": self.is_paused(),
-                "quiescing": self.is_quiescing(),
-                "stopping": self.is_stopping(),
-            }
-        )
-        return payload
-
     def restore_state(self, payload: dict | None):
         super().restore_state(payload)
-        if payload is None:
-            return
-        self._heartbeat_ts = payload.get("heartbeat_ts", 0)
-        if payload.get("paused"):
-            self._pause_event.set()
-        else:
-            self._pause_event.clear()
-        if payload.get("quiescing"):
-            self._quiesce_event.set()
-        else:
-            self._quiesce_event.clear()
-        if payload.get("stopping"):
-            self._stop_event.set()
-        else:
-            self._stop_event.clear()
+        self._sync_control_events()
+
+    def rebuild_runtime_handles(self, agent: "Agent" = None):
+        self._sync_control_events()
+
+    def _default_uid_prefix(self) -> str:
+        return "service"
     
     
     @abstractmethod
@@ -132,4 +121,18 @@ class Service(AgentElement):
         Implementations should perform any additional shutdown tasks required by the
         service.
         """
+
+    def _sync_control_events(self):
+        if self._paused_state:
+            self._pause_event.set()
+        else:
+            self._pause_event.clear()
+        if self._quiescing_state:
+            self._quiesce_event.set()
+        else:
+            self._quiesce_event.clear()
+        if self._stopping_state:
+            self._stop_event.set()
+        else:
+            self._stop_event.clear()
     

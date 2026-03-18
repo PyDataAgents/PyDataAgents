@@ -11,6 +11,7 @@ Use this document when you need to understand:
 - how a single `Agent` runtime persists and restores state
 - where restart and checkpoint logic lives in the class hierarchy
 - how runtime files are laid out under `resources/runtime/...`
+- how shared long-lived artifacts are laid out under `resources/...`
 - which parts of restart behavior are shared by the framework and which remain local to concrete elements
 - what is currently crash-tolerant, what is only cooperative, and what is still planned
 
@@ -36,11 +37,12 @@ The current implementation is a Stage 1 runtime foundation.
 What is implemented now:
 
 - one supervised `Agent` per runtime
-- stable runtime storage rooted by an immutable `uid`
+- stable runtime storage rooted by a deterministic `uid`
 - explicit aggregate lifecycle states
 - config persistence separated from runtime checkpoint persistence
 - per-element snapshots coordinated by the `Agent`
-- restart from the latest valid checkpoint
+- exact-match startup auto-resume from the latest valid checkpoint
+- automatic checkpoints coordinated by the `Agent`
 - cleanup hooks and checkpoint pruning
 - in-runtime REST endpoints for runtime control
 
@@ -106,6 +108,22 @@ Current runtime identifiers in practice:
 - `run_id` identifies a running release cycle inside the runtime metadata store
 - `checkpoint_id` identifies a checkpoint directory and manifest
 - `Node._execution_id` identifies a node execution attempt
+
+### Deterministic Default `uid` Derivation
+
+The default `uid` model is now deterministic rather than random.
+
+If a caller does not explicitly provide a `uid`:
+
+- `Agent.uid` is derived from a normalized form of `Agent.id`
+- top-level buffers derive `buffer/<normalized-id>`
+- top-level adapters derive `adapter/<normalized-id>`
+- top-level services derive `service/<normalized-id>`
+- statemachine nodes derive their `uid` from their service ownership scope plus their node id
+
+This matters because restart behavior depends on stable identity. A new process should derive the same runtime identity from the same logical definition without requiring the user to manually pass `uid` values every time.
+
+Explicit `uid` override still wins. The deterministic derivation is only the default.
 
 ## Aggregate Agent Lifecycle
 
@@ -191,6 +209,74 @@ SQLite currently stores:
 
 This is a hybrid design. Bulk element payloads and artifacts are not stored inside SQLite.
 
+## Agent Runtime Versus Shared Resource Roots
+
+The repository now uses two storage scopes on purpose:
+
+- agent runtime storage under `resources/runtime/<agent_uid>/...`
+- shared or user-facing resource roots under `resources/...`
+
+This is the rule developers should follow when adding new files, caches, stores, or other artifacts.
+
+### Use The Agent Runtime When The Data Belongs To One Runtime
+
+Use `resources/runtime/<agent_uid>/...` for:
+
+- checkpoints and manifests
+- runtime metadata and SQLite state
+- per-run temp files, logs, and spool files
+- agent-local artifacts that only make sense together with one runtime
+- artifacts that should disappear when the runtime is deleted or cleaned up
+
+Mental model:
+
+- "this belongs to one runtime instance and its lifecycle"
+
+Typical examples:
+
+- checkpoint files managed by `RuntimeStorage`
+- per-agent temp artifacts
+- owner-local runtime state that should be cleaned together with the runtime
+
+### Use `resources/...` When The Data Should Survive One Runtime
+
+Use the shared top-level resource roots for:
+
+- reusable model caches under `resources/models/...`
+- reusable vector stores or embedding stores under `resources/embeddings/...`
+- user-provided inputs under `resources/inputs/...`
+- user-facing outputs under `resources/outputs/...`
+- reusable scripts or source assets under `resources/scripts/...`
+
+Mental model:
+
+- "this should still exist even if one runtime is deleted"
+
+Typical examples in the current codebase:
+
+- embedding model downloads managed through `ModelUtils`
+- vector stores created by `RAGService` and `FileEmbeddingService`
+- generated PDF outputs written by `PDFWriteFormAction`
+
+### Practical Decision Rule
+
+When adding a new artifact, ask these questions in order:
+
+1. If the agent runtime is deleted, should this file or directory also disappear?
+   - If yes, use the agent runtime.
+   - If no, use a shared `resources/...` root.
+
+2. Is this artifact part of checkpoint-owned runtime state for exactly one agent?
+   - If yes, use the agent runtime.
+
+3. Is this expensive to rebuild and useful across restarts or later across agents?
+   - If yes, prefer a shared `resources/...` root.
+
+4. Is this user-facing input or output data?
+   - If yes, use `resources/inputs/...` or `resources/outputs/...`.
+
+This keeps restart state local while keeping durable reusable assets publicly available.
+
 ## Why `RuntimeStorage` Is A Peer Module Under `pydag/agents`
 
 `RuntimeStorage` is not just a private helper inside `Agent`.
@@ -236,6 +322,7 @@ Runtime persistence captures logical execution state that matters for restart an
 
 Current entry points:
 
+- `Agent.release(...)`
 - `Agent.checkpoint(...)`
 - `Agent.restore(...)`
 - `Agent.reload_current()`
@@ -254,9 +341,12 @@ Shared methods introduced or formalized there:
 - `load_config(...)`
 - `snapshot_state()`
 - `restore_state(payload)`
+- `prepare_checkpoint(...)`
 - `list_owned_artifacts()`
+- `describe_additional_artifacts()`
 - `save_owned_artifacts(...)`
 - `load_owned_artifacts(...)`
+- `rebuild_runtime_handles(...)`
 - `validate_restored_state(...)`
 - `build_snapshot(...)`
 - `restore_from_snapshot(...)`
@@ -275,6 +365,8 @@ What the base class owns:
 
 - path resolution
 - snapshot envelope structure
+- declarative field-role interpretation
+- persistence schema fingerprinting
 - config path defaults
 - artifact registration
 - generic cleanup dispatch
@@ -282,13 +374,44 @@ What the base class owns:
 
 What the concrete element still owns:
 
-- the logical payload inside `snapshot_state()`
-- the interpretation of that payload inside `restore_state(...)`
-- the artifact list it returns or registers
+- rare custom snapshot preparation when a field must be transformed before persistence
+- rare custom restore compatibility handling for older payloads
+- the artifact list it registers in owner-specific cases
 - whether an artifact should be reused or rebuilt
-- how an artifact is recreated after restore
+- how live runtime handles are recreated after restore or startup
 
 This is the core framework rule: policy is centralized high in the hierarchy, semantics remain local to the owner.
+
+### Declarative Persistence Roles
+
+The current code now prefers declarative field roles over ad hoc `snapshot_state()` implementations.
+
+The main roles are:
+
+- persisted inline state
+- artifact descriptor state
+- transient runtime-only state
+- runtime handles that must be rebuilt
+
+In code this is expressed through field helpers in `AgentElement`:
+
+- `persisted_field(...)`
+- `artifact_descriptor_field(...)`
+- `transient_field(...)`
+- `runtime_handle_field(...)`
+
+What these mean:
+
+- persisted inline state:
+  JSON-serializable logical state that should be written into the element snapshot payload
+- artifact descriptor state:
+  a path-like or descriptor-like value that should be represented as an `ArtifactRecord`, not as a live Python object
+- transient runtime-only state:
+  local helper state that should not participate in checkpointing
+- runtime handle state:
+  non-serializable live objects such as locks, clients, threads, models, stores, sessions, and servers that must be recreated
+
+This is intentionally explicit. The runtime does not try to serialize every attribute automatically and silently skip the ones that fail. That would be easier to write initially but much less safe to restore correctly.
 
 ## What Counts As Serializable State
 
@@ -318,6 +441,61 @@ The restart contract is therefore cooperative and reconstructive:
 
 - serialize logical state
 - re-create live runtime handles from configuration and descriptors
+
+## Runtime Handle Reconstruction
+
+Runtime handles are now treated as a first-class lifecycle concern rather than an accidental omission from checkpoint payloads.
+
+### Why Runtime Handles Are Excluded
+
+The framework does not checkpoint live objects like:
+
+- `threading.Event`
+- `threading.Lock`
+- `threading.Thread`
+- uvicorn server instances
+- LangChain runnable pipelines
+- LLM provider client objects
+- Chroma/vector-store client objects
+- loaded embedding model wrappers
+- live data-model method tables and interpreter-bound objects
+
+Those objects are either not serializable or would be incorrect to restore as raw process memory snapshots.
+
+### Reconstruction Rule
+
+The reconstruction rule is now:
+
+1. install the element
+2. restore inline persisted fields
+3. restore artifact descriptor fields
+4. load or reopen owner-managed artifacts
+5. rebuild runtime handles
+6. validate the restored state
+
+This rule is shared in `AgentElement.restore_from_snapshot(...)`.
+
+### Audited Important Classes
+
+The runtime-handle audit now explicitly covers:
+
+- `Service`
+- `ObserverService`
+- `RestService`
+- `Adapter`
+- `LLMService`
+- `RAGService`
+- `FileEmbeddingService`
+- `DataModelService`
+- `LearningNode`
+
+For these classes, the code now separates:
+
+- what is checkpointed
+- what is represented as an artifact descriptor
+- what must be recreated from config or restored descriptors
+
+This matters because a skipped runtime handle is only safe if startup or restore rebuilds it reliably.
 
 ## Fail-Safe Checkpoint Mechanics
 
@@ -377,7 +555,56 @@ That is why owner-level artifact logic still matters. If a concrete element writ
 
 Restore logic is the second half of the fail-safe restart model.
 
-### Restore Flow In `Agent.restore(...)`
+### Startup Auto-Resume In `Agent.release(...)`
+
+Normal restart behavior now lives in `Agent.release(...)`, not in user scripts.
+
+Current startup flow:
+
+1. finalize deterministic runtime identities for the agent and its elements
+2. ensure runtime storage layout exists
+3. persist the current config to `config/agent.json`
+4. install all current elements
+5. load the current checkpoint pointer if one exists
+6. compare the current definition against the checkpointed definition
+7. restore only exact-match elements
+8. fresh-start any changed or newly added elements
+9. ignore removed checkpoint elements during restore
+10. connect adapters
+11. start services
+12. enter `RUNNING`
+
+The default resume mode is `EXACT_MATCH_ONLY`.
+
+Exact match means:
+
+- same `uid`
+- same class/type
+- same definition fingerprint
+- same owner scope
+- same topology fingerprint for nodes
+
+This is intentionally strict. If an element changed in any way that affects its identity or definition, Stage 1 does not try to migrate it. The changed element is rebuilt and started fresh.
+
+### Reconciliation Outcomes
+
+The current reconciliation report uses three outcomes only:
+
+- `RESTORE_EXACT_MATCH`
+- `FRESH_START_CHANGED`
+- `REMOVED_IGNORED`
+
+This is a deliberate simplification. The framework does not yet try to interpret whether a change is "compatible enough" to restore. Any change means a fresh start for that element.
+
+Examples:
+
+- same buffer id and same config: restored
+- same service id but changed config field: fresh-started
+- node moved to a different statemachine service: fresh-started
+- node parent or child topology changed: fresh-started
+- element removed from the current agent but present in the old checkpoint: ignored during restore
+
+### Manual Restore Flow In `Agent.restore(...)`
 
 Current flow:
 
@@ -393,7 +620,7 @@ Current flow:
 10. If the runtime was actively running before restore, resume it.
 11. Otherwise restore the lifecycle value recorded in the manifest, or fall back to the prior state.
 
-This flow is restart-safe only if the element graph is structurally compatible with the stored checkpoint. In Stage 1, checkpoint restore assumes the same logical agent composition is present when restore is called.
+`Agent.restore(...)` remains available for explicit control and tests. It is not the primary day-to-day restart path anymore. The normal path is automatic reconciliation during `Agent.release(...)`.
 
 ### Reload Flow In `Agent.reload_current()`
 
@@ -413,6 +640,53 @@ Restore does not recreate the entire process image. It restores logical state in
 - owner-specific `restore_state(...)` logic must be conservative
 
 This also means there is no magic process checkpointing. If a service needs live handles back after restore, it must recreate them from config or descriptors when it next starts.
+
+## Automatic Checkpointing
+
+Automatic checkpointing is now coordinated by `Agent`, not by individual elements.
+
+### Current Trigger Model
+
+The Stage 1 implementation supports:
+
+- explicit manual checkpoint calls
+- checkpoint on graceful terminate
+- checkpoint on reload
+- periodic timer-based checkpoints
+- optional checkpoint on quiesce
+
+The runtime stores the checkpoint reason in metadata and manifests. Current reasons are:
+
+- `MANUAL`
+- `AUTO_TIMER`
+- `TERMINATE`
+- `RELOAD`
+- `QUIESCE`
+
+### Trigger-Based Behavior
+
+Timer-based checkpoints are now trigger-driven only.
+
+This means the timer loop no longer tries to decide whether enough runtime state changed. If the configured checkpoint condition is met, the runtime creates a checkpoint.
+
+For the current Stage 1 design this is intentional:
+
+- the runtime is long-lived
+- periodic snapshots are acceptable even when state changes are small
+- checkpoint behavior is easier to reason about when it depends only on explicit triggers
+
+If change-sensitive checkpointing is ever needed later, it should be reintroduced as a separate design step rather than hidden inside the current runtime behavior.
+
+### Checkpoint Scheduler Safeguards
+
+The automatic checkpoint loop is conservative:
+
+- the loop runs in a dedicated agent-owned background thread
+- the loop respects a minimum spacing between checkpoints
+- the loop skips while the runtime is already checkpointing, restoring, or stopping
+- agent-level locks serialize `release()`, `checkpoint()`, `restore()`, `reload_current()`, and `terminate()`
+
+This prevents checkpoint overlap between manual calls, REST calls, and timer-triggered checkpoints.
 
 ## Pause, Quiesce, And Stop Semantics
 
@@ -457,29 +731,79 @@ This improves restart coordination, but it is still cooperative. A service that 
 
 The Stage 1 runtime pushes common restart and persistence behavior upward into the hierarchy.
 
+### `AgentElement`
+
+`AgentElement` is now the declarative persistence engine for the whole hierarchy.
+
+It is responsible for:
+
+- interpreting field roles
+- building inline payloads from `persisted_field(...)`
+- turning `artifact_descriptor_field(...)` values into `ArtifactRecord`s
+- excluding transient and runtime-handle fields from payloads
+- fingerprinting the persistence schema
+- coordinating restore order, including runtime-handle rebuild
+
+For normal element authoring, this is now the most important base class to understand.
+
 ### `Buffer`
 
-`Buffer.snapshot_state()` now serializes:
+`Buffer` now declares most of its useful state directly through inherited field roles.
+
+By default it persists:
 
 - the logical buffer contents
 - last access timestamps
 - timer metadata
 
-`Buffer.restore_state(...)` restores those logical values directly.
+By default it treats as runtime-only:
 
-This is the simplest example of restartable logical state.
+- duplicate buffer references
+- lock objects
+
+Concrete buffers should normally only add or refine field roles if they introduce additional runtime state, for example an extra index counter.
+
+`DictBuffer` is a good example of the intended pattern. It inherits the general buffer defaults and only adds its own persisted index counter plus a small backward-compatibility restore mapping.
 
 ### `Adapter`
 
-`Adapter.snapshot_state()` now serializes:
+`Adapter` now provides the persistence default for adapter-level durable metadata.
+
+By default it persists:
 
 - side-effect receipt records
 
-This is groundwork for safer recovery later. It is not yet a full idempotency system.
+By default it treats as runtime handles:
+
+- live connections
+- sockets
+- client objects
+- transport/session handles
+
+This is groundwork for safer recovery later. It is not yet a full idempotency system, but it establishes the correct contract split.
+
+### `Service`
+
+`Service` now carries the shared service-level persistence defaults.
+
+By default it persists:
+
+- heartbeat timestamp
+- logical pause state
+- logical quiesce state
+- logical stop state
+
+By default it treats as runtime handles:
+
+- pause/quiesce/stop `Event` objects
+- agent references
+- threads and external server/client handles introduced by concrete services
+
+This matters because service control state is now restartable without pretending that a live thread or server instance can be serialized directly.
 
 ### `Node`
 
-`Node.snapshot_state()` now serializes:
+`Node` now persists execution metadata by default:
 
 - activation status
 - last execution timestamp
@@ -490,14 +814,24 @@ This is groundwork for safer recovery later. It is not yet a full idempotency sy
 
 `Node.record_output_artifact(...)` lets nodes register generated files as tracked artifacts or side effects without implying that they are fully managed checkpoint payloads.
 
+`Node` also contributes topology metadata to exact-match startup resume. Parent and child relationships are fingerprinted. If a node is rewired between runs, the runtime treats that as a changed definition and fresh-starts the node instead of restoring old execution state into a new workflow topology.
+
 ### `LearningNode`
 
-`LearningNode.snapshot_state()` now serializes:
+`LearningNode` extends the node defaults with model-oriented state.
+
+By default it persists:
 
 - whether the node still requires learning
-- model descriptors produced by `_serialize_models()`
+- model descriptors produced before checkpoint
 
-This intentionally avoids trying to serialize live model objects.
+By default it treats as runtime handles:
+
+- loaded model objects
+- model pipelines
+- trainer/runtime session objects
+
+This intentionally avoids trying to serialize live model objects. The base class persists descriptors and provides a rebuild hook, but concrete learning subclasses still need owner-specific logic when they want to turn descriptors back into real runtime models.
 
 ## Owner-Local Artifact Policy
 
@@ -525,22 +859,36 @@ The owning element controls:
 `RAGService`:
 
 - resolves its own vector-store directory through `_resolve_vector_store_directory()`
-- defaults to the agent runtime artifact root when installed in an agent and no path is configured
+- uses `resources/embeddings/...` for its durable vector-store directories
 - keeps existing explicit path semantics when configured directly
+- uses `resources/models/...` for downloaded embedding-model caches
 - registers the resolved vector store as a durable artifact
 
 `FileEmbeddingService`:
 
 - resolves its embedding-store directory itself
-- preserves standalone compatibility with the legacy shared path under `resources/embeddings/...`
-- uses the agent runtime artifact root when installed in an agent
+- uses `resources/embeddings/...` for durable embedding stores
+- uses `resources/models/...` for downloaded embedding-model caches
 - registers the embedding store as a durable artifact
 
 `DataModelService`:
 
 - snapshots model instance values into plain dictionaries
-- recreates fresh data-model instances on restore and reapplies values
+- recreates locks and model instances from restored payloads
+- reloads model methods from source on install
 - intentionally does not try to serialize Python execution state or live locks
+
+`LLMService`:
+
+- persists serializable session-history payloads
+- rebuilds `_llm` and `_langchain` runtime handles from config
+- recreates in-memory message histories from serialized message payloads
+
+`RestService`:
+
+- treats the FastAPI app, uvicorn server, and service thread as runtime handles
+- recreates the app/router setup during install or runtime-handle rebuild
+- only starts the live server thread during service start
 
 `WritePDFFormAction`:
 
@@ -604,6 +952,30 @@ Checkpoint pruning currently preserves the current checkpoint when pruning by co
 
 `runtime-orphaned-artifacts` and `shared-cache-prune` are design-level scopes today, but they are not yet implemented as a full reference-graph and safety-check system. Operators and developers should treat those scopes as planned extension points rather than complete production-grade cleanup automation.
 
+## Runtime Status And Reporting
+
+`Agent.status()` now reports more than simple lifecycle state. It also exposes runtime persistence decisions that are useful for operators and automated tooling.
+
+Current status fields include:
+
+- current lifecycle state
+- current `run_id`
+- `resume_mode`
+- auto-checkpoint configuration
+- last checkpoint reason
+- last checkpoint success or failure
+- last checkpoint error message, if any
+- last reconciliation report from startup
+
+The reconciliation report records:
+
+- which checkpoint was used
+- which elements were restored exactly
+- which elements were fresh-started because they changed
+- which old checkpoint elements were ignored because they no longer exist in the current definition
+
+This is especially useful when a restart did not restore everything. The runtime can explain that behavior instead of silently starting cold.
+
 ## REST Control Surface
 
 The in-runtime management surface is currently exposed through `AgentRESTAPI`.
@@ -645,25 +1017,57 @@ The current restart logic offers practical local resilience, but it is important
 - there is no external registry-driven restart manager yet
 - there is no full process supervisor policy inside the repo itself
 - there is no automatic undo for outputs already written to external systems
+- changed elements are not migrated; they are rebuilt and fresh-started
+- node ownership or topology changes count as definition changes during auto-resume
 
 ## Operational Implications
 
 When extending the repo, keep these operational rules in mind.
 
-### If You Add A New Element Type
+### How To Build A New Element
 
-Implement the smallest amount of custom persistence possible.
+When implementing a new element, follow these checks in order.
 
-Prefer to override:
+1. Start from the nearest base class.
+   Check `AgentElement`, then the closest family base such as `Buffer`, `Service`, `Adapter`, `Node`, or `LearningNode`.
+   Confirm which lifecycle and persistence behavior is already covered there before adding custom code.
 
-- `snapshot_state()`
-- `restore_state(...)`
-- `list_owned_artifacts()` or `register_artifact(...)`
-- `save_owned_artifacts(...)`
-- `load_owned_artifacts(...)`
-- `validate_restored_state(...)`
+2. Classify the element state.
+   Decide which values are:
+   - inline persisted state
+   - artifact-backed descriptor state
+   - transient runtime-only helpers
+   - runtime handles that must be rebuilt
 
-Do not duplicate runtime path logic in leaf classes unless there is a strong owner-specific reason.
+3. Declare the field roles.
+   Prefer field helpers and inherited family defaults over custom snapshot methods.
+   Only deviate when a field needs custom transformation or a legacy restore mapping.
+
+4. Check non-checkpointed runtime handles explicitly.
+   If the element owns models, DB clients, vector stores, threads, sessions, locks, servers, or external SDK handles, make sure startup and restore rebuild them correctly.
+   A skipped handle is only safe if there is a reliable reconstruction path.
+
+5. Verify owner-local artifact behavior.
+   If the element owns files, local DBs, vector stores, caches, or output directories, confirm whether startup should:
+   - reuse them
+   - reopen them
+   - validate them
+   - rebuild them
+   Also decide whether they belong to:
+   - the agent runtime under `resources/runtime/<agent_uid>/...`
+   - or a shared top-level resource root such as `resources/models/...`, `resources/embeddings/...`, `resources/inputs/...`, or `resources/outputs/...`
+
+6. Check exact-match behavior.
+   If parent ownership, node topology, or config changes should invalidate restore, make sure the current definition fingerprint reflects that correctly.
+
+7. Write focused tests.
+   At minimum test:
+   - checkpoint round-trip of the logical state
+   - startup or restore reconstruction of runtime handles
+   - fresh-start behavior when the definition changes
+   - artifact reuse or rebuild behavior when relevant
+
+This is the intended authoring model: use inherited defaults first, add the smallest amount of owner-specific persistence logic necessary, and test the restart path explicitly.
 
 ### If You Add A New Artifact Type
 

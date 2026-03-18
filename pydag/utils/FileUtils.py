@@ -9,6 +9,15 @@ import zipfile
 from loguru import logger
 
 class FileUtils:
+    COMMON_NON_TEXT_EXTENSIONS: set[str] = {
+        ".jpg", ".jpeg", ".png", ".gif", ".bmp", ".tiff", ".webp", ".heic", ".ico", ".svg",
+        ".mp4", ".mov", ".avi", ".mkv", ".wmv", ".flv", ".webm",
+        ".mp3", ".wav", ".flac", ".m4a", ".aac", ".ogg",
+        ".exe", ".dll", ".bin", ".dat", ".iso", ".sys", ".so", ".dylib", ".msi", ".bat",
+        ".zip", ".rar", ".7z", ".tar", ".gz", ".bz2", ".xz",
+        ".psd", ".ai", ".indd", ".eps", ".sketch", ".fig",
+        ".ttf", ".otf", ".woff", ".woff2",
+    }
     
     @staticmethod
     def exists_file(file_path : str) -> bool:

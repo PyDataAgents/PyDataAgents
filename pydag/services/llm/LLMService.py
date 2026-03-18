@@ -1,6 +1,8 @@
 from dataclasses import dataclass, field
 import enum
 
+from langchain_core.messages import messages_from_dict
+from langchain_core.messages.base import message_to_dict
 from langchain_openai import ChatOpenAI
 from langchain_ollama import OllamaLLM
 from langchain_core.prompts import PromptTemplate, ChatPromptTemplate, MessagesPlaceholder
@@ -10,6 +12,7 @@ from loguru import logger
 
 from ...services.ServiceException import ServiceException
 from ...services.Service import Service
+from ...agents.AgentElement import persisted_field, runtime_handle_field
 from ...utils.ModelUtils import ModelUtils
 
 SYS_GENERAL_ASSISTANT : str = "You are a helpful assistant. Answer the following question:\n\n{question}"
@@ -32,21 +35,25 @@ class LLMService(Service):
     model : str = field(default="gpt-4.1-mini", metadata={"description": "name of the model, e.g. gpt-4o | gemma:1b | ... . If you use OLLAMA, the following recommendation applies: For normal tasks without any specific requirements, we recomment using 'deepseek-r1' as it is a versatile and powerful model. Alternatively you can use Llama 3.1 8B. For tasks which must be run on CPU and where inference is critical, use 'phi3.5' or if coding / JSON is of importance, 'qwen2.5:3b' is recommended as default. "})
     retain_messages : bool = field(default=False, metadata={"description": "specify True if you want to retain the chat history for context"})
     system_message : str = field(default=SYS_GENERAL_ASSISTANT, metadata={"description":"Default System message to give to the LLM Agent"})
-    
-    def __post_init__(self):
-        super().__post_init__()
-        self._llm = None
-        self._langchain : RunnableWithMessageHistory = None
-        self._session_histories = dict()  # to store chat history
+    _session_history_payloads : dict = persisted_field(default_factory=dict, init=False, repr=False)
+    _llm : object = runtime_handle_field(default=None, init=False, repr=False)
+    _langchain : RunnableWithMessageHistory | None = runtime_handle_field(default=None, init=False, repr=False)
+    _session_histories : dict = runtime_handle_field(default_factory=dict, init=False, repr=False)
        
-    def __get_session_history(self, session_id: str):
+    def _get_session_history(self, session_id: str):
         """Returns a persistent chat history for a given session."""
         if session_id not in self._session_histories:
             self._session_histories[session_id] = InMemoryChatMessageHistory()
         return self._session_histories[session_id]
         
     def _on_start(self):
-        self._create_llm()                
+        self.rebuild_runtime_handles()
+
+    def rebuild_runtime_handles(self, agent=None):
+        self._restore_session_histories()
+        if self._llm is not None and self._langchain is not None:
+            return
+        self._create_llm()
         if self.retain_messages:
             prompt = ChatPromptTemplate.from_messages([
                 MessagesPlaceholder(variable_name="history"),
@@ -57,7 +64,7 @@ class LLMService(Service):
             
             self._langchain = RunnableWithMessageHistory(
                 chain,
-                get_session_history=self.__get_session_history,
+                get_session_history=self._get_session_history,
                 input_messages_key="question",     # where to pull current user input
                 history_messages_key="history"  # matches MessagesPlaceholder
             )          
@@ -68,6 +75,10 @@ class LLMService(Service):
             self._langchain = prompt | self._llm
             
         logger.debug("created langchain with prompt template and llm")
+
+    def prepare_checkpoint(self, agent=None):
+        super().prepare_checkpoint(agent)
+        self._session_history_payloads = self._serialize_session_histories()
     
     def _on_stop(self):        
         self._langchain = None
@@ -107,3 +118,17 @@ class LLMService(Service):
             case _:
                 raise ServiceException("Unknown Model " + self.model + " for " + self.cname())
         logger.debug("created LLM with model " + self.model + " from provider " + self.model_provider)
+
+    def _serialize_session_histories(self) -> dict[str, list[dict]]:
+        payload : dict[str, list[dict]] = {}
+        for session_id, history in self._session_histories.items():
+            payload[session_id] = [message_to_dict(message) for message in history.messages]
+        return payload
+
+    def _restore_session_histories(self):
+        restored : dict[str, InMemoryChatMessageHistory] = {}
+        for session_id, serialized_messages in self._session_history_payloads.items():
+            history = InMemoryChatMessageHistory()
+            history.messages = messages_from_dict(serialized_messages)
+            restored[session_id] = history
+        self._session_histories = restored

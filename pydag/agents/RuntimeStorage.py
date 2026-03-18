@@ -3,8 +3,10 @@ from __future__ import annotations
 from contextlib import contextmanager
 from dataclasses import asdict, dataclass, field, is_dataclass
 from enum import Enum
+from hashlib import sha256
 import json
 from pathlib import Path
+import re
 import sqlite3
 from typing import Any, Iterator
 import uuid
@@ -28,6 +30,28 @@ class ArtifactPolicy(str, Enum):
     SHARED = "shared"
 
 
+class ResumeMode(str, Enum):
+    DISABLED = "DISABLED"
+    EXACT_MATCH_ONLY = "EXACT_MATCH_ONLY"
+
+
+class CheckpointReason(str, Enum):
+    MANUAL = "MANUAL"
+    AUTO_TIMER = "AUTO_TIMER"
+    TERMINATE = "TERMINATE"
+    RELOAD = "RELOAD"
+    QUIESCE = "QUIESCE"
+
+
+class ElementReconciliationOutcome(str, Enum):
+    RESTORE_EXACT_MATCH = "RESTORE_EXACT_MATCH"
+    FRESH_START_CHANGED = "FRESH_START_CHANGED"
+    REMOVED_IGNORED = "REMOVED_IGNORED"
+
+
+CHECKPOINT_SCHEMA_VERSION = 4
+
+
 @dataclass
 class ArtifactRecord:
     name: str
@@ -44,8 +68,13 @@ class ElementSnapshot:
     id: str
     type: str
     state: str | None
+    config_fingerprint: str | None = None
+    definition_fingerprint: str | None = None
+    persistence_schema_fingerprint: str | None = None
+    topology_fingerprint: str | None = None
     payload: dict[str, Any] = field(default_factory=dict)
     artifacts: list[ArtifactRecord] = field(default_factory=list)
+    metadata: dict[str, Any] = field(default_factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
         data = asdict(self)
@@ -60,7 +89,13 @@ class CheckpointManifest:
     created_at: int
     lifecycle_state: str | None
     run_id: str | None
+    schema_version: int = CHECKPOINT_SCHEMA_VERSION
+    checkpoint_reason: str = CheckpointReason.MANUAL.value
+    agent_type: str | None = None
+    agent_config_fingerprint: str | None = None
+    agent_definition_fingerprint: str | None = None
     element_files: dict[str, str] = field(default_factory=dict)
+    element_inventory: dict[str, Any] = field(default_factory=dict)
     metadata: dict[str, Any] = field(default_factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
@@ -79,6 +114,54 @@ class CleanupReport:
         return asdict(self)
 
 
+@dataclass
+class AutoCheckpointConfig:
+    enabled: bool = True
+    interval_seconds: float = 60.0
+    checkpoint_on_terminate: bool = True
+    checkpoint_on_reload: bool = True
+    checkpoint_on_quiesce: bool = False
+    min_seconds_between_checkpoints: float = 5.0
+    resume_mode: str = ResumeMode.EXACT_MATCH_ONLY.value
+
+    def to_dict(self) -> dict[str, Any]:
+        return asdict(self)
+
+
+@dataclass
+class ElementReconciliationResult:
+    uid: str
+    id: str
+    type: str
+    outcome: str
+    reason: str | None = None
+
+    def to_dict(self) -> dict[str, Any]:
+        return asdict(self)
+
+
+@dataclass
+class ReconciliationReport:
+    resume_mode: str
+    checkpoint_id: str | None
+    created_at: int
+    restored: list[ElementReconciliationResult] = field(default_factory=list)
+    fresh_started: list[ElementReconciliationResult] = field(default_factory=list)
+    removed_ignored: list[ElementReconciliationResult] = field(default_factory=list)
+    exact_match: bool = False
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "resume_mode": self.resume_mode,
+            "checkpoint_id": self.checkpoint_id,
+            "created_at": self.created_at,
+            "restored": [item.to_dict() for item in self.restored],
+            "fresh_started": [item.to_dict() for item in self.fresh_started],
+            "removed_ignored": [item.to_dict() for item in self.removed_ignored],
+            "exact_match": self.exact_match,
+        }
+
+
 def _json_default(value: Any):
     if isinstance(value, Enum):
         return value.value
@@ -94,6 +177,17 @@ def _json_default(value: Any):
         except Exception:
             pass
     return str(value)
+
+
+def normalize_runtime_key(value: str | None, fallback: str = "element") -> str:
+    raw = "" if value is None else str(value).strip().lower()
+    normalized = re.sub(r"[^a-z0-9]+", "-", raw).strip("-")
+    return normalized or fallback
+
+
+def stable_fingerprint(payload: Any) -> str:
+    serialized = json.dumps(payload, sort_keys=True, default=_json_default)
+    return sha256(serialized.encode("utf-8")).hexdigest()
 
 
 class RuntimeStorage:

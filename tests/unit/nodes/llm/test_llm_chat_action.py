@@ -195,7 +195,7 @@ def test_execute_raises_on_missing_configured_parent_key():
 
 
 def test_execute_raises_on_template_placeholder_mismatch():
-    """Ensure legacy template mode fails if input_keys and placeholders are not aligned."""
+    """Ensure template fallback mode fails if input_keys and placeholders are not aligned."""
     service = _new_service()
     action = LLMChatAction(input_keys=["a", "b"], template="Only one placeholder: {}")
     action.set_service(service)
