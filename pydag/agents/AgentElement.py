@@ -7,6 +7,7 @@ import uuid
 from loguru import logger
 
 
+from .AgentElementException import AgentElementException
 from .AgentStates import AgentElementState
 from ..utils.ClassUtils import ClassUtils
 from ..utils.FileUtils import FileUtils
@@ -75,13 +76,20 @@ class AgentElement(ABC):
     
     def install(self, agent : Agent = None):
         """initializes the element with respect to startup functionality or initial internal object creation,
-           if agent is not None, it can be used to reference or create other agent elements
-           the method should always be used in child classes with super().install()
+            if agent is not None, it can be used to reference or create other agent elements
+            the method should always be used in child classes with super().install()
+           
+            Raises:
+                AgentElementException: if the state of the `AgentElement` is invalid
         """
-        if self.load_on_install:
-            self.load()
-        self._on_install(agent)
-        self._state = AgentElementState.INSTALLED
+        if self._state == AgentElementState.UNINSTALLED or self._state == AgentElementState.ERROR:
+            if self.load_on_install:
+                self.load()
+            self._on_install(agent)
+            self._state = AgentElementState.INSTALLED
+        else:
+            self._state = AgentElementState.ERROR
+            raise AgentElementException(f"{self.__class__.__name__} must be in state {AgentElementState.UNINSTALLED} or {AgentElementState.ERROR} in order to install")
         
     def uninstall(self, agent : Agent = None):
         """resets the element, this method can be used to stop internal element logic or reset objects that were initialized on creation

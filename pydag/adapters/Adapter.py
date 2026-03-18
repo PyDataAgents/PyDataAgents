@@ -2,8 +2,11 @@ from __future__ import annotations
 from abc import abstractmethod
 from typing import Union
 
+
+from .AdapterException import AdapterException
 from ..agents.AgentStates import AdapterState, AgentElementState
 from ..agents.AgentElement import AgentElement
+
 
 class Adapter(AgentElement):
     """
@@ -18,12 +21,16 @@ class Adapter(AgentElement):
         """
         connect to the data source/sink.
         """
-        success = self._on_connect()
-        if success:
-            self._state = AdapterState.CONNECTED
+        # check valid state before connection
+        if self._state == AdapterState.DISCONNECTED or self._state == AgentElementState.INSTALLED:
+            success = self._on_connect()
+            if success:
+                self._state = AdapterState.CONNECTED
+            else:
+                self._state = AgentElementState.ERROR
+            return success
         else:
-            self._state = AdapterState.DISCONNECTED
-        return success
+            raise AdapterException(f"{Adapter.__name__} '{self.id}' must be in state {AdapterState.DISCONNECTED} or {AgentElementState.INSTALLED} in order to connect")
     
     @abstractmethod
     def _on_connect(self) -> bool:
@@ -35,13 +42,16 @@ class Adapter(AgentElement):
         """
         disconnect from the data source/sink.    
         """
-        success = self._on_disconnect()
-        if success:
-            self._state = AdapterState.DISCONNECTED
+        if self._state == AdapterState.CONNECTED:
+            success = self._on_disconnect()
+            if success:
+                self._state = AdapterState.DISCONNECTED
+            else:
+                self._state = AgentElementState.ERROR
+            return success
         else:
-            self._state = AgentElementState.ERROR
-        return success
-    
+            raise AdapterException(f"{Adapter.__name__} '{self.id}' must be in state {AdapterState.CONNECTED} in order to disconnect")
+
     @abstractmethod
     def _on_disconnect(self) -> bool:
         """
