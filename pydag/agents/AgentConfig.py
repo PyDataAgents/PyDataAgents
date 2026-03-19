@@ -51,7 +51,7 @@ class AgentConfig:
     Y_HAT = "y_hat"
     
     # Service Config Keywords
-    MAX_EXPONENTIAL_SECONDS = 60 * 60 * 24 * 7
+    MAX_EXPONENTIAL_SECONDS = 60 * 60 * 24 * 3 # 3 days in seconds
 
 
     # resource folder
