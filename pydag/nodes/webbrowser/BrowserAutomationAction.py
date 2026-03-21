@@ -1,9 +1,9 @@
 from dataclasses import dataclass
 
-from ...services.Service import Service
+
 from ...nodes.NodeException import NodeException
 from ...agents.Agent import Agent
-from ...services.browser.BrowserAutomationService import BrowserAutomationService
+from ...services.webbrowser.BrowserAutomationService import BrowserAutomationService
 from ..Action import Action
 from ..ServiceNode import ServiceNode
 
