@@ -26,6 +26,7 @@ def test_000():
     time.sleep(3)
     
     buf = DictBuffer()
+    buf.install()
     buf.push({"a": 1.5})
     
     lba = LinkBufferAction()
