@@ -41,7 +41,10 @@ class Agent():
     def _install_elements(self):
         """ install all `Adapter`s, `Buffer`s, and `Service`s in the `Agent`.
         
-        iterates over each element and calls its install method with the `Agent` instance.
+        iterates over each element and calls its install method with the `Agent` instance. 
+        
+        Raises:
+            AgentElementException: if a `AgentElement` could not be installed
         """
         # iterating over a list of dictionary items, in case of modification on the dictionary aoccurs during installs
         for adapter in list(self.adapter_store.values()):
@@ -132,6 +135,9 @@ class Agent():
                 
     def _start_services(self):
         """ Start all `Service`s in the `Agent`
+        
+        Raises:
+            ServiceException: if a `Service` could not be startedf
         """
         for service in self.service_store.values():
             if service.auto_start:
@@ -145,9 +151,13 @@ class Agent():
         
         Args:
             blocking (bool, optional): Whether to block until Agent is terminated. Defaults to True.
+            
+        Raises:
+            ServiceException: if a `Service` could not be started
+            AgentElementException: if a `AgentElement` could not be installed
         """
         self._install_elements()
-        self._connect_adapters()
+        #self._connect_adapters() # not included anymore, because mappings or nodes connect adapters on demand
         self._start_services()
         self._stop_event.clear()
         self._is_running = True
@@ -162,7 +172,7 @@ class Agent():
         Signals the stop event to unblock any waiting release() call.
         """
         self._stop_services()
-        self._disconnect_adapters()
+        #self._disconnect_adapters() # mappings and nodes disconnect adapters on demand
         self._uninstall_elements()
         self._is_running = False
         self._stop_event.set()

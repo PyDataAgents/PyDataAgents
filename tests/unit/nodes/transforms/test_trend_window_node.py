@@ -4,7 +4,7 @@ from pydag.buffers.DictBuffer import DictBuffer
 from pydag.buffers.SignalBuffer import SignalBuffer
 from pydag.buffers.signals.Sine import Sine
 from pydag.nodes.buffers.LinkBufferAction import LinkBufferAction
-from pydag.nodes.cm.TrendWindowNode import TrendWindowNode
+from pydag.nodes.transforms.TrendWindowNode import TrendWindowNode
 
 
 def test_000():

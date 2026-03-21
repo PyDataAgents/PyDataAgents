@@ -3,6 +3,7 @@ from dataclasses import dataclass, field
 from typing import Union
 
 
+from .NodeException import NodeException
 from ..agents.AgentStates import AgentElementState, NodeState
 from ..agents.AgentElement import AgentElement
 
@@ -73,3 +74,21 @@ class Node(AgentElement):
     
     def get_last_timestamp(self) -> int:
         return self._last_timestamp
+    
+    def _check_state(self, next_state : AgentElementState):
+        match(next_state):
+            case AgentElementState.UNINSTALLED:
+                # any prior state is allowed
+                return
+                
+            case AgentElementState.INSTALLED:
+                # any prior state is allowed
+                return
+                
+            case AgentElementState.ERROR:
+                # any prior state is allowed
+                return
+            
+            case NodeState.EXECUTING:
+                if self._state != AgentElementState.INSTALLED:
+                    raise NodeException(f"{Node.__name__} {self.id} must be installed before executing!")

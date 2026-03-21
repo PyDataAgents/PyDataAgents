@@ -2,7 +2,7 @@ from __future__ import annotations
 import json
 from typing import TYPE_CHECKING
 from abc import ABC, abstractmethod
-from dataclasses import dataclass, field, fields
+from dataclasses import dataclass, field
 import uuid
 from loguru import logger
 
@@ -82,21 +82,17 @@ class AgentElement(ABC):
             Raises:
                 AgentElementException: if the state of the `AgentElement` is invalid
         """
-        if self._state == AgentElementState.UNINSTALLED or self._state == AgentElementState.ERROR:
-            if self.load_on_install:
-                self.load()
-            self._on_install(agent)
-            self._state = AgentElementState.INSTALLED
-        else:
-            self._state = AgentElementState.ERROR
-            raise AgentElementException(f"{self.__class__.__name__} must be in state {AgentElementState.UNINSTALLED} or {AgentElementState.ERROR} in order to install")
+        if self.load_on_install:
+            self.load()
+        self._on_install(agent)
+        self._state = AgentElementState.INSTALLED
         
     def uninstall(self, agent : Agent = None):
         """resets the element, this method can be used to stop internal element logic or reset objects that were initialized on creation
         """
+        self._check_state(AgentElementState.UNINSTALLED)
         self._on_uninstall(agent)
         self._state = AgentElementState.UNINSTALLED
-        return
     
     def load(self):
         file = self.id + ".json"
@@ -112,6 +108,17 @@ class AgentElement(ABC):
         d = self.config_options()
         with open(self.id + ".json", "w", encoding="utf-8") as json_file:
             json.dump(d, json_file, indent = 4)  # "indent" makes the output more readable
+    
+    @abstractmethod
+    def _check_state(self, next_state : AgentElementState):
+        """ checks whether the `next_state` is valid transitioning from current `_state`
+
+        Args:
+            next_state (AgentElementState): next target state
+            
+        Raises:
+            AgentElementException: if a `next_state` is illegal
+        """
             
     def get_state(self) -> AgentElementState:
         """
@@ -122,9 +129,9 @@ class AgentElement(ABC):
         return self._state
     
     def set_state(self, state : AgentElementState):
-        """ method to set the `AgentElement`s internal `state`
+        """ method to set the `AgentElement`s internal ``_state`
 
         Args:
-            state (AgentElementState): state enum
+            state (AgentElementState): state class
         """
         self._state = state

@@ -143,6 +143,20 @@ class MappingService(ObserverService):
         super()._on_uninstall(agent)
         self._buffers : dict[str, Buffer] = dict()
         self._adapter : Adapter = None
+    
+    def _on_start(self):
+        if self._adapter:
+            if not self._adapter.is_connected():
+                if not self._adapter.connect():
+                    raise ServiceException(f"Could not connect {Adapter.__name__} {self._adapter.id} before starting {MappingService.__name__}")
+        super()._on_start()
+        
+    def _on_stop(self):
+        if self._adapter:
+            if self._adapter.is_connected():
+                if not self._adapter.disconnect():
+                    raise ServiceException(f"Could not disconnect {Adapter.__name__} {self._adapter.id} when stopping {MappingService.__name__}")
+        super()._on_stop()
             
     def get_observer_thread(self) -> ObserverThread:
         return self._observer_thread

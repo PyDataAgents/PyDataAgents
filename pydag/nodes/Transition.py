@@ -3,7 +3,7 @@ import time
 
 
 from ..agents.Agent import Agent
-from ..agents.AgentStates import NodeState
+from ..agents.AgentStates import AgentElementState, NodeState
 from .Node import Node
 
 
@@ -18,10 +18,11 @@ class Transition(Node):
         return
         
     def check(self) -> bool:
+        self._check_state(NodeState.EXECUTING)
         self._state = NodeState.EXECUTING
         result = self._on_check()
-        self._state = NodeState.IDLE
-        self._last_timestamp = time.time_ns()    
+        self._state = AgentElementState.INSTALLED
+        self._last_timestamp = time.time_ns()
         return result
       
     @abstractmethod
