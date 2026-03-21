@@ -17,6 +17,7 @@ def test_000():
     lba.set_buffer(sb)
     
     buf = DictBuffer(timestamps_enabled=False, index_enabled=False)
+    buf.install()
     twn = TrendWindowNode(max_windows=4, input_keys=["values"], n=10)
     twn.set_buffer(buf)
     twn.add_parent(lba)

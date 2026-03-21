@@ -1,5 +1,5 @@
 import heapq
-from typing import List, Tuple, Union
+from typing import Any, List, Tuple, Union
 from scipy.signal import butter, filtfilt
 import numpy as np
 
@@ -199,3 +199,17 @@ class SignalUtils:
             return np.ndarray(new_timestamps), np.ndarray(indices)
         else:
             return new_timestamps, indices
+        
+    @staticmethod
+    def zscore(data : dict[str, Any]):
+        new_data = {}
+        for key in data:
+            ar = np.array(data[key])
+            std = ar.std()
+            if std == 0:
+                print(f"Warning: Standard deviation is zero during Z-Score normalization for key '{key}'. Original Data will be used.")
+                zscores = ar
+            else:
+                zscores : np.ndarray = (ar - ar.mean()) / (ar.std())
+            new_data[key] = zscores.tolist()
+        return new_data
