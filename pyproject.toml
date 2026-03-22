@@ -60,6 +60,7 @@ dependencies = [
     "docxtpl",
     "bs4",
     "lxml",
+    "fitz",
 
     # browser automation
     "selenium",

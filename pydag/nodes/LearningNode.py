@@ -3,6 +3,7 @@ from dataclasses import dataclass, field
 from typing import Any, Dict, Tuple, Union
 
 
+from .Action import Action
 from ..utils.SignalUtils import SignalUtils
 from ..utils.MLUtils import MLUtils
 from ..utils.DataUtils import DataUtils
@@ -10,7 +11,7 @@ from ..agents.AgentStates import AgentElementState, LearningState, NodeState
 from .BufferNode import BufferNode
 
 @dataclass
-class LearningNode(BufferNode):
+class LearningNode(BufferNode, Action):
     """
     LearningNode is a base class for elements that require a learning step in their pipeline execution.
     It extends the BufferNode class and provides additional functionality specific to learning tasks.

@@ -7,4 +7,4 @@ def test_000():
     ssa = SampledSignalAction(signal=ss, n=1000)
     ssa.install()    
     ssa.execute()    
-    print(ssa._buffer.data())    
+    print(ssa.get_buffer().data())    

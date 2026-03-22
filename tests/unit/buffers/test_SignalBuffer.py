@@ -20,11 +20,8 @@ def test_010():
     s.a = 1.0
     s.p = 0.0
     s.n = 0.1
-    sb = SignalBuffer()
+    sb = SignalBuffer(signal = s, capacity=10, sampling_period=100)
     sb.install()
-    sb.signal = s
-    sb.capacity=10
-    sb.sampling_period=100
     i = 0
     while i < 10:
         time.sleep(0.1)

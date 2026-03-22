@@ -72,11 +72,11 @@ class Adapter(AgentElement):
                      raise AdapterException(f"{Adapter.__name__} {self.id} must be installed, connected, disconnected or have an error before uninstalling!")
                  
             case AgentElementState.INSTALLED:
-                if self._state != AgentElementState.UNINSTALLED and self._state != AgentElementState.ERROR and self._state != AdapterState.CONNECTED and self._state == AdapterState.DISCONNECTED:
+                if self._state != AgentElementState.UNINSTALLED and self._state != AgentElementState.ERROR and self._state != AdapterState.CONNECTED and self._state != AdapterState.DISCONNECTED:
                     raise AdapterException(f"{Adapter.__name__} {self.id} must be uninstalled, connected, disconnected or have an error before installing!")
                 
             case AdapterState.CONNECTED:
-                if self._state != AgentElementState.INSTALLED and self._state != AdapterState.DISCONNECTED and self._state != AdapterState.PUBLISHING and self._state == AdapterState.SUBSCRIBING:
+                if self._state != AgentElementState.INSTALLED and self._state != AdapterState.DISCONNECTED and self._state != AdapterState.PUBLISHING and self._state != AdapterState.SUBSCRIBING:
                     raise AdapterException(f"{Adapter.__name__} {self.id} must be installed, disconnected, subscribing or publishing before connecting!")
                 
             case AdapterState.DISCONNECTED:

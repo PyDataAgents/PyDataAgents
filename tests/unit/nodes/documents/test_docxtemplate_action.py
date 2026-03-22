@@ -21,5 +21,7 @@ def test_000():
     docx_action = DocxTemplateAction(template_path=template_path, output_path=output_path)
     docx_action.set_buffer(buf1)
     
+    docx_action.install()
+    
     docx_action.execute()
         

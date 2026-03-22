@@ -17,13 +17,14 @@ def test_000():
     
 def test_010():
     
-    buf = DictBuffer()
-    buf.capacity = 2
+    buf = DictBuffer(capacity = 2)
+    buf.install()
     buf.push({"name": "Joe", "town": "Berlin"})
     buf.push({"name": "John", "town": "Amsterdam"})
     
     lba = LinkBufferAction()
     lba.set_buffer(buf)
+    lba.install()
     
     fsa = FormattedStringAction()
     fsa.input_keys = ["name", "town"]
@@ -38,8 +39,8 @@ def test_010():
     
 def test_020():
     
-    buf = DictBuffer()
-    buf.capacity = 2
+    buf = DictBuffer(capacity = 2)
+    buf.install()
     buf.push({"name": "Joe", "town": "Berlin"})
     buf.push({"name": "John", "town": "Amsterdam"})
     
@@ -59,8 +60,8 @@ def test_020():
     
 def test_021():
     
-    buf = DictBuffer()
-    buf.capacity = 2
+    buf = DictBuffer(capacity = 2)
+    buf.install()
     buf.push({"name": "Joe", "town": "Berlin"})
     buf.push({"name": "John", "town": "Amsterdam"})
     
@@ -81,8 +82,8 @@ def test_021():
     
 def test_022():
     
-    buf = DictBuffer()
-    buf.capacity = 2
+    buf = DictBuffer(capacity = 2)
+    buf.install()
     buf.push({"name": "Joe", "town": "Berlin"})
     buf.push({"name": "John", "town": "Amsterdam"})
     

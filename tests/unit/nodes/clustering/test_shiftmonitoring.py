@@ -24,6 +24,7 @@ def test_pca_returns_last_n_samples():
 
     lba = LinkBufferAction()
     lba.set_buffer(sine_buff)
+    lba.install()
 
     
     chronos = ChronosExtractor()
@@ -60,7 +61,7 @@ def test_shift_monitoring_with_pca_on_sine():
 
     lba = LinkBufferAction()
     lba.set_buffer(sine_buff)
-
+    lba.install()
     
     chronos = ChronosExtractor() # TODO: i dont think that this pipeline works with the ChronosExtractor default properties (sample_length = 0??)
     chronos.output_keys = ["CE-feature-1", "CE-feature-2"]
@@ -97,7 +98,7 @@ def test_shift_monitoring_raw_sine_no_features():
 
     lba = LinkBufferAction()
     lba.set_buffer(sine_buff)
-
+    lba.install()
     
 
     shift = ShiftMonitoring(min_learning_samples=10, sample_length=4, min_inference_samples=1, persistent=False)
@@ -126,7 +127,7 @@ def test_shift_monitoring_raw_sine_more_inference_samples():
 
     lba = LinkBufferAction()
     lba.set_buffer(sine_buff)
-
+    lba.install()
     
 
     shift = ShiftMonitoring(min_learning_samples=10, sample_length=3, min_inference_samples=5, persistent=False)
@@ -157,7 +158,7 @@ def test_shift_monitoring_raw_sine_return_input_values():
 
     lba = LinkBufferAction()
     lba.set_buffer(sine_buff)
-
+    lba.install()
     
 
     shift = ShiftMonitoring(min_learning_samples=10, sample_length=3, min_inference_samples=5, persistent=False, return_input=True)
@@ -189,7 +190,7 @@ def test_shift_monitoring_return_input_two_channels():
 
     lba = LinkBufferAction()
     lba.set_buffer(sine_buff)
-
+    lba.install()
     
 
     shift = ShiftMonitoring(min_learning_samples=10, sample_length=sample_length, min_inference_samples=1, persistent=False, return_input=True)
@@ -221,7 +222,8 @@ def test_shift_monitoring_on_ucr_car_dataset():
     
     lba = LinkBufferAction()
     lba.set_buffer(signal)
-
+    lba.install()
+    
     shift = ShiftMonitoring(min_learning_samples=10, sample_length=sample_length, input_keys=["values"], min_inference_samples=3, persistent=False, return_input=True)
     shift.install()
     shift.add_parent(lba)
@@ -251,7 +253,7 @@ def test_shift_monitoring_on_blobs_detects_shifts():
     
     lba = LinkBufferAction()
     lba.set_buffer(signal)
-
+    lba.install()
 
     shift = ShiftMonitoring(min_learning_samples=200, sample_length=2, min_inference_samples=1, persistent=False, input_keys=["values"], return_input=True, sensitivity=2) #1800
     shift.install()
