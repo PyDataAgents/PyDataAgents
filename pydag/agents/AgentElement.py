@@ -7,7 +7,6 @@ import uuid
 from loguru import logger
 
 
-from .AgentConfig import AgentConfig
 from .AgentStates import AgentElementState
 from ..utils.ClassUtils import ClassUtils
 from ..utils.FileUtils import FileUtils
@@ -44,7 +43,7 @@ class AgentElement(ABC):
         return s
 
     def config_options(self, with_descriptions = False) -> dict:
-        #from .AgentConfig import AgentConfig
+        from .AgentConfig import AgentConfig
         result = AgentConfig.config_options(self, with_descriptions)
         return result
 
@@ -97,6 +96,7 @@ class AgentElement(ABC):
     def load(self):
         """ load `AgentElement` config from filesystem
         """
+        from .AgentConfig import AgentConfig
         file = AgentConfig.SAVE_FOLDER + self.id + ".json"
         if FileUtils.exists_file(file):
             with open(file, "r", encoding="utf-8") as json_file:
@@ -108,8 +108,7 @@ class AgentElement(ABC):
     def save(self):
         """ saves the `AgentElement` config to filesystem
         """
-        #from .AgentConfig import AgentConfig
-        # Write config options to JSON file
+        from .AgentConfig import AgentConfig
         d = self.config_options()
         with open(AgentConfig.SAVE_FOLDER + self.id + ".json", "w", encoding="utf-8") as json_file:
             json.dump(d, json_file, indent = 4)  # "indent" makes the output more readable
