@@ -83,6 +83,7 @@ class AgentElement(ABC):
         """
         if self.load_on_install:
             self.load()
+        self._check_state(AgentElementState.INSTALLED)
         self._on_install(agent)
         self._state = AgentElementState.INSTALLED
         
