@@ -7,7 +7,7 @@ import uuid
 from loguru import logger
 
 
-from .AgentElementException import AgentElementException
+from .AgentConfig import AgentConfig
 from .AgentStates import AgentElementState
 from ..utils.ClassUtils import ClassUtils
 from ..utils.FileUtils import FileUtils
@@ -44,7 +44,7 @@ class AgentElement(ABC):
         return s
 
     def config_options(self, with_descriptions = False) -> dict:
-        from .AgentConfig import AgentConfig
+        #from .AgentConfig import AgentConfig
         result = AgentConfig.config_options(self, with_descriptions)
         return result
 
@@ -95,7 +95,9 @@ class AgentElement(ABC):
         self._state = AgentElementState.UNINSTALLED
     
     def load(self):
-        file = self.id + ".json"
+        """ load `AgentElement` config from filesystem
+        """
+        file = AgentConfig.SAVE_FOLDER + self.id + ".json"
         if FileUtils.exists_file(file):
             with open(file, "r", encoding="utf-8") as json_file:
                 d = json.load(json_file)
@@ -104,9 +106,12 @@ class AgentElement(ABC):
             logger.warning("no configuration file " + self.id + ".json to load from was found")
     
     def save(self):
+        """ saves the `AgentElement` config to filesystem
+        """
+        #from .AgentConfig import AgentConfig
         # Write config options to JSON file
         d = self.config_options()
-        with open(self.id + ".json", "w", encoding="utf-8") as json_file:
+        with open(AgentConfig.SAVE_FOLDER + self.id + ".json", "w", encoding="utf-8") as json_file:
             json.dump(d, json_file, indent = 4)  # "indent" makes the output more readable
     
     @abstractmethod

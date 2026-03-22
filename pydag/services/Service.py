@@ -94,3 +94,11 @@ class Service(AgentElement):
             case ServiceState.STOPPED:
                 if self._state != ServiceState.RUNNING:
                     raise ServiceException(f"{Service.__name__} {self.id} must be running before stopping!")
+                
+    def get_agent(self) -> Agent:
+        """ returns the `Agent`
+
+        Returns:
+            Agent: the application's `Agent`
+        """
+        return self._agent 

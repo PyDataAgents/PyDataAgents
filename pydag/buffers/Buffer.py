@@ -162,6 +162,13 @@ class Buffer(AgentElement):
     def data_with_meta(self, n : int = 0, persistent : bool = True) -> dict:
         pass
 
+    def save(self):
+        # move element values to initial values for being saved
+        self.initial_values = self._elements
+        super().save()
+        # clear after saving to save space
+        self.initial_values = None
+
     def json(self, n=None, persistent=True):
         # normalize None to 0 samples (i.e., all data) for concrete buffer implementations
         if n is None:

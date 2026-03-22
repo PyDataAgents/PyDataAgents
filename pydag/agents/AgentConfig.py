@@ -1,5 +1,6 @@
 from dataclasses import fields
 import json
+import os
 from typing import TYPE_CHECKING, Any
 
 
@@ -55,9 +56,10 @@ class AgentConfig:
 
 
     # resource folder
-    RESOURCE_FOLDER = "./resources/"
-    MODEL_RESOURCE_FOLDER = RESOURCE_FOLDER + "models/"
-    EMBEDDINGS_RESOURCE_FOLDER = RESOURCE_FOLDER + "embeddings/"
+    RESOURCE_FOLDER = "." + os.sep + "resources"  + os.sep
+    MODEL_RESOURCE_FOLDER = RESOURCE_FOLDER + "models" + os.sep
+    EMBEDDINGS_RESOURCE_FOLDER = RESOURCE_FOLDER + "embeddings" + os.sep
+    SAVE_FOLDER = RESOURCE_FOLDER + "save" + os.sep
 
     @staticmethod
     def config_options(obj : Any, with_descriptions = False) -> dict:
