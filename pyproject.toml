@@ -93,6 +93,7 @@ dependencies = [
     "langchain_text_splitters",
     "langchain_community",
     "langgraph<1",
+    "hf_xet",
 
     # optional core functionality
     "graphviz"
