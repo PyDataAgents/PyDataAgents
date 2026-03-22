@@ -12,7 +12,7 @@ from ...agents.Agent import Agent
 
 
 @dataclass
-class HuggingFaceNode(BufferNode, Action):
+class HuggingFaceAction(BufferNode, Action):
     
     task : str = field(default=None, metadata={"description": "task category of the model to use, e.g. image-classification, text-generation, sentiment-analysis, ... execute HuggingFaceNode.tasklist for full list"})
     model : str = field(default=None, metadata={"description": ""})

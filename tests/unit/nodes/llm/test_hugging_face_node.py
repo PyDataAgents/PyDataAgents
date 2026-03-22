@@ -1,9 +1,9 @@
 from pydag.nodes.buffers.LinkBufferAction import LinkBufferAction
-from pydag.nodes.llm.HuggingFaceNode import HuggingFaceNode
+from pydag.nodes.llm.HuggingFaceAction import HuggingFaceAction
 from pydag.buffers.ListBuffer import ListBuffer
 
 def test_hf_task_list():
-    print(HuggingFaceNode.task_list())
+    print(HuggingFaceAction.task_list())
     
     
 def test_sentiment_analysis():
@@ -31,7 +31,7 @@ def test_sentiment_analysis():
     lba.set_buffer(buf)
     lba.install()
     
-    hfn = HuggingFaceNode(task="sentiment-analysis", output_keys=["sentiment"], by_rows=True)
+    hfn = HuggingFaceAction(task="sentiment-analysis", output_keys=["sentiment"], by_rows=True)
     hfn.add_parent(lba)
     hfn.install()
     
@@ -65,7 +65,7 @@ def test_sentiment_analysis_1key():
     lba.set_buffer(buf)
     lba.install()
     
-    hfn = HuggingFaceNode(task="sentiment-analysis", by_rows=False)
+    hfn = HuggingFaceAction(task="sentiment-analysis", by_rows=False)
     hfn.add_parent(lba)
     hfn.install()
     
@@ -85,7 +85,7 @@ def test_translation():
     lba.set_buffer(buf)
     lba.install()
     
-    hfn = HuggingFaceNode(task="translation_en_to_de", output_keys=["translation"])
+    hfn = HuggingFaceAction(task="translation_en_to_de", output_keys=["translation"])
     hfn.add_parent(lba)
     hfn.install()
     
@@ -105,7 +105,7 @@ def test_translation_with_model():
     lba.set_buffer(buf)
     lba.install()
     
-    hfn = HuggingFaceNode(task="translation_en_to_de", model="google-t5/t5-base", output_keys=["translation"])
+    hfn = HuggingFaceAction(task="translation_en_to_de", model="google-t5/t5-base", output_keys=["translation"])
     hfn.add_parent(lba)
     hfn.install()
     
