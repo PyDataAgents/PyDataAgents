@@ -6,8 +6,8 @@ from loguru import logger
 @dataclass
 class DataModel(ABC):
     
-    id : str = field(default=None, metadata={"description": ""})
-    alias : str = field(default=None, metadata={"description": ""})
+    model_id : str = field(default=None, metadata={"description": "unique model id in UUID schema"})
+    alias : str = field(default=None, metadata={"description": "short name of the model, must not be unique across sessions, but within sessions"})
     version : str = field(default=None, metadata={"description": "version of the model"})
         
     def set_property(self, property_name : str, value : Any):
