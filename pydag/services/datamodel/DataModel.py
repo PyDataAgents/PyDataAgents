@@ -1,10 +1,14 @@
 from abc import ABC
-from dataclasses import dataclass, fields
+from dataclasses import dataclass, field, fields
 from typing import Any
 from loguru import logger
 
 @dataclass
 class DataModel(ABC):
+    
+    id : str = field(default=None, metadata={"description": ""})
+    alias : str = field(default=None, metadata={"description": ""})
+    version : str = field(default=None, metadata={"description": "version of the model"})
         
     def set_property(self, property_name : str, value : Any):
         """ sets the property specified by `property_name` to the given `value`
