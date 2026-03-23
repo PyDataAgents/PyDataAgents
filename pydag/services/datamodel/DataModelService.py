@@ -4,7 +4,10 @@ from pathlib import Path
 from dataclasses import dataclass, field
 import threading
 from typing import TYPE_CHECKING, Any
+import uuid
 import pandas as pd
+import time
+import asyncio
 
 
 from ...buffers.Buffer import Buffer
@@ -14,6 +17,28 @@ from ...utils.FileUtils import FileUtils
 from ...agents.Agent import Agent
 from ..Service import Service
 from .DataModel import DataModel
+
+class DataModelSession():
+    
+    def __post_init__(self):
+        self._timestamp : float = time.time_ns()
+        self._models : dict[str, DataModel] = dict()        
+    
+    def get_timestamp(self) -> float:
+        return self._timestamp
+    
+    def get_model_ids(self) -> set[str]:
+        return self._models.keys()
+    
+    def get_model(self, model_id : str) -> DataModel:
+        if model_id in self._models:
+            return self._models[model_id]
+        else:
+            return None
+        
+    def add_model(self, model : DataModel) -> str:
+        self._models[model.model_id] = model
+        return model.model_id
 
 @dataclass
 class DataModelService(Service):
@@ -60,9 +85,8 @@ class DataModelService(Service):
         
     def __post_init__(self):
         super().__post_init__()
-        self._lock : threading.Lock = threading.Lock()
-        self._model_locks : dict[str, threading.Lock] = dict()
-        self._model_store : dict[str, DataModel] = dict()
+        self._sessions : dict[str, DataModelSession] = dict()
+        self._session_locks : dict[str, threading.Lock] = dict()
         self._methods : dict = None
         self._method_input_vars : dict[str, list[str]] = None
         self._method_output_vars : dict[str, list[str]] = None
@@ -83,31 +107,36 @@ class DataModelService(Service):
     def _on_stop(self):
         return
 
-    def updates(self, model_id, property_value_pairs : dict):
-        """ 
+    def create_session(self) -> str:
+        session_id = uuid.uuid4()
+        self._sessions[session_id] = DataModelSession()
+        self._session_locks[session_id] = asyncio.Lock()
+        return session_id
+    
+    async def updates(self, session_id : str, model_id : str, property_value_pairs : dict):
+        """
         runs all methods over and over again until there is no more updates based on current available model values
         for the given `property_value_pairs`
         """
-        if not model_id in self._model_store:
-            # create a new empty model and its lock, if none is present
-            data_model = ClassUtils.load_instance(self.model_path, self.model_name)
-            lock : threading.Lock = threading.Lock()
-            self._model_locks[model_id] = lock
-            self._model_store[model_id] = data_model
-        else:
-            data_model = self._model_store[model_id]
-            lock = self._model_locks[model_id]
+        lock = self._session_locks[session_id]
+        
+        async with lock:
+            session : DataModelSession = self._sessions[session_id]
+            model : DataModel = session.get_model(model_id)
+            if not model:
+                # create a new empty model
+                model = ClassUtils.load_instance(self.model_path, self.model_name)
+                session.add_model(model)
             
-        with lock:                
-            data_model.set_properties(property_value_pairs)
+            model.set_properties(property_value_pairs)
             last_success_methods = 0
-            success_methods = self._run_methods(data_model, list(property_value_pairs.keys()))
+            success_methods = self._run_methods(model, list(property_value_pairs.keys()))
             # run as long as the number of methods being run successful increases or all methods were run
             while success_methods > last_success_methods and success_methods is not len(self._methods):
                 last_success_methods = success_methods
-                success_methods = self._run_methods(data_model, list(property_value_pairs.keys()))
+                success_methods = self._run_methods(model, list(property_value_pairs.keys()))
 
-    def update(self, model_id, property_name : str, value : Any):
+    async def update(self, session_id : str, model_id : str, property_name : str, value : Any):
         """ 
         runs all methods over and over again until there is no more updates based on current available model values
         for the given `property_name` and `value`
@@ -189,14 +218,20 @@ class DataModelService(Service):
             if not data_model.has_property(prop):
                 raise ServiceException(f"the script calls a property '{prop}', that does not exist in the model")
 
-    def get_data_model(self, model_id) -> DataModel:
-        if model_id in self._model_store:
-            return self._model_store[model_id]
+    def get_data_model(self, session_id : str, model_id : str) -> DataModel:
+        session = self._sessions[session_id]
+        if session:
+            model = session.get_model(model_id)
+            return model
         else:
             return None
     
-    def get_data_models(self) -> dict[str, DataModel]:
-        return self._model_store
+    def get_data_models(self, session_id : str = None) -> list[str]:
+        session = self._sessions[session_id]
+        if session:
+            return list(session.get_model_ids())
+        else:
+            return []            
     
     def get_source(self) -> str:
         return Path(self.model_path).read_text(encoding="utf-8")
