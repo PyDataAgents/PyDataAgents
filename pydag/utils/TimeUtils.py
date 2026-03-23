@@ -73,6 +73,22 @@ class TimeUtils:
         return s
     
     @staticmethod
+    def str_to_utc(date_str : str, dformat : str = "%Y-%m-%d %H:%M:%S %Z") -> float:
+        """
+        Converts a datetime string to a UTC timestamp in milliseconds.
+        
+        Args:
+            date_str (str): The datetime string to convert.
+            dformat (str, optional): The format of the datetime string. Defaults to "%Y-%m-%d %H:%M:%S %Z".
+        
+        Returns:
+            float: The UTC timestamp in milliseconds.
+        """    
+        dt = datetime.strptime(date_str, dformat)
+        dt = dt.replace(tzinfo=timezone.utc)
+        return dt.timestamp() * 1000.0
+    
+    @staticmethod
     def str_to_datetime(date_str : str, dformat : str = "%Y-%m-%d %H:%M:%S") -> datetime:
         """ returns a datetime object parsed from a string
 

@@ -1,10 +1,15 @@
 from abc import ABC
-from dataclasses import dataclass, fields
+from dataclasses import dataclass, field, fields
 from typing import Any
 from loguru import logger
 
 @dataclass
 class DataModel(ABC):
+    
+    model_id : str = field(default=None, metadata={"description": "unique model id in UUID schema", "hidden": False})
+    alias : str = field(default=None, metadata={"description": "short name of the model, must not be unique across sessions, but within sessions", "hidden": False})
+    version : str = field(default=None, metadata={"description": "version of the model", "hidden": False})
+    language : str = field(default=None, metadata={"description": "language code, in order to select language corresponding outputs", "hidden": False})
         
     def set_property(self, property_name : str, value : Any):
         """ sets the property specified by `property_name` to the given `value`
