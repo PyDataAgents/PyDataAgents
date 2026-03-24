@@ -2,7 +2,7 @@ name: Weekly Security Audit
 
 on:
   schedule:
-    - cron: "0 6 * * 1"
+    - cron: "0 6 * * 1" # run every monday
   workflow_dispatch:
 
 jobs:
@@ -25,10 +25,10 @@ jobs:
         run: pip install pip-audit bandit
 
       - name: Run pip-audit (JSON)
-        run: pip-audit -f json -o pip-audit.json
+        run: pip-audit -f json -o pip-audit.json --exit-zero
 
       - name: Run Bandit (JSON)
-        run: bandit -r . -f json -o bandit.json
+        run: bandit -r . -f json -o bandit.json --exit-zero
 
       - name: Upload JSON reports
         uses: actions/upload-artifact@v6

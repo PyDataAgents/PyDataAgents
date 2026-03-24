@@ -61,6 +61,10 @@ dependencies = [
     "bs4",
     "lxml",
 
+    # fea and simulation
+    "ross-rotordynamics",
+    "EasyFEA",
+
     # browser automation
     "selenium",
     
@@ -81,7 +85,6 @@ dependencies = [
     "tirex-ts @ git+https://github.com/NX-AI/tirex",
     "chronos-forecasting",
     "librosa",
-    "ross-rotordynamics",
 
     # langchain / llm packages
     "langchain-ollama",
