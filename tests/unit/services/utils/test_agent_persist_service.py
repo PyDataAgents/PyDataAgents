@@ -4,7 +4,7 @@ from pydag.agents.Agent import Agent
 from pydag.buffers.SignalBuffer import SignalBuffer
 from pydag.buffers.signals.Sine import Sine
 from pydag.services.ThreadType import ThreadType
-from pydag.services.documents.AgentPersistService import AgentPersistService
+from pydag.services.utils.AgentPersistService import AgentPersistService
 
 
 def test_000():
