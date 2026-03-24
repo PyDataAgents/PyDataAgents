@@ -1,0 +1,91 @@
+name: Weekly Security Audit
+
+on:
+  schedule:
+    - cron: "0 6 * * 1" # run every monday
+  workflow_dispatch:
+
+jobs:
+  audit:
+    runs-on: windows-latest
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true  # forces Node 24
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Cache pip
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/pyproject.toml') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Install dependencies
+        run: pip install .
+
+      - name: Install security tools
+        run: pip install pip-audit bandit
+
+      - name: Run pip-audit (JSON)
+        run: pip-audit -f json -o pip-audit.json || true
+     
+      - name: Run Bandit (JSON)
+        run: bandit -r . -f json -o bandit.json --skip B101 --exit-zero
+
+      - name: Show Bandit warnings
+        run: |
+          $banditData = Get-Content bandit.json | ConvertFrom-Json
+          foreach ($issue in $banditData.results) {
+            Write-Host "::warning file=$($issue.filename),line=$($issue.line_number)::$($issue.issue_text)"
+          }
+        shell: powershell
+
+      - name: Show pip-audit warnings
+        run: |
+          $pipData = Get-Content pip-audit.json | ConvertFrom-Json
+          foreach ($dep in $pipData.dependencies) {
+            if ($dep.vulns) {
+              foreach ($vuln in $dep.vulns) {
+                # GitHub Actions warning annotation
+                Write-Host "::warning title=$($dep.name)::$($vuln.id) - $($vuln.description)"
+              }
+            }
+          }
+        shell: powershell
+
+      - name: Generate Markdown report
+        run: |
+          $pip = Get-Content pip-audit.json | ConvertFrom-Json
+          $bandit = Get-Content bandit.json | ConvertFrom-Json
+          $md = "# Security Report`n`n"
+
+          $md += "## Pip-Audit Vulnerabilities`n"
+          foreach ($dep in $pip.dependencies) {
+            foreach ($vuln in $dep.vulns) {
+              $md += "- **$($dep.name)**: $($vuln.id) - $($vuln.description)`n"
+            }
+          }
+
+          $md += "`n## Bandit Issues`n"
+          foreach ($issue in $bandit.results) {
+            $md += "- **$($issue.filename)**:$($issue.line_number) - $($issue.issue_text)`n"
+          }
+
+          Set-Content -Path security-report.md -Value $md
+
+      - name: Upload reports
+        uses: actions/upload-artifact@v6
+        with:
+          name: security-reports
+          path: |
+            pip-audit.json
+            bandit.json
+            security-report.md

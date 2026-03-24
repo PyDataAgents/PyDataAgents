@@ -62,6 +62,10 @@ dependencies = [
     "lxml",
     "fitz",
 
+    # fea and simulation
+    "ross-rotordynamics",
+    "EasyFEA",
+
     # browser automation
     "selenium",
     
@@ -82,7 +86,6 @@ dependencies = [
     "tirex-ts @ git+https://github.com/NX-AI/tirex",
     "chronos-forecasting",
     "librosa",
-    "ross-rotordynamics",
 
     # langchain / llm packages
     "langchain-ollama",
@@ -93,7 +96,12 @@ dependencies = [
     "sentence-transformers",
     "langchain_text_splitters",
     "langchain_community",
+<<<<<<< HEAD
     "langgraph>=1.0.10",
+=======
+    "langgraph<1",
+    "hf_xet",
+>>>>>>> develop
 
     # optional core functionality
     "graphviz"
