@@ -29,7 +29,6 @@ dependencies = [
     "pandas",
     "fastapi[standard]",
     "APScheduler",
-    "pychrono",
 
     # IIoT
     "opcua",
@@ -96,12 +95,8 @@ dependencies = [
     "sentence-transformers",
     "langchain_text_splitters",
     "langchain_community",
-<<<<<<< HEAD
     "langgraph>=1.0.10",
-=======
-    "langgraph<1",
     "hf_xet",
->>>>>>> develop
 
     # optional core functionality
     "graphviz"
