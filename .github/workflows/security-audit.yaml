@@ -28,56 +28,10 @@ jobs:
       - name: Run Bandit (JSON)
         run: bandit -r . -f json -o bandit.json
 
-      - name: Generate HTML report
-        shell: powershell
-        run: |
-          $script = @"
-import json
-
-def load_json(path):
-    try:
-        with open(path) as f:
-            return json.load(f)
-    except:
-        return {}
-
-pip_data = load_json("pip-audit.json")
-bandit_data = load_json("bandit.json")
-
-html = "<html><body>"
-html += "<h2>🔐 Weekly Security Report</h2>"
-
-html += "<h3>Dependencies (pip-audit)</h3><ul>"
-for dep in pip_data.get("dependencies", []):
-    for vuln in dep.get("vulns", []):
-        html += f"<li><b>{dep['name']}</b> - {vuln['id']}: {vuln.get('description','')}</li>"
-html += "</ul>"
-
-html += "<h3>Code Issues (Bandit)</h3><ul>"
-for issue in bandit_data.get("results", []):
-    html += f"<li><b>{issue['filename']}</b>:{issue['line_number']} - {issue['issue_text']}</li>"
-html += "</ul>"
-
-html += "</body></html>"
-
-with open("report.html", "w") as f:
-    f.write(html)
-"@
-
-          # Save Python script to file
-          Set-Content -Path "generate_report.py" -Value $script -Encoding UTF8
-
-          # Run the script
-          python generate_report.py
-
-      - name: Send email
-        uses: dawidd6/action-send-mail@v3
+      - name: Upload JSON reports
+        uses: actions/upload-artifact@v4
         with:
-          server_address: smtp.strato.de
-          server_port: 587
-          username: ${{ secrets.MAIL_USERNAME }}
-          password: ${{ secrets.MAIL_PASSWORD }}
-          subject: "Weekly Security Report"
-          to: ${{ secrets.SECURITY_REPORT_MAIL }}
-          from: GitHub Actions
-          html_body: file://report.html
+          name: security-reports
+          path: |
+            pip-audit.json
+            bandit.json
