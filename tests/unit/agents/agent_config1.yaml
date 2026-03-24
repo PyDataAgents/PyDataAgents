@@ -1,4 +1,5 @@
 id: G1
+create_config: false
 description: null
 buffer_store:
   B1:
