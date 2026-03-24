@@ -36,7 +36,7 @@ jobs:
 
       - name: Run pip-audit (JSON)
         run: pip-audit -f json -o pip-audit.json || true
-
+     
       - name: Run Bandit (JSON)
         run: bandit -r . -f json -o bandit.json --skip B101 --exit-zero
 
@@ -45,6 +45,19 @@ jobs:
           $banditData = Get-Content bandit.json | ConvertFrom-Json
           foreach ($issue in $banditData.results) {
             Write-Host "::warning file=$($issue.filename),line=$($issue.line_number)::$($issue.issue_text)"
+          }
+        shell: powershell
+
+      - name: Show pip-audit warnings
+        run: |
+          $pipData = Get-Content pip-audit.json | ConvertFrom-Json
+          foreach ($dep in $pipData.dependencies) {
+            if ($dep.vulns) {
+              foreach ($vuln in $dep.vulns) {
+                # GitHub Actions warning annotation
+                Write-Host "::warning title=$($dep.name)::$($vuln.id) - $($vuln.description)"
+              }
+            }
           }
         shell: powershell
 
