@@ -1,0 +1,78 @@
+name: Weekly Security Audit
+
+on:
+schedule:
+- cron: "0 6 * * 1"
+workflow_dispatch:
+
+jobs:
+audit:
+runs-on: windows-latest
+
+steps:
+  - uses: actions/checkout@v4
+
+  - uses: actions/setup-python@v5
+    with:
+      python-version: "3.11"
+
+  - name: Install dependencies
+    run: pip install .
+
+  - name: Install tools
+    run: pip install pip-audit bandit
+
+  - name: Run pip-audit (JSON)
+    run: pip-audit -f json -o pip-audit.json
+
+  - name: Run Bandit (JSON)
+    run: bandit -r . -f json -o bandit.json
+
+  - name: Generate HTML report
+    run: |
+      python - <<EOF
+      import json
+
+      def load_json(path):
+          try:
+              with open(path) as f:
+                  return json.load(f)
+          except:
+              return {}
+
+      pip_data = load_json("pip-audit.json")
+      bandit_data = load_json("bandit.json")
+
+      html = "<html><body>"
+      html += "<h2>🔐 Weekly Security Report</h2>"
+
+      # pip-audit section
+      html += "<h3>Dependencies (pip-audit)</h3><ul>"
+      for dep in pip_data.get("dependencies", []):
+          for vuln in dep.get("vulns", []):
+              html += f"<li><b>{dep['name']}</b> - {vuln['id']}: {vuln.get('description','')}</li>"
+      html += "</ul>"
+
+      # Bandit section
+      html += "<h3>Code Issues (Bandit)</h3><ul>"
+      for issue in bandit_data.get("results", []):
+          html += f"<li><b>{issue['filename']}</b>:{issue['line_number']} - {issue['issue_text']}</li>"
+      html += "</ul>"
+
+      html += "</body></html>"
+
+      with open("report.html", "w") as f:
+          f.write(html)
+      EOF
+
+  - name: Send email
+    uses: dawidd6/action-send-mail@v3
+    with:
+      server_address: smtp.strato.de
+      server_port: 587
+      username: ${{ secrets.MAIL_USERNAME }}
+      password: ${{ secrets.MAIL_PASSWORD }}
+      subject: "Weekly Security Report"
+      to: ${{ secrets.SECURITY_REPORT_MAIL }}
+      from: GitHub Actions
+      html_body: file://report.html
