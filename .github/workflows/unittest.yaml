@@ -1,0 +1,30 @@
+name: Run Unit Tests
+
+on:
+  push:        # runs on every push
+  pull_request:
+
+jobs:
+  unit-tests:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install project dependencies
+        run: pip install .
+
+      - name: Run unit tests
+        run: pytest tests/unit --junitxml=unit-test-results.xml
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        with:
+          name: unit-test-results
+          path: unit-test-results.xml
