@@ -35,7 +35,7 @@ jobs:
         run: pip install pip-audit bandit
 
       - name: Run pip-audit (JSON)
-        run: pip-audit -f json -o pip-audit.json --exit-zero
+        run: pip-audit -f json -o pip-audit.json || true
 
       - name: Run Bandit (JSON)
         run: bandit -r . -f json -o bandit.json --exit-zero
