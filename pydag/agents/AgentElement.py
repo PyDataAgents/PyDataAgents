@@ -75,24 +75,20 @@ class AgentElement(ABC):
     
     def install(self, agent : Agent = None):
         """initializes the element with respect to startup functionality or initial internal object creation,
-            if agent is not None, it can be used to reference or create other agent elements
-            the method should always be used in child classes with super().install()
-           
-            Raises:
-                AgentElementException: if the state of the `AgentElement` is invalid
+           if agent is not None, it can be used to reference or create other agent elements
+           the method should always be used in child classes with super().install()
         """
         if self.load_on_install:
             self.load()
-        self._check_state(AgentElementState.INSTALLED)
         self._on_install(agent)
         self._state = AgentElementState.INSTALLED
         
     def uninstall(self, agent : Agent = None):
         """resets the element, this method can be used to stop internal element logic or reset objects that were initialized on creation
         """
-        self._check_state(AgentElementState.UNINSTALLED)
         self._on_uninstall(agent)
         self._state = AgentElementState.UNINSTALLED
+        return
     
     def load(self):
         """ load `AgentElement` config from filesystem
@@ -113,17 +109,6 @@ class AgentElement(ABC):
         d = self.config_options()
         with open(AgentConfig.SAVE_FOLDER + self.id + ".json", "w", encoding="utf-8") as json_file:
             json.dump(d, json_file, indent = 4)  # "indent" makes the output more readable
-    
-    @abstractmethod
-    def _check_state(self, next_state : AgentElementState):
-        """ checks whether the `next_state` is valid transitioning from current `_state`
-
-        Args:
-            next_state (AgentElementState): next target state
-            
-        Raises:
-            AgentElementException: if a `next_state` is illegal
-        """
             
     def get_state(self) -> AgentElementState:
         """
@@ -134,9 +119,9 @@ class AgentElement(ABC):
         return self._state
     
     def set_state(self, state : AgentElementState):
-        """ method to set the `AgentElement`s internal ``_state`
+        """ method to set the `AgentElement`s internal `state`
 
         Args:
-            state (AgentElementState): state class
+            state (AgentElementState): state enum
         """
         self._state = state

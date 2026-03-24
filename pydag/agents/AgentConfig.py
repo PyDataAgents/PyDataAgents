@@ -59,7 +59,7 @@ class AgentConfig:
     RESOURCE_FOLDER = "." + os.sep + "resources"  + os.sep
     MODEL_RESOURCE_FOLDER = RESOURCE_FOLDER + "models" + os.sep
     EMBEDDINGS_RESOURCE_FOLDER = RESOURCE_FOLDER + "embeddings" + os.sep
-    SAVE_FOLDER = RESOURCE_FOLDER + "save" + os.sep
+    SAVE_FOLDER = ".save" + os.sep
 
     @staticmethod
     def config_options(obj : Any, with_descriptions = False) -> dict:
@@ -101,6 +101,8 @@ class AgentConfig:
                             else:
                                 d[k] = v
                         result[f.name] = d
+                    elif hasattr(value, "__dict__"):
+                        result[f.name] = AgentConfig.config_options(value)
                     else:
                         result[f.name] = value
         return result

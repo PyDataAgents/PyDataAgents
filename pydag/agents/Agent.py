@@ -1,4 +1,5 @@
 from __future__ import annotations
+import os
 import threading
 from typing import TYPE_CHECKING, Type, cast
 from dataclasses import dataclass, field
@@ -6,6 +7,7 @@ import uuid
 from loguru import logger
 
 
+from .YAMLConfig import YAMLConfig
 from ..nodes.Node import Node
 from .AgentElement import AgentElement
 from .AgentConfig import AgentConfig
@@ -22,6 +24,7 @@ if TYPE_CHECKING:
 class Agent():
     
     id : str = field(default=None, metadata={"description": "unique identifier of the Agent application"})
+    create_config : bool = field(default=False, metadata={"description": "creates a configuration yaml on start, when True"})
     description : str = field(default=None, metadata={"description": "application/agent description"})
     buffer_store : dict[str, Buffer] = field(default_factory=dict, metadata={"description": "dictionary of Buffers in the Agent"})
     adapter_store : dict[str, Adapter] = field(default_factory=dict, metadata={"description": "dictionary of Adapters in the Agent"})
@@ -157,6 +160,9 @@ class Agent():
             AgentElementException: if a `AgentElement` could not be installed
         """
         self._install_elements()
+        gc = AgentConfig(self)
+        yc = YAMLConfig(f"Agent {self.id}.yaml")
+        yc.save(gc)
         #self._connect_adapters() # not included anymore, because mappings or nodes connect adapters on demand
         self._start_services()
         self._stop_event.clear()

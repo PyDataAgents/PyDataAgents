@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=61"]
+requires = ["setuptools>=70"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -93,7 +93,7 @@ dependencies = [
     "sentence-transformers",
     "langchain_text_splitters",
     "langchain_community",
-    "langgraph<1",
+    "langgraph>=1.0.10",
 
     # optional core functionality
     "graphviz"

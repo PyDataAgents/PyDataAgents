@@ -145,3 +145,9 @@ class StatemachineService(ObserverService):
             logger.debug(f"Node Graph written to {export_path}")
         else:
             logger.error("No Graphviz executable 'dot' was found on system PATH. Node graph cannot be rendered. Go to https://graphviz.org/download/")
+
+    def save(self):
+        super().save()
+        # call nodes separately, so that they can individually overwrite save() and load() of `AgentElement`
+        for node in self.nodes.values():
+            node.save()
