@@ -1,6 +1,7 @@
 from dataclasses import dataclass, field
 from typing import Any
 
+from loguru import logger
 from pypdf import PdfReader
 
 from ...agents.Agent import Agent
@@ -240,8 +241,8 @@ class ReadPDFFormAction(BufferNode, Action):
                 elif cm is not None and len(cm) >= 6:
                     x = float(cm[4])
                     y = float(cm[5])
-            except Exception:
-                pass
+            except Exception as e:
+                logger.error(e)
             spans.append({"text": clean, "x": x, "y": y})
 
         try:
@@ -310,7 +311,7 @@ class ReadPDFFormAction(BufferNode, Action):
         if hasattr(obj, "get_object"):
             try:
                 return obj.get_object()
-            except Exception:
+            except Exception as e:
                 return obj
         return obj
 
