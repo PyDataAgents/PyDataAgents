@@ -1,5 +1,6 @@
 from __future__ import annotations
 import os
+from pathlib import Path
 import threading
 from typing import TYPE_CHECKING, Type, cast
 from dataclasses import dataclass, field
@@ -7,6 +8,8 @@ import uuid
 from loguru import logger
 
 
+from .AgentException import AgentException
+from ..utils.FileUtils import FileUtils
 from .YAMLConfig import YAMLConfig
 from ..nodes.Node import Node
 from .AgentElement import AgentElement
@@ -153,6 +156,32 @@ class Agent():
             if service.auto_start:
                 service.start()
     
+    @staticmethod
+    def load_from(config_file : str) -> Agent:
+        """ loads an `Agent` from configuration file `config_file`
+
+        Args:
+            config_file (str): path to a config file, only YAML is implemented so far
+
+        Raises:
+            AgentException: if the `Agent` cannot be configured from `config_file`
+
+        Returns:
+            Agent: an `Agent` instance
+        """
+        if FileUtils.exists_file(config_file):
+            ext = Path(config_file).suffix
+            match(ext):
+                case ".yaml" | ".yml":
+                    yc = YAMLConfig(config_file)
+                    ac : AgentConfig = yc.load()
+                    ag : Agent = AgentConfig.create(ac)
+                    return ag
+                case _:
+                    raise AgentException(f"Unknown File Type for {Agent.__name__} configuration (only YAML is supported)")
+        else:
+            raise AgentException(f"Configuration File {config_file} was not found!")
+    
     def release(self, blocking : bool = True):
         """Release the `Agent` for operation.
         
@@ -167,9 +196,10 @@ class Agent():
             AgentElementException: if a `AgentElement` could not be installed
         """
         self._install_elements()
-        gc = AgentConfig(self)
-        yc = YAMLConfig(f"Agent {self.id}.yaml")
-        yc.save(gc)
+        if self.create_config:
+            gc = AgentConfig(self)
+            yc = YAMLConfig(f"Agent {self.id}.yaml")
+            yc.save(gc)
         #self._connect_adapters() # not included anymore, because mappings or nodes connect adapters on demand
         self._start_services()
         self._stop_event.clear()

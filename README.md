@@ -74,8 +74,7 @@ The `Agent` application follows a clear lifecycle from initialization to runtime
 ```python
 from pydag.agents.Agent import Agent
 
-agent = Agent()
-agent.id = "G1"
+agent = Agent(id = "G1")
 
 agent.add_buffer(...) # add a buffer
 agent.add_adapter(...) # add an adapter
@@ -95,6 +94,19 @@ agent.release() # starts an agent application and blocks until finished (runs fo
 agent.release(blocking=False) # non-blocking call
 
 ```
+
+or 
+
+```python
+from pydag.agents.Agent import Agent
+
+agent = Agent.load_from("config.yaml")
+agent.release()
+
+...
+
+```
+
 
 ### AgentElement
 All elements within an `Agent` application are derived from `AgentElement`.
