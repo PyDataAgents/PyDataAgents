@@ -39,6 +39,52 @@ jobs:
       - name: Run unit tests
         run: pytest tests/unit --junitxml=unit-test-results.xml
 
+      - name: Parse test results
+        id: parse_tests
+        shell: powershell
+        run: |
+          [xml]$xml = Get-Content unit-test-results.xml
+      
+          $total = [int]$xml.testsuite.tests
+          $failures = [int]$xml.testsuite.failures
+          $errors = [int]$xml.testsuite.errors
+          $passed = $total - $failures - $errors
+      
+          Write-Host "Passed: $passed / $total"
+      
+          # Collect failed tests
+          $failedTests = @()
+          foreach ($testcase in $xml.testsuite.testcase) {
+            if ($testcase.failure -or $testcase.error) {
+              $failedTests += "$($testcase.classname).$($testcase.name)"
+            }
+          }
+      
+          # Output for later steps
+          echo "passed=$passed" >> $env:GITHUB_OUTPUT
+          echo "total=$total" >> $env:GITHUB_OUTPUT
+      
+          # Save failed tests as multiline output
+          $failedList = $failedTests -join "`n"
+          echo "failed_tests<<EOF" >> $env:GITHUB_OUTPUT
+          echo "$failedList" >> $env:GITHUB_OUTPUT
+          echo "EOF" >> $env:GITHUB_OUTPUT
+      
+          # Write nice summary in GitHub UI
+          $summary = "## 🧪 Test Results`n"
+          $summary += "`n**Passed:** $passed / $total`n"
+      
+          if ($failedTests.Count -gt 0) {
+            $summary += "`n### ❌ Failed Tests`n"
+            foreach ($t in $failedTests) {
+              $summary += "- $t`n"
+            }
+          } else {
+            $summary += "`n✅ All tests passed"
+          }
+      
+          $summary | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append
+      
       - name: Upload test results
         uses: actions/upload-artifact@v6
         with:
