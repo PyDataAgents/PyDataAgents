@@ -1,14 +1,14 @@
 [build-system]
-requires = ["setuptools>=70"]
+requires = ["setuptools>=82"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "pydag"
-version = "v0.0.1"
+version = "0.0.1"
 description = "An IIoT framework for reading and writing from sources/sinks."
 readme = "README.md"
 requires-python = ">=3.11"
-license = "MIT"
+license = { file = "LICENSE" }
 keywords = ["IIoT", "Industrial Datalogging", "software robots", "data agents"]
 authors = [
   { name = "Jonas Hillenbrand", email = "hillenbrandjonas@hotmail.com" },
@@ -21,7 +21,6 @@ classifiers = [
 ]
 dependencies = [
     # base packages
-    "pytest",
     "matplotlib",
     "loguru",
     "PyYAML",
@@ -59,7 +58,6 @@ dependencies = [
     "docxtpl",
     "bs4",
     "lxml",
-    "fitz",
 
     # fea and simulation
     "ross-rotordynamics",
@@ -107,8 +105,8 @@ include-package-data = true
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["pydag*"]
-exclude = ["tests"]
+include = ["pydag", "pydag.*"]
+exclude = ["tests*"]
 
 [tool.setuptools.package-data]
 "pydag" = ["services/plot/*.html", "_docs/element_icons/**/*"]
