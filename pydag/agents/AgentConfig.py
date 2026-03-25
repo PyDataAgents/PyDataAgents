@@ -64,6 +64,7 @@ class AgentConfig:
     OUTPUT_RESOURCE_ROOT = RESOURCE_ROOT / "outputs"
     SCRIPT_RESOURCE_ROOT = RESOURCE_ROOT / "scripts"
 
+    @staticmethod
     def ensure_resource_layout() -> None:
         for path in (
             AgentConfig.RESOURCE_ROOT,

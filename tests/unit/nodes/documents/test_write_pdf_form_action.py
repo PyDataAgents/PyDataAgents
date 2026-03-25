@@ -31,6 +31,7 @@ if "graphviz" not in sys.modules:
     graphviz_stub.Digraph = _DummyDigraph
     sys.modules["graphviz"] = graphviz_stub
 
+from pydag.agents.AgentConfig import AgentConfig
 from pydag.buffers.DictBuffer import DictBuffer
 from pydag.buffers.ListBuffer import ListBuffer
 from pydag.nodes.NodeException import NodeException
@@ -538,6 +539,11 @@ def test_resolve_target_button_state_exact_and_normalized_matches():
 
     assert writer._resolve_target_button_state("ja", available_states) == "Ja"
     assert writer._resolve_target_button_state("/ Ja ", available_states) == "Ja"
+
+
+def test_default_output_folder_uses_agent_config_resource_layout():
+    writer = PDFWriteFormAction()
+    assert writer.output_folder == str(AgentConfig.OUTPUT_RESOURCE_ROOT)
 
 
 def test_resolve_target_button_state_semantic_binary_values():

@@ -15,6 +15,18 @@ Use this document when you need to understand:
 - which parts of restart behavior are shared by the framework and which remain local to concrete elements
 - what is currently crash-tolerant, what is only cooperative, and what is still planned
 
+If you are new to the project, read this document in this order:
+
+1. `Architectural Invariants`
+2. `Runtime Storage Layout`
+3. `Agent Runtime Versus Shared Resource Roots`
+4. `Fail-Safe Checkpoint Mechanics`
+5. `Fail-Safe Restore And Reload Mechanics`
+6. `Shared Element Specializations`
+7. `How To Build A New Element`
+
+That path is the shortest route from "what does the runtime do?" to "how do I extend it safely?".
+
 Repository anchors for the mechanics described here:
 
 - `pydag/agents/Agent.py`
@@ -211,12 +223,12 @@ This is a hybrid design. Bulk element payloads and artifacts are not stored insi
 
 ## Agent Runtime Versus Shared Resource Roots
 
-The repository now uses two storage scopes on purpose:
+The repository uses two storage scopes on purpose:
 
 - agent runtime storage under `resources/runtime/<agent_uid>/...`
 - shared or user-facing resource roots under `resources/...`
 
-This is the rule developers should follow when adding new files, caches, stores, or other artifacts.
+This split is one of the most important design rules in the current codebase. When you add a new file, cache, store, or directory, decide its scope first and only then write the code that creates it.
 
 ### Use The Agent Runtime When The Data Belongs To One Runtime
 
@@ -238,6 +250,12 @@ Typical examples:
 - per-agent temp artifacts
 - owner-local runtime state that should be cleaned together with the runtime
 
+Developer rule:
+
+- choose the agent runtime when the file is part of one agent's lifecycle
+- choose the agent runtime when deleting the runtime should also delete the file
+- choose the agent runtime when the file is part of checkpoint-owned execution state
+
 ### Use `resources/...` When The Data Should Survive One Runtime
 
 Use the shared top-level resource roots for:
@@ -258,6 +276,12 @@ Typical examples in the current codebase:
 - vector stores created by `RAGService` and `FileEmbeddingService`
 - generated PDF outputs written by `PDFWriteFormAction`
 
+Developer rule:
+
+- choose `resources/...` when the data should still exist after one runtime is deleted
+- choose `resources/...` when the data is expensive to rebuild and useful across runs
+- choose `resources/...` when the data is user-facing input or output rather than checkpoint-owned runtime state
+
 ### Practical Decision Rule
 
 When adding a new artifact, ask these questions in order:
@@ -276,6 +300,14 @@ When adding a new artifact, ask these questions in order:
    - If yes, use `resources/inputs/...` or `resources/outputs/...`.
 
 This keeps restart state local while keeping durable reusable assets publicly available.
+
+Examples:
+
+- checkpoint manifest: `resources/runtime/<agent_uid>/checkpoints/...`
+- runtime SQLite file: `resources/runtime/<agent_uid>/db/state.sqlite3`
+- downloaded embedding model cache: `resources/models/...`
+- durable embedding store you want to keep after one runtime is removed: `resources/embeddings/...`
+- generated PDF for the user: `resources/outputs/...`
 
 ## Why `RuntimeStorage` Is A Peer Module Under `pydag/agents`
 
@@ -375,7 +407,7 @@ What the base class owns:
 What the concrete element still owns:
 
 - rare custom snapshot preparation when a field must be transformed before persistence
-- rare custom restore compatibility handling for older payloads
+- rare owner-specific restore extensions when the generic declarative model is not enough
 - the artifact list it registers in owner-specific cases
 - whether an artifact should be reused or rebuilt
 - how live runtime handles are recreated after restore or startup
@@ -586,6 +618,13 @@ Exact match means:
 
 This is intentionally strict. If an element changed in any way that affects its identity or definition, Stage 1 does not try to migrate it. The changed element is rebuilt and started fresh.
 
+Important current behavior for statemachine services:
+
+- node matching currently depends not only on the node itself, but also on the owning service definition
+- because of that, changing one node inside a statemachine service can cause the service and other owned nodes to fresh-start as well
+- this is conservative by design in Stage 1
+- the current system prefers a safe fresh start over a risky partial restore inside a changed workflow definition
+
 ### Reconciliation Outcomes
 
 The current reconciliation report uses three outcomes only:
@@ -763,7 +802,7 @@ By default it treats as runtime-only:
 
 Concrete buffers should normally only add or refine field roles if they introduce additional runtime state, for example an extra index counter.
 
-`DictBuffer` is a good example of the intended pattern. It inherits the general buffer defaults and only adds its own persisted index counter plus a small backward-compatibility restore mapping.
+`DictBuffer` is a good example of the intended pattern. It inherits the general buffer defaults and only adds its own persisted index counter.
 
 ### `Adapter`
 
@@ -853,6 +892,11 @@ The owning element controls:
 - whether it should be reused
 - whether it should be rebuilt
 - how it should be loaded again
+
+In simpler terms:
+
+- the framework tells you where an artifact may live and how it is tracked
+- the owner tells the framework whether that artifact is valid and how to open or rebuild it
 
 ### Concrete Examples In The Current Repo
 
@@ -1026,7 +1070,7 @@ When extending the repo, keep these operational rules in mind.
 
 ### How To Build A New Element
 
-When implementing a new element, follow these checks in order.
+When implementing a new element, follow these checks in order. This checklist is intentionally high-level. It explains what you must think through, not which exact methods every subclass must override.
 
 1. Start from the nearest base class.
    Check `AgentElement`, then the closest family base such as `Buffer`, `Service`, `Adapter`, `Node`, or `LearningNode`.
@@ -1041,7 +1085,7 @@ When implementing a new element, follow these checks in order.
 
 3. Declare the field roles.
    Prefer field helpers and inherited family defaults over custom snapshot methods.
-   Only deviate when a field needs custom transformation or a legacy restore mapping.
+   Only deviate when a field genuinely needs custom transformation or custom rebuild behavior.
 
 4. Check non-checkpointed runtime handles explicitly.
    If the element owns models, DB clients, vector stores, threads, sessions, locks, servers, or external SDK handles, make sure startup and restore rebuild them correctly.
@@ -1059,6 +1103,7 @@ When implementing a new element, follow these checks in order.
 
 6. Check exact-match behavior.
    If parent ownership, node topology, or config changes should invalidate restore, make sure the current definition fingerprint reflects that correctly.
+   Be conservative. When you are unsure whether old state is still safe in a new definition, prefer a fresh start.
 
 7. Write focused tests.
    At minimum test:
@@ -1068,6 +1113,15 @@ When implementing a new element, follow these checks in order.
    - artifact reuse or rebuild behavior when relevant
 
 This is the intended authoring model: use inherited defaults first, add the smallest amount of owner-specific persistence logic necessary, and test the restart path explicitly.
+
+### A Simple Mental Model
+
+If you only remember four rules from this document, remember these:
+
+1. `Agent` decides when checkpointing and restore happen.
+2. `AgentElement` decides how one element is turned into a snapshot and restored again.
+3. Shared base classes such as `Buffer`, `Service`, `Adapter`, `Node`, and `LearningNode` should carry most of the common logic.
+4. Concrete elements still own the meaning of their artifacts, models, databases, stores, and other runtime handles.
 
 ### If You Add A New Artifact Type
 

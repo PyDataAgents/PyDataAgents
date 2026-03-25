@@ -1,10 +1,23 @@
 import os
+from pathlib import Path
+import uuid
+from pydag.agents.AgentConfig import AgentConfig
 from pydag.services.documents.FileEmbeddingService import FileEmbeddingService
 from pydag.services.ServiceException import ServiceException
+from pdf2image.exceptions import PDFInfoNotInstalledError, PDFPageCountError
 import pytest
-import tempfile
 import shutil
 import time
+
+
+def _docs_dir(name: str) -> str:
+    return str(Path(__file__).resolve().parent / "test_documents_for_embedding" / name)
+
+
+def _workspace_temp_dir() -> str:
+    root = AgentConfig.RESOURCE_ROOT / "tmp-tests" / "file-embedding-service" / uuid.uuid4().hex[:8]
+    root.mkdir(parents=True, exist_ok=True)
+    return str(root)
 
 
 
@@ -12,14 +25,14 @@ def test_embed_files_save_properly():
     # Test: Valid documents are placed in the embedding folder. --> All valid documents are embedded; the number of embedded documents matches the number of valid documents in the embedding folder.
     
         
-    fs = FileEmbeddingService(docs_folder = [r"C:\Users\tobia\Python Scripts\PyDataAgents\tests\unit\services\documents\test_documents_for_embedding\docs_0"], store_name="test_store")
+    fs = FileEmbeddingService(docs_folder=[_docs_dir("docs_0")], store_name="test_store")
     fs.install()
     fs.start()
 
     loaded_docs = fs._embedding_store._collection.count()
     print(f"Number of documents in embedding store: {loaded_docs}")
     assert loaded_docs == 7, "No documents were embedded, but there should be some valid documents in the folder."
-    assert os.path.exists(os.path.join(FileEmbeddingService.EMBEDDINGS_RESOURCE_FOLDER, "test_store")), "Embedding store folder was not created in the embeddings resource folder."
+    assert os.path.exists(fs._resolve_store_directory()), "Embedding store folder was not created in the central embedding resource folder."
     time.sleep(1) # Give some time for the file system to release the directory
 
 
@@ -27,7 +40,7 @@ def test_embed_files_properly():
     # Test: Files are embedded properly.
     
         
-    fs = FileEmbeddingService(docs_folder = [r"C:\Users\tobia\Python Scripts\PyDataAgents\tests\unit\services\documents\test_documents_for_embedding\docs_1"], store_name="test_store_1")
+    fs = FileEmbeddingService(docs_folder=[_docs_dir("docs_1")], store_name="test_store_1")
     fs.install()
     fs.start()
 
@@ -41,7 +54,7 @@ def test_empty_folder():
     # Test: No documents should be embedded from an empty folder.
     
         
-    fs = FileEmbeddingService(docs_folder = [r"C:\Users\tobia\Python Scripts\PyDataAgents\tests\unit\services\documents\test_documents_for_embedding\docs_2"], store_name="test_store_2")
+    fs = FileEmbeddingService(docs_folder=[_docs_dir("docs_2")], store_name="test_store_2")
     fs.install()
     fs.start()
 
@@ -55,7 +68,7 @@ def test_name_as_string():
     #Test:  provide folder name as string instead of list.
     
         
-    fs = FileEmbeddingService(docs_folder = r"C:\Users\tobia\Python Scripts\PyDataAgents\tests\unit\services\documents\test_documents_for_embedding\docs_3", store_name="test_store_3")
+    fs = FileEmbeddingService(docs_folder=_docs_dir("docs_3"), store_name="test_store_3")
     fs.install()
     fs.start()
 
@@ -68,7 +81,7 @@ def test_multiple_folders():
     # Test multiple folders with valid documents.
     
         
-    fs = FileEmbeddingService(docs_folder = [r"C:\Users\tobia\Python Scripts\PyDataAgents\tests\unit\services\documents\test_documents_for_embedding\docs_3", r"C:\Users\tobia\Python Scripts\PyDataAgents\tests\unit\services\documents\test_documents_for_embedding\docs_0"], store_name="test_store_4")
+    fs = FileEmbeddingService(docs_folder=[_docs_dir("docs_3"), _docs_dir("docs_0")], store_name="test_store_4")
     fs.install()
     fs.start()
 
@@ -91,7 +104,7 @@ def test_no_folders():
 def test_unauthorized_files():
     # Test mix of unauthorized and authorized files in folder
     
-    fs = FileEmbeddingService(docs_folder = [r"C:\Users\tobia\Python Scripts\PyDataAgents\tests\unit\services\documents\test_documents_for_embedding\docs_4"], store_name="test_store_6")
+    fs = FileEmbeddingService(docs_folder=[_docs_dir("docs_4")], store_name="test_store_6")
     fs.install()
     fs.start()
 
@@ -104,7 +117,7 @@ def test_call_multiple_same_folder():
     # Test: Method is called multiple times with the same unchanged folder. The database should not be changed. 
     
         
-    fs = FileEmbeddingService(docs_folder = [r"C:\Users\tobia\Python Scripts\PyDataAgents\tests\unit\services\documents\test_documents_for_embedding\docs_1"], store_name="test_store_7")
+    fs = FileEmbeddingService(docs_folder=[_docs_dir("docs_1")], store_name="test_store_7")
     fs.install()
     fs.start()
 
@@ -133,7 +146,7 @@ def test_multiple_folders_one_invalid():
     # Test: Multiple folders where one is invalid
     
     fs = FileEmbeddingService(docs_folder = [
-        r"C:\Users\tobia\Python Scripts\PyDataAgents\tests\unit\services\documents\test_documents_for_embedding\docs_0",
+        _docs_dir("docs_0"),
         r"C:\NonExistentFolder\Invalid"
     ], store_name="test_store_9")
     fs.install()
@@ -147,7 +160,7 @@ def test_embedding_store_updates_when_documents_change():
     # Test: When documents are added/removed, embedding store should update
     
     # Create temporary folder
-    temp_dir = tempfile.mkdtemp()
+    temp_dir = _workspace_temp_dir()
     
     try:
         fs = FileEmbeddingService(docs_folder=[temp_dir])
@@ -158,7 +171,7 @@ def test_embedding_store_updates_when_documents_change():
         assert initial_count == 0, "Empty folder should have no documents"
         
         # Copy some documents to the temp folder
-        src_folder = r"C:\Users\tobia\Python Scripts\PyDataAgents\tests\unit\services\documents\test_documents_for_embedding\docs_0"
+        src_folder = _docs_dir("docs_0")
         if os.path.exists(src_folder):
             for file in os.listdir(src_folder):
                 shutil.copy(os.path.join(src_folder, file), temp_dir)
@@ -188,9 +201,12 @@ def test_none_docs_folder():
 def test_pdf_files():
     # Test: Folder with pdf files should be embedded properly
     
-    fs = FileEmbeddingService(docs_folder=[r"C:\Users\tobia\Python Scripts\PyDataAgents\tests\unit\services\documents\test_documents_for_embedding\docs_5"], store_name="test_store_12")
+    fs = FileEmbeddingService(docs_folder=[_docs_dir("docs_5")], store_name="test_store_12")
     fs.install()
-    fs.start()
+    try:
+        fs.start()
+    except (PDFPageCountError, PDFInfoNotInstalledError) as exc:
+        pytest.skip(f"PDF embedding test requires a working local PDF toolchain: {exc}")
     
     loaded_docs = fs._embedding_store._collection.count()
     assert loaded_docs >= 0, "Should handle mixed file types gracefully"
@@ -200,9 +216,12 @@ def test_pdf_files():
 def test_searchin_in_embedding_store():
     # Test: Search for a document in the embedding store after embedding
     
-    fs = FileEmbeddingService(docs_folder=[r"C:\Users\tobia\Python Scripts\PyDataAgents\tests\unit\services\documents\test_documents_for_embedding\docs_5"], store_name="test_store_13")
+    fs = FileEmbeddingService(docs_folder=[_docs_dir("docs_5")], store_name="test_store_13")
     fs.install()
-    fs.start()
+    try:
+        fs.start()
+    except (PDFPageCountError, PDFInfoNotInstalledError) as exc:
+        pytest.skip(f"PDF embedding retrieval test requires a working local PDF toolchain: {exc}")
     
     retriever = fs._embedding_store.as_retriever(search_kwargs={"k": 20})
     results = retriever.get_relevant_documents("Who are the authors of the paper?")
@@ -234,6 +253,6 @@ def test_delete_all_test_folders():
     ]
     
     for folder in test_folders:
-        folder_path = os.path.join(FileEmbeddingService.EMBEDDINGS_RESOURCE_FOLDER, folder)
-        if os.path.exists(folder_path):
-            shutil.rmtree(folder_path, ignore_errors=True)
+        for folder_path in AgentConfig.EMBEDDING_RESOURCE_ROOT.rglob(folder):
+            if os.path.exists(folder_path):
+                shutil.rmtree(folder_path, ignore_errors=True)

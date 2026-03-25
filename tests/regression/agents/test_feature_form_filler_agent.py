@@ -353,16 +353,12 @@ def test_feature_form_filler_agent_end_to_end_local_example():
         store_name=embedding_store_name,
     )
 
-    vector_store_directory = os.path.join(
-        str(FileEmbeddingService.EMBEDDINGS_RESOURCE_FOLDER),
-        embedding_store_name,
-    )
     rag_service = RAGService(
         id="RAG_SERVICE_LOCAL",
         model_provider="OLLAMA",
         model=ollama_model,
         endpoint=ollama_endpoint,
-        vector_store_path=vector_store_directory,
+        persist_directory=embedding_store_name,
         retain_messages=False,
     )
 
@@ -447,14 +443,10 @@ def test_feature_form_filler_agent_end_to_end_openai_example():
         store_name=embedding_store_name,
     )
 
-    vector_store_directory = os.path.join(
-        str(FileEmbeddingService.EMBEDDINGS_RESOURCE_FOLDER),
-        embedding_store_name,
-    )
     rag_service = RAGService(
         id="RAG_SERVICE_OPENAI",
         api_key=openai_api_key,
-        vector_store_path=vector_store_directory,
+        persist_directory=embedding_store_name,
         model="gpt-4.1-mini",
         model_provider="OPENAI",
         retain_messages=False,
