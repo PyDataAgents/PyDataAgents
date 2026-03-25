@@ -41,12 +41,20 @@ jobs:
         run: bandit -r . -f json -o bandit.json --skip B101 --exit-zero
 
       - name: Show Bandit warnings
+        shell: powershell
         run: |
           $banditData = Get-Content bandit.json | ConvertFrom-Json
+      
           foreach ($issue in $banditData.results) {
-            Write-Host "::warning file=$($issue.filename),line=$($issue.line_number)::$($issue.issue_text)"
+            $file = $issue.filename
+            $line = $issue.line_number
+            $message = $issue.issue_text
+      
+            # Ensure file path is relative (important!)
+            $file = $file -replace '\\', '/'
+      
+            Write-Host "::warning file=$file,line=$line::$message"
           }
-        shell: powershell
 
       - name: Show pip-audit warnings
         run: |
