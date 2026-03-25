@@ -1,6 +1,8 @@
 from EasyFEA import Display, ElemType, Models, Simulations
 from EasyFEA.Geoms import Domain
-
+import matplotlib
+import matplotlib.pyplot as plt
+matplotlib.use("Agg")  # non-GUI backend, comment if you want to see the plots
 
 def test_000():
     # ----------------------------------------------
@@ -39,3 +41,5 @@ def test_000():
     Display.Plot_BoundaryConditions(simu)
     Display.Plot_Result(simu, "uy", plotMesh=True)
     Display.Plot_Result(simu, "Svm", plotMesh=True, ncolors=11)
+    
+    plt.show()
