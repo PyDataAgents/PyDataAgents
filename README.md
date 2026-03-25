@@ -446,6 +446,39 @@ There are the following specialized `Node`s for specific functionalities:
 - `TransformNode`: ...
 - `LearningNode`: ...
 
+## The use of coding assistants
+You should use coding assistants to support you in your development! Everything else is inefficient as long as you can't find you name in a list of the best programmers on the planet.
+Though, the get the most out of you agent and the best results for this repo, please follow the following general rules on how to treat your coding assistant which are taken from Ethan Mollicks book Co-Intelligence:
+1. Always use the AI
+2. Be the human in the loop
+3. Treat AI as a person and tell it exactly how to behave and what you expect and not expect from it
+4. Assume this is the worst AI you will ever use
+
+Additional to the above ruleset, here are a few 'Musts', 'Do's' and 'Dont's' for which you should and which you should better not use your coding assistant (for now; this might change in the future).
+**Musts**
+- Make shure you know what you expect as the result and define a clear list of acceptance criteria
+- You must define the scaffold of your solution
+- You must be able to understand and follow the implementations of your coding assistant
+
+**Do's**
+- Ask the coding assistant to review your ideas and challenge it.
+- Ask the coding assistant to check existing code for weak points and potential improvements.
+- Let the assistant explain things.
+- Let the assistant write documentation, comments and docstrings to your code.
+- Let the assistant propose variable names.
+- Ask the assistant for good ways on how to construct single methods.
+- Let the coding assistant write tests for your code (but make sure you have understood what to test and you are only using the assistant to make life easier to fill gaps in your testing plan).
+- Let the agent directly Write code snippets, single functions and methods as long as they are either boilerplate code or if they are short enough such that you can directly reason that everything is valid.
+- Create a slightly adjusted version of an existing method. E.g. you already have a node which does e.g. regression and you want to have a very similar node which does e.g. classification then everything besides a few lines of code stays the same.
+- Give the agent tasks which you would give to a junior developer as a task for max. 3 days before the next code review.
+- Slice the elephant. Implement a created plan (which you can develop together with the assistant) step by step and make sure each step is tested and you understood what has been done.
+
+**Dont's**
+- Don't let the agent implement huge parts in one run. You will receive more code than you can understand, test and further develop. The problem is, that you loose the overwiew about the funcionalities and mechanics of your code. Once this happes you are flying blind and all you can do is to hope that your coding agent knows what to do. Currently this fails at the latest, once the assistant is running out of context.
+- Dont't let the assistant do major refactorings in one step (see the fist bulletpoint for why this is not a good strategy).
+- Don't give the steering wheel to the assistant or to put it in another way: Don't change roles with the assistant (see rule number 2 above).
+- Don't let the assistant get too far ahead. This risks you loosing track of things (see the first bulletpoint in this list).
+- Don't underestimate but also don't overestimate the capabilities of you assistant. It is a very powerful coding machine but your assistant has a very low emotional intelligence quotient.
 
 ## Installation and Usage
 In order to install `pydag` - pyd(ata)ag(ents), use pip:
