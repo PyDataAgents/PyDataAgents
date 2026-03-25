@@ -25,8 +25,7 @@ class Service(AgentElement):
         self._state : Union[ServiceState, AgentElementState] = AgentElementState.UNINSTALLED
     
     def _on_install(self, agent : "Agent" = None):
-        self._agent = agent
-        
+        self._agent = agent        
     
     def _on_uninstall(self, agent : "Agent" = None):
         self._agent : None

@@ -25,6 +25,7 @@ class Agent():
     
     id : str = field(default=None, metadata={"description": "unique identifier of the Agent application"})
     create_config : bool = field(default=False, metadata={"description": "creates a configuration yaml on start, when True"})
+    load_on_install : bool = field(default=False, metadata={"description": "if True, all AgentElements are set to load_on_install = True"})
     description : str = field(default=None, metadata={"description": "application/agent description"})
     buffer_store : dict[str, Buffer] = field(default_factory=dict, metadata={"description": "dictionary of Buffers in the Agent"})
     adapter_store : dict[str, Adapter] = field(default_factory=dict, metadata={"description": "dictionary of Adapters in the Agent"})
@@ -52,10 +53,16 @@ class Agent():
         # iterating over a list of dictionary items, in case of modification on the dictionary aoccurs during installs
         for adapter in list(self.adapter_store.values()):
             adapter.install(self)
+            if self.load_on_install:
+                adapter.load_on_install = True
         for buffer in list(self.buffer_store.values()):
             buffer.install(self)
+            if self.load_on_install:
+                buffer.load_on_install = True
         for service in list(self.service_store.values()):
             service.install(self)
+            if self.load_on_install:
+                service.load_on_install = True
         
     def _uninstall_elements(self):
         """ uninstall all `Adapter`s, `Buffer`s, and `Service`s from the `Agent`.
