@@ -84,9 +84,3 @@ jobs:
           }
       
           $summary | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append
-      
-      - name: Upload test results
-        uses: actions/upload-artifact@v6
-        with:
-          name: unit-test-results
-          path: unit-test-results.xml

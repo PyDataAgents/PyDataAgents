@@ -41,12 +41,20 @@ jobs:
         run: bandit -r . -f json -o bandit.json --skip B101 --exit-zero
 
       - name: Show Bandit warnings
+        shell: powershell
         run: |
           $banditData = Get-Content bandit.json | ConvertFrom-Json
+      
           foreach ($issue in $banditData.results) {
-            Write-Host "::warning file=$($issue.filename),line=$($issue.line_number)::$($issue.issue_text)"
+            $file = $issue.filename
+            $line = $issue.line_number
+            $message = $issue.issue_text
+      
+            # Ensure file path is relative (important!)
+            $file = $file -replace '\\', '/'
+      
+            Write-Host "::warning file=$file,line=$line::$message"
           }
-        shell: powershell
 
       - name: Show pip-audit warnings
         run: |
@@ -60,32 +68,3 @@ jobs:
             }
           }
         shell: powershell
-
-      - name: Generate Markdown report
-        run: |
-          $pip = Get-Content pip-audit.json | ConvertFrom-Json
-          $bandit = Get-Content bandit.json | ConvertFrom-Json
-          $md = "# Security Report`n`n"
-
-          $md += "## Pip-Audit Vulnerabilities`n"
-          foreach ($dep in $pip.dependencies) {
-            foreach ($vuln in $dep.vulns) {
-              $md += "- **$($dep.name)**: $($vuln.id) - $($vuln.description)`n"
-            }
-          }
-
-          $md += "`n## Bandit Issues`n"
-          foreach ($issue in $bandit.results) {
-            $md += "- **$($issue.filename)**:$($issue.line_number) - $($issue.issue_text)`n"
-          }
-
-          Set-Content -Path security-report.md -Value $md
-
-      - name: Upload reports
-        uses: actions/upload-artifact@v6
-        with:
-          name: security-reports
-          path: |
-            pip-audit.json
-            bandit.json
-            security-report.md
