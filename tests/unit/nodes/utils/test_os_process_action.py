@@ -6,7 +6,7 @@ from pydag.nodes.utils.OSProcessAction import OSProcessAction
 
 
 def test_000():
-    pa = OSProcessAction(executable="python.exe", arguments=["--version"], detached=False)
+    pa = OSProcessAction(executable="ping.exe", arguments=["8.8.8.8", "-n", "3"], detached=False)
     pa.install()
     pa.execute()
     
