@@ -36,6 +36,9 @@ jobs:
       - name: Install project dependencies
         run: pip install .
 
+      - name: Install pytest
+        run: pip install pytest
+
       - name: Run unit tests
         run: pytest tests/unit --junitxml=unit-test-results.xml
 
