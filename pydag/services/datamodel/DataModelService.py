@@ -20,9 +20,9 @@ from .DataModel import DataModel
 
 class DataModelSession():
     
-    def __post_init__(self):
+    def __init__(self):
         self._timestamp : float = time.time_ns()
-        self._models : dict[str, DataModel] = dict()        
+        self._models : dict[str, DataModel] = dict()
     
     def get_timestamp(self) -> float:
         return self._timestamp
@@ -108,7 +108,7 @@ class DataModelService(Service):
         return
 
     def create_session(self) -> str:
-        session_id = uuid.uuid4()
+        session_id = str(uuid.uuid4())
         self._sessions[session_id] = DataModelSession()
         self._session_locks[session_id] = asyncio.Lock()
         return session_id
@@ -126,6 +126,7 @@ class DataModelService(Service):
             if not model:
                 # create a new empty model
                 model = ClassUtils.load_instance(self.model_path, self.model_name)
+                model.model_id = model_id
                 session.add_model(model)
             
             model.set_properties(property_value_pairs)
@@ -141,7 +142,7 @@ class DataModelService(Service):
         runs all methods over and over again until there is no more updates based on current available model values
         for the given `property_name` and `value`
         """
-        self.updates(model_id, {property_name: value})
+        await self.updates(session_id, model_id, {property_name: value})
 
     def lookup_table(self, table_name : str) -> pd.DataFrame:
         buf : Buffer = self._agent.get_buffer(table_name)

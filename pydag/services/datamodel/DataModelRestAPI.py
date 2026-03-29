@@ -32,7 +32,7 @@ class DataModelRestAPI:
             return service_ids
         
         @router.get("/{service_id}/models")
-        def datamodels(service_id : str = Path(..., description="id of the DataModel Service")):
+        def datamodels(service_id : str = Path(..., description="id of the DataModel Service")) -> list[str]:
             """returns the id's of all DataModels of a DataModelService
 
             Args:
@@ -44,12 +44,12 @@ class DataModelRestAPI:
             datamodel_ids = list()
             service = agent.get_service(service_id)
             if service and isinstance(service, DataModelService):
-                datamodel_ids = list(service.get_data_models().keys())
+                datamodel_ids = service.get_data_models()
             return datamodel_ids
         
-        @router.put("/{service_id}/session/{session_id}/models/{model_id}")
+        @router.put("/{service_id}/session/{session_id}/model/{model_id}")
         async def update_model(service_id : str = Path(..., description="id of the DataModel Service"), session_id : str = Path(..., description="id of the session with the models") , model_id : str = Path(..., description="id of the DataModel to update"), data : dict = Body(..., description="new data for the DataModel")):
-            """updates the DataModel with the given model_id of the DataModelService with the given service_id with the provided data
+            """updates the DataModel with the given model_id and session_id of the DataModelService with the given service_id with the provided data
 
             Args:
                 service_id (str): id of the DataModel Service

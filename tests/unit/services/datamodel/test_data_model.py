@@ -1,11 +1,15 @@
 import os
+import pytest
+
+
 from pydag.buffers.DictBuffer import DictBuffer
 from pydag.services.datamodel.DataModelService import DataModelService
 from pydag.utils.DataUtils import DataUtils
 from pydag.agents.Agent import Agent
 
 
-def test_000():
+@pytest.mark.asyncio
+async def test_000():
     
     dms = DataModelService()
     dms.model_name = "SimpleDataModel"
@@ -13,15 +17,18 @@ def test_000():
     
     dms.install()
     
-    dms.update("M1", "a", 1.5)
+    session_id = dms.create_session()
     
-    d1 = dms.get_data_model("M1").to_dict()
-    assert len(d1) == 2
-    d2 = dms.get_data_model("M1").to_dict(True)
-    assert len(d2) == 4
+    await dms.update(session_id, "M1", "a", 1.5)
+    
+    d1 = dms.get_data_model(session_id, "M1").to_dict()
+    assert len(d1) == 3
+    d2 = dms.get_data_model(session_id, "M1").to_dict(True)
+    assert len(d2) == 5
     
     
-def test_001():
+@pytest.mark.asyncio
+async def test_001():
     
     dms = DataModelService()
     dms.model_name = "SimpleDataModel"
@@ -29,12 +36,13 @@ def test_001():
     
     dms.install()
     
-    dms.updates("M1", {"a": 1.5}) 
+    session_id = dms.create_session()
+    await dms.updates(session_id, "M1", {"a": 1.5}) 
     
-    d1 = dms.get_data_model("M1").to_dict()
-    assert len(d1) == 2
-    d2 = dms.get_data_model("M1").to_dict(True)
-    assert len(d2) == 4
+    d1 = dms.get_data_model(session_id, "M1").to_dict()
+    assert len(d1) == 3
+    d2 = dms.get_data_model(session_id, "M1").to_dict(True)
+    assert len(d2) == 5
    
     
 def test_010():
@@ -53,7 +61,8 @@ def test_010():
     print(type(df_f[0]))
     
     
-def test_model_with_lookup():
+@pytest.mark.asyncio
+async def test_model_with_lookup():
     
     a = Agent()
     buf = DictBuffer(id="BUF")
@@ -73,9 +82,10 @@ def test_model_with_lookup():
     
     a.add_service(dms)
     
-    dms.update("M1", "a", 4)
+    session_id = dms.create_session()
+    await dms.update(session_id, "M1", "a", 4)
     
-    d1 = dms.get_data_model("M1").to_dict()
-    assert len(d1) == 3
-    d2 = dms.get_data_model("M1").to_dict(True)
-    assert len(d2) == 5
+    d1 = dms.get_data_model(session_id, "M1").to_dict()
+    assert len(d1) == 4
+    d2 = dms.get_data_model(session_id, "M1").to_dict(True)
+    assert len(d2) == 6
