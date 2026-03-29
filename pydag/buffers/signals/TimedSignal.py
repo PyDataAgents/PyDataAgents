@@ -22,5 +22,5 @@ class TimedSignal(Signal):
             self.count += 1
             if self.count >= len(self.times):
                 self.count = 0
-                self._on_install()
+                self.reset()
         return ti, self.values[self.count]

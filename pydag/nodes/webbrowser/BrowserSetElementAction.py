@@ -6,7 +6,7 @@ from selenium.common.exceptions import NoSuchElementException
 
 from ...agents.Agent import Agent
 from ...nodes.NodeException import NodeException
-from ...services.browser.BrowserAutomationService import BrowserAutomationService
+from ...services.webbrowser.BrowserAutomationService import BrowserAutomationService
 from ...nodes.BufferNode import BufferNode
 from .BrowserAutomationAction import BrowserAutomationAction
 

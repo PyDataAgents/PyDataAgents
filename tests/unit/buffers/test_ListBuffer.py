@@ -4,6 +4,7 @@ import numpy as np
 
 def test_000():
     buf1 = ListBuffer()
+    buf1.install()
     buf1.push((1))
     print()
     print(buf1)
@@ -12,6 +13,7 @@ def test_000():
 def test_010():
     buf1 = ListBuffer()
     buf1.capacity = 5
+    buf1.install()
     buf1.push((1))
     buf1.push(2)
     buf1.push(3)
@@ -23,6 +25,7 @@ def test_010():
 def test_020():
     buf1 = ListBuffer()
     buf1.capacity = 5
+    buf1.install()
     buf1.push((1.0, 1.1, 1.2, 1.3))
     print(buf1)
     buf1.push((1.4, 1.5, 1.6))
@@ -31,6 +34,7 @@ def test_020():
 def test_030():
     buf1 = ListBuffer()
     buf1.capacity = 5
+    buf1.install()
     buf1.push((1.0, 1.1, 1.2, 1.3, 1.4))
     print(buf1)
     print(buf1.data(3, True))
@@ -41,6 +45,7 @@ def test_030():
 
 def test_add_strings_to_buffer():
     buf1 = ListBuffer()
+    buf1.install()
     buf1.push("first")
     buf1.push("second")
     buf1.push("third")
@@ -51,6 +56,7 @@ def test_add_strings_to_buffer():
 
 def test_add_list_to_buffer():
     buf = ListBuffer()
+    buf.install()
     buf.push([1, 2, 3])
 
     assert buf.size() == 3
@@ -58,6 +64,7 @@ def test_add_list_to_buffer():
 
 def test_add_dict_to_buffer():
     buf = ListBuffer()
+    buf.install()
     d = {"a": 1, "b": 2, "c": 3}
     buf.push(d)
 
@@ -66,6 +73,7 @@ def test_add_dict_to_buffer():
 
 def test_add_numpy_array_to_buffer():
     buf = ListBuffer()
+    buf.install()
     arr = np.array([1, 2, 3])
     buf.push(arr)
 
@@ -78,6 +86,7 @@ def test_add_numpy_array_to_buffer():
 def test_capacity_eviction_with_individual_pushes():
     buf = ListBuffer()
     buf.capacity = 3
+    buf.install()
     buf.push(1)
     buf.push(2)
     buf.push(3)
@@ -89,6 +98,7 @@ def test_capacity_eviction_with_individual_pushes():
 def test_capacity_bulk_push_longer_than_capacity():
     buf = ListBuffer()
     buf.capacity = 3
+    buf.install()
     buf.push([1, 2, 3, 4, 5])
 
     assert buf.size() == 3
@@ -97,6 +107,7 @@ def test_capacity_bulk_push_longer_than_capacity():
 def test_capacity_with_numpy_arrays():
     buf = ListBuffer()
     buf.capacity = 2
+    buf.install()
     buf.push(np.array([1]))
     buf.push(np.array([2]))
     buf.push(np.array([3]))
@@ -111,6 +122,7 @@ def test_capacity_with_numpy_arrays():
 def test_capacity_with_dict_conversion_bulk():
     buf = ListBuffer()
     buf.capacity = 3
+    buf.install()
     d = {"a": 10, "b": 20, "c": 30, "d": 40}
     buf.push(d)
 
@@ -120,6 +132,7 @@ def test_capacity_with_dict_conversion_bulk():
 def test_capacity_with_string_pushes():
     buf = ListBuffer()
     buf.capacity = 3
+    buf.install()
     buf.push("first")
     buf.push("second")
     buf.push("third")
@@ -132,6 +145,7 @@ def test_capacity_with_string_pushes():
 def test_infinite_capacity():
     buf = ListBuffer()
     buf.capacity = AgentConfig.INFINITE_CAPACITY
+    buf.install()
     buf.push([1, 2, 3, 4, 5])
 
     assert buf.size() == 5
@@ -139,6 +153,7 @@ def test_infinite_capacity():
     
 def test_with_dict_input():
     buf = ListBuffer()
+    buf.install()
     dic = {"1": [1.0, 2.0]}
     buf.push(dic)
     
@@ -156,6 +171,7 @@ def test_with_dict_input():
 
 def test_with_dict_input2():
     buf = ListBuffer()
+    buf.install()
     dic = {"1": [1.0, 2.0], "2": [8.1, 7.3]}
     buf.push(dic)
     

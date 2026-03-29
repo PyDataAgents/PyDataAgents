@@ -31,7 +31,9 @@ class StatemachineService(ObserverService):
         self.connect_nodes()
         # then install nodes
         for node in self.nodes.values():
-            node.install(agent)
+            node.install(agent)            
+            if agent.load_on_install:
+                node.load_on_install = True
         # check for triggered nodes and start their trigger logic (cannot be executed before all nodes are installed)
         for node in self.nodes.values():
             if isinstance(node, TriggerAction):
@@ -145,3 +147,9 @@ class StatemachineService(ObserverService):
             logger.debug(f"Node Graph written to {export_path}")
         else:
             logger.error("No Graphviz executable 'dot' was found on system PATH. Node graph cannot be rendered. Go to https://graphviz.org/download/")
+
+    def save(self):
+        super().save()
+        # call nodes separately, so that they can individually overwrite save() and load() of `AgentElement`
+        for node in self.nodes.values():
+            node.save()

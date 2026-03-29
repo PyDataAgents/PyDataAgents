@@ -1,4 +1,6 @@
 from __future__ import annotations
+import os
+from pathlib import Path
 import threading
 from typing import TYPE_CHECKING, Type, cast
 from dataclasses import dataclass, field
@@ -6,6 +8,9 @@ import uuid
 from loguru import logger
 
 
+from .AgentException import AgentException
+from ..utils.FileUtils import FileUtils
+from .YAMLConfig import YAMLConfig
 from ..nodes.Node import Node
 from .AgentElement import AgentElement
 from .AgentConfig import AgentConfig
@@ -22,6 +27,8 @@ if TYPE_CHECKING:
 class Agent():
     
     id : str = field(default=None, metadata={"description": "unique identifier of the Agent application"})
+    create_config : bool = field(default=False, metadata={"description": "creates a configuration yaml on start, when True"})
+    load_on_install : bool = field(default=False, metadata={"description": "if True, all AgentElements are set to load_on_install = True"})
     description : str = field(default=None, metadata={"description": "application/agent description"})
     buffer_store : dict[str, Buffer] = field(default_factory=dict, metadata={"description": "dictionary of Buffers in the Agent"})
     adapter_store : dict[str, Adapter] = field(default_factory=dict, metadata={"description": "dictionary of Adapters in the Agent"})
@@ -41,15 +48,24 @@ class Agent():
     def _install_elements(self):
         """ install all `Adapter`s, `Buffer`s, and `Service`s in the `Agent`.
         
-        iterates over each element and calls its install method with the `Agent` instance.
+        iterates over each element and calls its install method with the `Agent` instance. 
+        
+        Raises:
+            AgentElementException: if a `AgentElement` could not be installed
         """
         # iterating over a list of dictionary items, in case of modification on the dictionary aoccurs during installs
         for adapter in list(self.adapter_store.values()):
             adapter.install(self)
+            if self.load_on_install:
+                adapter.load_on_install = True
         for buffer in list(self.buffer_store.values()):
             buffer.install(self)
+            if self.load_on_install:
+                buffer.load_on_install = True
         for service in list(self.service_store.values()):
             service.install(self)
+            if self.load_on_install:
+                service.load_on_install = True
         
     def _uninstall_elements(self):
         """ uninstall all `Adapter`s, `Buffer`s, and `Service`s from the `Agent`.
@@ -132,10 +148,39 @@ class Agent():
                 
     def _start_services(self):
         """ Start all `Service`s in the `Agent`
+        
+        Raises:
+            ServiceException: if a `Service` could not be startedf
         """
         for service in self.service_store.values():
             if service.auto_start:
                 service.start()
+    
+    @staticmethod
+    def load_from(config_file : str) -> Agent:
+        """ loads an `Agent` from configuration file `config_file`
+
+        Args:
+            config_file (str): path to a config file, only YAML is implemented so far
+
+        Raises:
+            AgentException: if the `Agent` cannot be configured from `config_file`
+
+        Returns:
+            Agent: an `Agent` instance
+        """
+        if FileUtils.exists_file(config_file):
+            ext = Path(config_file).suffix
+            match(ext):
+                case ".yaml" | ".yml":
+                    yc = YAMLConfig(config_file)
+                    ac : AgentConfig = yc.load()
+                    ag : Agent = AgentConfig.create(ac)
+                    return ag
+                case _:
+                    raise AgentException(f"Unknown File Type for {Agent.__name__} configuration (only YAML is supported)")
+        else:
+            raise AgentException(f"Configuration File {config_file} was not found!")
     
     def release(self, blocking : bool = True):
         """Release the `Agent` for operation.
@@ -145,9 +190,17 @@ class Agent():
         
         Args:
             blocking (bool, optional): Whether to block until Agent is terminated. Defaults to True.
+            
+        Raises:
+            ServiceException: if a `Service` could not be started
+            AgentElementException: if a `AgentElement` could not be installed
         """
         self._install_elements()
-        self._connect_adapters()
+        if self.create_config:
+            gc = AgentConfig(self)
+            yc = YAMLConfig(f"Agent {self.id}.yaml")
+            yc.save(gc)
+        #self._connect_adapters() # not included anymore, because mappings or nodes connect adapters on demand
         self._start_services()
         self._stop_event.clear()
         self._is_running = True
@@ -162,7 +215,7 @@ class Agent():
         Signals the stop event to unblock any waiting release() call.
         """
         self._stop_services()
-        self._disconnect_adapters()
+        #self._disconnect_adapters() # mappings and nodes disconnect adapters on demand
         self._uninstall_elements()
         self._is_running = False
         self._stop_event.set()

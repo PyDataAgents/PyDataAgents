@@ -22,5 +22,7 @@ def test_000():
     ma.subject = "Test Mail"
     ma.body = "<h1>Header</h1><p>That's a paragraph</p>"
     
+    ma.install()
+    
     ma.execute()
        

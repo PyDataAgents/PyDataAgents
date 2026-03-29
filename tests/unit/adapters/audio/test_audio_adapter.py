@@ -66,9 +66,8 @@ def test_011():
     block_size = 512  # number of frames per buffer (about 23ms at 44.1kHz)
     st = int(time.time() * 1000)
     
-    buf = ListBuffer()
-    buf.id = "AUDIO"
-    buf.capacity = 512
+    buf = ListBuffer(id="AUDIO", capacity=512)
+    buf.install()
         
     def audio_callback(indata, frames, time, status):
         if status:
@@ -96,9 +95,8 @@ def test_011():
             print("Stopped.")
             
 def test_020():
-    audio = AudioAdapter()
-    audio.id = "A1"
-    audio.sample_rate = 16_000    
+    audio = AudioAdapter(id="A1", sample_rate=16_000)
+    audio.install()       
     audio.connect()
     
     print(audio.config_options())
@@ -106,14 +104,14 @@ def test_020():
     
 def test_030():
     
-    audio = AudioAdapter()
-    audio.id = "A1"
-    audio.sample_rate = 16_000    
+    audio = AudioAdapter(id = "A1", sample_rate = 16_000)
+    audio.install()
     audio.connect()
     
     print(audio.config_options())
     
     buf = ListBuffer(capacity=10000)
+    buf.install()
     buffers = buf.to_dict()
     
     audio.subscribe(buffers, None, 0, 512)
@@ -131,14 +129,14 @@ def test_031():
     st = 1
     n = 512
     
-    audio = AudioAdapter()
-    audio.id = "A1"
-    audio.sample_rate = sr    
+    audio = AudioAdapter(id = "A1", sample_rate = sr)
+    audio.install()
     audio.connect()
     
     print(audio.config_options())
     
     buf = ListBuffer(capacity=sr * 2)
+    buf.install()
     buffers = buf.to_dict()
     
     audio.subscribe(buffers, None, 0, n)

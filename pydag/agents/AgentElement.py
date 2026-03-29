@@ -2,7 +2,7 @@ from __future__ import annotations
 import json
 from typing import TYPE_CHECKING
 from abc import ABC, abstractmethod
-from dataclasses import dataclass, field, fields
+from dataclasses import dataclass, field
 import uuid
 from loguru import logger
 
@@ -91,7 +91,10 @@ class AgentElement(ABC):
         return
     
     def load(self):
-        file = self.id + ".json"
+        """ load `AgentElement` config from filesystem
+        """
+        from .AgentConfig import AgentConfig
+        file = AgentConfig.SAVE_FOLDER + self.id + ".json"
         if FileUtils.exists_file(file):
             with open(file, "r", encoding="utf-8") as json_file:
                 d = json.load(json_file)
@@ -100,9 +103,11 @@ class AgentElement(ABC):
             logger.warning("no configuration file " + self.id + ".json to load from was found")
     
     def save(self):
-        # Write config options to JSON file
+        """ saves the `AgentElement` config to filesystem
+        """
+        from .AgentConfig import AgentConfig
         d = self.config_options()
-        with open(self.id + ".json", "w", encoding="utf-8") as json_file:
+        with open(AgentConfig.SAVE_FOLDER + self.id + ".json", "w", encoding="utf-8") as json_file:
             json.dump(d, json_file, indent = 4)  # "indent" makes the output more readable
             
     def get_state(self) -> AgentElementState:

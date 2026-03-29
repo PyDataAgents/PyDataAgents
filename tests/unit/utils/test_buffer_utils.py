@@ -3,8 +3,8 @@ from pydag.buffers.DictBuffer import DictBuffer
 from pydag.utils.DataUtils import DataUtils
 
 def test_000():
-    buf = DictBuffer()
-    buf.capacity = 3
+    buf = DictBuffer(capacity = 3)
+    buf.install()
     buf.push({"C1": 1, "C2": 2})
     buf.push({"C1": 3, "C2": 4})
     buf.push({"C1": 5, "C2": 6})
@@ -12,8 +12,8 @@ def test_000():
     print(html)
     
 def test_010():
-    buf = DictBuffer()
-    buf.capacity = 3
+    buf = DictBuffer(capacity = 3)
+    buf.install()
     buf.push({"C1": 1, "C2": 2})
     buf.push({"C1": 3, "C2": 4})
     buf.push({"C1": 5, "C2": 6})
@@ -33,8 +33,8 @@ def test_030():
     print(dd)
     
 def test_040():
-    buf = DictBuffer()
-    buf.capacity = 3
+    buf = DictBuffer(capacity = 3)
+    buf.install()
     buf.push({"C1": 1, "C2": 2})
     buf.push({"C1": 3, "C2": 4})
     buf.push({"C1": 5, "C2": 6})

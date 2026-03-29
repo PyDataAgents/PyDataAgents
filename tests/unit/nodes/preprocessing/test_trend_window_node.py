@@ -4,7 +4,7 @@ from pydag.buffers.DictBuffer import DictBuffer
 from pydag.buffers.SignalBuffer import SignalBuffer
 from pydag.buffers.signals.Sine import Sine
 from pydag.nodes.buffers.LinkBufferAction import LinkBufferAction
-from pydag.nodes.cm.TrendWindowNode import TrendWindowNode
+from pydag.nodes.preprocessing.windowing.TrendWindowNode import TrendWindowNode
 
 
 def test_000():
@@ -17,6 +17,7 @@ def test_000():
     lba.set_buffer(sb)
     
     buf = DictBuffer(timestamps_enabled=False, index_enabled=False)
+    buf.install()
     twn = TrendWindowNode(max_windows=4, input_keys=["values"], n=10)
     twn.set_buffer(buf)
     twn.add_parent(lba)

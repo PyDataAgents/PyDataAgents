@@ -1,0 +1,89 @@
+name: Run Unit Tests
+
+on:
+  workflow_dispatch:
+    paths:
+      - "pydag/**"
+      - "tests/unit**"
+      - "pyproject.toml"   # include dependency changes
+  pull_request:
+    paths:
+      - "pydag/**"
+      - "tests/unit**"
+      - "pyproject.toml"
+
+jobs:
+  unit-tests:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+        
+      - name: Cache pip
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/pyproject.toml') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Install project dependencies
+        run: pip install .
+
+      - name: Install pytest
+        run: pip install pytest
+
+      - name: Run unit tests
+        run: pytest tests/unit --junitxml=unit-test-results.xml
+
+      - name: Parse test results
+        id: parse_tests
+        shell: powershell
+        run: |
+          [xml]$xml = Get-Content unit-test-results.xml
+      
+          $total = [int]$xml.testsuite.tests
+          $failures = [int]$xml.testsuite.failures
+          $errors = [int]$xml.testsuite.errors
+          $passed = $total - $failures - $errors
+      
+          Write-Host "Passed: $passed / $total"
+      
+          # Collect failed tests
+          $failedTests = @()
+          foreach ($testcase in $xml.testsuite.testcase) {
+            if ($testcase.failure -or $testcase.error) {
+              $failedTests += "$($testcase.classname).$($testcase.name)"
+            }
+          }
+      
+          # Output for later steps
+          echo "passed=$passed" >> $env:GITHUB_OUTPUT
+          echo "total=$total" >> $env:GITHUB_OUTPUT
+      
+          # Save failed tests as multiline output
+          $failedList = $failedTests -join "`n"
+          echo "failed_tests<<EOF" >> $env:GITHUB_OUTPUT
+          echo "$failedList" >> $env:GITHUB_OUTPUT
+          echo "EOF" >> $env:GITHUB_OUTPUT
+      
+          # Write nice summary in GitHub UI
+          $summary = "## 🧪 Test Results`n"
+          $summary += "`n**Passed:** $passed / $total`n"
+      
+          if ($failedTests.Count -gt 0) {
+            $summary += "`n### ❌ Failed Tests`n"
+            foreach ($t in $failedTests) {
+              $summary += "- $t`n"
+            }
+          } else {
+            $summary += "`n✅ All tests passed"
+          }
+      
+          $summary | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append

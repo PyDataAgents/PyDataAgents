@@ -22,7 +22,9 @@ def test_000():
 def test_010():    
     file_path = os.path.dirname(__file__) + os.sep + "1730_Normal.npz"
     buf = DictBuffer(capacity=AgentConfig.INFINITE_CAPACITY)
+    buf.install()
     npz = NpzAdapter(file_path=file_path)
+    npz.install()
     buffers = buf.to_dict()
     addresses = None
     npz.connect()
@@ -31,9 +33,12 @@ def test_010():
     
 def test_011():    
     file_path = os.path.dirname(__file__) + os.sep + "1730_Normal.npz"  
-    buf1 = ListBuffer(capacity=AgentConfig.INFINITE_CAPACITY)    
+    buf1 = ListBuffer(capacity=AgentConfig.INFINITE_CAPACITY)
+    buf1.install()    
     buf2 = ListBuffer(capacity=AgentConfig.INFINITE_CAPACITY)
+    buf2.install()
     npz = NpzAdapter(file_path=file_path)
+    npz.install()
     buffers = buf1.to_dict()
     buffers[buf2.id] = buf2    
     addresses = ["FE", "DE"]    

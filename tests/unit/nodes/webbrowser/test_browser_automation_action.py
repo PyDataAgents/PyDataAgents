@@ -1,11 +1,11 @@
 import time
 from pydag.buffers.ListBuffer import ListBuffer
-from pydag.nodes.browser.BrowserClickElementAction import BrowserClickElementAction
-from pydag.nodes.browser.BrowserGetElementAction import BrowserGetElementAction
-from pydag.nodes.browser.BrowserSetElementAction import BrowserSetElementAction
-from pydag.nodes.browser.BrowserUrlNavigateAction import BrowserUrlNavigateAction
+from pydag.nodes.webbrowser.BrowserClickElementAction import BrowserClickElementAction
+from pydag.nodes.webbrowser.BrowserGetElementAction import BrowserGetElementAction
+from pydag.nodes.webbrowser.BrowserSetElementAction import BrowserSetElementAction
+from pydag.nodes.webbrowser.BrowserUrlNavigateAction import BrowserUrlNavigateAction
 from pydag.nodes.buffers.LinkBufferAction import LinkBufferAction
-from pydag.services.browser.BrowserAutomationService import BrowserAutomationService
+from pydag.services.webbrowser.BrowserAutomationService import BrowserAutomationService
 
 
 def test_url_navigate():

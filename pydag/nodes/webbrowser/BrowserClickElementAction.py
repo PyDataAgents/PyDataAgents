@@ -5,7 +5,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
 from ...nodes.NodeException import NodeException
-from ...services.browser.BrowserAutomationService import BrowserAutomationService
+from ...services.webbrowser.BrowserAutomationService import BrowserAutomationService
 from .BrowserAutomationAction import BrowserAutomationAction
 
 @dataclass

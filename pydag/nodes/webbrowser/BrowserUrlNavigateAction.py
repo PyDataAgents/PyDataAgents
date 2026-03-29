@@ -3,7 +3,7 @@ import time
 
 from ...services.Service import Service
 from ...nodes.NodeException import NodeException
-from ...services.browser.BrowserAutomationService import BrowserAutomationService
+from ...services.webbrowser.BrowserAutomationService import BrowserAutomationService
 from .BrowserAutomationAction import BrowserAutomationAction
 
 @dataclass

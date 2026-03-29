@@ -41,25 +41,18 @@ def test_010():
 
 def test_020():
     
-    buf1 = DictBuffer()
-    buf1.id = "BSD_DATA"
-    buf1.capacity = 500
-    buf1.data_type = DataType.FLOAT.value
-    buf1.description = "ball screw drive data"
+    buf1 = DictBuffer(id = "BSD_DATA", capacity = 500, data_type = DataType.FLOAT.value, description = "ball screw drive data")
+    buf1.install()
     
-    a1 = CsvReadAdapter()
-    a1.id = "CSV1"
-    a1.mode = CSVReadMode.LOOP.value
-    a1.auto_detect = True
-    a1.file_path = os.path.dirname(__file__) + os.sep + "ballscrew_drive_data.csv"
-    a1.force_numeric = True
+    a1 = CsvReadAdapter(id = "CSV1",
+                        mode = CSVReadMode.LOOP.value,
+                        auto_detect = True,
+                        file_path = os.path.dirname(__file__) + os.sep + "ballscrew_drive_data.csv",
+                        force_numeric = True)
     
     buffers : dict[str, Buffer] = buf1.to_dict()
-    
     addresses = None
-    
     n = 1
-    
     i = 0
     i_max = 100
     
@@ -77,21 +70,11 @@ def test_020():
 
 def test_021():
     
-    buf1 = DictBuffer()
-    buf1.id = "TESTDATA"
-    buf1.capacity = 500
-    buf1.data_type = DataType.FLOAT.value
-    buf1.description = "test data"
+    buf1 = DictBuffer(id = "TESTDATA", capacity = 500, data_type = DataType.FLOAT.value, description = "test data")
+    buf1.install()
     
-    a1 = CsvReadAdapter()
-    a1.id = "CSV1"
-    a1.mode = CSVReadMode.LOOP.value
-    a1.auto_detect = True
-    a1.file_path = os.path.dirname(__file__) + os.sep + "test_data2.csv"
-    a1.force_numeric = True
-    
+    a1 = CsvReadAdapter(id = "CSV1", mode = CSVReadMode.LOOP.value, auto_detect = True, file_path = os.path.dirname(__file__) + os.sep + "test_data2.csv", force_numeric = True)
     buffers : dict[str, Buffer] = buf1.to_dict()
-    
     addresses = None
     
     n = 1

@@ -47,7 +47,6 @@ class BufferNode(Node):
                                                     timestamps_enabled=True,
                                                     index_enabled=True
                                                 )
-                        self._buffer.install(agent)
                         agent.add_buffer(self._buffer)
                 else:
                     self._buffer = DictBuffer(
@@ -57,7 +56,6 @@ class BufferNode(Node):
                                                 index_enabled=True
                                             )
                     self.buffer_id = self._buffer.id
-                    self._buffer.install(agent)
                     agent.add_buffer(self._buffer)
             else:
                 self._buffer = DictBuffer(
@@ -67,7 +65,7 @@ class BufferNode(Node):
                     index_enabled=True
                 )
                 self.buffer_id = self._buffer.id
-                self._buffer.install(agent)
+            self._buffer.install(agent)
         
     def _on_uninstall(self, agent : Agent = None):
         self._buffer : Buffer = None

@@ -1,5 +1,7 @@
 import importlib
 import os
+import shutil
+from pathlib import Path
 import pytest
 import yaml
 
@@ -101,6 +103,39 @@ def test_042():
     g = gc.create()
     gc2 = AgentConfig(g)
     print(gc2)
+
+@pytest.mark.skip("test manually")
+def test_043_yaml_save_bare_filename(monkeypatch):
+    test_dir = Path(os.path.dirname(__file__)) / "tmp_yaml_save_bare"
+    if test_dir.exists():
+        shutil.rmtree(test_dir)
+    test_dir.mkdir()
+    monkeypatch.chdir(test_dir)
+
+    agent = Agent()
+    agent.id = "G2"
+    gc = AgentConfig(agent)
+    yc = YAMLConfig("agent_config_bare.yaml")
+
+    yc.save(gc)
+
+    assert (test_dir / "agent_config_bare.yaml").is_file()
+
+@pytest.mark.skip("test manually")
+def test_044_agent_release_writes_default_yaml_to_cwd(monkeypatch):
+    test_dir = Path(os.path.dirname(__file__)) / "tmp_agent_release_yaml"
+    if test_dir.exists():
+        shutil.rmtree(test_dir)
+    test_dir.mkdir()
+    monkeypatch.chdir(test_dir)
+
+    agent = Agent()
+    agent.id = "ReleaseTest"
+
+    agent.release(blocking=False)
+    agent.terminate()
+
+    assert (test_dir / "Agent ReleaseTest.yaml").is_file()
     
 def test_050():
     

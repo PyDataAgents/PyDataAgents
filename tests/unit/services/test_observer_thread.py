@@ -29,7 +29,7 @@ def test_millisecond_thread():
 def test_microsecond_thread():
     service = TestService()
     t_obs = 1000 # µs
-    t_sleep = 0.01 # s
+    t_sleep = 0.02 # s
     ot = ObserverThread(service=service, observing_time=t_obs, thread_type=ThreadType.MICRO_SECOND.value)
     o = TestObserver()
     ot.add_observer(o)
