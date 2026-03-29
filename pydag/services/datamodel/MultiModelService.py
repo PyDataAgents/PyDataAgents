@@ -40,7 +40,7 @@ class ModelHandler():
             raise ServiceException("No model_path or model_name was specified")
     
     def get_model_class(self) -> str:
-        return str(self._model_class)
+        return f"{self._model_class.__module__}.{self._model_class.__qualname__}"
     
     def get_model_path(self) -> str:
         return self._model_path
@@ -55,6 +55,9 @@ class ModelHandler():
                 if p.kind in (p.POSITIONAL_ONLY, p.POSITIONAL_OR_KEYWORD) and p.default == p.empty
             ])
             self._method_arguments[name] = num_args
+    
+    def create_instance(self) -> DataModel:
+        return self._model_class()
     
     def _find_method_vars(self):
         script_path = Path(self._model_path).resolve()
@@ -111,6 +114,9 @@ class ModelHandler():
                             method(data_model)
                         m = m + 1
         return m
+    
+    def get_methods(self) -> dict:
+        return self._methods
             
 @dataclass
 class MultiModelService(Service):
@@ -144,26 +150,24 @@ class MultiModelService(Service):
 
     def create_handler(self, model_path : str, model_name : str) -> str:
         handler : ModelHandler = ModelHandler(model_path, model_name)
-        handler_id : str = str(handler.get_model_class())
+        handler_id : str = handler.get_model_class()
         self._handlers[handler_id] = handler
         return handler_id
 
     def create_session(self) -> str:
-        session_id : str = uuid.uuid4()
+        session_id : str = str(uuid.uuid4())
         self._sessions[session_id] = DataModelSession()
         self._session_locks[session_id] = asyncio.Lock()
         return session_id
     
-    async def create_model(self, session_id : str, model_class : str) -> str:
-        lock = self._session_locks[session_id]
-        async with lock:
-            if model_class in self._handlers:
-                session : DataModelSession = self._sessions[session_id]
-                model = self._handlers[model_class]()
-                model_id = session.add_model(model)
-                return model_id
-            else:
-                raise ServiceException(f"The specified model_class {model_class} is not among registered ModelHandlers")
+    def create_model(self, session_id : str, model_class : str) -> str:
+        if model_class in self._handlers:
+            session : DataModelSession = self._sessions[session_id]
+            model = self._handlers[model_class].create_instance()
+            model_id = session.add_model(model)
+            return model_id
+        else:
+            raise ServiceException(f"The specified model_class {model_class} is not among registered ModelHandlers")
     
     async def updates(self, session_id : str, model_id : str, property_value_pairs : dict):
         """
@@ -176,14 +180,14 @@ class MultiModelService(Service):
             session : DataModelSession = self._sessions[session_id]
             model : DataModel = session.get_model(model_id)
             if model:
-                model_class : str = str(model.__class__)
+                model_class : str = model.get_model_class()
                 if model_class in self._handlers:
                     handler : ModelHandler = self._handlers[model_class]         
                     model.set_properties(property_value_pairs)
                     last_success_methods = 0
                     success_methods = handler.run_methods(model, list(property_value_pairs.keys()))
                     # run as long as the number of methods being run successful increases or all methods were run
-                    while success_methods > last_success_methods and success_methods is not len(self._methods):
+                    while success_methods > last_success_methods and success_methods is not len(handler.get_methods()):
                         last_success_methods = success_methods
                         success_methods = handler.run_methods(model, list(property_value_pairs.keys()))
 

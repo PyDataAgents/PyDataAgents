@@ -7,7 +7,7 @@ from loguru import logger
 @dataclass
 class DataModel(ABC):
     
-    model_id : str = field(default=str(uuid.uuid4()), metadata={"description": "unique model id in UUID schema", "hidden": False})
+    model_id : str = field(default_factory=lambda: str(uuid.uuid4()), metadata={"description": "unique model id in UUID schema", "hidden": False})
     alias : str = field(default=None, metadata={"description": "short name of the model, must not be unique across sessions, but within sessions", "hidden": False})
     version : str = field(default=None, metadata={"description": "version of the model", "hidden": False})
     language : str = field(default=None, metadata={"description": "language code, in order to select language corresponding outputs", "hidden": False})
@@ -68,3 +68,17 @@ class DataModel(ABC):
             if v is not None:
                 result[f.name] = v
         return result
+    
+    def get_model_class(self) -> str:
+        """
+            Get the fully qualified class name of the model.
+            This method returns the complete module path and class name of the current 
+            instance, which can be used for serialization, logging, or dynamic class 
+            instantiation.
+                str: The fully qualified class name in the format 'module.ClassName'.
+                    For example: 'pydag.services.datamodel.DataModel.DataModel'
+            
+            Returns:
+                str: fully qualified class name
+        """
+        return f"{self.__class__.__module__}.{self.__class__.__qualname__}"

@@ -25,10 +25,38 @@ if TYPE_CHECKING:
 
 @dataclass
 class Agent():
+    """ `Agent` class for managing a multi-component application system.
+    The `Agent` serves as the central orchestrator for managing Adapters, Buffers, and Services.
+    It handles the lifecycle of these components including installation, initialization, connection,
+    and termination. The `Agent` supports optional features such as persistence, REST API exposure,
+    and configurable startup behavior.
+    
+    Args:
+        id (str): Unique identifier for the `Agent` application. Auto-generated if not provided.
+        create_config (bool): If True, creates a configuration YAML file on startup. Defaults to False.
+        load_on_install (bool): If True, all `AgentElements` are set to load_on_install=True. Defaults to False.
+        with_persistence (bool): If True, an `AgentPersistService` is created by default to continuously
+            save `AgentElements` to local files. Defaults to False.
+        with_rest_api (bool): If True, a REST API `Service` is created by default for REST interactions
+            on port 4700. Defaults to False.
+        description (str): Application/agent description. Defaults to None.
+        buffer_store (dict[str, Buffer]): Dictionary storing all `Buffer` instances in the `Agent`.
+        adapter_store (dict[str, Adapter]): Dictionary storing all `Adapter` instances in the `Agent`.
+        service_store (dict[str, Service]): Dictionary storing all `Service` instances in the `Agent`.
+            to install or uninstall.
+    Raises:
+        AgentException: _description_
+        AgentException: _description_
+
+    Returns:
+        _type_: _description_
+    """
     
     id : str = field(default=None, metadata={"description": "unique identifier of the Agent application"})
     create_config : bool = field(default=False, metadata={"description": "creates a configuration yaml on start, when True"})
     load_on_install : bool = field(default=False, metadata={"description": "if True, all AgentElements are set to load_on_install = True"})
+    with_persistence : bool = field(default=False, metadata={"description": "if True, an AgentPersistService is created by default to contuinously save the AgentElements in a local files"})
+    with_rest_api : bool = field(default=False, metadata={"description": "if True, a REST API Service is created by default to interact with the Agent via REST calls under port 4700"})
     description : str = field(default=None, metadata={"description": "application/agent description"})
     buffer_store : dict[str, Buffer] = field(default_factory=dict, metadata={"description": "dictionary of Buffers in the Agent"})
     adapter_store : dict[str, Adapter] = field(default_factory=dict, metadata={"description": "dictionary of Adapters in the Agent"})
@@ -53,6 +81,17 @@ class Agent():
         Raises:
             AgentElementException: if a `AgentElement` could not be installed
         """
+        # check all with_xxx options to create services by default
+        if self.with_persistence:
+            from ..services.utils.AgentPersistService import AgentPersistService
+            from ..services.ThreadType import ThreadType
+            aps = AgentPersistService(thread_type=ThreadType.SECOND.value, observing_time=3600)
+            self.add_service(aps)
+        if self.with_rest_api:
+            from ..services.rest.RestService import RestService
+            rs = RestService(port=4700)
+            self.add_service(rs)
+            
         # iterating over a list of dictionary items, in case of modification on the dictionary aoccurs during installs
         for adapter in list(self.adapter_store.values()):
             adapter.install(self)
