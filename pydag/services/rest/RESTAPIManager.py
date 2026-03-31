@@ -1,66 +1,75 @@
 from enum import Enum
+import os
 from typing import Optional
-
+import secrets
+from bs4 import BeautifulSoup
 from fastapi import Depends, HTTPException, Header
+import webbrowser
 
-class APIRole(int, Enum):
+
+from ...utils.HTMLUtils import HTMLUtils
+
+
+class APIRole(str, Enum):
     ADMIN = "ADMIN"
     WRITE = "WRITE"
     READ = "READ"
     
-ROLE_HIERARCHY = {
-    APIRole.ADMIN: 3,
-    APIRole.WRITE: 2,
-    APIRole.READ: 1
-}
     
 class RESTAPIManager:
     
-    def __init__(self):
-        self._api_keys = {}  # Store API keys and their associated roles
+    _api_keys : dict = {}  # Store API keys and their associated roles
 
-    def generate_api_key(self, role: APIRole) -> str:
-        """Generate a new API key for a given role."""
-        import uuid
-        api_key = str(uuid.uuid4())
-        self._api_keys[api_key] = role
-        return api_key
+    _role_hierarchies = {
+        APIRole.ADMIN: 3,
+        APIRole.WRITE: 2,
+        APIRole.READ: 1
+    }
+    
+    API_KEY_TEMPLATE = os.path.dirname(__file__) + os.sep + "API_KEY_TEMPLATE.html"
+    
+    @staticmethod
+    def generate_api_keys(api_key_file : str = None):
+        """Generate a API keys for this application and roles."""        
+        soup : BeautifulSoup = HTMLUtils.open_html_doc(RESTAPIManager.API_KEY_TEMPLATE)
+        for role, hierarchy in RESTAPIManager._role_hierarchies.items():
+            key = secrets.token_hex(16)
+            if role not in RESTAPIManager._api_keys:
+                RESTAPIManager._api_keys[role] = key
+                HTMLUtils.replace_value_by_id(soup, f"apiKey-{role.lower()}", key)
+        if api_key_file:
+            HTMLUtils.save_html_doc(soup, api_key_file)
+            abs_path = os.path.abspath(api_key_file)
+        else:
+            HTMLUtils.save_html_doc(soup, "API_KEYS.html")
+            abs_path = os.path.abspath("API_KEYS.html")
+        webbrowser.open(f"file://{abs_path}")
+        
 
-    def validate_api_key(self, api_key: str) -> bool:
-        """Validate if the provided API key is valid."""
-        return api_key in self._api_keys
-
-    def get_api_key(self, authorization : Optional[str] = Header(default=None)) -> str:
+    @staticmethod
+    def get_api_key(authorization : Optional[str] = Header(default=None)) -> str:
         """Get the role associated with the provided API key."""
         if not authorization:
-           raise HTTPException(status_code=401, detail="Missing Authorization header")
-        
+           raise HTTPException(status_code=401, detail="Missing Authorization header")        
         try:
             scheme, key = authorization.split(" ")
         except ValueError as exc:
             raise HTTPException(status_code=401, detail="Invalid Authorization format") from exc
-
         if scheme != "ApiKey":
             raise HTTPException(status_code=401, detail="Invalid auth scheme")
-
         return key
 
-    def get_role(self, api_key: str = Depends(get_api_key)) -> APIRole:
-        for role, keys in self._api_keys.items():
+    @staticmethod
+    def get_role(api_key: str = Depends(get_api_key)) -> APIRole:
+        for role, keys in RESTAPIManager._api_keys.items():
             if api_key in keys:
                 return APIRole(role)
         raise HTTPException(status_code=403, detail="Invalid API key")
     
-    def require_min_role(self, min_role: APIRole):
-        def checker(role: APIRole = Depends(self.get_role)):
-            if ROLE_HIERARCHY[role] < ROLE_HIERARCHY[min_role]:
+    @staticmethod   
+    def require_min_role(min_role : APIRole):
+        def checker(role: APIRole = Depends(RESTAPIManager.get_role)):
+            if RESTAPIManager._role_hierarchies[role] < RESTAPIManager._role_hierarchies[min_role]:
                 raise HTTPException(status_code=403, detail="Insufficient permissions")
             return role
         return checker
-    
-    def revoke_api_key(self, api_key: str) -> bool:
-        """Revoke an API key."""
-        if api_key in self._api_keys:
-            del self._api_keys[api_key]
-            return True
-        return False
