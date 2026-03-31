@@ -2,7 +2,6 @@ from enum import Enum
 from typing import Optional
 
 from fastapi import Depends, HTTPException, Header
-from win32comext import authorization
 
 class APIRole(int, Enum):
     ADMIN = "ADMIN"
