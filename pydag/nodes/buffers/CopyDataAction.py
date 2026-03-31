@@ -1,6 +1,5 @@
 from dataclasses import dataclass, field
 
-from ...agents.Agent import Agent
 from ..Action import Action
 from ..BufferNode import BufferNode
 
