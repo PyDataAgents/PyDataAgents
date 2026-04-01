@@ -5,7 +5,6 @@ from pydag.adapters.opcua.OpcUaAdapter import OpcUaAdapter
 from pydag.buffers.ListBuffer import ListBuffer
 
 
-@pytest.mark.skip(reason="start the opc ua simulation server before testing")
 def test000():
     opcua = OpcUaAdapter()
     opcua.id = "OPC1"
@@ -31,7 +30,6 @@ def test000():
         print(buf1.data())
         i = i + 1
 
-@pytest.mark.skip(reason="start the opc ua simulation server before testing")        
 def test010():
     """
     start the opc ua simulation server before testing
@@ -60,4 +58,13 @@ def test010():
         print(buf1.data())
         time.sleep(1)
         i = i + 1
+        
+        
+def test_opcua_browsing():
+    opcua = OpcUaAdapter(endpoint = "opc.tcp://jh:48010", id = "OPC1")
+    opcua.install()
+    opcua.connect()
+    addresses = opcua.browse()
+    for addr in addresses:
+        print(addr)
         
