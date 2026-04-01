@@ -42,6 +42,7 @@ class TimedBuffer(ListBuffer):
         else:
             ts = round(time.time() * 1000)  # Current timestamp in milliseconds
             self._push_timestamp(elements, ts)
+        self._last_timestamp = time.time_ns()
     
     def push_timestamps(self, elements : list, timestamps : list):
         if isinstance(elements, str):
@@ -69,6 +70,7 @@ class TimedBuffer(ListBuffer):
         for dup in self._duplicates.values():
             if isinstance(dup, TimedBuffer):
                 dup.push_timestamps(elements, timestamps)
+        self._last_timestamp = time.time_ns()
                 
     def _on_data(self, n : int = 0, persistent : bool = True) -> dict[str, list]:
         if self.size() > 0:

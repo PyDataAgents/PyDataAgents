@@ -9,7 +9,7 @@ from pydag.utils.FileUtils import FileUtils
 
 def test_000():
     buf = DictBuffer(capacity=3)
-    
+    buf.install()
     d_now = datetime.now(pytz.UTC)
     d_1 = d_now
     d_2 = d_1 + timedelta(days=2)
@@ -34,5 +34,6 @@ def test_000():
     a.date_format = "%Y-%m-%d"
     
     a.set_buffer(buf)
+    a.install()
     
     a.execute()   

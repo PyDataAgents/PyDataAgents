@@ -1,4 +1,5 @@
 import configparser
+import pytest
 from pydag.buffers.DictBuffer import DictBuffer
 from pydag.nodes.buffers.LinkBufferAction import LinkBufferAction
 from pydag.nodes.utils.MailBufferAction import MailBufferAction
@@ -7,6 +8,11 @@ from pydag.nodes.utils.MailBufferAction import MailBufferAction
 def test_000():
     config = configparser.ConfigParser()
     config.read("config.ini")
+    if not config.has_section("GMX"):
+        pytest.skip("Skipping mail buffer action test: missing [GMX] in config.ini")
+    for key in ("test_mail", "smtp_server", "watchdog_mail", "smtp_port", "watchdog_pw"):
+        if not config.has_option("GMX", key):
+            pytest.skip(f"Skipping mail buffer action test: missing {key} in [GMX] of config.ini")
     
     buf = DictBuffer()
     buf.install()

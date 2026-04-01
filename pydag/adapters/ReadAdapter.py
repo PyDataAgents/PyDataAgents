@@ -30,6 +30,7 @@ class ReadAdapter(Adapter):
             addresses (list[str]): _description_
             n (int): _description_
         """
+        self._check_state(AdapterState.READING)
         self._state = AdapterState.READING
         self._on_read(buffers, addresses, n)
         self._state = AdapterState.CONNECTED

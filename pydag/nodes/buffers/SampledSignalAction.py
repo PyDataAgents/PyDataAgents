@@ -15,9 +15,9 @@ class SampledSignalAction(BufferNode, Action):
     def _on_install(self, agent : Agent = None):
         if self._buffer is None:
             self._buffer = TimedBuffer(capacity=self.n, data_type=DataType.FLOAT.value)
+            self._buffer.install(agent)
             if agent is not None:
                 agent.add_buffer(self._buffer)
-        super()._on_install(agent)
        
     def _on_execute(self):
         ts, values = self.signal.samples(self.n)

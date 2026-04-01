@@ -120,6 +120,15 @@ def test_install_enforces_rag_service_only():
         action.install()
 
 
+def test_install_rejects_duplicate_output_keys():
+    service = _new_service()
+    action = LLMChatAction(output_keys=["question", "question"])
+    action.set_service(service)
+
+    with pytest.raises(NodeException, match="output_keys must contain unique entries"):
+        action.install()
+
+
 def test_execute_resolves_literals_for_all_runtime_arguments():
     """Ensure key-or-literal resolution supports literal question/instruction/retrieval_query/input_context."""
     service = _new_service()
@@ -334,6 +343,33 @@ def test_retrieval_query_can_be_derived_from_fields_payload():
         "fields": fields_payload,
         "metadata": {"pages": 1},
     }
+
+
+def test_retrieval_query_can_use_nested_generated_question_path():
+    """Ensure retrieval_query_key can target nested fields.0.generated_question values."""
+    service = _new_service()
+    service.next_answer = '{"field_updates":[]}'
+
+    action = LLMChatAction(
+        question_key="llm_prompt",
+        retrieval_query_key="fields.0.generated_question",
+        use_rag_context=True,
+    )
+    action.set_service(service)
+    action.add_parent(
+        _link_parent_with_row(
+            {
+                "llm_prompt": "rich prompt with mapping hints",
+                "fields": [[{"generated_question": "What value should be written into Krankenkasse?"}]],
+            }
+        )
+    )
+    action.install()
+    action.execute()
+
+    assert service.calls[0]["question"] == "rich prompt with mapping hints"
+    assert service.calls[0]["retrieval_query"] == "What value should be written into Krankenkasse?"
+    assert service.calls[0]["input_context"] is None
 
 
 def test_OLLAMA_chat():

@@ -3,6 +3,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
+from loguru import logger
 from pypdf import PdfReader, PdfWriter
 from pypdf.generic import BooleanObject, NameObject
 
@@ -288,24 +289,24 @@ class WritePDFFormAction(BufferNode, Action):
 
         try:
             return json.loads(clean)
-        except Exception:
-            pass
+        except Exception as e:            
+            logger.error(e)
 
         object_start = clean.find("{")
         object_end = clean.rfind("}")
         if object_start >= 0 and object_end > object_start:
             try:
                 return json.loads(clean[object_start : object_end + 1])
-            except Exception:
-                pass
+            except Exception as e:            
+                logger.error(e)
 
         list_start = clean.find("[")
         list_end = clean.rfind("]")
         if list_start >= 0 and list_end > list_start:
             try:
                 return json.loads(clean[list_start : list_end + 1])
-            except Exception:
-                pass
+            except Exception as e:            
+                logger.error(e)
 
         return None
 

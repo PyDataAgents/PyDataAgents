@@ -28,6 +28,10 @@ def test_multiple_files():
     # Test multiple files in parent buffer.
     config = configparser.ConfigParser()
     config.read("config.ini")
+    if not config.has_section("OPENAI") or not config.has_option("OPENAI", "OPENAI_API_KEY"):
+        pytest.skip("Skipping OCR image analysis regression test: missing OPENAI_API_KEY in [OPENAI] of config.ini")
+    if not config.has_section("MISTRAL") or not config.has_option("MISTRAL", "MISTRAL_API_KEY"):
+        pytest.skip("Skipping OCR image analysis regression test: missing MISTRAL_API_KEY in [MISTRAL] of config.ini")
 
     # Define agent and services
     ag = Agent(id="A1")
@@ -108,6 +112,10 @@ def test_multiple_files_with_copyaction():
     # Test multiple files in parent buffer.
     config = configparser.ConfigParser()
     config.read("config.ini")
+    if not config.has_section("OPENAI") or not config.has_option("OPENAI", "OPENAI_API_KEY"):
+        pytest.skip("Skipping OCR image analysis regression test: missing OPENAI_API_KEY in [OPENAI] of config.ini")
+    if not config.has_section("MISTRAL") or not config.has_option("MISTRAL", "MISTRAL_API_KEY"):
+        pytest.skip("Skipping OCR image analysis regression test: missing MISTRAL_API_KEY in [MISTRAL] of config.ini")
 
     # Define agent and services
     ag = Agent(id="A1")
@@ -169,6 +177,10 @@ def test_multiple_files_with_copyaction():
 def test_ocr_agent_restapi():
     config = configparser.ConfigParser()
     config.read("config.ini")
+    if not config.has_section("OPENAI") or not config.has_option("OPENAI", "OPENAI_API_KEY"):
+        pytest.skip("Skipping OCR image analysis regression test: missing OPENAI_API_KEY in [OPENAI] of config.ini")
+    if not config.has_section("MISTRAL") or not config.has_option("MISTRAL", "MISTRAL_API_KEY"):
+        pytest.skip("Skipping OCR image analysis regression test: missing MISTRAL_API_KEY in [MISTRAL] of config.ini")
     
     ag = Agent(description="OCR Image Analysis Agent with REST API")
     

@@ -284,6 +284,16 @@ class DataUtils:
             return True
         else:
             return False
+        
+    @staticmethod
+    def replace_nan(data : dict[str, Any], nan_value : float = 0.0, posinf_value : float = 0.0, neginf_value : float = 0.0) -> dict:
+        cleaned : dict[str, Any] = {}
+        for k, v in data.items():
+            arr = np.asarray(v)
+            if not np.isfinite(arr).all():
+                arr = np.nan_to_num(arr, nan=nan_value, posinf=posinf_value, neginf=neginf_value)
+            cleaned[k] = arr.tolist() if not np.isscalar(arr) else list(arr)
+        return cleaned
 
         
         

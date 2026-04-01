@@ -1,20 +1,21 @@
-id: Agent [15d11302-6294-421f-bd1f-be251f632b87]
+id: Agent [95207adc-07f2-4000-8e25-aa3f668bf7bd]
+create_config: false
 description: null
 buffer_store: {}
 adapter_store: {}
 service_store:
-  SFCService [55bb9fd8-7dab-46af-a322-7fe0f2f3593c]:
+  SFCService [2a1e7578-c88f-4b20-8983-d407c28501f0]:
     type: pydag.services.statemachine.SFCService
-    id: SFCService [55bb9fd8-7dab-46af-a322-7fe0f2f3593c]
+    id: SFCService [2a1e7578-c88f-4b20-8983-d407c28501f0]
     load_on_install: false
     auto_start: true
     thread_type: INSTANT
     observing_time: 0
     week_days: null
     nodes:
-      StartAction [99e14ec6-2c9b-4867-8407-6a27649b48c2]:
+      StartAction [3d921e69-1bc7-4179-8ae8-db5f08ad171f]:
         type: pydag.nodes.utils.StartAction
-        id: StartAction [99e14ec6-2c9b-4867-8407-6a27649b48c2]
+        id: StartAction [3d921e69-1bc7-4179-8ae8-db5f08ad171f]
         load_on_install: false
         child_ids: []
     retry_error_nodes: false

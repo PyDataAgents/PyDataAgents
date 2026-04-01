@@ -1,5 +1,6 @@
 from __future__ import annotations
 import copy
+import time
 from loguru import logger
 import numpy as np
 
@@ -48,6 +49,7 @@ class ListBuffer(Buffer):
                 self._elements.extend(elements)
         else:
             self._push1(elements)
+        self._last_timestamp = time.time_ns()
 
     def _on_data(self, n : int = 0, persistent : bool = True) -> dict:
         if self.size() > 0:

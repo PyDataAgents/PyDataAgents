@@ -163,6 +163,7 @@ def test_032():
     addresses = ["INSERT INTO benutzer (name, email, age) VALUES (?, ?, ?)"]
     
     buf = DictBuffer()
+    buf.install()
     buf.push({"name": "John Doe", "email": "john.doe@aol.com", "age": 20})
     
     sql.install()    
@@ -183,6 +184,7 @@ def test_033():
     addresses = ["INSERT INTO benutzer (name, email, age) VALUES (?, ?, ?)"]
     
     buf = DictBuffer()
+    buf.install()
     buf.push({"name": "Paul Allen", "email": "p.allen@gmail.com", "age": 45})
     
     sql.install()    
@@ -203,6 +205,7 @@ def test_034():
     addresses = ["SELECT id, name FROM benutzer"]
     
     buf = DictBuffer()
+    buf.install()
     
     sql.install()    
     assert sql.connect(), "Could not connect to database"
@@ -224,6 +227,7 @@ def test_035():
     addresses = ["UPDATE benutzer SET name = ?, email = ? WHERE id = 1"]
     
     buf = DictBuffer()
+    buf.install()
     buf.push({"name": "Max Mustermann", "email": "m.mustermann@outlook.com"})
     
     sql.install()    
@@ -233,7 +237,8 @@ def test_035():
     
     addresses = ["SELECT id, name FROM benutzer"]
     
-    buf2 = DictBuffer()       
+    buf2 = DictBuffer()
+    buf2.install()       
     sql.read_from_source({buf2.id: buf2}, addresses, 0)
     
     assert sql.disconnect(), "Could not disconnect from database"

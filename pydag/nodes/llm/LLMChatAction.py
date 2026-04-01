@@ -4,6 +4,7 @@ import re
 from typing import Any
 
 from pydag.utils.DataUtils import DataUtils
+from pydag.utils.NodeUtils import NodeUtils
 
 from ...nodes.NodeException import NodeException
 from ...agents.Agent import Agent
@@ -102,6 +103,10 @@ class LLMChatAction(BufferNode, ServiceNode, Action):
     def _on_install(self, agent: Agent = None):
         BufferNode._on_install(self, agent)
         ServiceNode._on_install(self, agent)
+        NodeUtils.validate_key_names("input_keys", self.input_keys)
+        NodeUtils.validate_key_names("output_keys", self.output_keys)
+        NodeUtils.validate_key_names("input_context_keys", self.input_context_keys)
+        NodeUtils.validate_key_names("pass_through_keys", self.pass_through_keys)
         if not isinstance(self._service, RAGService):
             raise NodeException("referenced service is not an instance of " + RAGService.cname())
         if len(self.output_keys) < 2:
@@ -204,10 +209,32 @@ class LLMChatAction(BufferNode, ServiceNode, Action):
 
     def _resolve_key_or_value(self, row: dict, key: str | None, value: Any, name: str) -> Any:
         if key is not None:
-            if key not in row:
-                raise NodeException("missing configured key '" + key + "' for " + name)
-            return row[key]
+            if key in row:
+                return row[key]
+            return self._resolve_nested_key(row, key, name)
         return value
+
+    def _resolve_nested_key(self, row: dict, key: str, name: str) -> Any:
+        current: Any = row
+        for part in key.split("."):
+            if isinstance(current, dict):
+                if part not in current:
+                    raise NodeException("missing configured key '" + key + "' for " + name)
+                current = current[part]
+                continue
+
+            if isinstance(current, (list, tuple)):
+                try:
+                    idx = int(part)
+                except Exception as exc:
+                    raise NodeException("missing configured key '" + key + "' for " + name) from exc
+                if idx < 0 or idx >= len(current):
+                    raise NodeException("missing configured key '" + key + "' for " + name)
+                current = current[idx]
+                continue
+
+            raise NodeException("missing configured key '" + key + "' for " + name)
+        return current
 
     def _resolve_question(self, row: dict) -> str:
         resolved = self._resolve_key_or_value(row, self.question_key, self.question_value, "question")

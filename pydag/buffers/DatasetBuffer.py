@@ -1,6 +1,5 @@
 from dataclasses import dataclass, field
 import enum
-from sktime.datasets import load_UCR_UEA_dataset
 import numpy as np
 import pandas as pd
 import os
@@ -159,6 +158,8 @@ class DatasetBuffer(DictBuffer):
             
                
         else:
+            from sktime.datasets import load_UCR_UEA_dataset
+
             X, y = load_UCR_UEA_dataset(name=self.dataset_name)
             d = X.to_dict(orient="list") # convert dataframe to dict
             dv = d.values() # extract values from dict

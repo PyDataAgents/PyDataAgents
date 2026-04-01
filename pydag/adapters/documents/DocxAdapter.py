@@ -1,6 +1,5 @@
 from dataclasses import dataclass, field
 
-from docxtpl import DocxTemplate
 from loguru import logger
 
 
@@ -20,7 +19,7 @@ class DocxAdapter(WriteAdapter):
     template_path: str = field(default=None)
 
     def __post_init__(self):
-        self._doc : DocxTemplate = None
+        self._doc = None
     
     def _on_install(self, agent : Agent = None):
         super()._on_install(agent)
@@ -35,6 +34,8 @@ class DocxAdapter(WriteAdapter):
             bool: True if connection successful, False otherwise
         """
         if FileUtils.exists_file(self.template_path):
+            from docxtpl import DocxTemplate
+
             self._doc = DocxTemplate(self.template_path)
             return True
         else:

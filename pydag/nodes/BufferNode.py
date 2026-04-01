@@ -20,11 +20,12 @@ class BufferNode(Node):
     output_keys : list[str] = field(default_factory=list, metadata={"description": "optional explicit output keys; if empty, default naming is used"})
     ignore_keys : list[str] = field(default_factory=list, metadata={"description": "list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys"})        
     by_rows : bool = field(default=False, metadata={"description": "specifies whether data is retrieved by rows (True) or as columns (False)"})
+    ignore_empty_parents : bool = field(default=True, metadata={"description": "if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True)"})
          
     def __post_init__(self):
         super().__post_init__()
         self._buffer : Buffer = None  # private property for the linked buffer instance
-        
+
     def _on_install(self, agent : Agent = None):
         """this `install` method connects a `Buffer` instance from specified `agent` based on given `buffer_id`
 
@@ -46,7 +47,6 @@ class BufferNode(Node):
                                                     timestamps_enabled=True,
                                                     index_enabled=True
                                                 )
-                        self._buffer.install(agent)
                         agent.add_buffer(self._buffer)
                 else:
                     self._buffer = DictBuffer(
@@ -56,7 +56,6 @@ class BufferNode(Node):
                                                 index_enabled=True
                                             )
                     self.buffer_id = self._buffer.id
-                    self._buffer.install(agent)
                     agent.add_buffer(self._buffer)
             else:
                 self._buffer = DictBuffer(
@@ -66,7 +65,7 @@ class BufferNode(Node):
                     index_enabled=True
                 )
                 self.buffer_id = self._buffer.id
-                self._buffer.install(agent)
+            self._buffer.install(agent)
         
     def _on_uninstall(self, agent : Agent = None):
         self._buffer : Buffer = None
@@ -122,24 +121,32 @@ class BufferNode(Node):
             if len(self._parents) == 1:
                 parent = next(iter(self._parents))
                 if isinstance(parent, BufferNode):
+                    if parent.get_buffer() is None:
+                        raise NodeException(f"{Buffer.__name__} not initialized in parent {parent.id}")                        
                     d = parent.get_buffer().data(n = self.n, persistent = self.persistent)
                     if len(self.input_keys) > 0 and d is not None:
                         for dk in self.input_keys:
                             if dk in d:
                                 data[dk] = d[dk]
-                        if len(data) == 0:
-                            raise NodeException("None of the specified input_keys were found in the parent buffer data")
+                        if len(data) == 0 and len(d) > 0:
+                            if not self.ignore_empty_parents:
+                                raise NodeException("None of the specified input_keys were found in the parent buffer data")
                     else:
                         if d:
                             data = d
                         else:
-                            data = {}
+                            if not self.ignore_empty_parents and len(data) == 0:
+                                raise NodeException("No data was found in the parent buffer")
+                            else:
+                                data = {}
                 else:
                     raise NodeException("Parent is not a " + BufferNode.cname())
             else:
                 data = {}
                 for parent in self._parents:
                     if isinstance(parent, BufferNode):
+                        if parent.get_buffer() is None:
+                            raise NodeException(f"{Buffer.__name__} not initialized in parent {parent.id}")
                         d = parent.get_buffer().data(n = self.n, persistent = self.persistent)
                         if d is not None:
                             if len(d) > 0:
@@ -152,7 +159,7 @@ class BufferNode(Node):
                                                 if isinstance(d[dk], list):
                                                     data[dk] = d[dk]
                                                 else:
-                                                    data[dk] = [d[dk]] 
+                                                    data[dk] = [d[dk]]
                                 else:
                                     for key, value in d.items():
                                         if key in data:
@@ -164,8 +171,12 @@ class BufferNode(Node):
                                                 data[key] = [value]
                     else:
                         logger.debug("Parent is not a " + BufferNode.cname())
-                if len(self.input_keys) > 0 and len(data) == 0:
-                    raise NodeException("None of the specified input_keys were found in the parents buffer data")
+                if len(data) == 0:
+                    if not self.ignore_empty_parents:
+                        if len(self.input_keys) > 0:
+                            raise NodeException("None of the specified input_keys were found in the parent buffers data")                            
+                        else:
+                            raise NodeException("No data was found in the parent buffer data")
             for ik in self.ignore_keys:
                 if ik in data:
                     del data[ik]

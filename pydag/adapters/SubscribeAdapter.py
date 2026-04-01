@@ -21,6 +21,7 @@ class SubscribeAdapter(Adapter):
     def subscribe(self, buffers : dict[str, 'Buffer'], addresses : list[str], sampling_period : int, n : int):
         """subscribes to data from source into specified buffers and addresses, with specified sampling_period and n samples at once
         """
+        self._check_state(AdapterState.SUBSCRIBING)
         self._state = AdapterState.SUBSCRIBING
         self._on_subscribe(buffers, addresses, sampling_period, n)
     
@@ -32,5 +33,6 @@ class SubscribeAdapter(Adapter):
     def unsubscribe(self):
         """resets the subscription
         """
+        self._check_state(AdapterState.CONNECTED)
         self._on_unsubscribe()
         self._state = AdapterState.CONNECTED  

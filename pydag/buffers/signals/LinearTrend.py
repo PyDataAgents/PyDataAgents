@@ -19,10 +19,10 @@ class LinearTrend(Signal):
     def value(self, t : int = None) -> Tuple[int, float]:
         ti, tf = super().value(t)
         if tf > self.duration:
-            self._on_install()
-        return ti, self.__trend(tf)
+            self.reset()
+        return ti, self._trend(tf)
     
-    def __trend(self, tf : float) -> float:
+    def _trend(self, tf : float) -> float:
         """
         Calculates the linear trend value at time tf
         """        

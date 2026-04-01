@@ -3,18 +3,18 @@ from dataclasses import dataclass, field
 from typing import Any, Dict, Tuple, Union
 
 
+from .Action import Action
+from ..utils.SignalUtils import SignalUtils
+from ..utils.MLUtils import MLUtils
+from ..utils.DataUtils import DataUtils
 from ..agents.AgentStates import AgentElementState, LearningState, NodeState
-from .TransformNode import TransformNode
-from .transforms.utils.ReshapeTransform import ReshapeTransform
-from .transforms.statistics.ZScore import ZScore
-from .transforms.utils.NanToNumTransform import NanToNumTransform
-
+from .BufferNode import BufferNode
 
 @dataclass
-class LearningNode(TransformNode):
+class LearningNode(BufferNode, Action):
     """
     LearningNode is a base class for elements that require a learning step in their pipeline execution.
-    It extends the TransformNode class and provides additional functionality specific to learning tasks.
+    It extends the BufferNode class and provides additional functionality specific to learning tasks.
     """
 
     min_learning_samples : int = field(default=0, metadata={"description": "Minimum number of samples required for learning."})
@@ -53,31 +53,18 @@ class LearningNode(TransformNode):
     def preprocess(self, data : dict):
         """Apply preprocessing transformations to the input data."""
         # Insert NanToNumTransform as second transformation if requested
+        new_data : dict = data
         if self.nan_to_num:
-            self.transforms.insert(1, NanToNumTransform())
+            new_data = DataUtils.replace_nan(new_data)
         # Insert ReshapeTransform next if sample_length is specified (comes after nan cleaning per request)
         if self.sample_length > 0:
             # Determine insertion index: after potential nan_to_num (which would be at 1) or split key
-            insert_index = 2 if self.nan_to_num else 1
-            self.transforms.insert(insert_index, ReshapeTransform(sample_length=self.sample_length))
+            new_data = MLUtils.reshape(new_data, self.sample_length)
         # Normalize data if required (after reshape)
         if self.normalize:
-            # Place after reshape; compute index accordingly
-            base_index = 3 if self.nan_to_num and self.sample_length > 0 else (
-                2 if (self.nan_to_num or self.sample_length > 0) else 0
-            )
-            self.transforms.insert(base_index, ZScore())
+            new_data = SignalUtils.zscore(new_data)
 
-
-        # Do other transformations
-        if self.transforms is None or len(self.transforms) == 0:
-            d = data
-        
-        else:
-            d = data
-            for transform in self.transforms:
-                d = transform.transform(d)
-        return d
+        return new_data
         
     def _on_execute(self):
         size = self.get_data_size()              

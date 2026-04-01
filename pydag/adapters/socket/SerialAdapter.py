@@ -1,5 +1,4 @@
 from dataclasses import dataclass, field
-import serial
 
 
 from ...agents.Agent import Agent
@@ -17,9 +16,11 @@ class SerialAdapter(ByteStreamAdapter):
     
     def __post_init__(self):
         super().__post_init__()
-        self._serial : serial.Serial = None
+        self._serial = None
     
     def _on_install(self, agent : Agent = None):
+        import serial
+
         self._serial = serial.Serial(
             port=self.host,
             baudrate=self.baud_rate,

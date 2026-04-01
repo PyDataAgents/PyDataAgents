@@ -2,7 +2,6 @@ from dataclasses import dataclass, field
 from typing import Dict, Tuple
 import os
 import torch
-from tirex import load_model, ForecastModel
 
 
 from ...agents.Agent import Agent
@@ -22,7 +21,7 @@ class TirexExtractor(LearningNode):
     
     def __post_init__(self):
         super().__post_init__()
-        self._models : ForecastModel = None
+        self._models = None
         if torch.cuda.is_available():
             os.environ["TIREX_NO_CUDA"] = "0"
         else: 
@@ -30,21 +29,28 @@ class TirexExtractor(LearningNode):
         
     def _on_install(self, agent : Agent = None):
         super()._on_install(agent)
-        self._models : ForecastModel = load_model("NX-AI/TiRex", device="cuda" if torch.cuda.is_available() else "cpu")
+        from tirex import load_model
+
+        self._models = load_model("NX-AI/TiRex", device="cuda" if torch.cuda.is_available() else "cpu")
         
     def learn(self, data : dict, meta : dict = None) -> bool:
         return False
     
     def infer(self, data : dict, meta : dict = None) -> Tuple[Dict, Dict]:
         forecast = {}
-        for key, d in data.items():
-            x = torch.tensor(d)
-            x_shape = x.shape
+        forecast_index = 0
+        for d in data.values():
+            x = torch.as_tensor(d, dtype=torch.float32)
             x = x.view(-1, x.shape[-1])
-            fc = self._models.forecast(context=x, prediction_length=self.prediction_length, output_type="numpy")[1] # mean - the output is flattened and converted to list
-            for i in range(fc.shape[0]):
+            _, fc = self._models.forecast(
+                context=x,
+                prediction_length=self.prediction_length,
+                output_type="torch",
+            )
+            for row in fc:
                 if len(data.keys()) == len(self.output_keys):
-                    forecast[self.output_keys[i]] = fc[i].tolist()  #convert to list
+                    forecast[self.output_keys[forecast_index]] = row.reshape(-1).cpu().tolist()
                 else:
-                    forecast[self.__class__.__name__ + "-" + AgentConfig.FEATURE + "-" + f"{i}"] = fc[i].tolist()  #convert to list
+                    forecast[f"{self.cname()}-{AgentConfig.FEATURE}-{forecast_index}"] = row.reshape(-1).cpu().tolist()
+                forecast_index += 1
         return forecast, None

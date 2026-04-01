@@ -1,4 +1,7 @@
+import pytest
+
 from pydag.buffers.DictBuffer import DictBuffer
+from pydag.nodes.NodeException import NodeException
 from pydag.nodes.buffers.FormattedStringAction import FormattedStringAction
 from pydag.nodes.buffers.LinkBufferAction import LinkBufferAction
 
@@ -14,13 +17,14 @@ def test_000():
     
 def test_010():
     
-    buf = DictBuffer()
-    buf.capacity = 2
+    buf = DictBuffer(capacity = 2)
+    buf.install()
     buf.push({"name": "Joe", "town": "Berlin"})
     buf.push({"name": "John", "town": "Amsterdam"})
     
     lba = LinkBufferAction()
     lba.set_buffer(buf)
+    lba.install()
     
     fsa = FormattedStringAction()
     fsa.input_keys = ["name", "town"]
@@ -35,8 +39,8 @@ def test_010():
     
 def test_020():
     
-    buf = DictBuffer()
-    buf.capacity = 2
+    buf = DictBuffer(capacity = 2)
+    buf.install()
     buf.push({"name": "Joe", "town": "Berlin"})
     buf.push({"name": "John", "town": "Amsterdam"})
     
@@ -56,8 +60,8 @@ def test_020():
     
 def test_021():
     
-    buf = DictBuffer()
-    buf.capacity = 2
+    buf = DictBuffer(capacity = 2)
+    buf.install()
     buf.push({"name": "Joe", "town": "Berlin"})
     buf.push({"name": "John", "town": "Amsterdam"})
     
@@ -78,8 +82,8 @@ def test_021():
     
 def test_022():
     
-    buf = DictBuffer()
-    buf.capacity = 2
+    buf = DictBuffer(capacity = 2)
+    buf.install()
     buf.push({"name": "Joe", "town": "Berlin"})
     buf.push({"name": "John", "town": "Amsterdam"})
     
@@ -96,4 +100,13 @@ def test_022():
     fsa.execute()
     
     print(fsa.get_buffer().data())
+
+
+def test_install_rejects_duplicate_input_keys():
+    fsa = FormattedStringAction()
+    fsa.input_keys = ["name", "name"]
+    fsa.template = "Hi {}, are you from {}"
+
+    with pytest.raises(NodeException, match="input_keys must contain unique entries"):
+        fsa.install()
     

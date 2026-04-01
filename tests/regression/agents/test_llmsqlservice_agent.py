@@ -1,5 +1,6 @@
 import configparser
 import os
+import pytest
 
 from pydag.agents.Agent import Agent
 from pydag.services.llm.LLMRestService import LLMRestService
@@ -9,6 +10,8 @@ from pydag.services.llm.LLMSQLService import LLMSQLService
 def test_000():
     config = configparser.ConfigParser()
     config.read("config.ini")
+    if not config.has_section("OPENAI") or not config.has_option("OPENAI", "OPENAI_API_KEY"):
+        pytest.skip("Skipping LLMSQLService agent regression test: missing OPENAI_API_KEY in [OPENAI] of config.ini")
     
     ag = Agent()
     

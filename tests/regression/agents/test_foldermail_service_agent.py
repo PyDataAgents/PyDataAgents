@@ -1,5 +1,6 @@
 import configparser
 from pathlib import Path
+import pytest
 
 from pydag.agents.Agent import Agent
 from pydag.agents.AgentConfig import AgentConfig
@@ -12,6 +13,11 @@ def test_000():
     
     config = configparser.ConfigParser()
     config.read("config.ini")
+    if not config.has_section("AST"):
+        pytest.skip("Skipping folder mail regression test: missing [AST] in config.ini")
+    for key in ("SMTP_HOST", "SMTP_PORT", "SMTP_ACCOUNT", "MY_MAIL"):
+        if not config.has_option("AST", key):
+            pytest.skip(f"Skipping folder mail regression test: missing {key} in [AST] of config.ini")
     
     agent = Agent()
         
@@ -45,6 +51,11 @@ def test_000():
 def test_020():
     config = configparser.ConfigParser()
     config.read("config.ini")
+    if not config.has_section("GMX"):
+        pytest.skip("Skipping folder mail regression test: missing [GMX] in config.ini")
+    for key in ("smtp_server", "smtp_port", "watchdog_mail", "watchdog_pw", "test_mail"):
+        if not config.has_option("GMX", key):
+            pytest.skip(f"Skipping folder mail regression test: missing {key} in [GMX] of config.ini")
     
     agent = Agent()
     
@@ -78,6 +89,11 @@ def test_020():
 def test_021():
     config = configparser.ConfigParser()
     config.read("config.ini")
+    if not config.has_section("GMX"):
+        pytest.skip("Skipping folder mail regression test: missing [GMX] in config.ini")
+    for key in ("smtp_server", "smtp_port", "watchdog_mail", "watchdog_pw", "test_mail"):
+        if not config.has_option("GMX", key):
+            pytest.skip(f"Skipping folder mail regression test: missing {key} in [GMX] of config.ini")
     
     agent = Agent()
     

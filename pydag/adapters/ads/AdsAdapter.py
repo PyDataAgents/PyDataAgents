@@ -46,12 +46,23 @@ class AdsAdapter(ReadAdapter, WriteAdapter):
         return True
     
     def _on_read(self, buffers : dict[str, Buffer], addresses : list[str], n : int = 1):
-        if len(buffers) != len(addresses):
+        if len(buffers) == 1 and len(addresses) > 1:
+            # if only one buffer is provided, we assume that all addresses should be read into this buffer
+            buffer = next(iter(buffers.values()))
+            d : dict = {}
+            for address in addresses:
+                val = self._ads_client.read_by_name(address)
+                d[address] = val            
+            buffer.push(d)
+        elif len(buffers) != len(addresses):
             raise AdapterException("size of buffers and addresses must match")
-        b = 0
-        for key in buffers:
-            val = self._ads_client.read_by_name(addresses[b])
-            buffers[key].push(val)
+        else:
+            b = 0
+            for buffer in buffers.values():
+                val = self._ads_client.read_by_name(addresses[b])
+                buffer.push(val)
+                b = b + 1
+        
         
     def _on_write(self, buffers : dict[str, Buffer], addresses : list[str], n : int = 1, persistent : bool = True):
         if len(buffers) != len(addresses):

@@ -1,5 +1,6 @@
 from dataclasses import fields
 import json
+import os
 from typing import TYPE_CHECKING, Any
 
 
@@ -49,12 +50,16 @@ class AgentConfig:
     FEATURE = "feature"
     FEATURES = "features"
     Y_HAT = "y_hat"
+    
+    # Service Config Keywords
+    MAX_EXPONENTIAL_SECONDS = 60 * 60 * 24 * 3 # 3 days in seconds
 
 
     # resource folder
-    RESOURCE_FOLDER = "./resources/"
-    MODEL_RESOURCE_FOLDER = RESOURCE_FOLDER + "models/"
-    EMBEDDINGS_RESOURCE_FOLDER = RESOURCE_FOLDER + "embeddings/"
+    RESOURCE_FOLDER = "." + os.sep + "resources"  + os.sep
+    MODEL_RESOURCE_FOLDER = RESOURCE_FOLDER + "models" + os.sep
+    EMBEDDINGS_RESOURCE_FOLDER = RESOURCE_FOLDER + "embeddings" + os.sep
+    SAVE_FOLDER = ".save" + os.sep
 
     @staticmethod
     def config_options(obj : Any, with_descriptions = False) -> dict:
@@ -96,6 +101,8 @@ class AgentConfig:
                             else:
                                 d[k] = v
                         result[f.name] = d
+                    elif hasattr(value, "__dict__"):
+                        result[f.name] = AgentConfig.config_options(value)
                     else:
                         result[f.name] = value
         return result

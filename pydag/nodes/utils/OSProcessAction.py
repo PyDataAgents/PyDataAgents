@@ -15,6 +15,7 @@ class OSProcessAction(BufferNode, Action):
     executable : str = field(default=None, metadata={"description": "The executable to run, e.g., 'python.exe'"})    
     arguments : list = field(default_factory=list, metadata={"description": "List of arguments to pass to the executable"})
     detached : bool = field(default=True, metadata={"description": "Whether to run the process in a detached state"})
+    encoding : str = field(default="cp850", metadata={"description": "force utf-8, cp1252 or cp850 decoding, cp850 works on german windows systems"})
            
     def _on_execute(self):
         cmd : list[str] = None
@@ -43,7 +44,9 @@ class OSProcessAction(BufferNode, Action):
                 cmd,
                 capture_output=True,
                 text=True,
-                check=False
+                check=False,
+                encoding=self.encoding,
+                errors="strict"
             )
             self.add_data({"stdout": result.stdout, "stderr": result.stderr})
     

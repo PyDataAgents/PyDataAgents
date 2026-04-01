@@ -1,4 +1,5 @@
-from typing import Tuple, Union
+import heapq
+from typing import Any, List, Tuple, Union
 from scipy.signal import butter, filtfilt
 import numpy as np
 
@@ -125,6 +126,7 @@ class SignalUtils:
         b, a = butter(order, [normal_low_cutoff, normal_high_cutoff], btype='bandpass', analog=False)
         return filtfilt(b, a, data)
     
+    @staticmethod
     def fft(data : Union[np.ndarray | list], f_s : float) -> Tuple[np.ndarray, np.ndarray]:
         """
         computes the amplitude spectrum of th signal `data`
@@ -150,4 +152,64 @@ class SignalUtils:
         
         f = np.fft.rfftfreq(n, d = 1 / f_s)  # Frequenzachse
         return f, a
+    
+    @staticmethod
+    def timeseries_thinning(timestamps : list | np.ndarray, n : int) ->  Tuple[Union[List[float], np.ndarray], Union[List[int], np.ndarray]]: 
+        """
+        Reduces the number of timestamps in a time series to a specified number `n` by iteratively removing points that form the tightest clusters, preserving the overall distribution as much as possible.
         
+        Args:
+            timestamps (list or np.ndarray): The original sequence of timestamps to be thinned.
+            n (int): The desired number of timestamps to retain.
+        
+        Returns:
+            Tuple[Union[List[float], np.ndarray], Union[List[float], np.ndarray]]:
+                A tuple containing:
+                    - The thinned list or array of timestamps.
+                    - The corresponding indices of the retained timestamps in the original sequence.
+        """
+        indices : np.ndarray = np.linspace(0, len(timestamps) - 1, len(timestamps)).astype(int)
+        indices : list[int] = indices.tolist()
+        if len(timestamps) <= n:
+            if isinstance(timestamps, list):
+                return timestamps, indices
+            else:
+                return timestamps, np.ndarray(indices)
+        
+        new_timestamps = list(timestamps)
+    
+        while len(new_timestamps) > n:
+            heap = []
+            # compute removal cost for each interior element
+            for i in range(1, len(new_timestamps) - 1):
+
+                prev_gap = new_timestamps[i] - new_timestamps[i-1]
+                next_gap = new_timestamps[i+1] - new_timestamps[i]
+
+                merged_gap = prev_gap + next_gap
+
+                # smaller merged gap → tighter cluster → higher removal priority
+                heapq.heappush(heap, (merged_gap, i))
+
+            _, idx = heapq.heappop(heap)
+
+            new_timestamps.pop(idx)
+            indices.pop(idx)
+        if isinstance(timestamps, np.ndarray):
+            return np.ndarray(new_timestamps), np.ndarray(indices)
+        else:
+            return new_timestamps, indices
+        
+    @staticmethod
+    def zscore(data : dict[str, Any]):
+        new_data = {}
+        for key in data:
+            ar = np.array(data[key])
+            std = ar.std()
+            if std == 0:
+                print(f"Warning: Standard deviation is zero during Z-Score normalization for key '{key}'. Original Data will be used.")
+                zscores = ar
+            else:
+                zscores : np.ndarray = (ar - ar.mean()) / (ar.std())
+            new_data[key] = zscores.tolist()
+        return new_data

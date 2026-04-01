@@ -1,14 +1,12 @@
 import ast
 from dataclasses import dataclass, field
 import re
-from typing import Union
+from langgraph.graph import StateGraph, START
 from typing_extensions import Annotated, TypedDict
-from loguru import logger
 from langchain_core.messages import HumanMessage
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_community.utilities import SQLDatabase
 from langchain_community.tools.sql_database.tool import QuerySQLDatabaseTool
-from langgraph.graph import StateGraph, START
 
 from ...services.ServiceException import ServiceException
 from .LLMService import LLMService, ModelProvider
@@ -72,6 +70,7 @@ class LLMSQLService(LLMService):
             ("system", self.system_message),
             ("human", self._user_prompt)
         ])
+
         self._db = SQLDatabase.from_uri(self.sql_connection)
         self._create_llm()
         self._workflow = StateGraph(State)

@@ -1,14 +1,14 @@
 [build-system]
-requires = ["setuptools>=61"]
+requires = ["setuptools>=82"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "pydag"
-version = "v0.0.1"
+version = "0.0.1"
 description = "An IIoT framework for reading and writing from sources/sinks."
 readme = "README.md"
 requires-python = ">=3.11"
-license = "MIT"
+license = { file = "LICENSE" }
 keywords = ["IIoT", "Industrial Datalogging", "software robots", "data agents"]
 authors = [
   { name = "Jonas Hillenbrand", email = "hillenbrandjonas@hotmail.com" },
@@ -21,7 +21,6 @@ classifiers = [
 ]
 dependencies = [
     # base packages
-    "pytest",
     "matplotlib",
     "loguru",
     "PyYAML",
@@ -29,7 +28,6 @@ dependencies = [
     "pandas",
     "fastapi[standard]",
     "APScheduler",
-    "pychrono",
 
     # IIoT
     "opcua",
@@ -61,6 +59,10 @@ dependencies = [
     "bs4",
     "lxml",
 
+    # fea and simulation
+    "ross-rotordynamics",
+    "EasyFEA",
+
     # browser automation
     "selenium",
     
@@ -81,7 +83,6 @@ dependencies = [
     "tirex-ts @ git+https://github.com/NX-AI/tirex",
     "chronos-forecasting",
     "librosa",
-    "ross-rotordynamics",
 
     # langchain / llm packages
     "langchain-ollama",
@@ -92,6 +93,8 @@ dependencies = [
     "sentence-transformers",
     "langchain_text_splitters",
     "langchain_community",
+    "langgraph>=1.0.10",
+    "hf_xet",
 
     # optional core functionality
     "graphviz"
@@ -102,8 +105,8 @@ include-package-data = true
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["pydag*"]
-exclude = ["tests"]
+include = ["pydag", "pydag.*"]
+exclude = ["tests*"]
 
 [tool.setuptools.package-data]
 "pydag" = ["services/plot/*.html", "_docs/element_icons/**/*"]
@@ -115,6 +118,7 @@ Source = "https://github.com/PyDataAgents/PyDataAgents.git"
 [tool.pytest.ini_options]
 pythonpath = ["."]
 testpaths = ["tests"]
+addopts = "--import-mode=importlib"
 filterwarnings = [
     "ignore:Failed to initialize NumPy.*_ARRAY_API not found.*:UserWarning:transformers\\.cache_utils",
     "ignore:datetime\\.datetime\\.utcfromtimestamp\\(\\) is deprecated and scheduled for removal.*:DeprecationWarning:reactivex\\.internal\\.constants",

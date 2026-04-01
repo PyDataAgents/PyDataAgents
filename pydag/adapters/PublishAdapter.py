@@ -44,8 +44,10 @@ class PublishAdapter(Adapter):
         Raises:
             AdapterException: if an error occurs during publishing
         """
+        self._check_state(AdapterState.PUBLISHING)
         self._state = AdapterState.PUBLISHING
-        self._on_publish(buffers, addresses, sampling_period, n, persistent)        
+        self._on_publish(buffers, addresses, sampling_period, n, persistent)
+        
     
     @abstractmethod
     def _on_unpublish(self):
@@ -61,6 +63,7 @@ class PublishAdapter(Adapter):
         Raises:
             AdapterException: if an error occurs during unpublishing
         """
+        self._check_state(AdapterState.CONNECTED)
         self._on_unpublish()
-        self._state = AdapterState.CONNECTED  
+        self._state = AdapterState.CONNECTED
     

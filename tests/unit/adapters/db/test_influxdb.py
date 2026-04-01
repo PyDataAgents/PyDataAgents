@@ -10,6 +10,8 @@ from pydag.utils.AdapterUtils import AdapterUtils
 def test_000():
     config = configparser.ConfigParser()
     config.read("config.ini")
+    if not config.has_section("INFLUX") or not config.has_option("INFLUX", "influx_user"):
+        pytest.skip("Skipping InfluxDB test: missing influx_user in [INFLUX] of config.ini")
     
     print(config["INFLUX"]["influx_user"])
     
@@ -18,6 +20,11 @@ def test_000():
 def test_010():    
     config = configparser.ConfigParser()
     config.read("config.ini")
+    if not config.has_section("INFLUX"):
+        pytest.skip("Skipping InfluxDB test: missing [INFLUX] in config.ini")
+    for key in ("influx_token", "influx_org"):
+        if not config.has_option("INFLUX", key):
+            pytest.skip(f"Skipping InfluxDB test: missing {key} in [INFLUX] of config.ini")
         
     i = InfluxDbAdapter()
     i.endpoint = "http://localhost:8086"
