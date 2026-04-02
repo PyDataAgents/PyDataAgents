@@ -1,5 +1,7 @@
 from bs4 import BeautifulSoup
 
+from pydag.utils.StringUtils import StringUtils
+
 
 class HTMLUtils:
     
@@ -28,3 +30,31 @@ class HTMLUtils:
         """Find an element by ID and replace its text."""
         for element in soup.find_all(tag):
             element.string = new_text
+            
+    def dict_to_htmltable(data: dict) -> str:
+        DEFAULT_CELL_STYLE : str = "border: 1px solid black; border-collapse: collapse; padding: 5px"
+        if not data:
+            return "<table></table>"
+        display_cols = list(data.keys())
+        html = "<table border='1' style='" + DEFAULT_CELL_STYLE + "'>\n"
+        html += "  <tr>" + "".join(f"<th>{col}</th>" for col in display_cols) + "</tr>\n"        
+        if isinstance(data[display_cols[0]], list):
+            rows = zip(*[data[c] for c in display_cols])
+            for row in rows:
+                html += "  <tr>"
+                for val in row:
+                    if StringUtils.is_str_url(val):
+                        html += f"<td><a href='{val}' target='_blank'>{val}</a></td>"
+                    else:
+                        html += f"<td>{val}</td>"
+                html += "  </tr>\n"
+        else:
+            html += "  <tr>"
+            for key, val in data.items():
+                if StringUtils.is_str_url(val):
+                    html += f"<td><a href='{val}' target='_blank'>{val}</a></td>"
+                else:
+                    html += f"<td>{val}</td>"
+            html += "  </tr>\n"       
+        html += "</table>"        
+        return html

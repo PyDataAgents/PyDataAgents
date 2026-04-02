@@ -1,6 +1,7 @@
 import os
 from pydag.buffers.DictBuffer import DictBuffer
 from pydag.utils.DataUtils import DataUtils
+from pydag.utils.HTMLUtils import HTMLUtils
 
 def test_000():
     buf = DictBuffer(capacity = 3)
@@ -8,7 +9,7 @@ def test_000():
     buf.push({"C1": 1, "C2": 2})
     buf.push({"C1": 3, "C2": 4})
     buf.push({"C1": 5, "C2": 6})
-    html = buf.to_html()
+    html = HTMLUtils.dict_to_htmltable(buf.data())
     print(html)
     
 def test_010():
@@ -17,7 +18,7 @@ def test_010():
     buf.push({"C1": 1, "C2": 2})
     buf.push({"C1": 3, "C2": 4})
     buf.push({"C1": 5, "C2": 6})
-    html = buf.to_html()
+    html = HTMLUtils.dict_to_htmltable(buf.data())
     path = os.path.dirname(__file__) + os.sep + "test_table.html"
     with open(path, "w", encoding="utf-8") as f:
         f.write(html)
