@@ -4,6 +4,7 @@ from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Union
 
 
+from .ServiceException import ServiceException
 from ..agents.AgentStates import AgentElementState, ServiceState
 from ..agents.AgentElement import AgentElement
 
@@ -24,8 +25,7 @@ class Service(AgentElement):
         self._state : Union[ServiceState, AgentElementState] = AgentElementState.UNINSTALLED
     
     def _on_install(self, agent : "Agent" = None):
-        self._agent = agent
-        
+        self._agent = agent        
     
     def _on_uninstall(self, agent : "Agent" = None):
         self._agent : None
@@ -34,7 +34,11 @@ class Service(AgentElement):
         """Start the service and mark it as running.
 
         Implementations should perform any startup tasks required by the service.
+        
+        Raises:
+            ServiceException: if this `Service` cannot be started
         """
+        self._check_state(ServiceState.RUNNING)
         self._state = ServiceState.RUNNING
         self._on_start()
     
@@ -44,6 +48,9 @@ class Service(AgentElement):
         Implementations should perform any additional startup tasks required by the
         service.
         this method must be implemented with non-blocking behavior
+        
+        Raises:
+            ServiceException: if this `Service` cannot be started
         """      
     
     def stop(self):
@@ -53,6 +60,7 @@ class Service(AgentElement):
         service. Subclasses shall call `super().stop()` to ensure the internal
         `_is_running` flag is cleared (set to False) once the service has stopped.
         """
+        self._check_state(ServiceState.STOPPED)
         self._on_stop()
         self._state = ServiceState.STOPPED
         
@@ -63,4 +71,33 @@ class Service(AgentElement):
         Implementations should perform any additional shutdown tasks required by the
         service.
         """
-    
+        
+    def _check_state(self, next_state : AgentElementState):
+        match(next_state):
+            case AgentElementState.UNINSTALLED:
+                if self._state == ServiceState.RUNNING:
+                    raise ServiceException(f"{Service.__name__} {self.id} cannot be running when uninstalling!")
+                
+            case AgentElementState.INSTALLED:
+                if self._state == ServiceState.RUNNING:
+                    raise ServiceException(f"{Service.__name__} {self.id} cannot be running when installing!")
+                
+            case AgentElementState.ERROR:
+                # any prior state is allowed
+                return
+            
+            case ServiceState.RUNNING:
+                if self._state != ServiceState.INSTALLED and self._state != ServiceState.STOPPED:
+                    raise ServiceException(f"{Service.__name__} {self.id} must be installed or stopped before starting!")
+                
+            case ServiceState.STOPPED:
+                if self._state != ServiceState.RUNNING:
+                    raise ServiceException(f"{Service.__name__} {self.id} must be running before stopping!")
+                
+    def get_agent(self) -> Agent:
+        """ returns the `Agent`
+
+        Returns:
+            Agent: the application's `Agent`
+        """
+        return self._agent 

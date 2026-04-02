@@ -7,6 +7,7 @@ def test_000():
     buf = DictBuffer()
     buf.id = "B1"
     buf.capacity = 10
+    buf.install()
     
     csv_action = ReadCsvAction()
     csv_action.file_path = os.path.dirname(__file__) + os.sep + "sample-data.csv"

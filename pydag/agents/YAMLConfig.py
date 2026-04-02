@@ -19,8 +19,10 @@ class YAMLConfig(FileConfig):
     
     def save(self, agent_config: AgentConfig):
         d = agent_config.to_dict()
-        # make sure the directory exists        
-        FileUtils.create_dir(FileUtils.parent_folder(self._file_path))
+        # make sure the directory exists when a parent folder is part of the path
+        parent_folder = FileUtils.parent_folder(self._file_path)
+        if parent_folder:
+            FileUtils.create_dir(parent_folder)
         yaml_file = open(self._file_path, "w", encoding='utf-8')
         yaml.dump(d, yaml_file, sort_keys=False)
         yaml_file.close()

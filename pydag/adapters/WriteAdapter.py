@@ -16,6 +16,9 @@ class WriteAdapter(Adapter):
     @abstractmethod
     def _on_write(self, buffers : dict[str, 'Buffer'], addresses : list[str], n : int, persistent : bool):
         """ write logic from buffers to sink, based on specified addresses and n number of samples
+        
+        Raises:
+            AdapterException: if an error while writing to data sink occurs 
         """
     
     def write_to_sink(self, buffers : dict[str, 'Buffer'], addresses : list[str], n : int, persistent : bool):
@@ -27,7 +30,11 @@ class WriteAdapter(Adapter):
             addresses (list[str]): _description_
             n (int): _description_
             persistent (bool): _description_
+            
+        Raises:
+            AdapterException: if an error while writing to data sink occurs
         """
+        self._check_state(AdapterState.WRITING)
         self._state = AdapterState.WRITING
         self._on_write(buffers, addresses, n, persistent)
         self._state = AdapterState.CONNECTED

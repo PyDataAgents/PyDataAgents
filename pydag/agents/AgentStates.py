@@ -4,33 +4,33 @@ from enum import Enum
 from ..utils.TimeUtils import TimeUtils
 
 
-class AgentElementState(Enum):
+class AgentElementState():
     INSTALLED = "INSTALLED"
     UNINSTALLED = "UNINSTALLED"
     ERROR = "ERROR"
  
-class BufferState(Enum):
+class BufferState(AgentElementState):
     RETRIEVING = "RETRIEVING"
     STORING = "STORING"
-    IDLE = "IDLE"
        
-class AdapterState(Enum):
+class AdapterState(AgentElementState):
     CONNECTED = "CONNECTED"
     DISCONNECTED = "DISCONNECTED"
     READING = "READING"
     WRITING = "WRITING"
     SUBSCRIBING = "SUBSCRIBING"
     PUBLISHING = "PUBLISHING"
+    DISCOVERING = "DISCOVERING"
+    BROWSING = "BROWSING"
  
-class NodeState(Enum):
+class NodeState(AgentElementState):
     EXECUTING = "EXECUTING"
-    IDLE = "IDLE"
     
-class ServiceState(Enum):
+class ServiceState(AgentElementState):
     RUNNING = "RUNNING"
     STOPPED = "STOPPED"
     
-class LearningState(Enum):
+class LearningState(NodeState):
     LEARNING = "LEARNING"
     INFERING = "INFERING"
     PREPROCESSING = "PREPROCESSING"

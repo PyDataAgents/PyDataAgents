@@ -2,7 +2,7 @@ from abc import abstractmethod
 import time
 
 
-from ..agents.AgentStates import NodeState
+from ..agents.AgentStates import AgentElementState, NodeState
 from .Node import Node
 
 
@@ -12,11 +12,11 @@ class Action(Node):
         """
         method for execution of the `Action`
         """
+        self._check_state(NodeState.EXECUTING)
         self._state = NodeState.EXECUTING
         self._on_execute()
-        self._state = NodeState.IDLE
+        self._state = AgentElementState.INSTALLED
         self._last_timestamp = time.time_ns()
-        
         
     @abstractmethod
     def _on_execute(self):

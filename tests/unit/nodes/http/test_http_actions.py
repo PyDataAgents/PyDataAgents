@@ -27,6 +27,7 @@ def test_010():
 def test_020():
     
     buf = ListBuffer(capacity=1, data_type = DataType.STRING.value)
+    buf.install()
     buf.push("{'key1': 'value', 'key2': [1.0, 2.0, 3.0]}")
     
     hpa = HttpPostAction(url = "https://postman-echo.com/post")

@@ -2,7 +2,6 @@ import configparser
 import json
 import os
 import sys
-import tempfile
 import types
 from pathlib import Path
 

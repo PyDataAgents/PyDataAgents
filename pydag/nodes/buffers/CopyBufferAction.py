@@ -1,6 +1,8 @@
 import copy
 from dataclasses import dataclass
 
+
+from ...buffers.Buffer import Buffer
 from ...buffers.TimedBuffer import TimedBuffer
 from ...utils.ClassUtils import ClassUtils
 from ...agents.Agent import Agent
@@ -24,13 +26,14 @@ class CopyBufferAction(BufferNode, Action):
             if isinstance(parent, BufferNode):
                 self._parent_ref = parent
                 btype = parent.get_buffer().type
-                buf = ClassUtils.create_instance(btype)
+                buf : Buffer = ClassUtils.create_instance(btype)
                 ClassUtils.set_properties(buf, parent.get_buffer().config_options())
                 if self.buffer_id is not None:
                     buf.id = self.buffer_id
-                self.set_buffer(buf)
+                self._buffer = buf
                 if agent is not None:
                     agent.add_buffer(self._buffer)
+                self._buffer.install(agent)
                 break
     
     def _on_execute(self):

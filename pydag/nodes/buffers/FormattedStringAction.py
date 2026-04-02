@@ -45,6 +45,7 @@ class FormattedStringAction(BufferNode, Action):
                     self._buffer = DictBuffer()
                 else:
                     self._buffer = ListBuffer()
+                self._buffer.install(agent)
                 self._buffer.capacity = AgentConfig.INFINITE_CAPACITY
                 self._buffer.data_type = DataType.STRING
         

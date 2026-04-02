@@ -1,4 +1,9 @@
-class AdapterException(Exception):
-    
-    def __init__(self, message):
-        super().add_note(message)
+from ..agents.AgentElementException import AgentElementException
+
+
+class AdapterException(AgentElementException):
+    """ Exception thrown from `Adapter` classes
+
+    Args:
+        AgentElementException (Exception): parent exception
+    """

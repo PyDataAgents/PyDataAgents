@@ -7,6 +7,7 @@ import time
 from typing import TYPE_CHECKING, Union
 
 
+from .BufferException import BufferException
 from ..agents.AgentConfig import AgentConfig
 from ..agents.AgentStates import AgentElementState, BufferState
 from ..utils.ClassUtils import ClassUtils
@@ -41,6 +42,8 @@ class Buffer(AgentElement):
     def _on_install(self, agent: Agent = None):
         if self.initial_values is not None:
             self._elements = self.initial_values
+            # remove the initial values to keep buffer object small
+            self.initial_values = None
         if len(self._duplicates) > 0:
             self.duplicate_ids = list(self._duplicates.keys())
         elif len(self.duplicate_ids) > 0:
@@ -75,16 +78,39 @@ class Buffer(AgentElement):
         for buf in self._duplicates.values():
             buf.uninstall(agent)
     
+    def _check_state(self, next_state : AgentElementState):
+        match(next_state):
+            case AgentElementState.UNINSTALLED:
+                if self._state != AgentElementState.ERROR and self._state != AgentElementState.INSTALLED:
+                    raise BufferException(f"{Buffer.__name__} {self.id} must be installed or has an error before uninstalling!")
+                    
+            case AgentElementState.INSTALLED:
+                # all other states are allowed
+                return
+            
+            case AgentElementState.ERROR:
+                # all other states are allowed
+                return
+            
+            case BufferState.STORING:
+                if self._state != AgentElementState.INSTALLED:
+                    raise BufferException(f"{Buffer.__name__} {self.id} must be installed before storing data!")
+                    
+            case BufferState.RETRIEVING:
+                if self._state != AgentElementState.INSTALLED:
+                    raise BufferException(f"{Buffer.__name__} {self.id} must be installed before retrieving data!")    
+    
     def push(self, elements):
         """
         push new elements to buffer (and to duplicates)
         """
         with self._lock:
+            self._check_state(BufferState.STORING)
             self._state = BufferState.STORING
             self._on_push(elements)
             for dup in self._duplicates.values():
                 dup.push(elements)
-            self._state = BufferState.IDLE
+            self._state = BufferState.INSTALLED
     
     @abstractmethod  
     def _on_push(self, elements):
@@ -97,9 +123,10 @@ class Buffer(AgentElement):
         get the buffers data, or n samples, with persistent True/False you specify whether to keep the elements in buffer
         the return type should always be a dictionary
         """
+        self._check_state(BufferState.RETRIEVING)
         self._state = BufferState.RETRIEVING
         d = self._on_data(n, persistent)
-        self._state = BufferState.IDLE
+        self._state = BufferState.INSTALLED
         return d
         
     @abstractmethod
@@ -118,10 +145,10 @@ class Buffer(AgentElement):
             self._state = BufferState.RETRIEVING
             self._elements.clear()
             for dup in self._duplicates.values():
-                dup._state = BufferState.RETRIEVING
+                dup.set_state(BufferState.RETRIEVING)
                 dup.clear()
-                dup._state = BufferState.IDLE
-            self._state = BufferState.IDLE
+                dup.set_state(BufferState.INSTALLED)
+            self._state = BufferState.INSTALLED
 
     @abstractmethod
     def size(self) -> int:
@@ -134,6 +161,13 @@ class Buffer(AgentElement):
     @abstractmethod
     def data_with_meta(self, n : int = 0, persistent : bool = True) -> dict:
         pass
+
+    def save(self):
+        # move element values to initial values for being saved
+        self.initial_values = self._elements
+        super().save()
+        # clear after saving to save space
+        self.initial_values = None
 
     def json(self, n=None, persistent=True):
         # normalize None to 0 samples (i.e., all data) for concrete buffer implementations

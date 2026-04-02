@@ -60,6 +60,7 @@ def test_with_listbuffer():
     xpath = "//book/title/text()"
     
     buf = ListBuffer()
+    buf.install()
     
     rxa = ReadXMLAction(file_path = file_path, xpath = xpath)
     rxa.set_buffer(buf)
@@ -77,6 +78,7 @@ def test_with_element_return():
     xpath = "//book/title"
     
     buf = ListBuffer()
+    buf.install()
     
     rxa = ReadXMLAction(file_path = file_path, xpath = xpath)
     rxa.set_buffer(buf)
@@ -94,6 +96,7 @@ def test_with_element_return2():
     xpath = "//book/title"
     
     buf = DictBuffer()
+    buf.install()
     
     rxa = ReadXMLAction(file_path = file_path, xpath = xpath)
     rxa.set_buffer(buf)

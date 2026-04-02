@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>API Key</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 40px;
+        }
+
+        .container {
+            max-width: 400px;
+        }
+
+        .api-box {
+            display: flex;
+            align-items: center; /* vertically center label, input, button */
+            gap: 5px; /* reduce gap between items */
+            margin-bottom: 10px; /* spacing between rows */
+        }
+
+        label {
+            width: 60px; /* fixed width for labels so they align nicely */
+            text-align: right; /* align text to the right, next to input */
+            margin-right: 5px; /* small space between label and input */
+        }
+
+        input {
+            flex: 1;
+            padding: 10px;
+            font-size: 14px;
+        }
+
+        button {
+            padding: 10px;
+            cursor: pointer;
+        }
+
+        .copied {
+            color: green;
+            margin-top: 10px;
+            display: none;
+        }
+</style>
+</head>
+<body>
+
+<div class="container">
+    <h3>Agent REST API Keys</h3>
+
+    <div class="api-box">
+        <label>ADMIN</label>
+        <input id="apiKey-admin" type="text" value="1234-ABCD-SECRET-KEY" disabled>
+        <button onclick="copyKey('apiKey-admin')" title="Copy API Key">📋</button>
+    </div>
+    <div class="api-box">
+        <label>WRITE</label>
+        <input id="apiKey-write" type="text" value="1234-ABCD-SECRET-KEY" disabled>
+        <button onclick="copyKey('apiKey-write')" title="Copy API Key">📋</button>
+    </div>
+    <div class="api-box">
+        <label>READ</label>
+        <input id="apiKey-read" type="text" value="1234-ABCD-SECRET-KEY" disabled>
+        <button onclick="copyKey('apiKey-read')" title="Copy API Key">📋</button>
+    </div>
+
+    <div id="msg" class="copied">Copied!</div>
+</div>
+
+<script>
+function copyKey(inputId) {
+    const input = document.getElementById(inputId);
+    navigator.clipboard.writeText(input.value).then(() => {
+        const msg = document.getElementById("msg");
+        msg.style.display = "block";
+        setTimeout(() => {
+            msg.style.display = "none";
+        }, 1500);
+    });
+}
+</script>
+</body>
+</html>
