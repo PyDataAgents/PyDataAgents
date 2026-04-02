@@ -1,5 +1,5 @@
-from sympy import re
-
+from urllib.parse import urlparse
+import re
 
 class StringUtils:
     
@@ -14,9 +14,24 @@ class StringUtils:
         return d
     
     @staticmethod
-    def is_str_url(s : str) -> bool:
-        url_regex = re.compile(
-            r'^(https?|ftp)://[^\s/$.?#].[^\s]*$',
+    def is_valid_url(url: str) -> bool:
+        parsed = urlparse(url)
+        return parsed.scheme in ("http", "https", "ftp") and parsed.netloc != ""
+    
+    @staticmethod
+    def is_valid_file_link(s: str) -> bool:
+        windows_path = re.compile(
+            r'^[a-zA-Z]:\\(?:[^\\/:*?"<>|\r\n]+\\)*[^\\/:*?"<>|\r\n]*$'
+        )
+        unix_path = re.compile(
+            r'^(/[^/\0]+)+/?$'
+        )
+        file_url = re.compile(
+            r'^file://(/|localhost/)?[^\s]+$',
             re.IGNORECASE
         )
-        return re.match(url_regex, s) is not None
+        return (
+            bool(windows_path.match(s)) or
+            bool(unix_path.match(s)) or
+            bool(file_url.match(s))
+        )

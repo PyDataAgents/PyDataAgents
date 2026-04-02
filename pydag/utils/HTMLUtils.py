@@ -36,14 +36,14 @@ class HTMLUtils:
         if not data:
             return "<table></table>"
         display_cols = list(data.keys())
-        html = "<table border='1' style='" + DEFAULT_CELL_STYLE + "'>\n"
+        html = "<table style='" + DEFAULT_CELL_STYLE + "'>\n"
         html += "  <tr>" + "".join(f"<th>{col}</th>" for col in display_cols) + "</tr>\n"        
         if isinstance(data[display_cols[0]], list):
             rows = zip(*[data[c] for c in display_cols])
             for row in rows:
                 html += "  <tr>"
                 for val in row:
-                    if StringUtils.is_str_url(val):
+                    if StringUtils.is_valid_url(val) or StringUtils.is_valid_file_link(val):
                         html += f"<td><a href='{val}' target='_blank'>{val}</a></td>"
                     else:
                         html += f"<td>{val}</td>"
@@ -51,7 +51,7 @@ class HTMLUtils:
         else:
             html += "  <tr>"
             for key, val in data.items():
-                if StringUtils.is_str_url(val):
+                if StringUtils.is_valid_url(val) or StringUtils.is_valid_file_link(val):
                     html += f"<td><a href='{val}' target='_blank'>{val}</a></td>"
                 else:
                     html += f"<td>{val}</td>"
