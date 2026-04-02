@@ -1,3 +1,6 @@
+from sympy import re
+
+
 class StringUtils:
     
     @staticmethod
@@ -9,4 +12,11 @@ class StringUtils:
             if len(splits2) == 2:
                 d[splits2[0]] = splits2[1]                
         return d
-        
+    
+    @staticmethod
+    def is_str_url(s : str) -> bool:
+        url_regex = re.compile(
+            r'^(https?|ftp)://[^\s/$.?#].[^\s]*$',
+            re.IGNORECASE
+        )
+        return re.match(url_regex, s) is not None
