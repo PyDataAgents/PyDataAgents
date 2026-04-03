@@ -87,17 +87,27 @@ class DataModelService(Service):
         super().__post_init__()
         self._sessions : dict[str, DataModelSession] = dict()
         self._session_locks : dict[str, threading.Lock] = dict()
+        self._model_class : type = None
         self._methods : dict = None
         self._method_input_vars : dict[str, list[str]] = None
         self._method_output_vars : dict[str, list[str]] = None
         self._method_arguments : dict[str, int] = {}
+    
+    def set_model(self, model_class : type):
+        """ sets the model class for this service, this method can be used instead of specifying `model_path` and `model_name`
+
+        Args:
+            model_class (type): class of a DataModel
+        """
+        self._model_class = model_class
+        file_path = inspect.getfile(self._model_class)
+        self.model_name = self._model_class.__name__
+        self.model_path = file_path
+        
         
     def _on_install(self, agent : Agent = None):
-        super()._on_install(agent)
-        if not FileUtils.exists_file(self.model_path):
-            raise ServiceException(f"No model file was found for '{self.model_path}'")
-        if self.model_name is None:
-            raise ServiceException("No model name was specified")
+        super()._on_install(agent)        
+        self._find_model_class()
         self._find_methods()
         self._find_method_vars()
 
@@ -156,7 +166,7 @@ class DataModelService(Service):
         """ runs all methods once and returns how many were executed based on data model values availability
         """
         m : int = 0
-        for name, method in self._methods.items():
+        for name, method in self._methods:
             input_vars = self._method_input_vars[name]
             method_ready : bool = True
             # check if method is ready based on set inputs
@@ -175,10 +185,19 @@ class DataModelService(Service):
                             method(data_model)
                         m = m + 1
         return m                
+    
+    def _find_model_class(self):
+        if self._model_class is None:
+            if not FileUtils.exists_file(self.model_path):
+                raise ServiceException(f"No model file was found for '{self.model_path}'")
+            if self.model_name is None:
+                raise ServiceException("No model name was specified")
+            self._model_class = ClassUtils.load_class(self.model_path, self.model_name)
+            
                 
     def _find_methods(self):
-        self._methods = ClassUtils.load_methods(self.model_path)
-        for name, method in self._methods.items():
+        self._methods = inspect.getmembers(self._model_class, predicate=inspect.isfunction)
+        for name, method in self._methods:
             sig = inspect.signature(method)
             params = sig.parameters
             num_args = len([
