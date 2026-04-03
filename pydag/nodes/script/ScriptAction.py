@@ -2,7 +2,7 @@ from dataclasses import dataclass, field
 from loguru import logger
 
 from pydag.utils.FileUtils import FileUtils
-from pydag.utils.NodeUtils import NodeUtils
+#from pydag.utils.NodeUtils import NodeUtils
 from ...agents.Agent import Agent
 from ..BufferNode import BufferNode
 from ..Action import Action
@@ -29,8 +29,8 @@ class ScriptAction(BufferNode, Action):
         
     def _on_install(self, agent : Agent = None):
         BufferNode._on_install(self, agent)
-        NodeUtils.validate_key_names("input_keys", self.input_keys)
-        NodeUtils.validate_key_names("output_keys", self.output_keys)
+        #NodeUtils.validate_key_names("input_keys", self.input_keys)
+        #NodeUtils.validate_key_names("output_keys", self.output_keys)
         if self.script_path:
             if FileUtils.exists_file(self.script_path):
                 with open(self.script_path, 'r', encoding='utf-8') as file:
@@ -45,16 +45,16 @@ class ScriptAction(BufferNode, Action):
         local_scope = self.get_parent_data()
         # Data was in Parent Buffer but no matching input_keys found
         if len(local_scope) == 0:
-            logger.debug("no input data found in parent buffers for specified input_keys")
-            return         
+            logger.debug("no input data found in parent buffers for specified input_keys, executing script with empty local scope")
         exec(self._code, {}, local_scope)
         out = {}
         for key in self.output_keys:
             if key in local_scope:
                 out[key] = local_scope[key]
         if len(out) == 0:
-            raise NodeException("no output data found from script for specified output_keys")
-        self.add_data(out)
+            logger.debug("no output data found from script for specified output_keys, no data will be added to buffer")
+        else:
+            self.add_data(out)
             
         
     
