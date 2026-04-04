@@ -1,7 +1,5 @@
 from dataclasses import dataclass, field
 import pyodbc
-from sqlalchemy import table, values
-from torch import where
 
 from ...nodes.BufferNode import BufferNode
 from ...nodes.NodeException import NodeException
@@ -26,6 +24,8 @@ class SQLAction(BufferNode, Action):
         super()._on_install(agent)
         self._conn = pyodbc.connect(self.connection_str)
         self._cursor = self._conn.cursor()
+        if self.query is None:
+            raise NodeException(f"Query cannot be None for {SQLAction.__name__}")
         
     def _on_execute(self):
         data = self.get_parent_data()
