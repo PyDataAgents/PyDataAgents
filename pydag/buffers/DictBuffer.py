@@ -265,22 +265,5 @@ class DictBuffer(Buffer):
                 return len(v)
         # Fallback: only timestamps present
         return len(next(iter(self._elements.values())))
-        
-    def to_html(self) -> str:
-        DEFAULT_CELL_STYLE : str = "border: 1px solid black; border-collapse: collapse; padding: 5px"
-        data = self.data()
-        if not data:
-            return "<table></table>"
-        # Exclude timestamps from tabular rows if present
-        display_cols = [k for k in data.keys() if k != self.timestamps_key]
-        if not display_cols:
-            display_cols = list(data.keys())
-        rows = zip(*[data[c] for c in display_cols])
-        html = "<table border='1' style='" + DEFAULT_CELL_STYLE + "'>\n"
-        html += "  <tr>" + "".join(f"<th>{col}</th>" for col in display_cols) + "</tr>\n"
-        for row in rows:
-            html += "  <tr>" + "".join(f"<td>{val}</td>" for val in row) + "</tr>\n"
-        html += "</table>"
-        return html
 
 

@@ -1,12 +1,14 @@
+from __future__ import annotations
 from dataclasses import dataclass, field
 import multiprocessing
 import threading
 from loguru import logger
-from fastapi import APIRouter, FastAPI
+from fastapi import APIRouter, Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 
 
+from .RESTAPIManager import APIRole, RESTAPIManager
 from ...agents.Agent import Agent
 from ..Service import Service
 from .BufferRESTAPI import BufferRESTAPI
@@ -22,6 +24,7 @@ class RestService(Service):
     """
     
     port : int = field(default=8001, metadata={"description": "port of the REST API endpoint"})
+    api_key_file : str = field(default=None, metadata={"description": "path to the file where API keys will be generated, if None then no API Key protection of endpoints is provided"})
             
     def __post_init__(self):
         super().__post_init__()
@@ -30,7 +33,11 @@ class RestService(Service):
         
     def _on_install(self, agent : Agent = None):
         super()._on_install(agent)
-        self._app = FastAPI(title=agent.__class__.__name__ + " - " + RestService.cname(), docs_url="/docs")
+        if self.api_key_file:
+            RESTAPIManager.generate_api_keys(api_key_file=self.api_key_file, service=self) # Generate API keys and save to file if api_key_file is provided
+            self._app = FastAPI(title=agent.__class__.__name__ + " - " + RestService.cname(), docs_url="/docs", dependencies=[Depends(RESTAPIManager.require_min_role(APIRole.READ))])  # Protect all endpoints with API key dependency
+        else:
+            self._app = FastAPI(title=agent.__class__.__name__ + " - " + RestService.cname(), docs_url="/docs")
         self.add_cors()
         self.add_router(AgentRESTAPI.get_api_router(self._agent))
         self.add_router(BufferRESTAPI.get_api_router(self._agent))

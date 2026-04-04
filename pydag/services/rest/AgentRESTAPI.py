@@ -1,11 +1,12 @@
 from typing import Union
-from fastapi import APIRouter, Body, Path
+from fastapi import APIRouter, Depends, Path
 from pydantic import BaseModel, Field
 
 
+from .RESTAPIManager import APIRole, RESTAPIManager
 from ...agents.AgentElement import AgentElement
 from ...agents.Agent import Agent
-from ...agents.AgentConfig import AgentConfig
+
 
 ROOT_URL : str = "/api/v1/agent"
 
@@ -29,7 +30,7 @@ class AgentRESTAPI:
         def online():
             return True
         
-        @router.get("/config")
+        @router.get("/config", dependencies=[Depends(RESTAPIManager.require_min_role(APIRole.ADMIN))])
         def config():
             return agent.config_options()
         

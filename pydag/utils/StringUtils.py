@@ -1,3 +1,6 @@
+from urllib.parse import urlparse
+import re
+
 class StringUtils:
     
     @staticmethod
@@ -9,4 +12,26 @@ class StringUtils:
             if len(splits2) == 2:
                 d[splits2[0]] = splits2[1]                
         return d
-        
+    
+    @staticmethod
+    def is_valid_url(url: str) -> bool:
+        parsed = urlparse(url)
+        return parsed.scheme in ("http", "https", "ftp") and parsed.netloc != ""
+    
+    @staticmethod
+    def is_valid_file_link(s: str) -> bool:
+        windows_path = re.compile(
+            r'^[a-zA-Z]:\\(?:[^\\/:*?"<>|\r\n]+\\)*[^\\/:*?"<>|\r\n]*$'
+        )
+        unix_path = re.compile(
+            r'^(/[^/\0]+)+/?$'
+        )
+        file_url = re.compile(
+            r'^file://(/|localhost/)?[^\s]+$',
+            re.IGNORECASE
+        )
+        return (
+            bool(windows_path.match(s)) or
+            bool(unix_path.match(s)) or
+            bool(file_url.match(s))
+        )

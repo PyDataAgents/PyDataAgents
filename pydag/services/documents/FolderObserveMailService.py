@@ -3,6 +3,7 @@ from datetime import datetime
 from pathlib import Path
 from loguru import logger
 
+from ...utils.HTMLUtils import HTMLUtils
 from ...utils.FileUtils import FileUtils
 from ...utils.TimeUtils import TimeUtils
 from ..Observer import Observer
@@ -99,8 +100,8 @@ class FolderMailObserver(Observer):
         self._service.get_file_history().push(row_data)
         
         # create html table from dictbuffer
-        body = self._service.get_file_history().to_html()
-        body = "<h4>" + FolderObserveMailService.cname() + " - " + self._service.folder + "</h4>\n" + body
+        html_table = HTMLUtils.dict_to_htmltable(self._service.get_file_history().data())
+        body = "<h4>" + FolderObserveMailService.cname() + " - " + self._service.folder + "</h4>\n" + html_table
         
         # add file infos to body
         if self._service.list_files:
@@ -113,8 +114,9 @@ class FolderMailObserver(Observer):
                     COL_LINK: f"<a href='file://{f}'>{f}</a>"
                 }
                 file_buf.push(file_row)
-                        
-            body += file_buf.to_html()
+            
+            html_table = HTMLUtils.dict_to_htmltable(file_buf.data())            
+            body += html_table
             if len(files) > MAX_FILES:
                 body += f"Note: Only the last {MAX_FILES} files are listed."
         

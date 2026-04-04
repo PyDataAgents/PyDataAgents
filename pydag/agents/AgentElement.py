@@ -21,16 +21,14 @@ class AgentElement(ABC):
     """
 
     type : str = field(default=None, metadata={"description": "fully qualified package and class name descriptor"})
-    id : str = field(default=None, metadata = {"description": "unique identifier of element in DataGrabber application"})
+    id : str = field(default_factory=lambda: str(uuid.uuid4()), metadata = {"description": "unique identifier of element in DataAgent application"})
     load_on_install : bool = field(default=False, metadata = {"description": "specifies whether the AgentElement should try to load from local json config file on install"})
       
     def __post_init__(self):
         """
-        Initialize the agent element and assign a unique ID.
+        Initialize the agent element type and state
         """
-        self.type = self.__module__                   
-        if self.id is None: 
-            self.id = self.unique_id()
+        self.type = self.__module__
         self._state : AgentElementState = AgentElementState.UNINSTALLED
         
     def name(self) -> str:

@@ -20,6 +20,8 @@ class AdapterState(AgentElementState):
     WRITING = "WRITING"
     SUBSCRIBING = "SUBSCRIBING"
     PUBLISHING = "PUBLISHING"
+    DISCOVERING = "DISCOVERING"
+    BROWSING = "BROWSING"
  
 class NodeState(AgentElementState):
     EXECUTING = "EXECUTING"
