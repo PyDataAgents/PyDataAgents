@@ -1,95 +1,161 @@
 import os
+
 import pytest
+
+from pydag.agents.AgentConfig import AgentConfig
 from pydag.buffers.signals.SampledSine import SampledSine
-from pydag.nodes.Action import Action
 from pydag.nodes.BufferNode import BufferNode
+from pydag.nodes.NodeException import NodeException
 from pydag.nodes.buffers.SampledSignalAction import SampledSignalAction
 from pydag.nodes.script.ScriptAction import ScriptAction
-from pydag.nodes.NodeException import NodeException
-from pydag.agents.AgentConfig import AgentConfig
 
 
-def test_000():
-    
-    s = SampledSine(sample_rate=1000.0)
-    ssa = SampledSignalAction(signal=s, n=2000)
-    ssa.install()
-    
-    script_path = os.path.dirname(__file__) + os.sep + "script1.py"
-    sa = ScriptAction(script_path=script_path, input_keys=["values"], output_keys=["rms", "mean"])
-    sa.add_parent(ssa)
-    sa.install()
-        
-    nodes : list[Action] = [ssa, sa]
-    
-    for n in nodes:
-        n.execute()
-        if isinstance(n, BufferNode):
-            print(n.get_buffer().data())
-            
-def test_010():    
-    s = SampledSine(sample_rate=1000.0)
-    ssa = SampledSignalAction(signal=s, n=2000)
-    ssa.install()
-    
-    script_path = os.path.dirname(__file__) + os.sep + "script1.py"
-    sa = ScriptAction(script_path=script_path, input_keys=["values"], output_keys=["rms", "mean"])
-    sa.add_parent(ssa)
-    sa.install()
-        
-    nodes : list[Action] = [ssa, sa]
-    
-    for n in nodes:
-        n.execute()
-        if isinstance(n, BufferNode):
-            print(n.get_buffer().data())
+TEST_SCRIPTS_DIR = os.path.join(os.path.dirname(__file__), "test scripts")
+SCRIPT1_PATH = os.path.join(TEST_SCRIPTS_DIR, "script1.py")
+SCRIPT2_PATH = os.path.join(TEST_SCRIPTS_DIR, "script2.py")
+RUNTIME_ERROR_SCRIPT_PATH = os.path.join(TEST_SCRIPTS_DIR, "runtime_error.py")
+REQUESTED_OUTPUT_ONLY_SCRIPT_PATH = os.path.join(TEST_SCRIPTS_DIR, "requested_output_only.py")
+PARTIAL_OUTPUT_SCRIPT_PATH = os.path.join(TEST_SCRIPTS_DIR, "partial_output.py")
+NO_OUTPUT_KEYS_SCRIPT_PATH = os.path.join(TEST_SCRIPTS_DIR, "no_output_keys.py")
+MERGE_PARENT_DATA_SCRIPT_PATH = os.path.join(TEST_SCRIPTS_DIR, "merge_parent_data.py")
 
 
-def test_020_empty_parent_buffers():
-    # Parent exists but has no data; ScriptAction should return without pushing output
-    s = SampledSine(sample_rate=1000.0)
-    ssa = SampledSignalAction(signal=s, n=2000)
-    ssa.install()
-
-    script_path = os.path.dirname(__file__) + os.sep + "script1.py"
-    sa = ScriptAction(script_path=script_path, input_keys=["values"], output_keys=["rms", "mean"])
-    sa.add_parent(ssa)
-    sa.install()
-
-    # Do NOT execute parent; buffer stays empty
-    ssa.execute()  # This will populate the buffer with 'values', but we will override it to be empty
-    sa.execute()
-
-    # No output should be produced when parent buffers are empty
-    assert len(sa.get_buffer().data()) > 0, "Expected non empty dict outputs, but got: " + str(sa.get_buffer().data())
-
-def test_050_empty_dict_parent_data():
-    # Use SampledSignalAction parent but override its buffer to return an empty dict
-    s = SampledSine(sample_rate=1000.0)
-    ssa = SampledSignalAction(signal=s, n=2000)
-    ssa.install()
-
-    buf = ssa.get_buffer()
-
-    def wrong_key_dict(n=0, persistent=True):
-        return {"VALOOS": [1]}
-
-    buf.data = wrong_key_dict
-
-    script_path = os.path.dirname(__file__) + os.sep + "script1.py"
-    sa = ScriptAction(script_path=script_path, input_keys=[AgentConfig.VALUES], output_keys=["rms", "mean"])
-    sa.add_parent(ssa)
-    sa.install()
-
-    # Execute; empty dict should be treated as empty data
-    with pytest.raises(NodeException):
-        sa.execute()
-        assert sa.get_buffer().data() == {}, "Expected wrong input dict output when parent buffer returns empty dict, but got: " + str(sa.get_buffer().data())
+def _create_signal_parent() -> SampledSignalAction:
+    signal = SampledSine(sample_rate=1000.0)
+    parent = SampledSignalAction(signal=signal, n=2000)
+    parent.install()
+    return parent
 
 
-def test_install_rejects_duplicate_output_keys():
-    script_path = os.path.dirname(__file__) + os.sep + "script1.py"
-    sa = ScriptAction(script_path=script_path, input_keys=["values"], output_keys=["rms", "rms"])
+def _create_buffer_parent(data: dict) -> BufferNode:
+    parent = BufferNode()
+    parent.install()
+    parent.add_data(data)
+    return parent
 
-    with pytest.raises(NodeException, match="output_keys must contain unique entries"):
-        sa.install()
+
+def _buffer_user_data(action: ScriptAction) -> dict:
+    data = action.get_buffer().data()
+    data.pop(AgentConfig.TIMESTAMPS, None)
+    data.pop(AgentConfig.INDEX, None)
+    return data
+
+
+def test_install_requires_script_path():
+    action = ScriptAction(output_keys=["result"], use_parent_data=False)
+
+    with pytest.raises(NodeException, match="Script file path must be provided"):
+        action.install()
+
+
+def test_install_rejects_missing_script_file():
+    missing_script_path = os.path.join(TEST_SCRIPTS_DIR, "missing_script.py")
+    action = ScriptAction(script_path=missing_script_path, output_keys=["result"], use_parent_data=False)
+
+    with pytest.raises(NodeException, match="does not exist"):
+        action.install()
+
+
+def test_execute_swallows_script_runtime_error_and_keeps_buffer_empty():
+    action = ScriptAction(script_path=RUNTIME_ERROR_SCRIPT_PATH, output_keys=["result"], use_parent_data=False)
+    action.install()
+
+    action.execute()
+
+    assert action.get_buffer().data() == {}
+
+
+def test_execute_only_persists_requested_output_keys():
+    action = ScriptAction(script_path=REQUESTED_OUTPUT_ONLY_SCRIPT_PATH, output_keys=["requested"], use_parent_data=False)
+    action.install()
+
+    action.execute()
+
+    assert _buffer_user_data(action) == {"requested": [3.14]}
+
+
+def test_execute_partial_output_only_writes_existing_keys():
+    action = ScriptAction(script_path=PARTIAL_OUTPUT_SCRIPT_PATH, output_keys=["rms", "mean"], use_parent_data=False)
+    action.install()
+
+    action.execute()
+
+    assert _buffer_user_data(action) == {"rms": [2.5]}
+
+
+def test_execute_raises_when_ignore_empty_parents_is_false():
+    parent = _create_signal_parent()
+    parent.execute()
+
+    action = ScriptAction(
+        script_path=SCRIPT1_PATH,
+        input_keys=["missing"],
+        output_keys=["rms", "mean"],
+        ignore_empty_parents=False,
+    )
+    action.add_parent(parent)
+    action.install()
+
+    with pytest.raises(NodeException, match="None of the specified input_keys were found in the parent buffer data"):
+        action.execute()
+
+
+def test_execute_with_no_output_keys_does_not_push_data():
+    action = ScriptAction(script_path=NO_OUTPUT_KEYS_SCRIPT_PATH, use_parent_data=False)
+    action.install()
+
+    action.execute()
+
+    assert action.get_buffer().data() == {}
+
+
+def test_execute_with_multiple_parents_uses_merged_parent_data():
+    parent_a = _create_buffer_parent({AgentConfig.VALUES: [1, 2]})
+    parent_b = _create_buffer_parent({AgentConfig.VALUES: [3, 4]})
+    action = ScriptAction(
+        script_path=MERGE_PARENT_DATA_SCRIPT_PATH,
+        input_keys=[AgentConfig.VALUES],
+        output_keys=["merged_values"],
+    )
+    action.add_parent(parent_a)
+    action.add_parent(parent_b)
+    action.install()
+
+    action.execute()
+
+    assert _buffer_user_data(action) == {"merged_values": [1, 2, 3, 4]}
+
+
+def test_execute_without_parent_data_writes_output():
+    parent = _create_signal_parent()
+    parent.execute()
+
+    action = ScriptAction(
+        script_path=SCRIPT2_PATH,
+        use_parent_data=False,
+        output_keys=["mode"],
+    )
+    action.add_parent(parent)
+    action.install()
+
+    action.execute()
+
+    assert _buffer_user_data(action) == {"mode": ["standalone"]}
+
+
+def test_execute_with_parent_data_enabled_keeps_current_behavior():
+    parent = _create_signal_parent()
+    parent.execute()
+
+    action = ScriptAction(
+        script_path=SCRIPT2_PATH,
+        input_keys=[AgentConfig.VALUES],
+        use_parent_data=True,
+        output_keys=["mode"],
+    )
+    action.add_parent(parent)
+    action.install()
+
+    action.execute()
+
+    assert _buffer_user_data(action) == {"mode": ["parent"]}

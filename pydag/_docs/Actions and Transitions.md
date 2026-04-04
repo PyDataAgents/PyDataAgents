@@ -2633,6 +2633,7 @@ obj.output_keys='list()'
 `Action` for executing a custom script to process data from the parents' `Buffer`s and to store the processed data back into this `Buffer`.
 <br>The script must be a valid Python code snippet that runs properly.
 <br>The function takes the current buffer data and injects data from it by the specified `input_keys`.
+<br>If `use_parent_data` is `True`, `input_keys` must be provided explicitly.
 <br>The same way the `Action`returns data by the specified `output_keys` back to its `Buffer`.
 <br>Note that the script is executed in its own local scope, so variables defined in the script do not interfere with variables outside the script.
 <br>Also note that all output variables should be converted to primitives (e.g. int, float, str, list, dict) or list of primitives inside the script. Do not leave them as numpy arrays or dataframes.
@@ -2642,29 +2643,31 @@ obj.output_keys='list()'
 | `buffer_id` | `str` | `` | unique ID of the buffer |
 | `persistent` | `bool` | `True` | specifies whether data is removed (False) from parent or not (True) |
 | `n` | `int` | `0` | specifies how much data is retrieved from parent buffer. Default 0 -> all data |
-| `input_keys` | `list[str]` | `'list()'` | list of keys to extract from parent buffers, defaults to empty and all the keys are returned |
+| `input_keys` | `list[str]` | `'list()'` | list of keys to extract from parent buffers; must be provided when `use_parent_data=True` |
 | `ignore_keys` | `list[str]` | `'list()'` | list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys |
 | `id` | `str` | `` | unique identifier of element in DataGrabber application |
 | `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
 | `script_path` | `str` | `` | Python code snippet defining a script to process buffer data |
 | `output_keys` | `list[str]` | `'list()'` | keys to extract from the script and store their values into this element's buffer |
+| `use_parent_data` | `bool` | `True` | whether to use data from parent buffers; if `True`, `input_keys` must be provided explicitly |
 
 
 ```python
 # Example usage of `ScriptAction`
 from pydag.nodes.script.ScriptAction import ScriptAction  # Adjust import if needed
 
-obj = ScriptAction()
+obj = ScriptAction(input_keys=["values"])
 obj.child_ids='list()'
 obj.buffer_id="<string>"
 obj.persistent=True
 obj.n=0
-obj.input_keys='list()'
+obj.input_keys=["values"]
 obj.ignore_keys='list()'
 obj.id="<string>"
 obj.load_on_install=False
 obj.script_path="<string>"
 obj.output_keys='list()'
+obj.use_parent_data=True
 ```
 
 [Go to Summary](#summary)
