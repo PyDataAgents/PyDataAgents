@@ -2,7 +2,7 @@ from dataclasses import dataclass, field
 from loguru import logger
 
 from pydag.utils.FileUtils import FileUtils
-#from pydag.utils.NodeUtils import NodeUtils
+from pydag.utils.NodeUtils import NodeUtils
 from ...agents.Agent import Agent
 from ..BufferNode import BufferNode
 from ..Action import Action
@@ -21,16 +21,21 @@ class ScriptAction(BufferNode, Action):
     """
     
     script_path : str = field(default=None, metadata={"description": "Python code snippet defining a script to process buffer data"})
-    output_keys : list[str] = field(default_factory=list, metadata={"description": "keys to extract from the script and store their values into this element's buffer"})    
-       
+    output_keys : list[str] = field(default_factory=list, metadata={"description": "keys to extract from the script and store their values into this element's buffer. If empty, no data is stored in the buffer."})    
+    use_parent_data: bool = field(default=True, metadata={"description": "whether to use data from parent buffers. If set to false, the script will only receive data from its own buffer. This can be useful if you want to execute a script that does not depend on parent data, but you still may want to use the output_keys to store data in the buffer."})
+
     def __post_init__(self):
         super().__post_init__()
         self._code : str = None
         
     def _on_install(self, agent : Agent = None):
         BufferNode._on_install(self, agent)
-        #NodeUtils.validate_key_names("input_keys", self.input_keys)
-        #NodeUtils.validate_key_names("output_keys", self.output_keys)
+        if self.use_parent_data:
+            NodeUtils.validate_key_names("input_keys", self.input_keys)
+            if len(self.input_keys) == 0:
+                raise NodeException("input_keys must be provided if use_parent_data is True.")
+        if len(self.output_keys) > 0:
+            NodeUtils.validate_key_names("output_keys", self.output_keys)
         if self.script_path:
             if FileUtils.exists_file(self.script_path):
                 with open(self.script_path, 'r', encoding='utf-8') as file:
@@ -42,11 +47,15 @@ class ScriptAction(BufferNode, Action):
         
     def _on_execute(self):
         # generate local scope for script execution
-        local_scope = self.get_parent_data()
-        # Data was in Parent Buffer but no matching input_keys found
-        if len(local_scope) == 0:
+        local_scope = self.get_parent_data() if self.use_parent_data else {}
+        # Data was in Parent Buffer but no matching input_keys found.
+        if self.use_parent_data and len(local_scope) == 0:
             logger.debug("no input data found in parent buffers for specified input_keys, executing script with empty local scope")
-        exec(self._code, {}, local_scope)
+        try:
+            exec(self._code, {}, local_scope)
+        except Exception as e:
+            logger.error(f"Error executing script in {self.name()}: {e}")
+            #raise NodeException(f"Error executing script: {e}") # It might be the case, that a script fails due to wrong input data, but we do not want the whole agent to fail because of that. So we catch the exception and log it, but we do not raise it further.
         out = {}
         for key in self.output_keys:
             if key in local_scope:
