@@ -1,6 +1,7 @@
 import configparser
 import json
 import os
+import shutil
 import sys
 import types
 from pathlib import Path
@@ -33,6 +34,7 @@ if "graphviz" not in sys.modules:
     sys.modules["graphviz"] = graphviz_stub
 
 from pydag.agents.Agent import Agent
+from pydag.agents.AgentStates import ServiceState
 from pydag.buffers.DictBuffer import DictBuffer
 from pydag.nodes.buffers.LinkBufferAction import LinkBufferAction
 from pydag.nodes.documents.ListFilesAction import ListFilesAction
@@ -57,8 +59,44 @@ def _rag_context_folder() -> Path:
     return _repo_root() / "resources" / "inputs" / "RAG_context"
 
 
+def _pdf_form_path(filename: str) -> Path:
+    return _pdf_form_folder() / filename
+
+
+def _rag_context_file(filename: str) -> Path:
+    return _rag_context_folder() / filename
+
+
 def _output_folder() -> Path:
     return _repo_root() / "resources" / "Outputs"
+
+
+def _prepare_single_context_folder(source_file: Path, folder_name: str) -> Path:
+    context_folder = _output_folder() / "rag_context_inputs" / folder_name
+    if context_folder.exists():
+        shutil.rmtree(context_folder, ignore_errors=True)
+    context_folder.mkdir(parents=True, exist_ok=True)
+    shutil.copy2(source_file, context_folder / source_file.name)
+    return context_folder
+
+
+def _cleanup_single_context_folder(context_folder: Path):
+    shutil.rmtree(context_folder, ignore_errors=True)
+    parent = context_folder.parent
+    if parent.name == "rag_context_inputs" and parent.exists():
+        try:
+            parent.rmdir()
+        except OSError:
+            pass
+
+
+def _cleanup_agent(agent: Agent):
+    for service in agent.service_store.values():
+        if service.get_state() == ServiceState.RUNNING:
+            service.stop()
+    agent._uninstall_elements()
+    agent._is_running = False
+    agent._stop_event.set()
 
 
 def _normalize_pdf_value(value) -> str:
@@ -426,7 +464,7 @@ def test_feature_form_filler_agent_end_to_end_local_example():
             expected_suffix="_local",
         )
     finally:
-        agent.terminate()
+        _cleanup_agent(agent)
 
 
 def test_feature_form_filler_agent_end_to_end_openai_example():
@@ -531,4 +569,123 @@ def test_feature_form_filler_agent_end_to_end_openai_example():
             expected_suffix="_openai",
         )
     finally:
-        agent.terminate()
+        _cleanup_agent(agent)
+
+
+def test_feature_form_filler_agent_end_to_end_openai_nordlichter_context3():
+    """OpenAI end-to-end example for Nordlichter_Anmeldeformular.pdf with isolated context_3.txt RAG input."""
+    config = configparser.ConfigParser()
+    config.read("config.ini")
+    if not config.has_section("OPENAI"):
+        pytest.skip("Skipping OpenAI e2e test: missing [OPENAI] section in config.ini")
+    openai_api_key = config.get("OPENAI", "OPENAI_API_KEY", fallback="").strip()
+    if openai_api_key == "":
+        pytest.skip("Skipping OpenAI e2e test: missing OPENAI_API_KEY in config.ini")
+
+    pdf_path = _pdf_form_path("Nordlichter_Anmeldeformular.pdf")
+    context_file = _rag_context_file("context_3.txt")
+    isolated_context_folder = _prepare_single_context_folder(
+        source_file=context_file,
+        folder_name="nordlichter_context_3_only",
+    )
+
+    embedding_store_name = "form_filler_agent_e2e_openai_nordlichter_context3"
+    embedding_service = FileEmbeddingService(
+        id="FILE_EMBEDDING_SERVICE_OPENAI_NORDLICHTER",
+        docs_folder=str(isolated_context_folder),
+        store_name=embedding_store_name,
+    )
+
+    vector_store_directory = os.path.join(
+        str(FileEmbeddingService.EMBEDDINGS_RESOURCE_FOLDER),
+        embedding_store_name,
+    )
+    rag_service = RAGService(
+        id="RAG_SERVICE_OPENAI_NORDLICHTER",
+        api_key=openai_api_key,
+        vector_store_path=vector_store_directory,
+        model="gpt-4.1-mini",
+        model_provider="OPENAI",
+        retain_messages=False,
+    )
+
+    list_files_action = ListFilesAction(
+        id="LIST_PDFS_OPENAI_NORDLICHTER",
+        folder=str(pdf_path.parent),
+        pattern=pdf_path.name,
+        extension=".pdf",
+    )
+
+    read_pdf_form_action = PDFReadFormAction(
+        id="READ_PDF_FORM_OPENAI_NORDLICHTER",
+        input_keys=["values"],
+        row_mode="per_field",
+        include_bridge_prompt=True,
+    )
+    read_pdf_form_action.add_parent(list_files_action)
+
+    llm_fill_action = LLMChatAction(
+        id="LLM_FILL_FORM_OPENAI_NORDLICHTER",
+        question_key="llm_prompt",
+        instruction_value=_build_instruction(),
+        retrieval_query_key="fields.0.generated_question",
+        input_context_keys=["full_text_content", "fields", "metadata"],
+        use_rag_context=True,
+        pass_through_keys=["filepath"],
+    )
+    llm_fill_action.add_parent(read_pdf_form_action)
+    llm_fill_action.set_service(rag_service)
+
+    action_service = SimpleActionService(
+        id="FORM_FILLER_ACTION_SERVICE_OPENAI_NORDLICHTER",
+        thread_type=ThreadType.ONLY_ONCE.value,
+    )
+    action_service.add_node(list_files_action)
+    action_service.add_node(read_pdf_form_action)
+    action_service.add_node(llm_fill_action)
+
+    agent = Agent(id="FORM_FILLER_AGENT_E2E_OPENAI_NORDLICHTER")
+    agent.add_service(embedding_service)
+    agent.add_service(rag_service)
+    agent.add_service(action_service)
+
+    try:
+        agent.release(blocking=False)
+        action_service.get_observer_thread()._thread.join(timeout=240)
+
+        listed_data = list_files_action.get_buffer().data()
+        assert listed_data.get("values", []) == [str(pdf_path)]
+
+        llm_data = llm_fill_action.get_buffer().data()
+        read_data = read_pdf_form_action.get_buffer().data()
+        if "answer" not in llm_data or len(llm_data.get("answer", [])) == 0:
+            service_state = action_service.get_state()
+            state_label = service_state.value if hasattr(service_state, "value") else str(service_state)
+            pytest.skip(
+                "Skipping OpenAI Nordlichter e2e test: no LLM answer produced "
+                + "(state="
+                + state_label
+                + "). This can happen due to API/network/quota/provider issues."
+            )
+
+        final_answers = _apply_unresolved_fallback_with_expanded_query(
+            read_data=read_data,
+            first_pass_answers=list(llm_data["answer"]),
+            rag_service=rag_service,
+        )
+        write_pdf_form_action = _write_answers_for_rows(
+            filepath_rows=list(llm_data["filepath"]),
+            answer_rows=final_answers,
+            output_suffix="_openai_nordlichter_context3",
+            row_mode="per_field",
+        )
+        _assert_form_pipeline_result(
+            list_files_action=list_files_action,
+            read_pdf_form_action=read_pdf_form_action,
+            llm_fill_action=llm_fill_action,
+            write_pdf_form_action=write_pdf_form_action,
+            expected_suffix="_openai_nordlichter_context3",
+        )
+    finally:
+        _cleanup_agent(agent)
+        _cleanup_single_context_folder(isolated_context_folder)
