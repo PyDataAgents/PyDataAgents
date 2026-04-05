@@ -28,35 +28,61 @@ class SQLAction(BufferNode, Action):
             raise NodeException(f"Query cannot be None for {SQLAction.__name__}")
         
     def _on_execute(self):
-        data = self.get_parent_data()
-        # check for query type
-        if self.query.strip().lower().startswith("select"):
-            self._cursor.execute(self.query)
-        elif self.query.strip().lower().startswith("insert"):
-            columns = ', '.join(data.keys())
-            placeholders = ', '.join(['?'] * len(data))
-            query = self.query
-            if "(COLUMNS)" in query and "(VALUES)" in query:
-                query = query.replace("(COLUMNS)", f"({columns})")
-                query = query.replace("(VALUES)", f"({placeholders})")
-                self._cursor.execute(query, list(data.values()))
+        try:
+            # check for query type
+            if self.query.strip().lower().startswith("select"):
+                # SELECT
+                self._cursor.execute(self.query)            
+                self._conn.commit()
+                results = self._cursor.fetchall()
+                columns = [column[0] for column in self._cursor.description]
+                data_with_columns = [dict(zip(columns, row)) for row in results]
+                self.add_data(data_with_columns)
+            elif self.query.strip().lower().startswith("insert"):
+                # INSERT
+                if "?" in self.query:
+                    data = self.get_parent_data()                    
+                    if self.by_rows:
+                        row : dict = next(iter(data))
+                        if len(row.keys()) == self.query.count("?"):
+                            tuple_data = tuple(list(row.values()) for row in data)
+                            self._cursor.executemany(self.query, tuple_data)
+                        else:
+                            raise NodeException(f"Number of input keys must match the number of parameters in the query {self.query} for {SQLAction.__name__}")
+                    else:
+                        if len(data.keys()) == self.query.count("?"):
+                            tuple_data = list(zip(*data.values()))
+                            self._cursor.executemany(self.query, tuple_data)
+                        else:
+                            raise NodeException(f"Number of input keys must match the number of parameters in the query {self.query} for {SQLAction.__name__}")                    
+                else:
+                    self._cursor.execute(self.query)
+                self._conn.commit()
+            elif self.query.strip().lower().startswith("update"):
+                # UPDATE
+                if "?" in self.query:
+                    data = self.get_parent_data()
+                    if self.by_rows:
+                        row : dict = next(iter(data))
+                        if len(row.keys()) == self.query.count("?"):
+                            tuple_data = tuple(list(row.values()) for row in data)
+                            self._cursor.executemany(self.query, tuple_data)
+                        else:
+                            raise NodeException(f"Number of input keys must match the number of parameters in the query {self.query} for {SQLAction.__name__}")
+                    else:
+                        if len(data.keys()) == self.query.count("?"):
+                            self._cursor.executemany(self.query, tuple(data.values()))
+                        else:
+                            raise NodeException(f"Number of input keys must match the number of parameters in the query {self.query} for {SQLAction.__name__}")
+                else:
+                    self._cursor.execute(self.query)
+                self._conn.commit()
             else:
-                self._cursor.execute(query)
-        elif self.query.strip().lower().startswith("update"):
-            if "(SET)" in self.query:
-                set_clause = ', '.join([f"{col} = ?" for col in data.keys()])            
-                query = self.query
-                query = query.replace("(SET)", set_clause)
-                self._cursor.execute(query, tuple(data.values()))
-            else:
+                # DELETE, CREATE, ...
                 self._cursor.execute(self.query)
-        elif self.query.strip().lower().startswith("delete"):
-            self._cursor.execute(self.query)
-        else:
-            self._cursor.execute(self.query)
+                self._conn.commit()
+        except pyodbc.Error as e:
+            raise NodeException(f"Error executing SQL query: {e}") from e
+            
+            
         
-        self._conn.commit()
-        results = self._cursor.fetchall()
-        columns = [column[0] for column in self._cursor.description]
-        data_with_columns = [dict(zip(columns, row)) for row in results]
-        self.add_data(data_with_columns)
