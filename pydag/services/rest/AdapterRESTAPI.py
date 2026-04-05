@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Union
+from typing import Any, Dict
 from fastapi import APIRouter, Path, Query
 from pydantic import BaseModel, Field
 

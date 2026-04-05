@@ -1,11 +1,9 @@
-import os
 import time
 import sounddevice as sd
 import numpy as np
 
 from pydag.adapters.audio.AudioAdapter import AudioAdapter
 from pydag.buffers.ListBuffer import ListBuffer
-from pydag.services.plot.PlotlifyService import PlotlifyService
 
 def test_000():
 
@@ -147,6 +145,5 @@ def test_031():
     
     data = buf.data(persistent=True)
     print(data)
-    #PlotlifyService.line(y=data["values"]).to_file(os.path.dirname(__file__) + os.sep + "audioadapter_test_031.html", open_in_browser=False)
     assert buf.size() > sr * st - 2 * n
     

@@ -1,7 +1,6 @@
 from dataclasses import dataclass, field
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
-from loguru import logger
 
 
 from pydag.agents.Agent import Agent

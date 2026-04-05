@@ -2,7 +2,8 @@ import os
 import sys
 import types
 
-import pytest
+import pydag.services.llm.RAGService as rag_module
+from pydag.services.llm.RAGService import RAGService
 
 # Fallback for environments where graphviz is not installed.
 if "graphviz" not in sys.modules:
@@ -23,10 +24,6 @@ if "graphviz" not in sys.modules:
 
     graphviz_stub.Digraph = _DummyDigraph
     sys.modules["graphviz"] = graphviz_stub
-
-import pydag.services.llm.RAGService as rag_module
-from pydag.services.llm.RAGService import RAGService
-
 
 class DummyEmbeddingStore:
     def __init__(self):

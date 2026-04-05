@@ -4,7 +4,6 @@ import http.server
 import socketserver
 import threading
 import webbrowser
-from pathlib import Path
 
 # Settings
 FOLDER = os.path.dirname(__file__)  # <-- change this

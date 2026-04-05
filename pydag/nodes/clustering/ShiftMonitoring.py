@@ -1,16 +1,12 @@
 from dataclasses import dataclass, field
 import enum
-import os
 import string
 from typing import Dict, Tuple
-
 import numpy as np
 from scipy.spatial import KDTree
 from scipy.spatial.distance import jensenshannon
 from scipy.stats import wasserstein_distance
-import matplotlib.pyplot as plt
 
-from ...agents.Agent import Agent
 from ...agents.AgentConfig import AgentConfig
 from ..LearningNode import LearningNode
 

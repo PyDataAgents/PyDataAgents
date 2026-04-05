@@ -1,5 +1,4 @@
 import os
-from pathlib import Path
 from langchain_unstructured import UnstructuredLoader
 from langchain_text_splitters import CharacterTextSplitter
 from langchain_community.vectorstores.utils import filter_complex_metadata

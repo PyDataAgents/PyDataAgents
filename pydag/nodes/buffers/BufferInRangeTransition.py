@@ -1,5 +1,4 @@
 from dataclasses import dataclass, field
-from ...buffers.Comparator import Comparator
 from ..BufferNode import BufferNode
 from ..Transition import Transition
 

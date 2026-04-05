@@ -7,7 +7,6 @@ import time
 from ..buffers.BufferException import BufferException
 from ..agents.AgentConfig import AgentConfig
 from .Buffer import Buffer
-from ..agents import Agent
 
 
 @dataclass

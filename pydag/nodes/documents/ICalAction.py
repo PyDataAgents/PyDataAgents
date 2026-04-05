@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import datetime
 import uuid
 from zoneinfo import ZoneInfo
 import pytz

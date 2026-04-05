@@ -3,7 +3,6 @@ from langchain_tavily import TavilySearch
 from langchain.agents import tool, initialize_agent, AgentType
 
 
-from ...services.Service import Service
 from ..llm.LLMService import LLMService
 
 

@@ -1,6 +1,5 @@
 from dataclasses import dataclass, field
 import os
-from loguru import logger
 
 
 from ...agents.Agent import Agent

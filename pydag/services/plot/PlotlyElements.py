@@ -1,10 +1,9 @@
 from dataclasses import dataclass
 from enum import Enum
 import json
-import math
 import os
 from pathlib import Path
-from typing import Optional, Tuple, Union, List
+from typing import Optional, Union, List
 from bs4 import BeautifulSoup
 from loguru import logger
 import numpy as np

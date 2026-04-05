@@ -1,4 +1,3 @@
-import base64
 from dataclasses import dataclass, field
 
 from loguru import logger

@@ -1,5 +1,4 @@
 from dataclasses import dataclass, field
-import time
 import sounddevice as sd
 import numpy as np
 from loguru import logger
