@@ -2,10 +2,11 @@ from datetime import datetime
 import threading
 import time
 from typing import Union
-from zoneinfo import ZoneInfo
+#from zoneinfo import ZoneInfo
 from loguru import logger
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.schedulers.blocking import BlockingScheduler
+from apscheduler.job import Job
 
 from pydag.utils.TimeUtils import TimeUtils
 
@@ -35,7 +36,8 @@ class ObserverThread():
         self._counts : int = 0
         self._week_days : str = week_days
         
-        self._scheduler : Union[BlockingScheduler|BackgroundScheduler] = None        
+        self._scheduler : Union[BlockingScheduler|BackgroundScheduler] = None
+        self._scheduled_job : Job = None    
                
         name = "Thread " + self._service.id
         match self._thread_type:
@@ -92,6 +94,8 @@ class ObserverThread():
                         self._is_running = True                
                     if self._scheduler is not None:
                         self._scheduler.start()
+                        dt : datetime = self._scheduled_job.next_run_time
+                        self._next_time = TimeUtils.datetime_to_utc(dt)
                     elif self._thread is not None:
                         self._thread.start()
                     else:
@@ -144,6 +148,7 @@ class ObserverThread():
                     self.notify_observers()
                     self._counts += 1
                     self._last_time = round(time.time() * 1000)
+                    self._next_time = self._last_time + self._observing_time
                 except ObserverException as e:
                     logger.error(e)
                     with self._lock:
@@ -166,9 +171,10 @@ class ObserverThread():
             if current_timer - last_timer >= self._observing_time - SAFETY_DIFF_TIME_UNITS:
                 try:
                     self.notify_observers()
-                    self._counts += 1
-                    self._last_time = time.time_ns() / 1000                    
-                    last_timer = current_timer 
+                    self._counts += 1                   
+                    last_timer = current_timer
+                    self._last_time = time.time_ns() / 1000 
+                    self._next_time = self._last_time + self._observing_time 
                 except ObserverException as e:
                     logger.error(e)
                     with self._lock:
@@ -193,8 +199,9 @@ class ObserverThread():
                 try:
                     self.notify_observers()
                     self._counts += 1
-                    self._last_time = time.time_ns()
                     last_timer = current_timer
+                    self._last_time = time.time_ns()
+                    self._next_time = self._last_time + self._observing_time
                 except ObserverException as e:
                     logger.error(e)
                     with self._lock:
@@ -218,6 +225,7 @@ class ObserverThread():
                     self.notify_observers()
                     self._counts += 1
                     self._last_time = time.time()
+                    self._next_time = self._last_time + self._observing_time
                 except ObserverException as e:
                     logger.error(e)
                     with self._lock:
@@ -235,7 +243,8 @@ class ObserverThread():
             try:
                 self.notify_observers()
                 self._counts += 1
-                self._last_time = time.time_ns()   
+                self._last_time = time.time_ns()
+                self._next_time = self._last_time
             except ObserverException as e:
                 logger.error(e)
                 with self._lock:
@@ -259,7 +268,7 @@ class ObserverThread():
     def _create_datetime_schedule(self):
         self._scheduler = BackgroundScheduler()
         dt : datetime = TimeUtils.str_to_datetime(self._observing_time, dformat="%Y-%m-%d %H:%M:%S")
-        self._scheduler.add_job(self.notify_observers, trigger='date', run_date=dt, id = "Scheduled-Job " + self._service.id)               
+        self._scheduled_job = self._scheduler.add_job(self.notify_observers, trigger='date', run_date=dt, id = "Scheduled-Job " + self._service.id)               
     
     def _create_daytime_schedule(self):
         local_tz = datetime.now().astimezone().tzinfo
@@ -268,15 +277,22 @@ class ObserverThread():
             dt : datetime = TimeUtils.str_to_datetime(self._observing_time, dformat="%H:%M")
             hour : int = dt.hour
             minute : int = dt.minute
-            self._scheduler.add_job(self.notify_observers, trigger='cron', day_of_week=self._week_days, hour=hour, minute=minute, id = "Scheduled-Job " + self._service.id)                
+            self._scheduled_job = self._scheduler.add_job(self._daytime_task, trigger='cron', day_of_week=self._week_days, hour=hour, minute=minute, id = "Scheduled-Job " + self._service.id)                
         elif self._observing_time.count(":") == 2:
             dt : datetime = TimeUtils.str_to_datetime(self._observing_time, dformat="%H:%M:%S")
             hour : int = dt.hour
             minute : int = dt.minute
             second : int = dt.second
-            self._scheduler.add_job(self.notify_observers, trigger='cron', day_of_week=self._week_days, hour=hour, minute=minute, second=second, id = "Scheduled-Job " + self._service.id)
+            self._scheduled_job = self._scheduler.add_job(self._daytime_task, trigger='cron', day_of_week=self._week_days, hour=hour, minute=minute, second=second, id = "Scheduled-Job " + self._service.id)
         else:
             raise ObserverException("Wrong dateformat in observingtime " + self._observing_time)       
+    
+    def _daytime_task(self):
+        """ helper task for daytime schedule to set next_time and execute observers
+        """
+        self.notify_observers()
+        dt : datetime = self._scheduled_job.next_run_time
+        self._next_time = TimeUtils.datetime_to_utc(dt)
     
     def _run_exponential_thread(self):
         self._last_time = 0
@@ -293,6 +309,7 @@ class ObserverThread():
                     self._observing_time = 2 * self._observing_time
                     if self._observing_time > AgentConfig.MAX_EXPONENTIAL_SECONDS:
                         self._observing_time = AgentConfig.MAX_EXPONENTIAL_SECONDS
+                    self._next_time = self._last_time + self._observing_time
                 except ObserverException as e:
                     logger.error(e)
                     with self._lock:
@@ -309,8 +326,43 @@ class ObserverThread():
             return self._is_running
     
     def get_last_update(self) -> float:
-        return self._last_time
+        """ returns the timestamp of the last `ObserverThread` iteration in ms
+        """
+        match (self._thread_type):
+            case ThreadType.SECOND.value:
+                return self._last_time * 1000.0
+            case ThreadType.MILLI_SECOND.value:
+                return self._last_time
+            case ThreadType.MICRO_SECOND.value:
+                return self._last_time / 1000.0
+            case ThreadType.NANO_SECOND.value:
+                return self._last_time / 1000.0 / 1000.0
+            case ThreadType.INSTANT.value:
+                return self._last_time / 1000.0 / 1000.0
+            case ThreadType.EXPONENTIAL_SECOND.value:
+                return self._last_time * 1000.0
+            case _:
+                return self._last_time
 
+    def get_next_update(self) -> float:
+        """ returns the timestamp of the next `ObserverThread` iteration in ms
+        """
+        match (self._thread_type):
+            case ThreadType.SECOND.value:
+                return self._next_time * 1000.0
+            case ThreadType.MILLI_SECOND.value:
+                return self._next_time
+            case ThreadType.MICRO_SECOND.value:
+                return self._next_time / 1000.0
+            case ThreadType.NANO_SECOND.value:
+                return self._next_time / 1000.0 / 1000.0
+            case ThreadType.INSTANT.value:
+                return self._next_time / 1000.0 / 1000.0
+            case ThreadType.EXPONENTIAL_SECOND.value:
+                return self._next_time * 1000.0
+            case _:
+                return self._next_time
+    
     def get_counts(self) -> int:
         return self._counts
     

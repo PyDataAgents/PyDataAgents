@@ -3,6 +3,7 @@ import time
 from loguru import logger
 
 from pydag.services.Observer import Observer
+from pydag.services.ObserverService import ObserverService
 from pydag.services.ObserverThread import ObserverThread
 from pydag.services.Service import Service
 from pydag.services.ThreadType import ThreadType
@@ -109,10 +110,40 @@ def test_exponential_thread():
     ot.run()    
     time.sleep(32)    
     ot.terminate()
+    
+def test_second_thread_next_time():
+    service = TestService()
+    ot = ObserverThread(service=service, observing_time=2, thread_type=ThreadType.SECOND.value)
+    o = TestObserver2(ot)
+    ot.add_observer(o)
+    ot.run()
+    time.sleep(5)
+    ot.terminate()
+    
+def test_millisecond_thread_next_time():
+    service = TestService()
+    ot = ObserverThread(service=service, observing_time=500, thread_type=ThreadType.MILLI_SECOND.value)
+    o = TestObserver2(ot)
+    ot.add_observer(o)
+    ot.run()
+    time.sleep(2)
+    ot.terminate()
 
 class TestObserver(Observer):
     def observe(self):
         logger.info("observing...")
+    
+    def unobserve(self):
+        logger.info("unobserving...")
+
+class TestObserver2(Observer):
+    
+    def __init__(self, othread : ObserverThread):
+        super().__init__()
+        self._othread : ObserverThread = othread
+    
+    def observe(self):
+        logger.info(f"last: {self._othread.get_last_update()} -> next: {self._othread.get_next_update()}")
     
     def unobserve(self):
         logger.info("unobserving...") 
