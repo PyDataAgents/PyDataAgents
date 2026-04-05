@@ -52,6 +52,8 @@ class AdsAdapter(ReadAdapter, WriteAdapter):
             d : dict = {}
             for address in addresses:
                 val = self._ads_client.read_by_name(address)
+                if val is None:
+                    raise AdapterException(f"Reading {address} returned None, {self.__class__.__name__} might be unconnected or invalid address")
                 d[address] = val            
             buffer.push(d)
         elif len(buffers) != len(addresses):
@@ -60,6 +62,8 @@ class AdsAdapter(ReadAdapter, WriteAdapter):
             b = 0
             for buffer in buffers.values():
                 val = self._ads_client.read_by_name(addresses[b])
+                if val is None:
+                    raise AdapterException(f"Reading {address} returned None, {self.__class__.__name__} might be unconnected or invalid address")
                 buffer.push(val)
                 b = b + 1
         
