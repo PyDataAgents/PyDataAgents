@@ -6,7 +6,7 @@ import socketserver
 import threading
 from loguru import logger
 
-from ...services.Service import Service
+from ..Service import Service
 
 
 class CORSRequestHandler(SimpleHTTPRequestHandler):

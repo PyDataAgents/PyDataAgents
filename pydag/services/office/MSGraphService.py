@@ -5,7 +5,7 @@ import webbrowser
 
 import requests
 
-from ...services.documents.HttpHTMLService import HttpHTMLService
+from ..webserver.HttpHTMLService import HttpHTMLService
 from ...agents.Agent import Agent
 from ...services.ServiceException import ServiceException
 from ...services.Service import Service

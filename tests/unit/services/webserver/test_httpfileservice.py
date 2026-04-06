@@ -1,7 +1,7 @@
 import os
 import time
 import webbrowser
-from pydag.services.documents.HttpFileService import HttpFileService
+from pydag.services.webserver.HttpFileService import HttpFileService
 
 
 def test_000():

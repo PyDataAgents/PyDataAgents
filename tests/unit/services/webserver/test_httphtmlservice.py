@@ -1,6 +1,6 @@
 import time
 import webbrowser
-from pydag.services.documents.HttpHTMLService import HttpHTMLService
+from pydag.services.webserver.HttpHTMLService import HttpHTMLService
 
 
 def test_000():

@@ -4,7 +4,7 @@ import socketserver
 import threading
 from loguru import logger
 
-from ...services.Service import Service
+from ..Service import Service
 
 def make_handler(html : str):
     class HTMLHandler(SimpleHTTPRequestHandler):
