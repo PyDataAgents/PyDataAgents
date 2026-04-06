@@ -32,11 +32,29 @@ class HTMLUtils:
             element.string = new_text
             
     def dict_to_htmltable(data: dict) -> str:
-        DEFAULT_CELL_STYLE : str = "border: 1px solid black; border-collapse: collapse; padding: 5px"
+        DEFAULT_CELL_STYLE : str = """
+        <style>
+            .bordered-table {
+                border-collapse: collapse; /* make borders appear as single lines */
+                width: 100%;
+            }
+
+            .bordered-table th,
+            .bordered-table td {
+                border: 1px solid #000; /* black border for each cell */
+                padding: 8px;
+                text-align: left;
+            }
+
+            .bordered-table th {
+                background-color: #f0f0f0; /* optional: header background */
+            }
+        </style>\n
+        """
         if not data:
             return "<table></table>"
         display_cols = list(data.keys())
-        html = "<table style='" + DEFAULT_CELL_STYLE + "'>\n"
+        html = DEFAULT_CELL_STYLE + "<table class='bordered-table'>\n"
         html += "  <tr>" + "".join(f"<th>{col}</th>" for col in display_cols) + "</tr>\n"        
         if isinstance(data[display_cols[0]], list):
             rows = zip(*[data[c] for c in display_cols])
