@@ -29,7 +29,10 @@ class ModelHandler():
         self._methods : dict = None
         self._method_input_vars : dict[str, list[str]] = None
         self._method_output_vars : dict[str, list[str]] = None
-        self._method_arguments : dict[str, int] = {}
+        self._method_arguments : dict[str, int] = {}        
+        self._model_input_vars : set[str] = set()
+        self._model_output_vars : set[str] = set()
+        
         if self._model_path and self._model_name:        
             if not FileUtils.exists_file(model_path):
                 raise ServiceException(f"No model file was found for '{self._model_path}'")        
@@ -82,6 +85,18 @@ class ModelHandler():
                 read_vars[key] = rv
         self._method_input_vars = read_vars
         self._method_output_vars = write_vars
+        
+        # collect all input and output model variables
+        out_vars : set
+        for k, out_vars in write_vars.items():
+            for ov in out_vars:
+                self._model_output_vars.add(ov)
+        input_vars : set
+        for k, input_vars in read_vars.items():
+            for iv in input_vars:
+                if iv not in self._model_output_vars:
+                    self._model_input_vars.add(iv)
+    
         # validate if method properties exist in model properties
         data_model = ClassUtils.load_instance(self._model_path, self._model_name)
         self._validate_properties(data_model, all_vars)

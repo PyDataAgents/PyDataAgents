@@ -90,8 +90,10 @@ class DataModelService(Service):
         self._model_class : type = None
         self._methods : dict = None
         self._method_input_vars : dict[str, list[str]] = None
-        self._method_output_vars : dict[str, list[str]] = None
+        self._method_output_vars : dict[str, list[str]] = None        
         self._method_arguments : dict[str, int] = {}
+        self._model_input_vars : set[str] = set()
+        self._model_output_vars : set[str] = set()
     
     def set_model(self, model_class : type):
         """ sets the model class for this service, this method can be used instead of specifying `model_path` and `model_name`
@@ -211,6 +213,8 @@ class DataModelService(Service):
         source_code = script_path.read_text(encoding="utf-8")
         # Parse file into AST
         tree = ast.parse(source_code)
+        
+        # collect all mthod inputs and outputs
         visitor1 = DataModelReadAccessVisitor()
         visitor1.visit(tree)
         read_vars : dict = visitor1.read_accesses
@@ -226,9 +230,21 @@ class DataModelService(Service):
                 for v in wv:
                     if v in rv:
                         rv.remove(v)
-                read_vars[key] = rv
+                read_vars[key] = rv               
         self._method_input_vars = read_vars
         self._method_output_vars = write_vars
+        
+        # collect all input and output model variables
+        out_vars : set
+        for k, out_vars in write_vars.items():
+            for ov in out_vars:
+                self._model_output_vars.add(ov)
+        input_vars : set
+        for k, input_vars in read_vars.items():
+            for iv in input_vars:
+                if iv not in self._model_output_vars:
+                    self._model_input_vars.add(iv)
+            
         # validate if method properties exist in model properties
         data_model = ClassUtils.load_instance(self.model_path, self.model_name)
         self._validate_properties(data_model, all_vars)
