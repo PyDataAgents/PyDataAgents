@@ -1,9 +1,10 @@
 from typing import Any, Dict
-from fastapi import APIRouter, Path, Query
+from fastapi import APIRouter, Depends, Path, Query
 from pydantic import BaseModel, Field
 
-from pydag.agents.AgentConfig import AgentConfig
 
+from ...agents.AgentConfig import AgentConfig
+from ...services.rest.RESTAPIManager import APIRole, RESTAPIManager
 from ...adapters.Adapter import Adapter
 from ...agents.Agent import Agent
 from ...utils.ClassUtils import ClassUtils
@@ -37,7 +38,7 @@ class AdapterRESTAPI:
             """
             return ClassUtils.get_subclasses(Adapter, True)                        
         
-        @router.get("/configs")
+        @router.get("/configs", dependencies=[Depends(RESTAPIManager.require_min_role(APIRole.ADMIN))])
         def adapter_configs() -> list:
             """
             Returns a list of all adapter configurations.
@@ -81,7 +82,7 @@ class AdapterRESTAPI:
                 return {"error": "adapter not found"}
             return adapter.config_options()
                       
-        @router.post("/")
+        @router.post("/", dependencies=[Depends(RESTAPIManager.require_min_role(APIRole.WRITE))])
         def add_adapter(adapter_def : AdapterDefinition) -> str:
             type = adapter_def.definition[AgentConfig.TYPE]
             if not type is None:

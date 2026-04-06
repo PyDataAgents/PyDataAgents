@@ -1,5 +1,5 @@
 from typing import Any, Dict
-from fastapi import APIRouter, Path
+from fastapi import APIRouter, Depends, Path
 from pydantic import BaseModel, Field
 
 
@@ -10,6 +10,7 @@ from ...agents.AgentConfig import AgentConfig
 from ...agents.Agent import Agent
 from ...utils.ClassUtils import ClassUtils
 from ...nodes.Node import Node
+from ..rest.RESTAPIManager import APIRole, RESTAPIManager
 
 ROOT_URL : str = "/api/v1/nodes"
  
@@ -69,7 +70,7 @@ class NodeRESTAPI:
             else:
                 return {}
                       
-        @router.post("/{service_id}/add")
+        @router.post("/{service_id}/add", dependencies=[Depends(RESTAPIManager.require_min_role(APIRole.WRITE))])
         def add_node(node_def : NodeDefinition, service_id: str = Path(..., description="")) -> Any:
             """ add a new node based on `node_def` for specified `Service` with `service_id`
 

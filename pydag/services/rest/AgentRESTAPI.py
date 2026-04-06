@@ -38,7 +38,7 @@ class AgentRESTAPI:
         def description():
             return agent.description
         
-        @router.put("/config/{id}")
+        @router.put("/config/{id}", dependencies=[Depends(RESTAPIManager.require_min_role(APIRole.ADMIN))])
         def set_element_property(id : str = Path(..., description="the id of the element to be changed"),
                                  element_definition : ElementDefinition = None) -> dict:
             if element_definition is None:
@@ -52,5 +52,9 @@ class AgentRESTAPI:
             if element_definition.requires_install:
                 element.install(agent)
             return {"success": True, "message": f"Property '{element_definition.prop}' of element with id '{id}' updated successfully to {element_definition.value}."}
+        
+        @router.get("/mgmt/states")
+        def get_state_tree() -> dict:
+            return agent.state_tree()
                 
         return router

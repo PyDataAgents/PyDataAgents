@@ -7,6 +7,7 @@ import uuid
 from loguru import logger
 
 
+
 from .AgentException import AgentException
 from ..utils.FileUtils import FileUtils
 from .YAMLConfig import YAMLConfig
@@ -14,7 +15,8 @@ from ..nodes.Node import Node
 from .AgentElement import AgentElement
 from .AgentConfig import AgentConfig
 from ..services.statemachine.StatemachineService import StatemachineService
-
+from ..services.mappings.MappingService import MappingService
+from ..services.ObserverService import ObserverService
 
 if TYPE_CHECKING:
     from ..adapters.Adapter import Adapter
@@ -363,6 +365,78 @@ class Agent():
             else:
                 logger.error(f"no {Node.cname()} with id={id} was found!")
                 return None
+    
+    def state_tree(self) -> dict:
+        """ returns a dictionary tree structure with (Mapping)Services and their contained Nodes, Adapters, Buffers
+        and ObserverThreads with their respective state, possible next iterations or other relevant info
+
+        Returns:
+            dict: dictionary with element tree
+        """
+        tree : dict = {}
+        service : Service
+        for k, service in self.service_store.items():
+            if isinstance(service, MappingService):
+                sd : dict = {
+                    "type": service.type,
+                    "state": service.get_state(),
+                    "last_update": service.get_observer_thread().get_last_update(),
+                    "next_update": service.get_observer_thread().get_next_update(),
+                    "adapter": {},
+                    "buffers": {}
+                }
+                if service.get_adapter():
+                    sd["adapter"] = {
+                        "id": service.get_adapter().id,
+                        "type": service.get_adapter().type,
+                        "state": service.get_adapter().get_state()
+                    }
+                if len(service.get_buffers()) > 0:
+                    buffer : Buffer
+                    for kk, buffer in service.get_buffers().items():
+                        bd = {
+                            "type": buffer.type,
+                            "size": buffer.size(),
+                            "capacity": buffer.capacity,
+                            "state": buffer.get_state(),
+                            "last_access": buffer.get_last_access() 
+                        }
+                        sd["buffers"][buffer.id] = bd
+                tree[service.id] = sd
+            elif isinstance(service, StatemachineService):
+                nds : dict = {}
+                node : Node
+                for kk, node in service.nodes.items():
+                    nd : dict = {
+                        "type": node.type,
+                        "state": node.get_state(),
+                        "last_execution": node.get_last_timestamp(),
+                        "active": node.is_active()
+                    }
+                    nds[node.id] = nd
+                sd : dict = {
+                    "type": service.type,
+                    "state": service.get_state(),
+                    "last_update": service.get_observer_thread().get_last_update(),
+                    "next_update": service.get_observer_thread().get_next_update(),
+                    "nodes": nds                
+                }
+                tree[service.id] = sd
+            elif isinstance(service, ObserverService):                
+                sd : dict = {
+                    "type": service.type,
+                    "state": service.get_state(),
+                    "last_update": service.get_observer_thread().get_last_update(),
+                    "next_update": service.get_observer_thread().get_next_update()
+                }
+                tree[service.id] = sd
+            else:
+                sd : dict = {
+                    "type": service.type,
+                    "state": service.get_state()
+                }
+                tree[service.id] = sd
+        return tree
     
     def _get_deep_element(self, id : str) -> AgentElement:
         """checks for nested `AgentElement`s

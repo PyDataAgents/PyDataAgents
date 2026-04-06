@@ -1,7 +1,9 @@
 from typing import Any, Dict
-from fastapi import APIRouter, Path, Query
+from fastapi import APIRouter, Depends, Path, Query
 from pydantic import BaseModel, Field
 
+
+from ..rest.RESTAPIManager import APIRole, RESTAPIManager
 from ...agents.AgentConfig import AgentConfig
 from ...services.Service import Service
 from ...agents.Agent import Agent
@@ -67,7 +69,7 @@ class ServiceRESTAPI:
                 return {"error": "service not found"}
             return service.config_options()
                       
-        @router.post("/")
+        @router.post("/", dependencies=[Depends(RESTAPIManager.require_min_role(APIRole.WRITE))])
         def add_service(service_def : ServiceDefinition) -> str:
             type = service_def.definition[AgentConfig.TYPE]
             if not type is None:

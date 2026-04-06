@@ -1,7 +1,9 @@
 from typing import Any, Dict, List, Union
-from fastapi import APIRouter, Body, Path, Query
+from fastapi import APIRouter, Body, Depends, Path, Query
 from pydantic import BaseModel, Field
 
+
+from ..rest.RESTAPIManager import APIRole, RESTAPIManager
 from ...buffers.DictBuffer import DictBuffer
 from ...agents.AgentConfig import AgentConfig
 from ...utils.DataUtils import DataUtils
@@ -138,21 +140,21 @@ class BufferRESTAPI:
                 else:
                     return data
                
-        @router.post("/")
+        @router.post("/", dependencies=[Depends(RESTAPIManager.require_min_role(APIRole.WRITE))])
         def add_buffer(buffer_def : Union[BufferDefinition, DictBufferDefinition]) -> str:
             buffer : Buffer = ClassUtils.create_instance(buffer_def.type)
             ClassUtils.set_properties(buffer, buffer_def.model_dump())
             agent.add_buffer(buffer)
             return buffer_def.id
         
-        @router.put("/{id}/data")
+        @router.put("/{id}/data", dependencies=[Depends(RESTAPIManager.require_min_role(APIRole.WRITE))])
         def add_data(id : str = Path(description="unique ID of the buffer"), data : Union[Any, List[Any], Dict[str, Any]] = Body(..., description="data to be added to the buffer"))-> bool:
             if id not in agent.buffer_store:
                 return False
             agent.get_buffer(id).push(data)
             return True
         
-        @router.delete("/{id}/data")
+        @router.delete("/{id}/data", dependencies=[Depends(RESTAPIManager.require_min_role(APIRole.WRITE))])
         def clear_data(id : str = Path(description="unique ID of the buffer"))-> bool:
             if id not in agent.buffer_store:
                 return False
