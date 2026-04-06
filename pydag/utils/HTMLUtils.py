@@ -43,7 +43,7 @@ class HTMLUtils:
             for row in rows:
                 html += "  <tr>"
                 for val in row:
-                    if StringUtils.is_valid_url(val) or StringUtils.is_valid_file_link(val):
+                    if isinstance(val, str) and (StringUtils.is_valid_url(val) or StringUtils.is_valid_file_link(val)):
                         html += f"<td><a href='{val}' target='_blank'>{val}</a></td>"
                     else:
                         html += f"<td>{val}</td>"

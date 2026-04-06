@@ -90,7 +90,7 @@ class BufferNode(Node):
         """
         return self._buffer
         
-    def get_parent_data(self) -> dict:
+    def get_parent_data(self) -> dict | list:
         """ Retrieve data from parent node buffers.
         This method aggregates data from one or more parent BufferNode instances.
         For a single parent, it retrieves data directly from that parent's buffer.
