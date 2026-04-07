@@ -243,3 +243,5 @@ class MultiModelService(Service):
             logger.error(f"No ModelHandler for class {model_class} was registered")
             return None
 
+    def get_handlers(self) -> dict[str, ModelHandler]:
+        return self._handlers
