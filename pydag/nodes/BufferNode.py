@@ -35,6 +35,7 @@ class BufferNode(Node):
         Raises:
             StatemachineException: throws an `Exception` if no `buffer` with the specified `buffer_id` can be found in `agent`
         """
+        # check buffer installation
         if self._buffer is None:
             if agent is not None:
                 if self.buffer_id is not None:
@@ -66,6 +67,32 @@ class BufferNode(Node):
                 )
                 self.buffer_id = self._buffer.id
             self._buffer.install(agent)
+        # check validity of input and output keys
+        seen : set[str] = set()
+        if isinstance(self.input_keys, list):
+            if len(self.input_keys) > 0:
+                for key in self.input_keys:
+                    if not isinstance(key, str) or key.strip() == "":
+                        raise NodeException(f"{self.input_keys} must contain only non-empty strings")
+                    normalized = key.strip()
+                    if normalized in seen:
+                        raise NodeException(f"{self.input_keys} must contain unique entries")
+                    seen.add(normalized)
+        else:
+            raise NodeException(f"{self.input_keys} ({type(self.input_keys)}) must be of type list")
+                
+        seen = set()
+        if isinstance(self.output_keys, list):
+            if len(self.output_keys) > 0:
+                for key in self.output_keys:
+                    if not isinstance(key, str) or key.strip() == "":
+                        raise NodeException(f"{self.output_keys} must contain only non-empty strings")
+                    normalized = key.strip()
+                    if normalized in seen:
+                        raise NodeException(f"{self.output_keys} must contain unique entries")
+                    seen.add(normalized)
+        else:
+            raise NodeException(f"{self.output_keys} ({type(self.output_keys)}) must be of type list")      
         
     def _on_uninstall(self, agent : Agent = None):
         self._buffer : Buffer = None

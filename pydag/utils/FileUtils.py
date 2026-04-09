@@ -163,6 +163,12 @@ class FileUtils:
         recursively creates all missing parent directories of `dir`
         """
         os.makedirs(dir, exist_ok=True)
+    
+    @staticmethod
+    def copy_dir(source : str, target : str):
+        """ copies one directory into another, even if folders already (partially) exists
+        """
+        shutil.copytree(source, target, dirs_exist_ok=True)
         
     @staticmethod
     def parent_folder(file_path : str) -> str:

@@ -8,6 +8,7 @@ class JsonUtils:
     """ utility class for collection of helpful json methods
     """
     
+    @staticmethod
     def read(path : str, encoding : str = "utf-8") -> dict:
         if FileUtils.exists_file(path):
             with open(path, "r", encoding=encoding) as f:
@@ -15,7 +16,8 @@ class JsonUtils:
                 return data
         else:
             return None
-        
+    
+    @staticmethod    
     def write(path : str, data : dict, encoding : str = "utf-8"):
         with open(path, "w", encoding=encoding) as f:
             json.dump(data, f, indent=4)
