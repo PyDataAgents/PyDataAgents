@@ -1,5 +1,8 @@
 id: G1
 create_config: false
+load_on_install: false
+with_persistence: false
+with_rest_api: false
 description: null
 buffer_store:
   B1:

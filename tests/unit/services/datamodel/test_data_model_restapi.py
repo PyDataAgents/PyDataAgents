@@ -12,18 +12,21 @@ def test_000():
     
     agent = Agent()
     
-    dms = DataModelService()
+    dms = DataModelService(id="DMS1")
     dms.model_name = "SimpleDataModel"
     dms.model_path = os.path.dirname(__file__) + os.sep + "SimpleDataModel.py"
     
+    session_id : str = dms.create_session()
+    
     agent.add_service(dms)
     
+    port = 8092
     dmrs = DataModelRestService(port=8092)
     agent.add_service(dmrs)
     
     agent.release(blocking=False)
         
-    time.sleep(3)
+    time.sleep(5)
     
     buf = DictBuffer()
     buf.install()
@@ -35,7 +38,7 @@ def test_000():
     
     service_id = dms.id
     model_id = "M1"       
-    http = HttpPutAction(url=f"http://localhost:8092/api/v1/datamodelservices/{service_id}/models/{model_id}", by_rows=True)
+    http = HttpPutAction(url=f"http://localhost:{port}/api/v1/datamodelservices/{service_id}/session/{session_id}/model/{model_id}", by_rows=True)
     http.add_parent(lba)
     http.install()
     

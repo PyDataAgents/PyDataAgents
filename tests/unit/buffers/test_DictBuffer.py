@@ -352,7 +352,7 @@ def test_timestamps_mixed_provided_then_missing():
     provided = [now, now -1 , now -2]
     buf.push({"a": [9, 10, 11], buf.timestamps_key: provided})
     buf.push({"a": [12]})
-    buf.push({"a": [12, 14, 15]})
+    buf.push({"a": [12, 14, 15]})    
     data = buf.data()
     ts = data.get(buf.timestamps_key)
     assert ts is not None

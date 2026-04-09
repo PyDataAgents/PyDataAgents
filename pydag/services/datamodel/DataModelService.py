@@ -125,6 +125,12 @@ class DataModelService(Service):
         self._session_locks[session_id] = asyncio.Lock()
         return session_id
     
+    def get_sessions(self) -> dict[str, int]:
+        s = dict()
+        for key, session in self._sessions.items():
+            s[key] = len(session.get_model_ids())
+        return s
+    
     async def updates(self, session_id : str, model_id : str, property_value_pairs : dict):
         """
         runs all methods over and over again until there is no more updates based on current available model values
@@ -168,24 +174,25 @@ class DataModelService(Service):
         """ runs all methods once and returns how many were executed based on data model values availability
         """
         m : int = 0
-        for name, method in self._methods:
-            input_vars = self._method_input_vars[name]
-            method_ready : bool = True
-            # check if method is ready based on set inputs
-            for input_var in input_vars:
-                if not data_model.has_value(input_var):
-                    method_ready = False
-                    break
-            if method_ready:
-                # check if the method has output variables that are blocked
-                for blocked_var in blocked_vars:
-                    if not blocked_var in self._method_output_vars[name]:
-                        # check whether to pass only model or lookup as well
-                        if self._method_arguments[name] > 1:
-                            method(data_model, self)
-                        else:                 
-                            method(data_model)
-                        m = m + 1
+        for name, method in self._methods.items():
+            if name in self._method_input_vars:
+                input_vars = self._method_input_vars[name]
+                method_ready : bool = True
+                # check if method is ready based on set inputs
+                for input_var in input_vars:
+                    if not data_model.has_value(input_var):
+                        method_ready = False
+                        break
+                if method_ready:
+                    # check if the method has output variables that are blocked
+                    for blocked_var in blocked_vars:
+                        if not blocked_var in self._method_output_vars[name]:
+                            # check whether to pass only model or lookup as well
+                            if self._method_arguments[name] > 1:
+                                method(data_model, self)
+                            else:                 
+                                method(data_model)
+                            m = m + 1
         return m                
     
     def _find_model_class(self):
@@ -198,15 +205,17 @@ class DataModelService(Service):
             
                 
     def _find_methods(self):
-        self._methods = inspect.getmembers(self._model_class, predicate=inspect.isfunction)
-        for name, method in self._methods:
+        methods = inspect.getmembers(self._model_class, predicate=inspect.isfunction)
+        self._methods = dict()
+        for name, method in methods:
             sig = inspect.signature(method)
             params = sig.parameters
             num_args = len([
                 p for p in params.values()
                 if p.kind in (p.POSITIONAL_ONLY, p.POSITIONAL_OR_KEYWORD) and p.default == p.empty
             ])
-            self._method_arguments[name] = num_args
+            self._methods[f"{self.model_name}.{name}"] = method
+            self._method_arguments[f"{self.model_name}.{name}"] = num_args
     
     def _find_method_vars(self):
         script_path = Path(self.model_path).resolve()

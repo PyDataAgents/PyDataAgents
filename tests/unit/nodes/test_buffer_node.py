@@ -17,12 +17,17 @@ def test_000():
     
 
 def test_validate_key_names_rejects_non_list_input():
-    with pytest.raises(NodeException):
+    with pytest.raises(NodeException, match="must be of type list"):
         rca = ReadCsvAction(input_keys="values")
+        rca.install()
+        
+def test_validate_key_names_empty_string():
+    with pytest.raises(NodeException, match="must contain only non-empty strings"):
+        rca = ReadCsvAction(input_keys=[""])
         rca.install()
 
 
 def test_validate_key_names_rejects_duplicate_entries():
-    with pytest.raises(NodeException):
+    with pytest.raises(NodeException, match="must contain unique entries"):
         rca = ReadCsvAction(output_keys=["values", "values "])
         rca.install()

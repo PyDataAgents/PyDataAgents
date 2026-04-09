@@ -66,6 +66,7 @@ async def test_model_with_lookup():
     
     a = Agent()
     buf = DictBuffer(id="BUF")
+    buf.install(a)
     buf.push(
         {
          "A": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
@@ -73,7 +74,6 @@ async def test_model_with_lookup():
          }
     )
     a.add_buffer(buf)
-    buf.install(a)
     
     dms = DataModelService()
     dms.model_name = "SimpleLookupDataModel"

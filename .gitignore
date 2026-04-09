@@ -69,3 +69,6 @@ __pycache__
 
 # test ical file
 /tests/**/test*.ics
+
+# .save folder for agent persistence
+.save/

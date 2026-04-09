@@ -24,13 +24,30 @@ class FileWatchdogService(Service):
         self._file_event_buffer : DictBuffer = None
     
     def _on_install(self, agent : Agent = None):
-        self._on_install(agent)
+        super()._on_install(agent)
         if self._file_event_buffer is None:
-            buf = agent.get_buffer(self.buffer_id)
-            if buf:
-                self._file_event_buffer = buf
+            if self.buffer_id:
+                if agent:
+                    buf = agent.get_buffer(self.buffer_id)
+                    if buf:
+                        self._file_event_buffer = buf
+                        self._file_event_buffer.id = buf.id
+                    else:                    
+                        self._file_event_buffer = DictBuffer(id=self.buffer_id)
+                        agent.add_buffer(self._file_event_buffer)
+                        self._file_event_buffer.install(agent)
+                else:
+                    self._file_event_buffer = DictBuffer(id=self.buffer_id)
+                    self._file_event_buffer.install()
             else:
-                raise ServiceException("No " + Buffer.cname() + " with id=" + self.buffer_id + " exists in " + Agent.cname())
+                self._file_event_buffer = DictBuffer(id=f"{self.id}-Buffer")                    
+                if agent:
+                    agent.add_buffer(self._file_event_buffer)
+                    self._file_event_buffer.install(agent)
+                else:
+                    self._file_event_buffer = DictBuffer(id=f"{self.id}-Buffer")
+                    self._file_event_buffer.install()    
+                    
 
     def _on_uninstall(self, agent : Agent = None):
         super()._on_uninstall(agent)

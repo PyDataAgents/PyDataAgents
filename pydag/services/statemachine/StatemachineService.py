@@ -31,9 +31,10 @@ class StatemachineService(ObserverService):
         self.connect_nodes()
         # then install nodes
         for node in self.nodes.values():
-            node.install(agent)            
-            if agent.load_on_install:
-                node.load_on_install = True
+            node.install(agent)
+            if agent:            
+                if agent.load_on_install:
+                    node.load_on_install = True
         # check for triggered nodes and start their trigger logic (cannot be executed before all nodes are installed)
         for node in self.nodes.values():
             if isinstance(node, TriggerAction):

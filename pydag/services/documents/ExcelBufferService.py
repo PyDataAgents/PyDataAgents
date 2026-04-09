@@ -36,6 +36,8 @@ class ExcelBufferService(Service):
                     #print(type(table_range))
                     cells = ws[table_range]
                     dbuf = DictBuffer(id=table_name, capacity=len(cells))
+                    self._agent.add_buffer(dbuf)
+                    dbuf.install(self._agent)
                     r = 0
                     headers = []
                     for row in cells:
@@ -50,7 +52,6 @@ class ExcelBufferService(Service):
                                 h = h + 1
                             dbuf.push(d)
                         r = r + 1
-                    self._agent.add_buffer(dbuf)
                     self._named_tables.append(dbuf.id)
         else:
             raise ServiceException("the file " + self.excel_file + " could not be found")
