@@ -17,6 +17,7 @@ from .AgentConfig import AgentConfig
 from ..services.statemachine.StatemachineService import StatemachineService
 from ..services.mappings.MappingService import MappingService
 from ..services.ObserverService import ObserverService
+from ..nodes.BufferNode import BufferNode
 
 if TYPE_CHECKING:
     from ..adapters.Adapter import Adapter
@@ -411,8 +412,19 @@ class Agent():
                         "type": node.type,
                         "state": node.get_state(),
                         "last_execution": node.get_last_timestamp(),
-                        "active": node.is_active()
+                        "active": node.is_active(),
                     }
+                    if isinstance(node, BufferNode):
+                        if node.get_buffer():
+                            nd["buffer"] = {
+                                "id": node.get_buffer().id,
+                                "type": node.get_buffer().type,
+                                "size": node.get_buffer().size(),
+                                "capacity": node.get_buffer().capacity,
+                                "state": node.get_buffer().get_state(),
+                                "last_access": node.get_buffer().get_last_access()
+                            }
+                        
                     nds[node.id] = nd
                 sd : dict = {
                     "type": service.type,
