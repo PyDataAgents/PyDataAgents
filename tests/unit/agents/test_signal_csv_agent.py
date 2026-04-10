@@ -93,4 +93,8 @@ def test_signal_csv_agent_rest():
     
     time.sleep(5)
     
+    t = ag.state_tree()
+    print(t)
+    
     ag.terminate()
+    

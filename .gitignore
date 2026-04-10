@@ -44,6 +44,7 @@ __pycache__
 
 # test ical files
 /tests/**/test*.ics
+/tests/**/test*.ical
 
 # test sqlite files
 /tests/**/test*.sqlite

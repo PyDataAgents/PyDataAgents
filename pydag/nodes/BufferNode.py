@@ -1,14 +1,16 @@
 from dataclasses import dataclass, field
+from typing import TYPE_CHECKING
 from loguru import logger
-
 
 from ..utils.DataUtils import DataUtils
 from ..nodes.NodeException import NodeException
 from ..agents.AgentConfig import AgentConfig
 from ..buffers.DictBuffer import DictBuffer
 from ..buffers.Buffer import Buffer
-from ..agents.Agent import Agent
 from .Node import Node
+
+if TYPE_CHECKING:
+    from ..agents.Agent import Agent
 
 @dataclass
 class BufferNode(Node):
@@ -26,7 +28,7 @@ class BufferNode(Node):
         super().__post_init__()
         self._buffer : Buffer = None  # private property for the linked buffer instance
 
-    def _on_install(self, agent : Agent = None):
+    def _on_install(self, agent : 'Agent' = None):
         """this `install` method connects a `Buffer` instance from specified `agent` based on given `buffer_id`
 
         Args:
@@ -94,7 +96,7 @@ class BufferNode(Node):
         else:
             raise NodeException(f"{self.output_keys} ({type(self.output_keys)}) must be of type list")      
         
-    def _on_uninstall(self, agent : Agent = None):
+    def _on_uninstall(self, agent : 'Agent' = None):
         self._buffer : Buffer = None
         
     def set_buffer(self, buffer : Buffer):
