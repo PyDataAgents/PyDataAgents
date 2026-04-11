@@ -121,41 +121,8 @@ def test_faulty_sql():
     sa.install()
     with pytest.raises(NodeException) as exc_info:
         sa.execute()
-        
-def testsql_insert_from_buffer_by_rows():
-    sqlite_file = os.path.dirname(__file__) + os.sep + "Chinook.db"
-    connection_str = "DRIVER={SQLite3 ODBC Driver};DATABASE=" + sqlite_file + ";"
     
-    buf = DictBuffer()
-    buf.install()
-    buf.push({"Name": ["New Artist 1", "New Artist 2"]})
-    
-    lba = LinkBufferAction()
-    lba.set_buffer(buf)
-    
-    query1 = "INSERT INTO artist (Name) VALUES (?);"
-    sa = SQLAction(
-        connection_str=connection_str,
-        query=query1,
-        input_keys=["Name"],
-        by_rows=True
-    )
-    sa.add_parent(lba)
-    sa.install()
-    sa.execute()
-    
-    # Now verify the insert
-    query2 = "SELECT Name FROM artist ORDER BY ArtistId DESC LIMIT 2;"
-    sa.uninstall()
-    sa.query = query2
-    sa.install()
-    sa.execute()
-    data = sa.get_buffer().data()
-    print(data)
-    assert data["Name"][0] == "New Artist 2"
-    assert data["Name"][1] == "New Artist 1"
-    
-def testsql_insert_from_buffer_by_columns():
+def testsql_insert_from_buffer():
     sqlite_file = os.path.dirname(__file__) + os.sep + "Chinook.db"
     connection_str = "DRIVER={SQLite3 ODBC Driver};DATABASE=" + sqlite_file + ";"
     
@@ -170,8 +137,7 @@ def testsql_insert_from_buffer_by_columns():
     sa = SQLAction(
         connection_str=connection_str,
         query=query1,
-        input_keys=["Name"],
-        by_rows=False
+        input_keys=["Name"]
     )
     sa.add_parent(lba)
     sa.install()
@@ -203,8 +169,7 @@ def testsql_insert_from_buffer_multiple_keys():
     sa = SQLAction(
         connection_str=connection_str,
         query=query1,
-        input_keys=["ArtistId", "Name"],
-        by_rows=False
+        input_keys=["ArtistId", "Name"]
     )
     sa.add_parent(lba)
     sa.install()
@@ -221,39 +186,7 @@ def testsql_insert_from_buffer_multiple_keys():
     assert data["Name"][0] == "New Artist 4"
     assert data["Name"][1] == "New Artist 3"
 
-def test_sql_update_from_buffer_by_rows():
-    sqlite_file = os.path.dirname(__file__) + os.sep + "Chinook.db"
-    connection_str = "DRIVER={SQLite3 ODBC Driver};DATABASE=" + sqlite_file + ";"
-    
-    buf = DictBuffer()
-    buf.install()
-    buf.push({"Name": ["Updated Artist"]})
-    
-    lba = LinkBufferAction()
-    lba.set_buffer(buf)
-    
-    query1 = "UPDATE artist SET Name = ? WHERE ArtistId > 1000;"
-    sa = SQLAction(
-        connection_str=connection_str,
-        query=query1,
-        input_keys=["ArtistId", "Name"],
-        by_rows=True
-    )
-    sa.add_parent(lba)
-    sa.install()
-    sa.execute()
-    
-    # Now verify the insert
-    query2 = "SELECT Name FROM artist ORDER BY ArtistId DESC LIMIT 1;"
-    sa.uninstall()
-    sa.query = query2
-    sa.install()
-    sa.execute()
-    data = sa.get_buffer().data()
-    print(data)
-    assert data["Name"][0] == "Updated Artist"
-
-def test_sql_update_from_buffer_by_columns():
+def test_sql_update_from_buffer():
     sqlite_file = os.path.dirname(__file__) + os.sep + "Chinook.db"
     connection_str = "DRIVER={SQLite3 ODBC Driver};DATABASE=" + sqlite_file + ";"
     
@@ -268,8 +201,7 @@ def test_sql_update_from_buffer_by_columns():
     sa = SQLAction(
         connection_str=connection_str,
         query=query1,
-        input_keys=["ArtistId", "Name"],
-        by_rows=False
+        input_keys=["ArtistId", "Name"]
     )
     sa.add_parent(lba)
     sa.install()

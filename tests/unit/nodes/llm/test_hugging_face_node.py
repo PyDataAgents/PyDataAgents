@@ -31,7 +31,7 @@ def test_sentiment_analysis():
     lba.set_buffer(buf)
     lba.install()
     
-    hfn = HuggingFaceAction(task="sentiment-analysis", output_keys=["sentiment"], by_rows=True)
+    hfn = HuggingFaceAction(task="sentiment-analysis", output_keys=["sentiment"])
     hfn.add_parent(lba)
     hfn.install()
     
@@ -65,7 +65,7 @@ def test_sentiment_analysis_1key():
     lba.set_buffer(buf)
     lba.install()
     
-    hfn = HuggingFaceAction(task="sentiment-analysis", by_rows=False)
+    hfn = HuggingFaceAction(task="sentiment-analysis")
     hfn.add_parent(lba)
     hfn.install()
     

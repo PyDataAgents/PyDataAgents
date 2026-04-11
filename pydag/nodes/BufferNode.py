@@ -21,7 +21,6 @@ class BufferNode(Node):
     input_keys : list[str] = field(default_factory=list, metadata={"description": "list of keys to extract from parent buffers, defaults to empty and all the keys are returned"})        
     output_keys : list[str] = field(default_factory=list, metadata={"description": "optional explicit output keys; if empty, default naming is used"})
     ignore_keys : list[str] = field(default_factory=list, metadata={"description": "list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys"})        
-    by_rows : bool = field(default=False, metadata={"description": "specifies whether data is retrieved by rows (True) or as columns (False)"})
     ignore_empty_parents : bool = field(default=True, metadata={"description": "if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True)"})
          
     def __post_init__(self):
@@ -119,25 +118,27 @@ class BufferNode(Node):
         """
         return self._buffer
         
-    def get_parent_data(self) -> dict | list:
+    def get_parent_data(self, by_rows : bool = False) -> dict | list:
         """ Retrieve data from parent node buffers.
         This method aggregates data from one or more parent BufferNode instances.
         For a single parent, it retrieves data directly from that parent's buffer.
         For multiple parents, it merges data from all parents, extending list values
         where keys overlap across parents.
         Parameters
-        -------
-        dict
-            A dictionary containing the aggregated data from parent buffers.
+        
+        Args:
+            by_rows(bool): specifies whether data is retrieved by rows (True) or as columns (False)
+            
+        Returns:
+            dict: A dictionary containing the aggregated data from parent buffers.
             - If input_keys are specified, only those keys are included.
             - If ignore_keys are specified, those keys are excluded from the result.
             - For multiple parents, values are converted to lists and extended
               when the same key exists in multiple parents.
-        Raises
-        ------
-        NodeException
-            If parent is not a BufferNode instance.
-            If input_keys are specified but none are found in parent buffer data.
+        Raises:
+            NodeException
+                If parent is not a BufferNode instance.
+                If input_keys are specified but none are found in parent buffer data.
         Notes
         -----
         - Single parent: Returns filtered/unfiltered data based on input_keys
@@ -210,7 +211,7 @@ class BufferNode(Node):
             for ik in self.ignore_keys:
                 if ik in data:
                     del data[ik]
-        if self.by_rows:
+        if by_rows:
             data = DataUtils.dict_to_list(data)
         return data
         

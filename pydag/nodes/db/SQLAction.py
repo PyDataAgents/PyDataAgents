@@ -42,19 +42,11 @@ class SQLAction(BufferNode, Action):
                 # INSERT
                 if "?" in self.query:
                     data = self.get_parent_data()                    
-                    if self.by_rows:
-                        row : dict = next(iter(data))
-                        if len(row.keys()) == self.query.count("?"):
-                            tuple_data = tuple(list(row.values()) for row in data)
-                            self._cursor.executemany(self.query, tuple_data)
-                        else:
-                            raise NodeException(f"Number of input keys must match the number of parameters in the query {self.query} for {SQLAction.__name__}")
+                    if len(data.keys()) == self.query.count("?"):
+                        tuple_data = list(zip(*data.values()))
+                        self._cursor.executemany(self.query, tuple_data)
                     else:
-                        if len(data.keys()) == self.query.count("?"):
-                            tuple_data = list(zip(*data.values()))
-                            self._cursor.executemany(self.query, tuple_data)
-                        else:
-                            raise NodeException(f"Number of input keys must match the number of parameters in the query {self.query} for {SQLAction.__name__}")                    
+                        raise NodeException(f"Number of input keys must match the number of parameters in the query {self.query} for {SQLAction.__name__}")                    
                 else:
                     self._cursor.execute(self.query)
                 self._conn.commit()
@@ -62,18 +54,10 @@ class SQLAction(BufferNode, Action):
                 # UPDATE
                 if "?" in self.query:
                     data = self.get_parent_data()
-                    if self.by_rows:
-                        row : dict = next(iter(data))
-                        if len(row.keys()) == self.query.count("?"):
-                            tuple_data = tuple(list(row.values()) for row in data)
-                            self._cursor.executemany(self.query, tuple_data)
-                        else:
-                            raise NodeException(f"Number of input keys must match the number of parameters in the query {self.query} for {SQLAction.__name__}")
+                    if len(data.keys()) == self.query.count("?"):
+                        self._cursor.executemany(self.query, tuple(data.values()))
                     else:
-                        if len(data.keys()) == self.query.count("?"):
-                            self._cursor.executemany(self.query, tuple(data.values()))
-                        else:
-                            raise NodeException(f"Number of input keys must match the number of parameters in the query {self.query} for {SQLAction.__name__}")
+                        raise NodeException(f"Number of input keys must match the number of parameters in the query {self.query} for {SQLAction.__name__}")
                 else:
                     self._cursor.execute(self.query)
                 self._conn.commit()

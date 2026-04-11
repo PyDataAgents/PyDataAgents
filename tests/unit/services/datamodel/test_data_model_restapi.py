@@ -26,7 +26,7 @@ def test_000():
     
     agent.release(blocking=False)
         
-    time.sleep(5)
+    time.sleep(1)
     
     buf = DictBuffer()
     buf.install()
@@ -38,7 +38,7 @@ def test_000():
     
     service_id = dms.id
     model_id = "M1"       
-    http = HttpPutAction(url=f"http://localhost:{port}/api/v1/datamodelservices/{service_id}/session/{session_id}/model/{model_id}", by_rows=True)
+    http = HttpPutAction(url=f"http://localhost:{port}/api/v1/datamodelservices/{service_id}/session/{session_id}/model/{model_id}")
     http.add_parent(lba)
     http.install()
     

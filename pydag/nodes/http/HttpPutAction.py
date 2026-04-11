@@ -1,6 +1,4 @@
 from dataclasses import dataclass, field
-import json
-from loguru import logger
 import jsonpath_ng
 import requests
 
@@ -20,25 +18,22 @@ class HttpPutAction(BufferNode, Action):
     json_path : str = field(default=None, metadata={"description": "JSONPath specififcation to parse the returned PUT response"})
     
     def _on_execute(self):
-        data = self.get_parent_data()
-        if self.by_rows:
-            for row in data:
-                self._put_request(row)
-        else:
-            self._put_request(data)
+        data = self.get_parent_data(by_rows = True)
+        self._put_request(data)
         
     def _put_request(self, data):
-        response = requests.put(self.url, headers=self.headers, timeout=self.timeout, json=data)
-        if response.status_code != 200:
-            raise NodeException("Could not PUT to " + self.url + ": " + response.text)
-        d = response.json()
-        if self.json_path is not None:
-            jsonpath_expression = jsonpath_ng.parse(self.json_path)
-            json_obj = jsonpath_expression.find(d)
-            if len(json_obj) == 1:
-                json_obj = json_obj[0].value
+        for item in data:
+            response = requests.put(self.url, headers=self.headers, timeout=self.timeout, json=item)
+            if response.status_code != 200:
+                raise NodeException("Could not PUT to " + self.url + ": " + response.text)
+            d = response.json()
+            if self.json_path is not None:
+                jsonpath_expression = jsonpath_ng.parse(self.json_path)
+                json_obj = jsonpath_expression.find(d)
+                if len(json_obj) == 1:
+                    json_obj = json_obj[0].value
+                else:
+                    json_obj = [match.value for match in json_obj]
+                self.add_data(json_obj)
             else:
-                json_obj = [match.value for match in json_obj]
-            self.add_data(json_obj)
-        else:
-            self.add_data(d) 
+                self.add_data(d) 
