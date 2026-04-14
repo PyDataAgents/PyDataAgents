@@ -195,6 +195,7 @@ def test_read_pdf_form_install_rejects_duplicate_output_keys():
         reader.install()
 
 
+
 def test_read_pdf_form_wraps_runtime_processing_errors_as_node_exception(monkeypatch):
     def _fake_import_fitz():
         class _FakePage:
