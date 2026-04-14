@@ -5,14 +5,19 @@ import pytest
 import tempfile
 import shutil
 import time
+from pathlib import Path
 
+TEST_DOCS_ROOT = Path(__file__).resolve().parent/"test_documents_for_embedding"
+
+def _docs_path(name:str) -> str:
+    return str(TEST_DOCS_ROOT / name)
 
 
 def test_embed_files_save_properly():
     # Test: Valid documents are placed in the embedding folder. --> All valid documents are embedded; the number of embedded documents matches the number of valid documents in the embedding folder.
     
         
-    fs = FileEmbeddingService(docs_folder = [r"C:\Users\tobia\Python Scripts\PyDataAgents\tests\unit\services\documents\test_documents_for_embedding\docs_0"], store_name="test_store")
+    fs = FileEmbeddingService(docs_folder = [_docs_path("docs_0")], store_name="test_store")
     fs.install()
     fs.start()
 
@@ -27,7 +32,7 @@ def test_embed_files_properly():
     # Test: Files are embedded properly.
     
         
-    fs = FileEmbeddingService(docs_folder = [r"C:\Users\tobia\Python Scripts\PyDataAgents\tests\unit\services\documents\test_documents_for_embedding\docs_1"], store_name="test_store_1")
+    fs = FileEmbeddingService(docs_folder = [_docs_path("docs_1")], store_name="test_store_1")
     fs.install()
     fs.start()
 
@@ -41,7 +46,7 @@ def test_empty_folder():
     # Test: No documents should be embedded from an empty folder.
     
         
-    fs = FileEmbeddingService(docs_folder = [r"C:\Users\tobia\Python Scripts\PyDataAgents\tests\unit\services\documents\test_documents_for_embedding\docs_2"], store_name="test_store_2")
+    fs = FileEmbeddingService(docs_folder = [_docs_path("docs_2")], store_name="test_store_2")
     fs.install()
     fs.start()
 
@@ -55,7 +60,7 @@ def test_name_as_string():
     #Test:  provide folder name as string instead of list.
     
         
-    fs = FileEmbeddingService(docs_folder = r"C:\Users\tobia\Python Scripts\PyDataAgents\tests\unit\services\documents\test_documents_for_embedding\docs_3", store_name="test_store_3")
+    fs = FileEmbeddingService(docs_folder = _docs_path("docs_3"), store_name="test_store_3")
     fs.install()
     fs.start()
 
@@ -68,7 +73,7 @@ def test_multiple_folders():
     # Test multiple folders with valid documents.
     
         
-    fs = FileEmbeddingService(docs_folder = [r"C:\Users\tobia\Python Scripts\PyDataAgents\tests\unit\services\documents\test_documents_for_embedding\docs_3", r"C:\Users\tobia\Python Scripts\PyDataAgents\tests\unit\services\documents\test_documents_for_embedding\docs_0"], store_name="test_store_4")
+    fs = FileEmbeddingService(docs_folder = [_docs_path("docs_3"), _docs_path("docs_0")], store_name="test_store_4")
     fs.install()
     fs.start()
 
@@ -91,7 +96,7 @@ def test_no_folders():
 def test_unauthorized_files():
     # Test mix of unauthorized and authorized files in folder
     
-    fs = FileEmbeddingService(docs_folder = [r"C:\Users\tobia\Python Scripts\PyDataAgents\tests\unit\services\documents\test_documents_for_embedding\docs_4"], store_name="test_store_6")
+    fs = FileEmbeddingService(docs_folder = [_docs_path("docs_4")], store_name="test_store_6")
     fs.install()
     fs.start()
 
@@ -102,16 +107,15 @@ def test_unauthorized_files():
 
 def test_call_multiple_same_folder():
     # Test: Method is called multiple times with the same unchanged folder. The database should not be changed. 
-    
+    fs = FileEmbeddingService(docs_folder = [_docs_path("docs_1")], store_name="test_store_7")
         
-    fs = FileEmbeddingService(docs_folder = [r"C:\Users\tobia\Python Scripts\PyDataAgents\tests\unit\services\documents\test_documents_for_embedding\docs_1"], store_name="test_store_7")
     fs.install()
     fs.start()
 
     loaded_docs = fs._embedding_store._collection.count()
     print(f"Number of documents in embedding store: {loaded_docs}")
     assert loaded_docs == 14, "No documents were embedded, but there should be some valid documents in the folder."
-    
+    fs.stop()
     # Call start again
     fs.start()
     loaded_docs_after = fs._embedding_store._collection.count()
@@ -188,7 +192,7 @@ def test_none_docs_folder():
 def test_pdf_files():
     # Test: Folder with pdf files should be embedded properly
     
-    fs = FileEmbeddingService(docs_folder=[r"C:\Users\tobia\Python Scripts\PyDataAgents\tests\unit\services\documents\test_documents_for_embedding\docs_5"], store_name="test_store_12")
+    fs = FileEmbeddingService(docs_folder=[_docs_path("docs_5")], store_name="test_store_12")
     fs.install()
     fs.start()
     
@@ -200,7 +204,7 @@ def test_pdf_files():
 def test_searchin_in_embedding_store():
     # Test: Search for a document in the embedding store after embedding
     
-    fs = FileEmbeddingService(docs_folder=[r"C:\Users\tobia\Python Scripts\PyDataAgents\tests\unit\services\documents\test_documents_for_embedding\docs_5"], store_name="test_store_13")
+    fs = FileEmbeddingService(docs_folder=[_docs_path("docs_5")], store_name="test_store_13")
     fs.install()
     fs.start()
     
