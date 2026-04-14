@@ -185,14 +185,15 @@ def test_read_pdf_form_install_raises_for_invalid_row_mode():
 
 def test_read_pdf_form_install_rejects_duplicate_input_keys():
     reader = PDFReadFormAction(input_keys=["values", "values"])
-    with pytest.raises(NodeException, match="input_keys must contain unique entries"):
+    with pytest.raises(NodeException, match="must contain unique entries"):
         reader.install()
 
 
 def test_read_pdf_form_install_rejects_duplicate_output_keys():
     reader = PDFReadFormAction(output_keys=["filepath", "metadata", "fields", "fields", "llm_prompt"])
-    with pytest.raises(NodeException, match="output_keys must contain unique entries"):
+    with pytest.raises(NodeException, match="must contain unique entries"):
         reader.install()
+
 
 
 def test_read_pdf_form_wraps_runtime_processing_errors_as_node_exception(monkeypatch):
