@@ -54,7 +54,7 @@ class Agent():
         _type_: _description_
     """
     
-    id : str = field(default=None, metadata={"description": "unique identifier of the Agent application"})
+    id : str = field(default_factory=lambda: str(uuid.uuid4()), metadata = {"description": "unique identifier of Agent"})
     create_config : bool = field(default=False, metadata={"description": "creates a configuration yaml on start, when True"})
     load_on_install : bool = field(default=False, metadata={"description": "if True, all AgentElements are set to load_on_install = True"})
     with_persistence : bool = field(default=False, metadata={"description": "if True, an AgentPersistService is created by default to contuinously save the AgentElements in a local files"})
@@ -70,8 +70,6 @@ class Agent():
         Sets up the internal storage dictionaries for `Buffer`s, `Adapter`s, and `Service`s.
         Generates a unique ID if not provided.
         """
-        if self.id is None: 
-            self.id = f"{self.__class__.__name__} [{uuid.uuid4()}]"
         self._is_running = False
         self._stop_event = threading.Event()
     
