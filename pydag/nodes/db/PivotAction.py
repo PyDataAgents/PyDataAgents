@@ -9,18 +9,24 @@ from ..BufferNode import BufferNode
 
 @dataclass
 class PivotAction(BufferNode, Action):
+    """ 
     
-    index : str | list = field(default_factory=None)
-    columns : str | list = field(default_factory=None)
-    values : str | list = field(default_factory=None)
-    aggfunc : str | list = field(default_factory=None)
+    Args:
+        BufferNode (_type_): _description_
+        Action (_type_): _description_
+    """
+    
+    index : str | list = field(default_factory=list)
+    columns : str | list = field(default_factory=list)
+    values : str | list = field(default_factory=list)
+    aggfunc : str | list = field(default_factory=list)
     
     def _on_execute(self):
         data = self.get_parent_data()
         df : pd.DataFrame = DataUtils.dict_to_dataframe(data)        
         
-        if isinstance(values, str):
-            values = [values]
+        if isinstance(self.values, str):
+            self.values = [self.values]
         
         pivot = df.pivot_table(
             index=self.index,
@@ -30,7 +36,7 @@ class PivotAction(BufferNode, Action):
         )
         
         # Fill missing values if needed
-        pivot = pivot.fillna(0)
+        #pivot = pivot.fillna(0)
         
         if isinstance(pivot.columns, pd.MultiIndex):
             pivot.columns = [
