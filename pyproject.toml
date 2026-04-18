@@ -96,6 +96,9 @@ dependencies = [
     "langgraph>=1.0.10",
     "hf_xet",
 
+    # messaging / social media
+    "python-telegram-bot",
+
     # optional core functionality
     "graphviz"
 ]

@@ -28,7 +28,7 @@ class TriggerAction(Action):
         self._state = NodeState.EXECUTING
         self._on_trigger()
         self._last_trigger = time.time()
-        self._state = NodeState.IDLE
+        self._state = NodeState.INSTALLED
     
     @abstractmethod
     def _on_trigger(self):
