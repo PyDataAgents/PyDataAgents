@@ -496,6 +496,56 @@ pip uninstall pydag -y; pip install git+https://github.com/PyDataAgents/PyDataAg
 
 Project Dependencies can be found in [pyproject.toml](pyproject.toml)
 
+or use a pyproject.toml
+```
+[build-system]
+requires = ["setuptools>=82"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "a_pydataagent_project"
+version = "0.0.1"
+description = "A PyDataAgents Project"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { file = "LICENSE" }
+dependencies = [
+    "pydag @ git+https://github.com/PyDataAgents/PyDataAgents.git"
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["<REPO_ROOT>*"]
+namespaces = true
+```
+
+# Optional Dependencies
+Optional dependencies are managed in pyproject.toml.
+You can choose from the following additional dependencies:
+- docs
+- db
+- iiot
+- office
+- browser
+- dsp
+- llm
+- ocr
+- cad
+- sim
+- test
+
+and add themto your project build via:
+
+```
+...
+
+dependencies = [
+    "pydag[llm] @ git+https://github.com/PyDataAgents/PyDataAgents.git"
+]
+
+...
+
+```
 
 ## Examples and Testing
 All unit tests and examples are found in [unit](tests/unit) and [regression](tests/regression) folders.

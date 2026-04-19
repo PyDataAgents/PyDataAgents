@@ -20,7 +20,6 @@ classifiers = [
   "Programming Language :: Python :: 3.11"
 ]
 dependencies = [
-    # base packages
     "matplotlib",
     "loguru",
     "PyYAML",
@@ -28,9 +27,12 @@ dependencies = [
     "pandas",
     "fastapi[standard]",
     "APScheduler",
+    "graphviz",       
+]
 
-    # IIoT
-    "opcua",
+[project.optional-dependencies]
+iiot = [
+   "opcua",
     "pyads",
     "sounddevice",
     "paho-mqtt",
@@ -39,43 +41,40 @@ dependencies = [
     "python-snap7",
     "websocket-client",
     "pyserial",
+]
 
-    # database processing
-    "influxdb-client",
-    "pyodbc",
-    #"pyrfc",
+docs = [
+  "openpyxl",
+  "pypdf",
+  "PyMuPDF",
+  "unstructured[all-docs]",
+  "watchdog",
+  "vobject",
+  "psutil",
+  "docxtpl",
+  "bs4",
+  "lxml",
+]
 
-    # document processing
-    "openpyxl",
-    "pypdf",
-    "PyMuPDF",
-    "unstructured[all-docs]",
-    "watchdog",
-    "cadquery",
-    "cq-editor",
-    "vobject",
-    "psutil",
-    "docxtpl",
-    "bs4",
-    "lxml",
-
-    # fea and simulation
-    "ross-rotordynamics",
-    "EasyFEA",
-
-    # browser automation
-    "selenium",
-    
-    # office
+office = [
     "msal",
-        
-    # ocr
-    "pdf2image",
-    "pytesseract",
-    "pillow",
-    "mistralai",
-    
-    # data / signal processing    
+]
+
+browser = [
+  "selenium",
+]
+
+cad = [  
+  "cadquery",
+  "cq-editor",
+]
+
+db = [
+  "influxdb-client",
+  "pyodbc",
+]
+
+dsp = [    
     "numba",
     "torch",
     "sktime",
@@ -83,8 +82,16 @@ dependencies = [
     "tirex-ts @ git+https://github.com/NX-AI/tirex",
     "chronos-forecasting",
     "librosa",
+]
 
-    # langchain / llm packages
+ocr = [
+  "pdf2image",
+  "pytesseract",
+  "pillow",
+  "mistralai",
+]
+
+llm = [
     "langchain-ollama",
     "langchain-chroma",
     "langchain-unstructured",
@@ -95,9 +102,16 @@ dependencies = [
     "langchain_community",
     "langgraph>=1.0.10",
     "hf_xet",
+]
 
-    # optional core functionality
-    "graphviz"
+sim = [
+  "ross-rotordynamics",
+  "EasyFEA",
+]
+
+test = [
+  "pytest",
+  "pytest-asyncio",
 ]
 
 [tool.setuptools]
