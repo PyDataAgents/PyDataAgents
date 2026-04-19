@@ -57,7 +57,7 @@ class Agent():
     id : str = field(default_factory=lambda: str(uuid.uuid4()), metadata = {"description": "unique identifier of Agent"})
     create_config : bool = field(default=False, metadata={"description": "creates a configuration yaml on start, when True"})
     load_on_install : bool = field(default=False, metadata={"description": "if True, all AgentElements are set to load_on_install = True"})
-    with_persistence : bool = field(default=False, metadata={"description": "if True, an AgentPersistService is created by default to contuinously save the AgentElements in a local files"})
+    with_persistence : bool = field(default=False, metadata={"description": "if True, an AgentPersistService is created by default to continuously save the AgentElements in a local files"})
     with_rest_api : bool = field(default=False, metadata={"description": "if True, a REST API Service is created by default to interact with the Agent via REST calls under port 4700"})
     description : str = field(default=None, metadata={"description": "application/agent description"})
     buffer_store : dict[str, Buffer] = field(default_factory=dict, metadata={"description": "dictionary of Buffers in the Agent"})
@@ -92,7 +92,7 @@ class Agent():
             rs = RestService(port=4700)
             self.add_service(rs)
             
-        # iterating over a list of dictionary items, in case of modification on the dictionary aoccurs during installs
+        # iterating over a list of dictionary items, in case of modification on the dictionary occurs during installs
         for adapter in list(self.adapter_store.values()):
             adapter.install(self)
             if self.load_on_install:
@@ -111,7 +111,7 @@ class Agent():
         
         iterates over each element and calls its uninstall method.
         """
-        # iterating over a list of dictionary items, in case of modification on the dictionary aoccurs during uninstalls
+        # iterating over a list of dictionary items, in case of modification on the dictionary occurs during uninstalls
         for adapter in list(self.adapter_store.values()):
             adapter.uninstall(self)
         for buffer in list(self.buffer_store.values()):
@@ -189,7 +189,7 @@ class Agent():
         """ Start all `Service`s in the `Agent`
         
         Raises:
-            ServiceException: if a `Service` could not be startedf
+            ServiceException: if a `Service` could not be started
         """
         for service in self.service_store.values():
             if service.auto_start:
@@ -463,12 +463,12 @@ class Agent():
                 if isinstance(attr_value, AgentElement):
                     if attr_value.id == id:
                         return attr_value
-            for buffer in self.buffer_store.values():
-                for attr_name, attr_value in vars(buffer).items():
-                    #print(f"{attr_name}: {type(attr_value)}")
-                    if isinstance(attr_value, AgentElement):
-                        if attr_value.id == id:
-                            return attr_value
+        for buffer in self.buffer_store.values():
+            for attr_name, attr_value in vars(buffer).items():
+                #print(f"{attr_name}: {type(attr_value)}")
+                if isinstance(attr_value, AgentElement):
+                    if attr_value.id == id:
+                        return attr_value
         for service in self.service_store.values():
             for attr_name, attr_value in vars(service).items():
                 #print(f"{attr_name}: {type(attr_value)}")
