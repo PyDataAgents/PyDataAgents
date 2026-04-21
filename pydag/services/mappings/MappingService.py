@@ -60,10 +60,11 @@ class MappingService(ObserverService):
         if len(self._buffers) == 0:
             if agent is not None:
                 for buffer_id in self.buffer_ids:
-                        if agent.get_buffer(buffer_id):
-                            self.add_buffer(agent.get_buffer(buffer_id))
-                        else:
-                            logger.error("Buffer " + buffer_id + " not found in agent")
+                    buffer : Buffer = agent.get_buffer(buffer_id)
+                    if buffer:
+                        self.add_buffer(buffer)
+                    else:
+                        logger.error("Buffer " + buffer_id + " not found in agent")
             else:
                 logger.error("Agent is None, cannot get buffers " + str(self.buffer_ids))
         # check auto complete for mapping_type and thread type

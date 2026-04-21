@@ -274,7 +274,7 @@ class Agent():
             return None
         
     def get_buffer(self, id : str) -> Buffer:
-        """ return the `Buffer` specified by `id`
+        """ return the `Buffer` specified by `id`, if the specified `Buffer` is not found, the method returns `None
 
         Args:
             id (str): unique id of the `Buffer`
