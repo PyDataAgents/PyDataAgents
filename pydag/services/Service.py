@@ -2,6 +2,7 @@ from __future__ import annotations
 from abc import abstractmethod
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Union
+from loguru import logger
 
 
 from .ServiceException import ServiceException
@@ -40,7 +41,11 @@ class Service(AgentElement):
         """
         self._check_state(ServiceState.RUNNING)
         self._state = ServiceState.RUNNING
-        self._on_start()
+        try:
+            self._on_start()
+        except ServiceException:
+            logger.exception(f"Could not start {self.__class__.__name__}")
+            self._state = AgentElementState.ERROR
     
     @abstractmethod
     def _on_start(self):

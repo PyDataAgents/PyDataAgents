@@ -3,6 +3,8 @@ from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Optional, Union
 
 
+from.ServiceException import ServiceException
+from .ObserverException import ObserverException
 from .Service import Service
 from .ObserverThread import ObserverThread
 
@@ -33,7 +35,10 @@ class ObserverService(Service):
         
     def _on_start(self):        
         if not self._observer_thread.is_running():
-            self._observer_thread.run()
+            try:
+                self._observer_thread.run()
+            except ObserverException as e:
+                raise ServiceException(f"{Service.__name__} {self.__class__.__name__} could not run {ObserverThread.__name__}") from e
         
     def _on_stop(self):
         if self._observer_thread.is_running():

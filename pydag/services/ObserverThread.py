@@ -84,7 +84,7 @@ class ObserverThread():
         
     def run(self):
         """ run the `ObserverThread` logic in a separate thread        
-        """        
+        """
         if len(self._observers) > 0:
             if not self._is_running:
                 # exclude TRIGGERED threads from being started
