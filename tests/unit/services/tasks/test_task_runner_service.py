@@ -7,23 +7,18 @@ def test_specify_sequence_by_file():
     task_files = [os.path.dirname(__file__) + os.sep + "tasktest.py"]
     task_sequence = ["hello", "goodbye"]
     trs = TaskRunnerService(task_files=task_files, task_sequence=task_sequence)
-    trs.install()
-    
+    trs.install()    
     data = trs.run({"name": "John"})
-    print(data)
-    
+    print(data)    
     assert len(data) == 3, "context length does not fit"
-    
 
 def test_specify_sequence_by_file_2():
     task_files = [os.path.dirname(__file__) + os.sep + "tasktest.py"]
     task_sequence = ["hello"]
     trs = TaskRunnerService(task_files=task_files, task_sequence=task_sequence)
-    trs.install()
-    
+    trs.install()    
     data = trs.run({"name": "John"})
-    print(data)
-    
+    print(data)    
     assert len(data) == 2, "context length does not fit"
     
 def test_specify_sequence_in_script():
@@ -32,8 +27,7 @@ def test_specify_sequence_in_script():
     trs.add_task(goodbye)
     trs.install()
     data = trs.run({"name": "John"})
-    print(data)
-    
+    print(data)    
     assert len(data) == 3, "context length does not fit"
     
 def test_non_matching_param_names():
