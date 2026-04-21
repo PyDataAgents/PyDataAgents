@@ -4,11 +4,12 @@ from ...nodes.NodeException import NodeException
 from ...agents.Agent import Agent
 from ...agents.AgentElement import AgentElement
 from ..BufferNode import BufferNode
+from ..Action import Action
 from ..AgentNode import AgentNode
 from ...utils.ClassUtils import ClassUtils
 
 @dataclass
-class ConfigureElementAction(AgentNode, BufferNode):
+class ConfigureElementAction(AgentNode, BufferNode, Action):
     """this `Action` configures a `GrabberElement` property by the provided `element_id` and name of the `option`, which is the class' property
     <br>the new property value is derived from the `Node`'s `buffer`
 
@@ -22,7 +23,6 @@ class ConfigureElementAction(AgentNode, BufferNode):
     
     option : str = field(init=True, default=None, metadata={"description": "option to configure with new value"})
     element_id : str = field(init=True, default=None, metadata={"description": "id of the element to change the option for"})
-    extract_key : str = field(default=None, metadata={"description": "specifies the key to extract from parent buffer, if no key is specified, the value for the new config option is selected based on buffer data"})
         
     def _on_install(self, agent : Agent = None):
         AgentNode._on_install(self, agent)
@@ -33,9 +33,8 @@ class ConfigureElementAction(AgentNode, BufferNode):
         BufferNode._on_uninstall(self, agent)
         
     def _on_execute(self):
-        val = self._buffer.data(n = self.n, persistent = self.persistent)
-        if self.extract_key is not None:
-            val = val[self.extract_key]
+        data = self.get_parent_data()
+        val = next(iter(data.values()))
         element = self._agent.get_element(self.element_id)
         if element is not None:
             if ClassUtils.is_property_dict(element, self.option):
