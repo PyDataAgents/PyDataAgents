@@ -2,7 +2,10 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING
 
+from pydag.nodes.NodeException import NodeException
 
+
+from ..ObserverException import ObserverException
 from ...agents.AgentStates import AgentElementState, ServiceState
 from ...nodes.utils.StopAction import StopAction
 from .StatemachineService import StatemachineService
@@ -36,7 +39,10 @@ class SFCObserver(Observer):
             # execute active actions
             for action in self._statemachine.get_actions().values():
                 if (action.is_active() or (action.get_state() == AgentElementState.ERROR and self._statemachine.retry_error_nodes)):
-                    action.execute()
+                    try:
+                        action.execute()
+                    except NodeException as e:
+                        raise ObserverException(f"Error executing action '{action.name}': {str(e)}") from e
                     for node in action.get_children():
                         if isinstance(node, Transition):
                             node.set_active(True)
@@ -46,17 +52,20 @@ class SFCObserver(Observer):
             # go through transitions to check               
             for transition in self._statemachine.get_transitions().values():
                 if (transition.is_active() or (transition.get_state() == AgentElementState.ERROR and self._statemachine.retry_error_nodes)):
-                    if transition.check():
-                        # deactivate parent actions
-                        for node in transition.get_parents():
-                            if isinstance(node, Action):
-                                self._statemachine.deactivate(node)
-                        # activate child actions and add new transitions
-                        for node in transition.get_children():
-                            if isinstance(node, Action):
-                                self._statemachine.activate(node)
-                            elif isinstance(node, Transition):
-                                node.set_active(True)
+                    try:
+                        if transition.check():
+                            # deactivate parent actions
+                            for node in transition.get_parents():
+                                if isinstance(node, Action):
+                                    self._statemachine.deactivate(node)
+                            # activate child actions and add new transitions
+                            for node in transition.get_children():
+                                if isinstance(node, Action):
+                                    self._statemachine.activate(node)
+                                elif isinstance(node, Transition):
+                                    node.set_active(True)
+                    except NodeException as e:
+                        raise ObserverException(f"Error checking transition '{transition.name}': {str(e)}") from e
                     
                     # deactivate the transition itself
                     transition.set_active(False)

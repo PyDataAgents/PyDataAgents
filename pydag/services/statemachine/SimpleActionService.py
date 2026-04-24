@@ -1,6 +1,7 @@
 from __future__ import annotations
 from dataclasses import dataclass
 
+from ..ObserverException import ObserverException
 from .StatemachineService import StatemachineService
 from ..Observer import Observer
 from ...nodes.Action import Action
@@ -15,7 +16,10 @@ class SimpleActionObserver(Observer):
     def observe(self):
         for node in self._service.nodes.values():
             if node.is_active() and isinstance(node, Action):
-                node.execute()
+                try:
+                    node.execute()
+                except Exception as e:
+                    raise ObserverException(f"Error executing action '{node.name}': {str(e)}") from e
 
     def unobserve(self):
         return
