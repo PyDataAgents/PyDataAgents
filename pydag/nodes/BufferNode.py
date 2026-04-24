@@ -3,6 +3,7 @@ from typing import TYPE_CHECKING
 from loguru import logger
 
 from ..utils.DataUtils import DataUtils
+from ..utils.NodeUtils import NodeUtils
 from ..nodes.NodeException import NodeException
 from ..agents.AgentConfig import AgentConfig
 from ..buffers.DictBuffer import DictBuffer
@@ -18,8 +19,8 @@ class BufferNode(Node):
     buffer_id : str = field(default=None, metadata={"description": "unique ID of the buffer"})
     persistent : bool = field(default=True, metadata={"description": "specifies whether data is removed (False) from parent or not (True)"})
     n : int = field(default=0, metadata={"description": "specifies how much data is retrieved from parent buffer. Default 0 -> all data"})
-    input_keys : list[str] = field(default_factory=list, metadata={"description": "list of keys to extract from parent buffers, defaults to empty and all the keys are returned"})        
-    output_keys : list[str] = field(default_factory=list, metadata={"description": "optional explicit output keys; if empty, default naming is used"})
+    input_keys : list[str] = field(default_factory=list, metadata={"description": "list of input key selectors used to extract data from parent buffers. Each selector can be an exact key name (e.g. 'temperature'), a Python-style slice string over the ordered parent keys (e.g. '1:3' or '0:5:2', stop exclusive), or a type selector ('type:string' for text-like values, 'type:number' for numeric and bool values). Multiple selectors are combined with OR semantics, duplicates are removed while preserving first-match order. If empty, all parent keys are returned"})        
+    output_keys : list[str] = field(default_factory=list, metadata={"description": "optional explicit output key names written by this node. output_keys are literal names only and do not support selector syntax. If empty, the node uses its default output naming"})
     ignore_keys : list[str] = field(default_factory=list, metadata={"description": "list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys"})        
     ignore_empty_parents : bool = field(default=True, metadata={"description": "if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True)"})
          
@@ -68,32 +69,8 @@ class BufferNode(Node):
                 )
                 self.buffer_id = self._buffer.id
             self._buffer.install(agent)
-        # check validity of input and output keys
-        seen : set[str] = set()
-        if isinstance(self.input_keys, list):
-            if len(self.input_keys) > 0:
-                for key in self.input_keys:
-                    if not isinstance(key, str) or key.strip() == "":
-                        raise NodeException(f"{self.input_keys} must contain only non-empty strings")
-                    normalized = key.strip()
-                    if normalized in seen:
-                        raise NodeException(f"{self.input_keys} must contain unique entries")
-                    seen.add(normalized)
-        else:
-            raise NodeException(f"{self.input_keys} ({type(self.input_keys)}) must be of type list")
-                
-        seen = set()
-        if isinstance(self.output_keys, list):
-            if len(self.output_keys) > 0:
-                for key in self.output_keys:
-                    if not isinstance(key, str) or key.strip() == "":
-                        raise NodeException(f"{self.output_keys} must contain only non-empty strings")
-                    normalized = key.strip()
-                    if normalized in seen:
-                        raise NodeException(f"{self.output_keys} must contain unique entries")
-                    seen.add(normalized)
-        else:
-            raise NodeException(f"{self.output_keys} ({type(self.output_keys)}) must be of type list")      
+        NodeUtils.validate_key_names("input_keys", self.input_keys, allow_special=True)
+        NodeUtils.validate_key_names("output_keys", self.output_keys)
         
     def _on_uninstall(self, agent : 'Agent' = None):
         self._buffer : Buffer = None
@@ -156,9 +133,7 @@ class BufferNode(Node):
                         raise NodeException(f"{Buffer.__name__} not initialized in parent {parent.id}")                        
                     d = parent.get_buffer().data(n = self.n, persistent = self.persistent)
                     if len(self.input_keys) > 0 and d is not None:
-                        for dk in self.input_keys:
-                            if dk in d:
-                                data[dk] = d[dk]
+                        data = NodeUtils.filter_data_by_selectors(d, self.input_keys)
                         if len(data) == 0 and len(d) > 0:
                             if not self.ignore_empty_parents:
                                 raise NodeException("None of the specified input_keys were found in the parent buffer data")
@@ -182,15 +157,13 @@ class BufferNode(Node):
                         if d is not None:
                             if len(d) > 0:
                                 if len(self.input_keys) > 0:
-                                    for dk in self.input_keys:
-                                        if dk in d:
-                                            if dk in data:
-                                                data[dk].extend(d[dk])
-                                            else:
-                                                if isinstance(d[dk], list):
-                                                    data[dk] = d[dk]
-                                                else:
-                                                    data[dk] = [d[dk]]
+                                    filtered = NodeUtils.filter_data_by_selectors(d, self.input_keys)
+                                    for dk, dv in filtered.items():
+                                        values = dv if isinstance(dv, list) else [dv]
+                                        if dk in data:
+                                            data[dk].extend(values)
+                                        else:
+                                            data[dk] = values
                                 else:
                                     for key, value in d.items():
                                         if key in data:
