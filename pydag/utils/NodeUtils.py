@@ -7,6 +7,7 @@ class NodeUtils:
 
     TYPE_STRING = "type:string"
     TYPE_NUMBER = "type:number"
+    _INDEX_PATTERN = re.compile(r"^\s*-?\d+\s*$")
     _SLICE_PATTERN = re.compile(r"^\s*(-?\d*)\s*:\s*(-?\d*)\s*(?::\s*(-?\d*)\s*)?$")
 
     @staticmethod
@@ -26,15 +27,19 @@ class NodeUtils:
                 NodeUtils._validate_special_selector(name, normalized)
 
     @staticmethod
-    def filter_data_by_selectors(data: dict, selectors: list[str]) -> dict:
+    def filter_data_by_selectors(data: dict, selectors: list[str], input_selector_mode: bool = False) -> dict:
         if not data or len(selectors) == 0:
             return data if data is not None else {}
 
-        keys = list(data.keys())
+        keys = list(data.keys()) if input_selector_mode else None
         selected = []
         seen = set()
         for selector in selectors:
-            matching = NodeUtils._select_keys(keys, data, selector.strip())
+            normalized = selector.strip()
+            if not input_selector_mode:
+                matching = [normalized] if normalized in data else []
+            else:
+                matching = NodeUtils._select_keys(keys, data, normalized)
             for key in matching:
                 if key not in seen:
                     selected.append(key)
@@ -60,7 +65,15 @@ class NodeUtils:
         if match:
             return keys[slice(*(NodeUtils._to_int(value) for value in match.groups()))]
 
-        return [selector] if selector in keys else []
+        if selector in keys:
+            return [selector]
+
+        if NodeUtils._INDEX_PATTERN.match(selector):
+            index = int(selector)
+            if -len(keys) <= index < len(keys):
+                return [keys[index]]
+
+        return []
 
     @staticmethod
     def _sample_value(value):

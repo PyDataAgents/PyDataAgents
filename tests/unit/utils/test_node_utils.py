@@ -32,21 +32,31 @@ def test_filter_data_by_selectors_supports_exact_names():
     }
 
 
+def test_filter_data_by_selectors_defaults_to_literal_key_matching():
+    assert NodeUtils.filter_data_by_selectors(DATA, ["1:3"]) == {}
+
+
 def test_filter_data_by_selectors_supports_slice_strings():
-    assert NodeUtils.filter_data_by_selectors(DATA, ["1:3"]) == {
+    assert NodeUtils.filter_data_by_selectors(DATA, ["1:3"], input_selector_mode=True) == {
         "pressure": [1.0, 1.1],
         "active": [True, False],
     }
 
 
+def test_filter_data_by_selectors_supports_integer_index_strings():
+    assert NodeUtils.filter_data_by_selectors(DATA, ["1"], input_selector_mode=True) == {
+        "pressure": [1.0, 1.1]
+    }
+
+
 def test_filter_data_by_selectors_supports_type_string():
-    assert NodeUtils.filter_data_by_selectors(DATA, ["type:string"]) == {
+    assert NodeUtils.filter_data_by_selectors(DATA, ["type:string"], input_selector_mode=True) == {
         "status": ["ok", "warn"]
     }
 
 
 def test_filter_data_by_selectors_supports_type_number_with_bool():
-    assert NodeUtils.filter_data_by_selectors(DATA, ["type:number"]) == {
+    assert NodeUtils.filter_data_by_selectors(DATA, ["type:number"], input_selector_mode=True) == {
         "temperature": [20.1, 20.2],
         "pressure": [1.0, 1.1],
         "active": [True, False],
@@ -54,7 +64,7 @@ def test_filter_data_by_selectors_supports_type_number_with_bool():
 
 
 def test_filter_data_by_selectors_applies_selectors_with_or_semantics():
-    assert NodeUtils.filter_data_by_selectors(DATA, ["2:4", "type:string"]) == {
+    assert NodeUtils.filter_data_by_selectors(DATA, ["2:4", "type:string"], input_selector_mode=True) == {
         "active": [True, False],
         "status": ["ok", "warn"],
     }
