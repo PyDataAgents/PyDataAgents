@@ -47,7 +47,7 @@ def test_get_parent_data_supports_slice_and_type_selectors():
         }
     )
 
-    node = BufferNode(input_keys=["1:3", "type:string"])
+    node = BufferNode(input_keys=["1:3", "type:string"], input_selector_mode=True)
     node.add_parent(parent)
     node.install()
 

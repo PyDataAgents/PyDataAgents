@@ -19,7 +19,8 @@ class BufferNode(Node):
     buffer_id : str = field(default=None, metadata={"description": "unique ID of the buffer"})
     persistent : bool = field(default=True, metadata={"description": "specifies whether data is removed (False) from parent or not (True)"})
     n : int = field(default=0, metadata={"description": "specifies how much data is retrieved from parent buffer. Default 0 -> all data"})
-    input_keys : list[str] = field(default_factory=list, metadata={"description": "list of input key selectors used to extract data from parent buffers. Each selector can be an exact key name (e.g. 'temperature'), a Python-style slice string over the ordered parent keys (e.g. '1:3' or '0:5:2', stop exclusive), or a type selector ('type:string' for text-like values, 'type:number' for numeric and bool values). Multiple selectors are combined with OR semantics, duplicates are removed while preserving first-match order. If empty, all parent keys are returned"})        
+    input_keys : list[str] = field(default_factory=list, metadata={"description": "list of input key names used to extract data from parent buffers. If input_selector_mode is True, each entry can also be a selector over ordered parent keys: an integer index (e.g. '1' or '-1'), a Python-style slice string (e.g. '1:3' or '0:5:2', stop exclusive), or a type selector ('type:string' for text-like values, 'type:number' for numeric and bool values). Multiple selectors are combined with OR semantics, duplicates are removed while preserving first-match order. If empty, all parent keys are returned"})
+    input_selector_mode : bool = field(default=False, metadata={"description": "if True, input_keys support selector syntax (exact names, integer index selectors, slice strings, and type selectors). If False, input_keys are treated as literal key names only"})
     output_keys : list[str] = field(default_factory=list, metadata={"description": "optional explicit output key names written by this node. output_keys are literal names only and do not support selector syntax. If empty, the node uses its default output naming"})
     ignore_keys : list[str] = field(default_factory=list, metadata={"description": "list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys"})        
     ignore_empty_parents : bool = field(default=True, metadata={"description": "if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True)"})
@@ -69,7 +70,7 @@ class BufferNode(Node):
                 )
                 self.buffer_id = self._buffer.id
             self._buffer.install(agent)
-        NodeUtils.validate_key_names("input_keys", self.input_keys, allow_special=True)
+        NodeUtils.validate_key_names("input_keys", self.input_keys, allow_special=self.input_selector_mode)
         NodeUtils.validate_key_names("output_keys", self.output_keys)
         
     def _on_uninstall(self, agent : 'Agent' = None):
@@ -133,7 +134,7 @@ class BufferNode(Node):
                         raise NodeException(f"{Buffer.__name__} not initialized in parent {parent.id}")                        
                     d = parent.get_buffer().data(n = self.n, persistent = self.persistent)
                     if len(self.input_keys) > 0 and d is not None:
-                        data = NodeUtils.filter_data_by_selectors(d, self.input_keys)
+                        data = NodeUtils.filter_data_by_selectors(d, self.input_keys, input_selector_mode=self.input_selector_mode)
                         if len(data) == 0 and len(d) > 0:
                             if not self.ignore_empty_parents:
                                 raise NodeException("None of the specified input_keys were found in the parent buffer data")
@@ -157,7 +158,7 @@ class BufferNode(Node):
                         if d is not None:
                             if len(d) > 0:
                                 if len(self.input_keys) > 0:
-                                    filtered = NodeUtils.filter_data_by_selectors(d, self.input_keys)
+                                    filtered = NodeUtils.filter_data_by_selectors(d, self.input_keys, input_selector_mode=self.input_selector_mode)
                                     for dk, dv in filtered.items():
                                         values = dv if isinstance(dv, list) else [dv]
                                         if dk in data:
