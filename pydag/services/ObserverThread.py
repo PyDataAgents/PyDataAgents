@@ -70,7 +70,11 @@ class ObserverThread():
                 
             case ThreadType.EXPONENTIAL_SECOND.value:
                 self._thread = threading.Thread(target = self._run_exponential_thread, name=name)
-                    
+            
+            case ThreadType.DAEMON.value:
+                # daemon threads are not started or stopped by the ObserverThread, but by the service itself
+                pass
+            
             case _:
                 self._thread = threading.Thread(target = self._run_millisecond_thread, name=name)
     
@@ -99,7 +103,10 @@ class ObserverThread():
                     elif self._thread is not None:
                         self._thread.start()
                     else:
-                        raise ObserverException(f"could not start {self.__class__.__name__} for {self._service.__class__.__name__}, because no thread or scheduler was defined for thread type {self._thread_type}")
+                        if self._thread_type == ThreadType.DAEMON.value:
+                            self._run_daemon_observers()
+                        else:
+                            raise ObserverException(f"could not start {self.__class__.__name__} for {self._service.__class__.__name__}, because no thread or scheduler was defined for thread type {self._thread_type}")
             else:
                 raise ObserverException(f"could not start {self.__class__.__name__}, because it is running already")
         else:
@@ -253,13 +260,24 @@ class ObserverThread():
         logger.info(f"{self.__class__.__name__} [{self._thread.name}] has stopped") 
     
     def _run_only_once_thread(self):
-        self.notify_observers()
+        try:
+            self.notify_observers()
+        except ObserverException as e:
+            self._set_service_state(ServiceState.ERROR)
+            logger.error(e)
         self._last_time = time.time()
         self._counts += 1
         with self._lock:
             self._is_running = False
         self._set_service_state(ServiceState.STOPPED)
         
+    def _run_daemon_observers(self):
+        try:
+            self.notify_observers()
+        except ObserverException as e:
+            self._set_service_state(ServiceState.ERROR)
+            logger.error(e)
+
     def _run_triggered_thread(self):
         """ a triggered does nothing and its connected observers must be notified from the outside of this class
         """

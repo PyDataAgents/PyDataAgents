@@ -30,17 +30,20 @@ class PlotlifyAction(BufferNode, Action):
     def _on_execute(self):
         if len(self.data) == 0:
             d = self.get_parent_data()
-            new_data = []
-            i = 0
-            for k, v in d.items():
-                trace = {}
-                trace["y"] = v
-                trace["name"] = k
-                if self.colors is not None:
-                    if len(d) <= len(self.colors):
-                        trace["line"] = {"color": self.colors[i]}
-                new_data.append(trace)
-                i += 1
+            if len(d) > 0:
+                new_data = []
+                i = 0
+                for k, v in d.items():
+                    trace = {}
+                    trace["y"] = v
+                    trace["name"] = k
+                    if self.colors is not None:
+                        if len(d) <= len(self.colors):
+                            trace["line"] = {"color": self.colors[i]}
+                    new_data.append(trace)
+                    i += 1
+            else:
+                return
         else:
             new_data = self.data.copy()
             dlist : list[dict] = []

@@ -85,7 +85,7 @@ class WebSocketAdapter(WriteAdapter, SubscribeAdapter):
             except Exception as e:
                 raise AdapterException("Failed to send websocket message") from e
             
-    def _on_subscribe(self, buffers : dict[str, Buffer], addresses : list[str] = None, sampling_period : int = 0, n : int = 0):        
+    def _on_subscribe(self, buffers : dict[str, Buffer], addresses : list[str] = None, sampling_period : int = 0, n : int = 0, error_callback : callable = None):        
         
         def on_message(ws, message):
             #print("📨 Message received:", message)
@@ -95,9 +95,11 @@ class WebSocketAdapter(WriteAdapter, SubscribeAdapter):
                 if i in buffers:
                     buffers[i].push(data)
                 else:
+                    if error_callback:
+                        error_callback(AdapterException("No " + Buffer.cname() + " with id=" + i + " was found"))
                     raise AdapterException("No " + Buffer.cname() + " with id=" + i + " was found")
             else:
-                logger.debug("Socket message does not conform with schema {id: <BUFFER_ID>, data: [...]}: " + message)
+                logger.error("Socket message does not conform with schema {id: <BUFFER_ID>, data: [...]}: " + message)
         
         if self._socket is None:
             raise AdapterException("WebSocket is not connected")

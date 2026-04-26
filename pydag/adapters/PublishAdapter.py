@@ -14,7 +14,7 @@ class PublishAdapter(Adapter):
     """
     
     @abstractmethod
-    def _on_publish(self, buffers : dict[str, 'Buffer'], addresses : list[str], sampling_period : int, n : int, persistent : bool):
+    def _on_publish(self, buffers : dict[str, 'Buffer'], addresses : list[str], sampling_period : int, n : int, persistent : bool, error_callback : callable = None):
         """publish logic for samples from buffers to addresses with specified sampling_period and n samples at once
             <br>if persistent is specified False, then the samples will be removed from buffers.
             The method must non-blocking.
@@ -25,6 +25,7 @@ class PublishAdapter(Adapter):
             sampling_period (int): _description_
             n (int): _description_
             persistent (bool): _description_
+            error_callback (callable, optional): Callback that can be used to handle errors in publishing logic. Defaults to None.
             
         Raises:
             AdapterException: if an error occurs during publishing

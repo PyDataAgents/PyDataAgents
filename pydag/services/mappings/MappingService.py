@@ -79,13 +79,13 @@ class MappingService(ObserverService):
                 if not issubclass(self._adapter.__class__, SubscribeAdapter):
                     raise ServiceException("adapter must be of type " + SubscribeAdapter.__name__) 
                 if self.thread_type is None:                    
-                    self.thread_type = ThreadType.ONLY_ONCE.value
+                    self.thread_type = ThreadType.DAEMON.value
                     logger.debug(f"auto-completed thread_type to {self.thread_type}")
             case MappingType.PUB:
                 if not issubclass(self._adapter.__class__, PublishAdapter):
                     raise ServiceException("adapter must be of type " + PublishAdapter.__name__)
                 if self.thread_type is None:                    
-                    self.thread_type = ThreadType.ONLY_ONCE.value
+                    self.thread_type = ThreadType.DAEMON.value
                     logger.debug(f"auto-completed thread_type to {self.thread_type}")             
             case None:
                 # try to detect correct mapping type
@@ -108,7 +108,7 @@ class MappingService(ObserverService):
                                 self.mapping_type = MappingType.SUB.value
                                 logger.debug(f"auto-completed mapping_type to {self.mapping_type} in {self.config_options()}")
                                 if self.thread_type is None:                    
-                                    self.thread_type = ThreadType.ONLY_ONCE.value
+                                    self.thread_type = ThreadType.DAEMON.value
                                     logger.debug(f"auto-completed thread_type to {self.thread_type}")
                 elif issubclass(self._adapter.__class__, PublishAdapter):
                     if not issubclass(self._adapter.__class__, ReadAdapter):
@@ -117,7 +117,7 @@ class MappingService(ObserverService):
                                 self.mapping_type = MappingType.PUB.value
                                 logger.debug(f"auto-completed mapping_type to {self.mapping_type} in {self.config_options()}")
                                 if self.thread_type is None:                    
-                                    self.thread_type = ThreadType.ONLY_ONCE.value
+                                    self.thread_type = ThreadType.DAEMON.value
                                     logger.debug(f"auto-completed thread_type to {self.thread_type}")
         # check if mapping_type and thread_type are still not set
         if self.mapping_type is None:

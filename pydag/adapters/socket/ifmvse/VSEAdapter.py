@@ -113,11 +113,11 @@ class VSEAdapter(SubscribeAdapter):
             except Exception:
                 return False
         return True
-    
-    def _on_subscribe(self, buffers : dict[str, Buffer], addresses : list[str], sampling_period : int = 0, n : int = 0):        
+         
+    def _on_subscribe(self, buffers : dict[str, Buffer], addresses : list[str], sampling_period : int = 0, n : int = 0, error_callback : callable = None):        
         buffer : Buffer = next(iter(buffers.values()))
         # start the message processing task
-        self._thread = threading.Thread(target=self._process_incoming_messages, args = [buffer], daemon=True)
+        self._thread = threading.Thread(target=self._process_incoming_messages, args = [buffer], daemon=True, name=f"{self.__class__.__name__}-{self.id}-MessageThread")
         self._is_measuring = True
         self._thread.start()
         self._set_mode(3)  # set to measurement mode
@@ -166,7 +166,7 @@ class VSEAdapter(SubscribeAdapter):
         b_ar.extend(bs)
         return bytes(b_ar)
 
-    def _process_incoming_messages(self, buffer : Buffer):
+    def _process_incoming_messages(self, buffer : Buffer, error_callback : callable = None):
         try: 
             while self._is_measuring:
                 id_bytes = self._socket.recv(MSG_ID_BYTES)                        
@@ -193,5 +193,7 @@ class VSEAdapter(SubscribeAdapter):
                 #print(d)
         except ConnectionAbortedError as e:
             if self._is_measuring:
+                if error_callback:
+                    error_callback(AdapterException("Connection to VSE device was interrupted"))
                 raise AdapterException("Connection to VSE device was interrupted") from e
                               

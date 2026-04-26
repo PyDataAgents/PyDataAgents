@@ -51,6 +51,6 @@ class MappingRestartService(ObserverService):
         self._mapping_restarts : dict = dict()        
             
     def _on_install(self, agent : Agent = None):
-        super()._on_install()
+        super()._on_install(agent)
         observer : RestartObserver = RestartObserver(self)
         self._observer_thread.add_observer(observer)

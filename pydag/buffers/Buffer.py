@@ -96,8 +96,8 @@ class Buffer(AgentElement):
                     raise BufferException(f"{Buffer.__name__} {self.id} must be installed before storing data!")
                     
             case BufferState.RETRIEVING:
-                if self._state != AgentElementState.INSTALLED:
-                    raise BufferException(f"{Buffer.__name__} {self.id} must be installed before retrieving data!")    
+                if self._state == AgentElementState.UNINSTALLED or self._state == AgentElementState.ERROR:
+                    raise BufferException(f"{Buffer.__name__} {self.id} must be installed before retrieving data!")
     
     def push(self, elements):
         """

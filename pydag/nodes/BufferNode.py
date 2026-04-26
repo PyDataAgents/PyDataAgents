@@ -68,7 +68,7 @@ class BufferNode(Node):
                     timestamps_enabled=True,
                     index_enabled=True
                 )
-                self.buffer_id = self._buffer.id
+                self.buffer_id = self._buffer.id            
             self._buffer.install(agent)
         NodeUtils.validate_key_names("input_keys", self.input_keys, allow_special=self.input_selector_mode)
         NodeUtils.validate_key_names("output_keys", self.output_keys)

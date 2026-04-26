@@ -3,6 +3,8 @@ import sounddevice as sd
 import numpy as np
 from loguru import logger
 
+from pydag.adapters.AdapterException import AdapterException
+
 
 from ...agents.Agent import Agent
 from ...adapters.SubscribeAdapter import SubscribeAdapter
@@ -40,11 +42,13 @@ class AudioAdapter(SubscribeAdapter):
             self._stream.close()
         return True
 
-    def _on_subscribe(self, buffers : dict[str, Buffer], addresses : list[str] = None, sampling_period : int = 0, n : int = 1024):
+    def _on_subscribe(self, buffers : dict[str, Buffer], addresses : list[str] = None, sampling_period : int = 0, n : int = 1024, error_callback : callable = None):
         buf = next(iter(buffers.values()))
 
         def audio_callback(indata : np.ndarray, frames, time, status):
             if status:
+                if error_callback:
+                    error_callback(AdapterException("Audio Stream status: " + str(status)))
                 logger.error("Audio Stream status: ", status)
             buf.push(indata.ravel().tolist())
 

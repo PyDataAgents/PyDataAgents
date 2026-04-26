@@ -43,7 +43,7 @@ class MQTTAdapter(SubscribeAdapter, WriteAdapter):
             self._client.disconnect()
         return True
     
-    def _on_subscribe(self, buffers : dict[str, Buffer], addresses : list[str], sampling_period : int = 0, n : int = 1):
+    def _on_subscribe(self, buffers : dict[str, Buffer], addresses : list[str], sampling_period : int = 0, n : int = 1, error_callback : callable = None):
         """subscribe to mqtt topics by specifying addresses in the schema of address = "topic=this/is/a/topic;id=buf1"
             <br>where id is the buffer id, where this topic's messages shall be stored to
         Args:
@@ -51,6 +51,7 @@ class MQTTAdapter(SubscribeAdapter, WriteAdapter):
             addresses (list[str]): _description_
             sampling_period (int, optional): _description_. Defaults to 0.
             n (int, optional): _description_. Defaults to 1.
+            error_callback (callable, optional): Callback that can be used to handle errors in subscribing logic. Defaults to None.
         """
         if n > 1:
             raise AdapterException("n > 1 is not implemented yet")
