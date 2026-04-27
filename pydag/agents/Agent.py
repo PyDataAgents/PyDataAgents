@@ -186,7 +186,7 @@ class Agent():
     def release(self, blocking : bool = True):
         """Release the `Agent` for operation.
         
-        Installs all elements, connects adapters, and starts services. If blocking is True,
+        Installs all elements and starts services. If blocking is True,
         waits until the stop event is set (typically by calling terminate()).
         
         Args:
@@ -201,7 +201,6 @@ class Agent():
             gc = AgentConfig(self)
             yc = YAMLConfig(f"Agent {self.id}.yaml")
             yc.save(gc)
-        #self._connect_adapters() # not included anymore, because mappings or nodes connect adapters on demand
         self._start_services()
         self._stop_event.clear()
         self._is_running = True
@@ -212,11 +211,10 @@ class Agent():
     def terminate(self):
         """ Terminate the `Agent`.
         
-        Stops all services, disconnects adapters, and uninstalls elements.
+        Stops all services and uninstalls elements.
         Signals the stop event to unblock any waiting release() call.
         """
         self._stop_services()
-        #self._disconnect_adapters() # mappings and nodes disconnect adapters on demand
         self._uninstall_elements()
         self._is_running = False
         self._stop_event.set()
@@ -312,8 +310,8 @@ class Agent():
                 return None
     
     def state_tree(self) -> dict:
-        """ returns a dictionary tree structure with (Mapping)Services and their contained Nodes, Adapters, Buffers
-        and ObserverThreads with their respective state, possible next iterations or other relevant info
+        """ returns a dictionary tree structure with (Mapping)Services and their contained Nodes, Buffers
+        with their respective state, possible next iterations or other relevant info
 
         Returns:
             dict: dictionary with element tree
@@ -327,7 +325,6 @@ class Agent():
                     "state": service.get_state(),
                     "last_update": service.get_last_update(),
                     "next_update": service.get_next_update(),
-                    "adapter": {},
                     "buffers": {}
                 }                
                 if len(service.get_buffers()) > 0:

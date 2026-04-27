@@ -1,12 +1,11 @@
 import os
 
-from pydag.services.socket.ifmvse.VSEService import VSEAdapter
+from pydag.services.socket.ifmvse.VSEService import VSEService
 from pydag.agents.Agent import Agent
 from pydag.buffers.ListBuffer import ListBuffer
 from pydag.nodes.buffers.LinkBufferAction import LinkBufferAction
 from pydag.nodes.documents.PlotlifyAction import PlotlifyAction
 from pydag.services.ThreadType import ThreadType
-from pydag.services.MappingService import MappingService
 from pydag.services.statemachine.SimpleActionService import SimpleActionService
 from pydag.services.utils.MappingRestartService import MappingRestartService
 
@@ -17,13 +16,9 @@ def test_000():
     buf = ListBuffer(id="B1", capacity=100000)
     ag.add_buffer(buf)
     
-    va = VSEAdapter(id="A1", sensor=1, host="192.168.0.10")
-    ag.add_adapter(va)
-    
-    ms = MappingService(id="M1")
-    ms.set_adapter(va)
-    ms.add_buffer(buf)
-    ag.add_service(ms)
+    va = VSEService(id="A1", sensor=1, host="192.168.0.10")
+    va.add_buffer(buf)    
+    ag.add_service(va)
     
     sas = SimpleActionService(id="S1", thread_type=ThreadType.SECOND.value, observing_time=1)
     

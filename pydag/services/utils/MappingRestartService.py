@@ -3,7 +3,7 @@ from dataclasses import dataclass, field
 from typing import Union
 from loguru import logger
 
-from ...adapters.AdapterException import AdapterException
+
 from ..ObserverException import ObserverException
 from ..ServiceException import ServiceException
 from ...agents.AgentStates import AgentElementState
@@ -36,7 +36,7 @@ class RestartObserver(Observer):
                         service.install() # reinstall the service to reset it
                         service.start() # start the service to trigger the restart
                         self._service._mapping_restarts.pop(service.id, None)
-                    except (ServiceException, AdapterException, ObserverException) as e:
+                    except (ServiceException, ObserverException) as e:
                         logger.debug(f"Failed to restart {service.__class__.__name__} {service.id}: {e}")
         return
 
@@ -59,4 +59,4 @@ class MappingRestartService(ObserverService):
     def _on_install(self, agent : Agent = None):
         super()._on_install(agent)
         observer : RestartObserver = RestartObserver(self)
-        self._observer_thread.add_observer(observer)
+        self.add_observer(observer)

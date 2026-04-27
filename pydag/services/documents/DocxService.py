@@ -27,7 +27,7 @@ class DocxService(WriteService):
             from docxtpl import DocxTemplate
             self._doc = DocxTemplate(self.template_path)
         else:
-            raise ServiceException(f"DocxAdapter template file does not exist: {self.template_path}")
+            raise ServiceException(f"{self.__class__.__name__} template file does not exist: {self.template_path}")
         
     def _on_uninstall(self, agent : Agent = None):
         super()._on_uninstall(agent)

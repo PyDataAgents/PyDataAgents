@@ -7,11 +7,11 @@ from .ObserverService import ObserverService
 
 @dataclass
 class DiscoveryService(ObserverService):
-    """ `Adapter` Interface for discovering available data sources and their addresses.
-       <br>new `Adapters` that allow for discovery of sources and addresses must inherit this class next to `Adapter`.
+    """ `Service` Interface for discovering available data sources and their addresses.
+       <br>new `Service` that allow for discovery of sources and addresses must inherit this class next to `Service`.
 
     Args:
-        Adapter (_type_): parent class for all Adapters, provides basic connection management and state handling
+        ObserverService (_type_): parent class for all Service, provides basic connection management and state handling
     """
     
     @abstractmethod
@@ -19,5 +19,5 @@ class DiscoveryService(ObserverService):
         """ discovery logic to find available data sources and their config options
         
         Raises:
-            AdapterException: if an error occurs during discovery
+            ServiceException: if an error occurs during discovery
         """

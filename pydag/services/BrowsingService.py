@@ -8,7 +8,7 @@ from .ObserverService import ObserverService
 
 @dataclass
 class Address():
-    """Address class for representing data source addresses in `DiscoveryAdapter`. 
+    """Address class for representing data source addresses in `BrowsingService`. 
        <br>new address types must inherit this class and implement the required properties and methods.
     """
     source : dict[str, Any] = field(default=None, metadata={"description": "the data source this address belongs to"})
@@ -18,7 +18,7 @@ class Address():
     description : str = field(default=None, metadata={"description": "a human-readable description of the address and the data it provides"})
     
 class BrowseFilter():
-    """Filter for browsing available addresses in `DiscoveryAdapter`. 
+    """Filter for browsing available addresses in `BrowsingService`. 
        <br>new filters must inherit this class and implement the `apply` method.
     """
     

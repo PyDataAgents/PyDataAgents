@@ -19,7 +19,7 @@ FIELD = "f"
 
 @dataclass
 class InfluxDbService(ReadService, WriteService):
-    """`Adapter` thats reads or writes to InfluxDB.
+    """`MappingService` thats reads or writes to InfluxDB.
     <br>Address Schema:
     <br>address = "b=[bucket];m=[measurement];f=[field]"
     """

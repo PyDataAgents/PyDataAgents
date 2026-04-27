@@ -23,7 +23,7 @@ if TYPE_CHECKING:
 
 @dataclass
 class MappingService(ObserverService):
-    """A `ObserverService` for mapping `Adapter`s and `Buffer`s together for reading, writing, subscribing or publishing from sources and sinks
+    """A `ObserverService` for mapping `Buffer`s together for reading, writing, subscribing or publishing from sources and sinks
 
     Raises:
         ServiceException: _description_

@@ -75,7 +75,7 @@ class SQLService(ReadService, WriteService):
             persistent (bool, optional): _description_. Defaults to True.
 
         Raises:
-            AdapterException: exception if a non-compliant input is specified
+            ServiceException: exception if a non-compliant input is specified
         """
         if len(self.get_buffers()) == len(self.addresses):
             it = iter(self.addresses)

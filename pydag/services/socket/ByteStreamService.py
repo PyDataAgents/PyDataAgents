@@ -6,9 +6,7 @@ from typing import Union
 
 from ..ServiceException import ServiceException
 from ..WriteService import WriteService
-from ...adapters.AdapterException import AdapterException
-from ...buffers.Buffer import Buffer
-from ...adapters.ReadAdapter import ReadService
+from ..ReadService import ReadService
 
 SCHEMA_SIZES = {
     'i': 4,  # int
@@ -168,7 +166,7 @@ class ByteStreamService(ReadService, WriteService):
             schema (str): schema string, e.g. "BfI"
 
         Raises:
-            AdapterException: if incorrect schema or unknown type is found
+            ServiceException: if incorrect schema or unknown type is found
 
         Returns:
             tuple[int, int]: number of bytes, number of fields
@@ -193,7 +191,7 @@ class ByteStreamService(ReadService, WriteService):
             data (Union[tuple, list[tuple]]): data to convert
 
         Raises:
-            AdapterException: if data cannot be converted to schema types
+            ServiceException: if data cannot be converted to schema types
 
         Returns:
             Union[tuple, list[tuple]]: converted data

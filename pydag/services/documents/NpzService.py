@@ -14,7 +14,7 @@ from ..ReadService import ReadService
 
 @dataclass
 class NpzService(ReadService):
-    """`Adapter` that retrieves data from a *.npz numpy file
+    """`MappingService` that retrieves data from a *.npz numpy file
     
     """
     

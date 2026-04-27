@@ -11,7 +11,7 @@ from ...buffers.DataType import DataType
 
 @dataclass
 class S7Service(ReadService, WriteService):
-    """`Adapter`reading from and writing to S7 PLCs.
+    """`MappingService`reading from and writing to S7 PLCs.
     """
 
     host : str = field(default="127.0.0.1", metadata={"description": "The IP address or hostname of the S7 PLC."})

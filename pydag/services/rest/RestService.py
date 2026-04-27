@@ -13,7 +13,6 @@ from ...agents.Agent import Agent
 from ..Service import Service
 from .BufferRESTAPI import BufferRESTAPI
 from .AgentRESTAPI import AgentRESTAPI
-from .AdapterRESTAPI import AdapterRESTAPI
 from .ServiceRESTAPI import ServiceRESTAPI
 from .NodeRESTAPI import NodeRESTAPI
 
@@ -41,7 +40,6 @@ class RestService(Service):
         self.add_cors()
         self.add_router(AgentRESTAPI.get_api_router(self._agent))
         self.add_router(BufferRESTAPI.get_api_router(self._agent))
-        self.add_router(AdapterRESTAPI.get_api_router(self._agent))
         self.add_router(ServiceRESTAPI.get_api_router(self._agent))
         self.add_router(NodeRESTAPI.get_api_router(self._agent))
     

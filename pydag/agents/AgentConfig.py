@@ -27,7 +27,7 @@ class AgentConfig:
     ID = "id"
     DESCRIPTION = "description"
     
-    # Adapter Keywords    
+    # Service Keywords    
     ADDRESS = "address"
     ADDRESSES = "addresses"
     

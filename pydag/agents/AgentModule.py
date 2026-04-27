@@ -1,9 +1,7 @@
 class AgentModule:
     
     @staticmethod
-    def load_core_modules():
-        # adapters
-        
+    def load_core_modules():        
         # services
         import pydag.services.rest.RestService
         import pydag.services.ObserverService
@@ -24,7 +22,7 @@ class AgentModule:
     
     @staticmethod
     def load_iiot_modules(skip_ads : bool = False):
-        # adapters
+        # services
         if not skip_ads:
             import pydag.services.ads.AdsService
         import pydag.services.mqtt.MQTTService
@@ -34,9 +32,7 @@ class AgentModule:
         import pydag.services.socket.SerialService
         import pydag.services.socket.TCPClientService
         import pydag.services.socket.WebSocketService
-        import pydag.services.socket.ifmvse.VSEService
-        
-        # services
+        import pydag.services.socket.ifmvse.VSEService        
         import pydag.services.office.MSGraphService
         
         # nodes
@@ -47,7 +43,6 @@ class AgentModule:
     
     @staticmethod
     def load_database_modules():
-        # adapters
         
         # services
         
@@ -57,7 +52,6 @@ class AgentModule:
     
     @staticmethod
     def load_document_modules():
-        # adapters
         
         # services
         
@@ -67,7 +61,6 @@ class AgentModule:
     
     @staticmethod
     def load_llm_modules():
-        # adapters
         
         # services
         import pydag.services.llm.LLMService
@@ -85,10 +78,8 @@ class AgentModule:
     
     @staticmethod
     def load_vision_modules():
-        # adapters
-        import pydag.services.vision.WebcamService
-        
         # services
+        import pydag.services.vision.WebcamService        
         import pydag.services.vision.WebcamVideoRollbackService
         
         # nodes

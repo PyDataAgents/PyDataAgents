@@ -1,7 +1,6 @@
-
-from pydag.adapters.csv.CsvReadAdapter import CsvReadAdapter
-from pydag.adapters.csv.CsvWriteAdapter import CsvWriteAdapter
-from pydag.adapters.db.SQLAdapter import SQLAdapter
+from pydag.services.csv.CsvReadService import CsvReadService
+from pydag.services.csv.CsvWriteService import CsvWriteService
+from pydag.services.db.SQLService import SQLService
 from pydag.agents.Agent import Agent
 from pydag.buffers.DataType import DataType
 from pydag.buffers.DictBuffer import DictBuffer
@@ -44,16 +43,16 @@ def test_020():
     b2 = DictBuffer()
     agent.add_buffer(b2)
     
-    adapter1 = CsvReadAdapter()
-    agent.add_adapter(adapter1)
+    s1 = CsvReadService()
+    agent.add_service(s1)
     
-    adapter2 = CsvWriteAdapter()
-    agent.add_adapter(adapter2)    
+    s2 = CsvWriteService()
+    agent.add_service(s2)    
     
-    adapter3 = SQLAdapter()
-    agent.add_adapter(adapter3)
+    s3 = SQLService()
+    agent.add_service(s3)
     
-    service = RestService(id = "S1", port=8001)
-    agent.add_service(service)
+    s4 = RestService(id = "S1", port=8001)
+    agent.add_service(s4)
     
     agent.release()
