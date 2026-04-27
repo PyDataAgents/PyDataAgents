@@ -33,7 +33,7 @@ def test_000():
     
     ag.add_service(sas)
     
-    mrs = MappingRestartService(id="R1", thread_type=ThreadType.SECOND.value, observing_time=5, restart_attempts=3)
+    mrs = MappingRestartService(id="R1", thread_type=ThreadType.SECOND.value, observing_time=10, max_restart_attempts=3)
     ag.add_service(mrs)
     
     ag.release()

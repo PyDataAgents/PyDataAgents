@@ -65,9 +65,9 @@ class Service(AgentElement):
         service. Subclasses shall call `super().stop()` to ensure the internal
         `_is_running` flag is cleared (set to False) once the service has stopped.
         """
-        self._check_state(ServiceState.STOPPED)
+        self._check_state(ServiceState.INSTALLED)
         self._on_stop()
-        self._state = ServiceState.STOPPED
+        self._state = ServiceState.INSTALLED
         
     
     @abstractmethod
@@ -92,12 +92,8 @@ class Service(AgentElement):
                 return
             
             case ServiceState.RUNNING:
-                if self._state != ServiceState.INSTALLED and self._state != ServiceState.STOPPED:
-                    raise ServiceException(f"{Service.__name__} {self.id} must be installed or stopped before starting!")
-                
-            case ServiceState.STOPPED:
-                if self._state != ServiceState.RUNNING and self._state != ServiceState.ERROR:
-                    raise ServiceException(f"{Service.__name__} {self.id} must be running or in error state before stopping!")
+                if self._state != ServiceState.INSTALLED:
+                    raise ServiceException(f"{Service.__name__} {self.id} must be installed before starting!")
                 
     def get_agent(self) -> Agent:
         """ returns the `Agent`

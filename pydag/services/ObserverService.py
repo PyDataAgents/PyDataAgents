@@ -279,7 +279,7 @@ class ObserverService(Service):
         self._counts += 1
         with self._lock:
             self._is_running = False
-        self._state = ServiceState.STOPPED
+        self._state = ServiceState.INSTALLED
         
     def _run_daemon_observers(self):
         try:

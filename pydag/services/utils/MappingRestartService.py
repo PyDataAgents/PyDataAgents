@@ -15,6 +15,8 @@ from ..ObserverService import ObserverService
 
 
 class RestartObserver(Observer):
+    """ Observer for checking restart attempts of other `MappingServices`'s
+    """
     
     def __init__(self, service : MappingRestartService):
         self._service : MappingRestartService = service
@@ -24,21 +26,31 @@ class RestartObserver(Observer):
             if isinstance(service, MappingService):
                 requires_restart : bool = False
                 if service.get_state() == AgentElementState.ERROR:
-                    if service.id in self._service._mapping_restarts:
-                        ra = self._service._mapping_restarts[service.id]
-                        if ra < self._service.restart_attempts:
+                    if service.id in self._service.get_restart_attempts():
+                        ra = self._service.get_restart_attempts()[service.id]
+                        if ra < self._service.max_restart_attempts:
                             requires_restart = True
                     else:
                         requires_restart = True
                 if requires_restart:
                     try:
                         service.stop() # stop the service to prepare for restart
+                        #service.uninstall() # uninstall before install
                         service.install() # reinstall the service to reset it
                         service.start() # start the service to trigger the restart
-                        self._service._mapping_restarts.pop(service.id, None)
-                    except (ServiceException, ObserverException) as e:
-                        logger.debug(f"Failed to restart {service.__class__.__name__} {service.id}: {e}")
-        return
+                        self._service.get_restart_attempts().pop(service.id, None)
+                    except ServiceException as e:
+                        # keep the error state
+                        service.set_state(AgentElementState.ERROR)
+                        # increment the restart count
+                        if service.id in self._service.get_restart_attempts():
+                            self._service.get_restart_attempts()[service.id] = self._service.get_restart_attempts()[service.id] + 1
+                        else:
+                            self._service.get_restart_attempts()[service.id] = 1
+                        logger.debug(f"Failed to restart {service.__class__.__name__} {service.id}, attempt {self._service.get_restart_attempts()[service.id]}: {e}")
+    
+    def unobserve(self):
+        self._service.get_restart_attempts().clear()
 
 @dataclass
 class MappingRestartService(ObserverService):
@@ -50,13 +62,16 @@ class MappingRestartService(ObserverService):
 
     thread_type : str = field(default=ThreadType.SECOND, metadata={"description": "type of thread, e.g. MILLI_SECONDS, MICRO_SECONDS, INSTANT, ONLY_ONCE, DAYTIME, DATE, ..."})    
     observing_time : Union[int|str] = field(default=10, metadata={"description": "interval of seconds for restarts attempts"})
-    restart_attempts : int = field(default=3, metadata={"description": "number of consecutive restarts attempts before omitting the mapping service from restart attempts"})
+    max_restart_attempts : int = field(default=3, metadata={"description": "number of consecutive restarts attempts before omitting the mapping service from restart attempts"})
     
     def __post_init__(self):
         super().__post_init__()
-        self._mapping_restarts : dict = dict()        
+        self._restart_attempts : dict[str, int] = dict()        
             
     def _on_install(self, agent : Agent = None):
         super()._on_install(agent)
         observer : RestartObserver = RestartObserver(self)
         self.add_observer(observer)
+        
+    def get_restart_attempts(self) -> dict[str, int]:
+        return self._restart_attempts

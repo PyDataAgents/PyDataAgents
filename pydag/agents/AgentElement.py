@@ -6,6 +6,8 @@ from dataclasses import dataclass, field
 import uuid
 from loguru import logger
 
+from pydag.agents.AgentElementException import AgentElementException
+
 
 from .AgentStates import AgentElementState
 from ..utils.ClassUtils import ClassUtils
@@ -76,6 +78,7 @@ class AgentElement(ABC):
            if agent is not None, it can be used to reference or create other agent elements
            the method should always be used in child classes with super().install()
         """
+        self._check_state(AgentElementState.INSTALLED)
         if self.load_on_install:
             self.load()
         self._on_install(agent)
@@ -123,3 +126,20 @@ class AgentElement(ABC):
             state (AgentElementState): state enum
         """
         self._state = state
+    
+    def _check_state(self, next_state : AgentElementState):
+        match(next_state):
+            case AgentElementState.UNINSTALLED:
+                if self._state != AgentElementState.ERROR and self._state != AgentElementState.INSTALLED:
+                    raise AgentElementException(f"{self.__class__.__name__} {self.id} cannot be running when uninstalling!")
+                
+            case AgentElementState.INSTALLED:
+                if self._state != AgentElementState.ERROR and self._state != AgentElementState.UNINSTALLED:
+                    raise AgentElementException(f"{self.__class__.__name__} {self.id} cannot be running when installing!")
+                
+            case AgentElementState.ERROR:
+                # any prior state is allowed
+                return
+            
+            case _:
+                raise AgentElementException("")

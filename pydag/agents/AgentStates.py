@@ -18,7 +18,6 @@ class NodeState(AgentElementState):
     
 class ServiceState(AgentElementState):
     RUNNING = "RUNNING"
-    STOPPED = "STOPPED"
     
 class LearningState(NodeState):
     LEARNING = "LEARNING"

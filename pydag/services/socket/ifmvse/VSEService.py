@@ -88,6 +88,7 @@ class VSEService(SubscribeService):
     port : int = field(default=3321, metadata={"description": "port of the vse host device"})
     sensor : int = field(default=1, metadata={"description": "sensor number to measure"})
     sample_rate : int = field(default=10000, metadata={"description": "sample rate in Hz from 1.000 Hz to 100.000 Hz"})
+    timeout : int = field(default=3, metadata={"description": "socket timeout, any blocking operation (connect, recv, send, accept) will wait max 'timeout' seconds"})
         
     def __post_init__(self):
         super().__post_init__()
@@ -100,8 +101,12 @@ class VSEService(SubscribeService):
         super()._on_install(agent)
         # Create a TCP/IP socket
         self._socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self._socket.settimeout(self.timeout)
         # Connect to the server
-        self._socket.connect((self.host, self.port))
+        try:
+            self._socket.connect((self.host, self.port))
+        except TimeoutError as e:
+            raise ServiceException(f"Could not connect to socket in {self.__class__.__name__}") from e
        
     def _on_uninstall(self, agent = None):
         super()._on_uninstall(agent)
@@ -109,24 +114,29 @@ class VSEService(SubscribeService):
             try:
                 self._socket.close()
                 self._socket = None
+                self._thread = None
             except Exception as e:
                 raise ServiceException(f"could not disconnect from socket in {self.__class__.__name__}") from e
              
     def _subscribe(self):        
         buffer : Buffer = next(iter(self.get_buffers().values()))
         # start the message processing task
-        self._thread = threading.Thread(target=self._process_incoming_messages, args = [buffer], daemon=True, name=f"{self.__class__.__name__}-{self.id}-MessageThread")
-        self._is_measuring = True
-        self._thread.start()
-        try:
-            self._set_mode(3)  # set to measurement mode
-            self._start_measure(sensor=self.sensor, sample_rate=self.sample_rate)  # start measurement msg
-        except (ConnectionAbortedError, ConnectionResetError) as e:
-            raise ServiceException("Connection to VSE device was interrupted") from e
+        if not self._is_measuring:
+            self._thread = threading.Thread(target=self._process_incoming_messages, args = [buffer], daemon=True, name=f"{self.__class__.__name__}-{self.id}-MessageThread")
+            self._is_measuring = True
+            self._thread.start()
+            try:
+                self._set_mode(3)  # set to measurement mode
+                self._start_measure(sensor=self.sensor, sample_rate=self.sample_rate)  # start measurement msg
+            except (ConnectionAbortedError, ConnectionResetError) as e:
+                raise ServiceException("Connection to VSE device was interrupted") from e
 
         
     def _unsubscribe(self):
         self._is_measuring = False
+        if self._thread:
+            self._thread.join()
+            self._thread = None
             
     def _set_mode(self, mode : int):
         """
@@ -192,7 +202,7 @@ class VSEService(SubscribeService):
                         d = None
                     
                 #print(d)
-        except (ConnectionAbortedError, ConnectionResetError) as e:
+        except (ConnectionAbortedError, ConnectionResetError, Exception) as e:
             self._is_measuring = False
             self._state = AgentElementState.ERROR
             logger.error(e)
