@@ -30,7 +30,8 @@ def test_010():
                           file_post_fix="test",
                           file_extension="csv",
                           delimiter=";",
-                          thread_type=ThreadType.MILLI_SECOND.value)
+                          thread_type=ThreadType.MILLI_SECOND.value,
+                          n=1)
     
     csv.add_buffer(buf)
     csv.install()
