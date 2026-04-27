@@ -93,7 +93,7 @@ class SFCService(StatemachineService):
         first_node = next(iter(self.nodes.values()))
         self._assemble(first_node)
         observer = SFCObserver(self)
-        self._observer_thread.add_observer(observer)
+        self.add_observer(observer)
     
     def _assemble(self, node : Node):
         if isinstance(node, Transition):

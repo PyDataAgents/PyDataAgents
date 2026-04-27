@@ -14,16 +14,11 @@ buffer_store:
     initial_values: null
     unit: null
     description: Test buffer
-    duplicate_ids: []  
+    duplicate_ids: []
 service_store:
   A1:
-      type: pydag.services.opcua.OpcUaService
-      id: A1
-      load_on_install: false
-      endpoint: opc.tcp://localhost:4840/freeopcua/server/
-  M1:
-    type: pydag.services.mappings.MappingService
-    id: M1
+    type: pydag.services.opcua.OpcUaService
+    id: A1
     load_on_install: false
     auto_start: true
     thread_type: MILLI_SECOND
@@ -31,8 +26,8 @@ service_store:
     week_days: null
     buffer_ids:
     - B1
-    adapter_id: A1
     addresses: []
     mapping_type: null
-    n: 1
+    n: 0
     persistent: true
+    endpoint: opc.tcp://localhost:4840/freeopcua/server/

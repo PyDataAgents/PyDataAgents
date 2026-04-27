@@ -39,4 +39,4 @@ class SimpleStatemachine(StatemachineService):
     def _on_install(self, agent : Agent = None):
         super()._on_install(agent)
         observer = SimpleStatemachineObserver(self)
-        self._observer_thread.add_observer(observer)       
+        self.add_observer(observer)       
