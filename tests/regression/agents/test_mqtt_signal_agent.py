@@ -4,8 +4,8 @@ from pydag.buffers.SignalBuffer import SignalBuffer
 from pydag.buffers.signals.LinearTrend import LinearTrend
 from pydag.buffers.signals.Sine import Sine
 from pydag.agents.Agent import Agent
-from pydag.services.mappings.MappingService import MappingService
-from pydag.services.mappings.MappingType import MappingType
+from pydag.services.MappingService import MappingService
+from pydag.services.MappingType import MappingType
 from pydag.services.ThreadType import ThreadType
 
 

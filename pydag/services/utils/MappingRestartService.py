@@ -1,11 +1,14 @@
 from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Union
+from loguru import logger
 
-
+from ...adapters.AdapterException import AdapterException
+from ..ObserverException import ObserverException
+from ..ServiceException import ServiceException
 from ...agents.AgentStates import AgentElementState
 from ..ThreadType import ThreadType
-from ..mappings.MappingService import MappingService
+from ..MappingService import MappingService
 from ..Observer import Observer
 from ...agents.Agent import Agent
 from ..ObserverService import ObserverService
@@ -28,10 +31,13 @@ class RestartObserver(Observer):
                     else:
                         requires_restart = True
                 if requires_restart:
-                    if service.start():
+                    try:
+                        service.stop() # stop the service to prepare for restart
+                        service.install() # reinstall the service to reset it
+                        service.start() # start the service to trigger the restart
                         self._service._mapping_restarts.pop(service.id, None)
-    
-    def unobserve(self):
+                    except (ServiceException, AdapterException, ObserverException) as e:
+                        logger.debug(f"Failed to restart {service.__class__.__name__} {service.id}: {e}")
         return
 
 @dataclass

@@ -1,6 +1,6 @@
 id: G1
-adapter_store:
+service_store:
   OPC1:
-    type: pydag.adapters.opcua.OpcUaAdapter
+    type: pydag.services.opcua.OpcUaService
     id: OPC1
     endpoint: opc.tcp://jh:48010

@@ -1,8 +1,8 @@
-from pydag.adapters.socket.ifmvse.VSEAdapter import VSEAdapter
+from pydag.services.socket.ifmvse.VSEService import VSEAdapter
 from pydag.agents.Agent import Agent
 from pydag.buffers.ListBuffer import ListBuffer
-from pydag.services.mappings.MappingService import MappingService
-from pydag.services.mappings.MappingType import MappingType
+from pydag.services.MappingService import MappingService
+from pydag.services.MappingType import MappingType
 from pydag.services.rest.RestService import RestService
 
 

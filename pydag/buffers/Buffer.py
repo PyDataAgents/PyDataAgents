@@ -40,7 +40,7 @@ class Buffer(AgentElement):
 
     def _on_install(self, agent: Agent = None):
         if self.initial_values is not None:
-            self._elements = self.initial_values
+            self._on_push(self.initial_values)
             # remove the initial values to keep buffer object small
             self.initial_values = None
         if len(self._duplicates) > 0:

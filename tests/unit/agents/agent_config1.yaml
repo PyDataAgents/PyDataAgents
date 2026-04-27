@@ -14,14 +14,13 @@ buffer_store:
     initial_values: null
     unit: null
     description: Test buffer
-    duplicate_ids: []
-adapter_store:
-  A1:
-    type: pydag.adapters.opcua.OpcUaAdapter
-    id: A1
-    load_on_install: false
-    endpoint: opc.tcp://localhost:4840/freeopcua/server/
+    duplicate_ids: []  
 service_store:
+  A1:
+      type: pydag.services.opcua.OpcUaService
+      id: A1
+      load_on_install: false
+      endpoint: opc.tcp://localhost:4840/freeopcua/server/
   M1:
     type: pydag.services.mappings.MappingService
     id: M1

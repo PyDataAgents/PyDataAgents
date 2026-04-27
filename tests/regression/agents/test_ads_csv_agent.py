@@ -11,7 +11,7 @@ from pydag.buffers.ListBuffer import ListBuffer
 from pydag.agents.AgentConfig import AgentConfig
 from pydag.agents.YAMLConfig import YAMLConfig
 from pydag.agents.Agent import Agent
-from pydag.services.mappings.MappingService import MappingService
+from pydag.services.MappingService import MappingService
 
 
 def test_000():

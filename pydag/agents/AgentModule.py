@@ -7,7 +7,7 @@ class AgentModule:
         # services
         import pydag.services.rest.RestService
         import pydag.services.ObserverService
-        import pydag.services.mappings.MappingService
+        import pydag.services.MappingService
         import pydag.services.statemachine.SimpleActionService
         import pydag.services.statemachine.SimpleStatemachine
         import pydag.services.statemachine.SFCService
@@ -26,15 +26,15 @@ class AgentModule:
     def load_iiot_modules(skip_ads : bool = False):
         # adapters
         if not skip_ads:
-            import pydag.adapters.ads.AdsAdapter
-        import pydag.adapters.mqtt.MQTTAdapter
-        import pydag.adapters.audio.AudioAdapter
-        import pydag.adapters.opcua.OpcUaAdapter
-        import pydag.adapters.s7.S7Adapter
-        import pydag.adapters.socket.SerialAdapter
-        import pydag.adapters.socket.TCPClientAdapter
-        import pydag.adapters.socket.WebSocketAdapter
-        import pydag.adapters.socket.ifmvse.VSEAdapter
+            import pydag.services.ads.AdsService
+        import pydag.services.mqtt.MQTTService
+        import pydag.services.audio.AudioService
+        import pydag.services.opcua.OpcUaService
+        import pydag.services.s7.S7Service
+        import pydag.services.socket.SerialService
+        import pydag.services.socket.TCPClientService
+        import pydag.services.socket.WebSocketService
+        import pydag.services.socket.ifmvse.VSEService
         
         # services
         import pydag.services.office.MSGraphService
@@ -86,7 +86,7 @@ class AgentModule:
     @staticmethod
     def load_vision_modules():
         # adapters
-        import pydag.adapters.vision.WebcamAdapter
+        import pydag.services.vision.WebcamService
         
         # services
         import pydag.services.vision.WebcamVideoRollbackService

@@ -96,8 +96,8 @@ class Service(AgentElement):
                     raise ServiceException(f"{Service.__name__} {self.id} must be installed or stopped before starting!")
                 
             case ServiceState.STOPPED:
-                if self._state != ServiceState.RUNNING:
-                    raise ServiceException(f"{Service.__name__} {self.id} must be running before stopping!")
+                if self._state != ServiceState.RUNNING and self._state != ServiceState.ERROR:
+                    raise ServiceException(f"{Service.__name__} {self.id} must be running or in error state before stopping!")
                 
     def get_agent(self) -> Agent:
         """ returns the `Agent`

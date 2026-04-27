@@ -15,12 +15,11 @@ from ..nodes.Node import Node
 from .AgentElement import AgentElement
 from .AgentConfig import AgentConfig
 from ..services.statemachine.StatemachineService import StatemachineService
-from ..services.mappings.MappingService import MappingService
+from ..services.MappingService import MappingService
 from ..services.ObserverService import ObserverService
 from ..nodes.BufferNode import BufferNode
 
 if TYPE_CHECKING:
-    from ..adapters.Adapter import Adapter
     from ..buffers.Buffer import Buffer
     from ..services.Service import Service
 
@@ -28,7 +27,7 @@ if TYPE_CHECKING:
 @dataclass
 class Agent():
     """ `Agent` class for managing a multi-component application system.
-    The `Agent` serves as the central orchestrator for managing Adapters, Buffers, and Services.
+    The `Agent` serves as the central orchestrator for managing Buffers, Nodes and Services.
     It handles the lifecycle of these components including installation, initialization, connection,
     and termination. The `Agent` supports optional features such as persistence, REST API exposure,
     and configurable startup behavior.
@@ -43,7 +42,6 @@ class Agent():
             on port 4700. Defaults to False.
         description (str): Application/agent description. Defaults to None.
         buffer_store (dict[str, Buffer]): Dictionary storing all `Buffer` instances in the `Agent`.
-        adapter_store (dict[str, Adapter]): Dictionary storing all `Adapter` instances in the `Agent`.
         service_store (dict[str, Service]): Dictionary storing all `Service` instances in the `Agent`.
             to install or uninstall.
     Raises:
@@ -61,20 +59,16 @@ class Agent():
     with_rest_api : bool = field(default=False, metadata={"description": "if True, a REST API Service is created by default to interact with the Agent via REST calls under port 4700"})
     description : str = field(default=None, metadata={"description": "application/agent description"})
     buffer_store : dict[str, Buffer] = field(default_factory=dict, metadata={"description": "dictionary of Buffers in the Agent"})
-    adapter_store : dict[str, Adapter] = field(default_factory=dict, metadata={"description": "dictionary of Adapters in the Agent"})
     service_store : dict[str, Service] = field(default_factory=dict, metadata={"description": "dictionary of Services in the Agent"})
 
     def __post_init__(self):
-        """ initialize `Agent` instance after dataclass initialization.
-        
-        Sets up the internal storage dictionaries for `Buffer`s, `Adapter`s, and `Service`s.
-        Generates a unique ID if not provided.
+        """ initialize `Agent` instance after dataclass initialization.        
         """
         self._is_running = False
         self._stop_event = threading.Event()
     
     def _install_elements(self):
-        """ install all `Adapter`s, `Buffer`s, and `Service`s in the `Agent`.
+        """ install all `Node`s, `Buffer`s, and `Service`s in the `Agent`.
         
         iterates over each element and calls its install method with the `Agent` instance. 
         
@@ -93,27 +87,21 @@ class Agent():
             self.add_service(rs)
             
         # iterating over a list of dictionary items, in case of modification on the dictionary aoccurs during installs
-        for adapter in list(self.adapter_store.values()):
-            adapter.install(self)
-            if self.load_on_install:
-                adapter.load_on_install = True
         for buffer in list(self.buffer_store.values()):
             buffer.install(self)
             if self.load_on_install:
                 buffer.load_on_install = True
         for service in list(self.service_store.values()):
-            service.install(self)
+            service.install(self) # nodes are installed via its service
             if self.load_on_install:
                 service.load_on_install = True
         
     def _uninstall_elements(self):
-        """ uninstall all `Adapter`s, `Buffer`s, and `Service`s from the `Agent`.
+        """ uninstall all `Node`s, `Buffer`s, and `Service`s from the `Agent`.
         
         iterates over each element and calls its uninstall method.
         """
         # iterating over a list of dictionary items, in case of modification on the dictionary aoccurs during uninstalls
-        for adapter in list(self.adapter_store.values()):
-            adapter.uninstall(self)
         for buffer in list(self.buffer_store.values()):
             buffer.uninstall(self)
         for service in list(self.service_store.values()):
@@ -131,16 +119,6 @@ class Agent():
         # in order to make duplicate buffers and their ids available in agent for later elements or acces (in scripts), we install them right away
         if len(buffer.duplicate_ids) > 0:
             buffer.install(self)
-        
-    def add_adapter(self, adapter : Adapter):
-        """Add an Adapter to the Agent's adapter store.
-        
-        Args:
-            adapter (Adapter): The Adapter instance to add.
-        """
-        if adapter.id in self.adapter_store:
-            logger.warning(f"A {adapter.__class__.__name__} with id='{adapter.id}' already exists in {self.__class__.__name__}'s adapter_store and is overwritten!")
-        self.adapter_store[adapter.id] = adapter
         
     def add_service(self, service : Service):
         """Add a Service to the Agent's service store.
@@ -162,28 +140,12 @@ class Agent():
             dict: Configuration options dictionary.
         """
         return AgentConfig.config_options(self, with_descriptions)
-           
-    def _disconnect_adapters(self):
-        """ Disconnect all `Adapter`s in the `Agent`.
-        
-        Logs errors for adapters that fail to disconnect.
-        """
-        for adapter in self.adapter_store.values():
-            if adapter.disconnect() is False:
-                logger.error(adapter.name() + " could not be disconnected")
         
     def _stop_services(self):
         """ Stop all `Service`s in the `Agent`.
         """
         for service in self.service_store.values():
-            service.stop()
-                   
-    def _connect_adapters(self):
-        """ Connect all `Adapter`s in the `Agent`.        
-        """
-        for adapter in self.adapter_store.values():
-            if adapter.connect() is False:
-                logger.error(adapter.name() + " could not be connected")           
+            service.stop()          
                 
     def _start_services(self):
         """ Start all `Service`s in the `Agent`
@@ -258,20 +220,6 @@ class Agent():
         self._uninstall_elements()
         self._is_running = False
         self._stop_event.set()
-            
-    def get_adapter(self, id : str) -> Adapter:
-        """ return the `Adapter` specified by `id`
-        Args:
-            id (str): _description_
-
-        Returns:
-            Adapter: _description_
-        """
-        if id in self.adapter_store:
-            return self.adapter_store[id]    
-        else:
-            logger.error("No Adapter with id=" + id + " was found")
-            return None
         
     def get_buffer(self, id : str) -> Buffer:
         """ return the `Buffer` specified by `id`, if the specified `Buffer` is not found, the method returns `None
@@ -315,9 +263,7 @@ class Agent():
     def get_element(self, id : str) -> AgentElement:
         """Return the `AgentElement` with the specified `id`.
         """        
-        if id in self.adapter_store:
-            return self.adapter_store[id]
-        elif id in self.buffer_store:
+        if id in self.buffer_store:
             return self.buffer_store[id]
         elif id in self.service_store:
             return self.service_store[id]
@@ -379,17 +325,11 @@ class Agent():
                 sd : dict = {
                     "type": service.type,
                     "state": service.get_state(),
-                    "last_update": service.get_observer_thread().get_last_update(),
-                    "next_update": service.get_observer_thread().get_next_update(),
+                    "last_update": service.get_last_update(),
+                    "next_update": service.get_next_update(),
                     "adapter": {},
                     "buffers": {}
-                }
-                if service.get_adapter():
-                    sd["adapter"] = {
-                        "id": service.get_adapter().id,
-                        "type": service.get_adapter().type,
-                        "state": service.get_adapter().get_state()
-                    }
+                }                
                 if len(service.get_buffers()) > 0:
                     buffer : Buffer
                     for kk, buffer in service.get_buffers().items():
@@ -427,8 +367,8 @@ class Agent():
                 sd : dict = {
                     "type": service.type,
                     "state": service.get_state(),
-                    "last_update": service.get_observer_thread().get_last_update(),
-                    "next_update": service.get_observer_thread().get_next_update(),
+                    "last_update": service.get_last_update(),
+                    "next_update": service.get_next_update(),
                     "nodes": nds                
                 }
                 tree[service.id] = sd
@@ -436,8 +376,8 @@ class Agent():
                 sd : dict = {
                     "type": service.type,
                     "state": service.get_state(),
-                    "last_update": service.get_observer_thread().get_last_update(),
-                    "next_update": service.get_observer_thread().get_next_update()
+                    "last_update": service.get_last_update(),
+                    "next_update": service.get_next_update()
                 }
                 tree[service.id] = sd
             else:
@@ -457,18 +397,6 @@ class Agent():
         Returns:
             AgentElement:
         """
-        for adapter in self.adapter_store.values():
-            for attr_name, attr_value in vars(adapter).items():
-                #print(f"{attr_name}: {type(attr_value)}")
-                if isinstance(attr_value, AgentElement):
-                    if attr_value.id == id:
-                        return attr_value
-            for buffer in self.buffer_store.values():
-                for attr_name, attr_value in vars(buffer).items():
-                    #print(f"{attr_name}: {type(attr_value)}")
-                    if isinstance(attr_value, AgentElement):
-                        if attr_value.id == id:
-                            return attr_value
         for service in self.service_store.values():
             for attr_name, attr_value in vars(service).items():
                 #print(f"{attr_name}: {type(attr_value)}")

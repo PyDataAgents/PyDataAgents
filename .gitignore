@@ -25,7 +25,7 @@ __pycache__
 /tests/**/test_*.html
 
 # test docx files
-/tests/**/*.docx
+/tests/**/*test*.docx
 
 # test images
 /tests/**/image_*.jpg
@@ -51,7 +51,7 @@ __pycache__
 
 
 # ignore csv test files
-/tests/**/*test.csv
+/tests/**/*test*.csv
 
 
 # ignore txt test files

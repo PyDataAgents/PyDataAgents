@@ -20,8 +20,6 @@ class AgentConfig:
     AGENT = "agent"
     BUFFER = "buffer"
     BUFFERS = "buffers"
-    ADAPTER = "adapter"
-    ADAPTERS = "adapters"
     SERVICE = "service"
     SERVICES = "services"
     
