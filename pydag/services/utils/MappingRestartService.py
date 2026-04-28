@@ -3,9 +3,7 @@ from dataclasses import dataclass, field
 from typing import Union
 from loguru import logger
 
-
-from ..ObserverException import ObserverException
-from ..ServiceException import ServiceException
+from ...agents.AgentElementException import AgentElementException
 from ...agents.AgentStates import AgentElementState
 from ..ThreadType import ThreadType
 from ..MappingService import MappingService
@@ -39,7 +37,7 @@ class RestartObserver(Observer):
                         service.install() # reinstall the service to reset it
                         service.start() # start the service to trigger the restart
                         self._service.get_restart_attempts().pop(service.id, None)
-                    except ServiceException as e:
+                    except AgentElementException as e:
                         # keep the error state
                         service.set_state(AgentElementState.ERROR)
                         # increment the restart count
@@ -47,7 +45,7 @@ class RestartObserver(Observer):
                             self._service.get_restart_attempts()[service.id] = self._service.get_restart_attempts()[service.id] + 1
                         else:
                             self._service.get_restart_attempts()[service.id] = 1
-                        logger.debug(f"Failed to restart {service.__class__.__name__} {service.id}, attempt {self._service.get_restart_attempts()[service.id]}: {e}")
+                        logger.info(f"Failed to restart {service.__class__.__name__} {service.id}, attempt {self._service.get_restart_attempts()[service.id]}: {e}")
     
     def unobserve(self):
         self._service.get_restart_attempts().clear()

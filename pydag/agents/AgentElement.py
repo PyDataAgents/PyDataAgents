@@ -7,6 +7,9 @@ import uuid
 from loguru import logger
 
 from pydag.agents.AgentElementException import AgentElementException
+from pydag.buffers.BufferException import BufferException
+from pydag.nodes.NodeException import NodeException
+from pydag.services.ServiceException import ServiceException
 
 
 from .AgentStates import AgentElementState
@@ -78,11 +81,15 @@ class AgentElement(ABC):
            if agent is not None, it can be used to reference or create other agent elements
            the method should always be used in child classes with super().install()
         """
-        self._check_state(AgentElementState.INSTALLED)
-        if self.load_on_install:
-            self.load()
-        self._on_install(agent)
-        self._state = AgentElementState.INSTALLED
+        try:
+            self._check_state(AgentElementState.INSTALLED)
+            if self.load_on_install:
+                self.load()
+            self._on_install(agent)
+            self._state = AgentElementState.INSTALLED
+        except AgentElementException as e:
+            self._state = AgentElementState.ERROR
+            raise AgentElementException(f"Could not install {self.__class__.__name__}") from e
         
     def uninstall(self, agent : Agent = None):
         """resets the element, this method can be used to stop internal element logic or reset objects that were initialized on creation

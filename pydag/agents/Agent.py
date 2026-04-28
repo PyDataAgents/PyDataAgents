@@ -6,8 +6,7 @@ from dataclasses import dataclass, field
 import uuid
 from loguru import logger
 
-
-
+from .AgentElementException import AgentElementException
 from .AgentException import AgentException
 from ..utils.FileUtils import FileUtils
 from .YAMLConfig import YAMLConfig
@@ -88,14 +87,20 @@ class Agent():
             
         # iterating over a list of dictionary items, in case of modification on the dictionary aoccurs during installs
         for buffer in list(self.buffer_store.values()):
-            buffer.install(self)
-            if self.load_on_install:
-                buffer.load_on_install = True
+            try:
+                buffer.install(self) # nodes are installed via its service
+                if self.load_on_install:
+                    buffer.load_on_install = True
+            except AgentElementException as e:
+                logger.error(f"Could not install{buffer.__class__.__name__} with {buffer.config_options()}: {e}")
         for service in list(self.service_store.values()):
-            service.install(self) # nodes are installed via its service
-            if self.load_on_install:
-                service.load_on_install = True
-        
+            try:
+                service.install(self) # nodes are installed via its service
+                if self.load_on_install:
+                    service.load_on_install = True
+            except AgentElementException as e:
+                logger.error(f"Could not install{service.__class__.__name__} with {service.config_options()}: {e}")
+                    
     def _uninstall_elements(self):
         """ uninstall all `Node`s, `Buffer`s, and `Service`s from the `Agent`.
         
@@ -155,7 +160,10 @@ class Agent():
         """
         for service in self.service_store.values():
             if service.auto_start:
-                service.start()
+                try:
+                    service.start()
+                except AgentElementException as e:
+                    logger.error(f"Could not start {service.__class__.__name__}: {e}")
     
     @staticmethod
     def load_from(config_file : str) -> Agent:
@@ -196,7 +204,7 @@ class Agent():
             ServiceException: if a `Service` could not be started
             AgentElementException: if a `AgentElement` could not be installed
         """
-        self._install_elements()
+        self._install_elements()            
         if self.create_config:
             gc = AgentConfig(self)
             yc = YAMLConfig(f"Agent {self.id}.yaml")

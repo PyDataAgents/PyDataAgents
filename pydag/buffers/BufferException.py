@@ -1,4 +1,6 @@
-class BufferException(Exception):
-    
-    def __init__(self, message):
-        super().add_note(message)
+from ..agents.AgentElementException import AgentElementException
+
+
+class BufferException(AgentElementException):
+    """ custom exception class for errors in `Buffer`'s
+    """

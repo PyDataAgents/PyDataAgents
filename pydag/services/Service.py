@@ -39,13 +39,13 @@ class Service(AgentElement):
         Raises:
             ServiceException: if this `Service` cannot be started
         """
-        self._check_state(ServiceState.RUNNING)
-        self._state = ServiceState.RUNNING
         try:
+            self._check_state(ServiceState.RUNNING)
+            self._state = ServiceState.RUNNING        
             self._on_start()
-        except ServiceException:
-            logger.exception(f"Could not start {self.__class__.__name__}")
+        except ServiceException as e:
             self._state = AgentElementState.ERROR
+            raise ServiceException(f"Could not start {self.__class__.__name__}") from e
     
     @abstractmethod
     def _on_start(self):

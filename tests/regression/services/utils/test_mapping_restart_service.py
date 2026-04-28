@@ -16,7 +16,7 @@ def test_000():
     buf = ListBuffer(id="B1", capacity=100000)
     ag.add_buffer(buf)
     
-    va = VSEService(id="A1", sensor=1, host="192.168.0.10")
+    va = VSEService(id="A1", sensor=1, host="192.168.0.10", timeout=5)
     va.add_buffer(buf)    
     ag.add_service(va)
     
@@ -33,7 +33,7 @@ def test_000():
     
     ag.add_service(sas)
     
-    mrs = MappingRestartService(id="R1", thread_type=ThreadType.SECOND.value, observing_time=10, max_restart_attempts=3)
+    mrs = MappingRestartService(id="R1", thread_type=ThreadType.SECOND.value, observing_time=60, max_restart_attempts=72)
     ag.add_service(mrs)
     
     ag.release()
