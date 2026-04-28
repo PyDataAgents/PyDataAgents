@@ -37,17 +37,15 @@ Extract relevant features from vibration/temperature/current signals, update a p
 
 ## Important Concepts
 - `Agent` lifecycle:
-  An `Agent` installs all registered elements, connects adapters, starts services via `release(...)`, and can be shut down cleanly via `terminate()`.
+  An `Agent` installs all registered elements, starts services via `release(...)`, and can be shut down cleanly via `terminate()`.
 - `Buffer` as data backbone:
-  Buffers are the primary data exchange mechanism between adapters, services, and nodes.
-- `Adapter` interaction modes:
-  Adapters follow a consistent interface model: `read`, `write`, `subscribe`, and `publish`.
+  Buffers are the primary data exchange mechanism between services and nodes.
 - `Service` concept:
-  Services are long-running, usually background components (e.g., REST APIs, schedulers, observers, model/tool providers) that encapsulate reusable runtime capabilities.
+  Services are long-running, usually background components (e.g., REST APIs, data streams, schedulers, observers, model/tool providers) that encapsulate reusable runtime capabilities.
 - `Node` / `Action` concept:
   Nodes represent compact workflow steps. `Action` nodes execute tasks, `Transition` nodes evaluate flow conditions, and both are composed to build deterministic automation pipelines.
 - `MappingService` as orchestrator:
-  `MappingService` links adapters and buffers and executes recurring data transfer logic.
+  `MappingService` links buffers with respective data source or sinks and executes recurring data transfer logic.
 - `StatemachineService` for workflows:
   Complex automation flows are built from small `Action` and `Transition` nodes.
 
@@ -61,9 +59,8 @@ Have a look at [Contribute.md](Contribute.md)
 The core element of the framework is a [(data)agent](pydag/agents/Agent.py).
 <br>An agent can consist of one or more of the following [AgentElements](pydag/agents/AgentElement.py):
 - buffers
-- adapters
 - services
-- actions and transitions
+- actions and transitions (nodes)
 <br>Each [AgentElement](pydag/agents/AgentElement.py) is dedicated to a specific task within the framework.
 <br>These tasks are highlighted below.
 
@@ -77,14 +74,11 @@ from pydag.agents.Agent import Agent
 agent = Agent(id = "G1")
 
 agent.add_buffer(...) # add a buffer
-agent.add_adapter(...) # add an adapter
 agent.add_service(...) # add a service
 
 buf = agent.get_buffer(id) # get a buffer reference
-ad = agent.get_adapter(id) # get an adapter reference
 s = agent.get_service(id) # get a service reference
 
-adapters = agent.adapter_store    # get a reference to all adapters stored in a dict[str, Adapter]
 buffers = agent.buffer_store    # get a reference to all buffers stored in a dict[str, Buffer]
 services = agent.service_store    # get a reference to all services stored in a dict[str, Service]
 
@@ -200,139 +194,13 @@ buffer.data_with_meta(n = 0, persistent = True) # returns buffer data and metada
 
 ```
 
-### Adapter
-An overview of all available adapters and their usage is given [here](pydag/_docs/Adapters.md).
-<br>An `Adapter` is a specialized connector for a single data source or sink. It connects an `Agent` with the respective source/sink and retrieves data from a source or transfers data to a sink using `Buffer`s. You can view adapters as universal plugs for different source/sink systems.
-<br>All `Adapter`s adhere to the same interface composition and method flow.
-Every `Adapter` is initialized, installed, connected/disconnected and then, depending on source or sink interaction, reads/subscribes from sources or writes/publishes to sinks. Therefore an adapter can inherit from the following interfaces (abstract super classes):
-- ReadAdapter
-- WriteAdapter
-- SubscribeAdapter
-- PublishAdapter
-
-It is important that `Adapter` methods are always used in the correct order. Within an `Agent` application this is ensured by design, but when used outside that context it must be handled by the developer.
-<br>The following list outlines the correct method order of an adapter:
-- install(...)
-- connect()
-- read_from_source(...) / write_to_sink(...) / subscribe(...) / publish(...)
-- disconnect()
-- uninstall(...)
-
-<br>The `Adapter` class itself defines the following interface methods, that are common to all `Adapter`s and must be implemented by each subclass:
-- _on_install(agent : `Agent`): internal method called by install(...)
-- _on_uninstall(agent : `Agent`): internal method called by uninstall(...)
-- _on_connect(): internal method called by connect(...)
-- _on_disconnect(): internal method called by disconnect(...)
-<br>Additionally, depending on the inherited interface(s), the following methods must be implemented as well:
-- _on_read(buffers : dict[str, Buffer], addresses : list[str],  n : int): internal method called by read_from_source(...)
-- _on_write(buffers : dict[str, Buffer], addresses : list[str],  n : int, persistent : bool): internal method called by write_to_sink(...)
-- _on_subscribe(buffers : dict[str, Buffer], addresses : list[str], sampling_period : int, n : int): internal method called by subscribe(...)
-- _on_unsubscribe(): internal method called by unsubscribe(...)
-- _on_publish(buffers : dict[str, Buffer], addresses : list[str], sampling_period : int, n : int, persistent : bool): internal method called by publish(...)
-- _on_unpublish(): internal method called by unpublish(...)
-
-
-<br>Here are some example workflows for the usage of an `Adapter`:
-
-```python
-from pydag.adapters.csv.CsvReadAdapter import CsvReadAdapter
-
-adapter = CsvReadAdapter(
-    id = "CSV1",
-    file_path="path/to/file.txt",
-    delimiter=';',
-    has_header=True,
-    auto_detect=True,
-    force_numeric=True,
-    mode = "LOOP"
-)
-
-adapter.install()
-
-adapter.connect()
-
-# buffers : dict[str, Buffer]
-# addresses : list[str] the schema and content of addresses depends on the adapter implementation
-# n : int number of samples to read, 0 means all available samples
-adapter.read_from_source(buffers, addresses, n)
-
-adapter.disconnect()
-
-adapter.uninstall()
-
-```
-
-```python
-from pydag.adapters.csv.CsvWriteAdapter import CsvWriteAdapter
-
-adapter = CsvWriteAdapter(
-    id = "CSV2",
-    folder="path/to/folder",
-    delimiter = ";"
-)
-
-adapter.install()
-
-adapter.connect()
-
-# buffers : dict[str, Buffer]
-# addresses : list[str] the schema and content of addresses depends on the adapter implementation
-# n : int number of samples to read, 0 means all available samples
-# persistent : bool whether to keep the data in the buffer after writing
-adapter.write_to_sink(buffers, addresses, n, persistent)
-
-adapter.disconnect()
-
-adapter.uninstall()
-
-```
-
-```python
-from pydag.adapters.mqtt.MQTTAdapter import MQTTAdapter
-
-adapter = MQTTAdapter()
-adapter.id = "MQTT1"
-adapter.endpoint = "localhost"
-adapter.port = 1883
-adapter.qos = 0
-
-adapter.install()
-
-adapter.connect()
-
-adapter.subscribe(buffers, addresses, sampling_period, n)
-
-adapter.disconnect()
-
-adapter.uninstall()
-
-```
-
-```python
-from pydag.adapters.PublishAdapter import PublishAdapter
-
-adapter = PublishAdapter()
-adapter.id = "PA1"
-
-adapter.install()
-
-adapter.connect()
-
-adapter.publish(buffers, addresses, sampling_period, n, persistent)
-
-adapter.disconnect()
-
-adapter.uninstall()
-
-```
-
 ### Service
 An overview of all available services and their usage is given [here](pydag/_docs/Services.md).
 <br>In general, `Service`s are standalone micro applications within the `Agent`. Their tasks include observing resources (filesystem, agent state, ...), background daemon services (copy files from one folder to another, ...), providing reusable resources for other `AgentElement`s (browser, vector store, LLM model, ...), or providing REST API endpoints to monitor or manipulate the `Agent` application. `Service`s usually have no direct interaction with other parts of the `Agent` and run in a closed loop.
 
 If one of the following criteria is met, a `Service` should be implemented (instead of a `Node`):
 - the process/task is running in the background continuously or on a defined interval
-- the process/task needs to access other elements of the `Agent` during runtime (e.g. `Buffer`s, `Adapter`s, etc.); `Node`s do not have access to other `AgentElement`s except for other `Node`s within a `StatemachineService` and the `Agent` itself during `install()`
+- the process/task needs to access other elements of the `Agent` during runtime (e.g. `Buffer`s, etc.); `Node`s do not have access to other `AgentElement`s except for other `Node`s within a `StatemachineService` and the `Agent` itself during `install()`
 - the process/task needs to provide an API endpoint for external applications
 - optional: the process/task implements a third party library that requires credentials and this object can be reused in other `Node`s
 
@@ -376,40 +244,49 @@ s1.stop()
 
 #### MappingService
 A special service is the `MappingService`.
-<br>In general a `MappingService` defines the interaction between an `Adapter` and one or more `Buffer`s in terms of how often, how many samples and which data/information (`addresses`) in the source or sink are being accessed.
-<br>The mapping defines this interaction and is used as data model to instantiate a background thread that runs for every specified `MappingService` and acquires or transfers data from `Buffer`s to or from source/sinks using their respective `Adapter`s. You can view a `MappingService` as the recipe of a specific data connection to or from a system.
+<br>In general a `MappingService` defines the interaction between a data source or sink and one or more `Buffer`s in terms of how often, how many samples and which data/information (`addresses`) in the source or sink are being accessed.
+<br>The mapping defines this interaction and is used as data model to instantiate a background thread that runs for every specified `MappingService` and acquires or transfers data from `Buffer`s to or from source/sinks using the respective logic. You can view a `MappingService` as the recipe of a specific data connection to or from a system.
+
+Examples for `MappingService`'s are:
+- OpcUAService
+- S7Service
+- MQTTService
+- InfluxDbService
+- SQLService
+- CsvReadService
+- CsvWriteService
+- ...
 
 ```python
 from pydag.services.mappings.MappingService import MappingService
 
-m1 = MappingService(
+m1 = OpcUaService(
     id="M1",
-    adapter_id="MQTT1",
-    addresses=["signals/sine", "signals/linear"],
-    buffer_ids=["SINE1", "LINEAR1"],
+    endpoint="localhost:4048"
+    addresses=["ns=1;i=10012"],
+    buffer_ids=["B1"],
     thread_type=ThreadType.MILLI_SECOND.value,
-    mapping_type=MappingType.WRITE.value,
+    mapping_type=MappingType.READ.value,
     observing_time=1000,
-    n=0,
+    n=1,
     persistent=False,
     auto_start=True
 )
 
 # or
 
-m2 = MappingService(
-    id="M1",
-    addresses=["signals/sine", "signals/linear"],
+buf = DictBuffer(id="B2")
+
+m2 = CsvWriteService(
+    id="M2",
+    folder="/c/fake/path/"
     thread_type=ThreadType.MILLI_SECOND.value,
     mapping_type=MappingType.WRITE.value,
     observing_time=1000,
     n=0,
     persistent=False
 )
-m2.set_adapter(adapter)
 m2.add_buffer(buf)
-# or
-m2.set_buffers(buffers)
 
 ```
 
@@ -429,7 +306,7 @@ If one of the following criteria is met, a `Node` should be implemented (instead
 
 <br>All `Action`s can be executed by the following method:
 - execute()
-This method's purpose is to execute the single task that this `Action` was dedicated to. Within the `execute()` implementation, other `AgentElement`s can be accessed (e.g. `Buffer`s, `Adapter`s, etc.). This way `Action`s can retrieve data from previous `Action`s or `Buffer`s, or generate data and store it in `Buffer`s.
+This method's purpose is to execute the single task that this `Action` was dedicated to. Within the `execute()` implementation, other `AgentElement`s can be accessed (e.g. `Buffer`s, etc.). This way `Action`s can retrieve data from previous `Action`s or `Buffer`s, or generate data and store it in `Buffer`s.
 <br>All `Transition`s can be executed by using the method:
 - check() -> bool
 
@@ -441,7 +318,6 @@ This method's purpose is to execute the single task that this `Action` was dedic
 
 There are the following specialized `Node`s for specific functionalities:
 - `BufferNode`: base node type, that provides access to `Buffer`s or provides an internal `Buffer` for data intermediate/temporary storage
-- `AdapterNode`: base node type, that provides access to `Adapter`s
 - `ServiceNode`: base node type, that provides access to `Service`s
 - `TransformNode`: ...
 - `LearningNode`: ...
@@ -534,13 +410,24 @@ You can choose from the following additional dependencies:
 - sim
 - test
 
-and add themto your project build via:
+and add them to your project build via:
 
 ```
 ...
 
 dependencies = [
     "pydag[llm] @ git+https://github.com/PyDataAgents/PyDataAgents.git"
+]
+
+...
+
+```
+or 
+```
+...
+
+dependencies = [
+    "pydag[llm,cad,docs] @ git+https://github.com/PyDataAgents/PyDataAgents.git"
 ]
 
 ...
