@@ -40,49 +40,49 @@ class LLMChatAction(BufferNode, ServiceNode, Action):
     question_key: str = field(
         default=None,
         metadata={
-            "description": "The final task/question the model must answer. This is what the generated answer should respond to. ",
+            "description": "Key from which to receive the data for the final task/question the model must answer. This is what the generated answer should respond to. ",
         },
     )
     question_value: str = field(
         default=None,
         metadata={
-            "description": "The final task/question the model must answer. This is what the generated answer should respond to.",
+            "description": "Fixed value for the final task/question the model must answer. This is what the generated answer should respond to.",
         },
     )
     instruction_key: str = field(
         default=None,
         metadata={
-            "description": "Rules on how to answer (format, style, constraints, priorities).",
+            "description": "Key from which to receive the Rules on how to answer (format, style, constraints, priorities).",
         },
     )
     instruction_value: str = field(
         default=None,
         metadata={
-            "description": "Rules on how to answer (format, style, constraints, priorities).",
+            "description": "Fixed value for the Rules on how to answer (format, style, constraints, priorities).",
         },
     )
     retrieval_query_key: str = field(
         default=None,
         metadata={
-            "description": "The query used only for document retrieval from the vector store. ",
+            "description": "Key from which to receive the The query used only for document retrieval from the vector store. ",
         },
     )
     retrieval_query_value: str = field(
         default=None,
         metadata={
-            "description": "The query used only for document retrieval from the vector store. ",
+            "description": "Fixed value for the query used only for document retrieval from the vector store. ",
         },
     )
     input_context_keys: list[str] = field(
         default_factory=list,
         metadata={
-            "description": "Additional runtime context passed directly from parent buffers (not retrieved from vector DB).",
+            "description": "Key from which to receive the Additional runtime context passed directly from parent buffers (not retrieved from vector DB).",
         },
     )
     input_context_value: str | dict | list | None = field(
         default=None,
         metadata={
-            "description": "Additional runtime context passed directly from parent buffers (not retrieved from vector DB). if input_context_keys is not configured, this value is used as the input context for all rows.",
+            "description": "Fixed value for the Additional runtime context passed directly from parent buffers (not retrieved from vector DB). if input_context_keys is not configured, this value is used as the input context for all rows.",
         },
     )
 
