@@ -7,6 +7,9 @@ from pydag.nodes.llm.LLMOCRAction import LLMOCRAction
 from pydag.utils.DataUtils import DataUtils
 import os
 import re
+import sys
+import types
+
 
 
 def test_correctly_extract_value_from_pdf():
@@ -123,7 +126,6 @@ def test_correctly_extract_value_from_image():
     assert "Artikel 5" in output["documents"][0]
     assert output["filepath"][0] == folder + "960px-Art_5_GG.jpg"
 
-
 def test_no_value_parent_buffer():
     # Test no value in Parent buffer.
     config = configparser.ConfigParser()
@@ -152,6 +154,7 @@ def test_no_value_parent_buffer():
     
     output = lca.get_buffer().data(persistent=True)
     assert output == {}
+
 
 
 def test_multiple_files_same_type():
@@ -185,7 +188,6 @@ def test_multiple_files_same_type():
     assert "Fertigungsauftrag" in output["documents"][1]
     assert output["filepath"][0] == folder + "960px-Art_5_GG.jpg"
     assert output["filepath"][1] == folder + "89_prod_fa_rep_abmitean.jpg"
-
 
 def test_multiple_files_different_type():
     # Test multiple files in parent buffer.
@@ -246,7 +248,7 @@ def test_empty_file():
     output = lca.get_buffer().data(persistent=True)
 
     assert output == {}     
-
+    
 
 class RecordingOllamaClient:
     def __init__(self, answers):
@@ -259,6 +261,11 @@ class RecordingOllamaClient:
         return {"message": {"content": answer}}
 
 
+class FakeOllamaResponseError(Exception):
+    def __init__(self, status_code):
+        self.status_code = status_code
+
+
 class FakeOllamaMessage:
     def __init__(self, content):
         self.content = content
@@ -269,7 +276,14 @@ class FakeOllamaResponse:
         self.message = FakeOllamaMessage(content)
 
 
-def install_mocked_ollama_ocr_action(parent_value, answers=None, output_keys=None):
+def install_mocked_ollama_ocr_action(monkeypatch, parent_value, answers=None, output_keys=None):
+    fake_ollama = types.SimpleNamespace(
+        chat=lambda *args, **kwargs: pytest.fail("Unit tests must not call the real Ollama model"),
+        pull=lambda *args, **kwargs: pytest.fail("Unit tests must not pull Ollama models"),
+        ResponseError=FakeOllamaResponseError,
+    )
+    monkeypatch.setitem(sys.modules, "ollama", fake_ollama)
+
     buf = ListBuffer(id="Buf1")
     buf.install()
     buf.push(parent_value)
@@ -288,6 +302,28 @@ def install_mocked_ollama_ocr_action(parent_value, answers=None, output_keys=Non
     return lca
 
 
+def test_ollama_image_data_url_calls_mocked_client_without_data_url_prefix(monkeypatch):
+    lca = install_mocked_ollama_ocr_action(
+        monkeypatch,
+        "data:image/png;base64,image-content",
+        answers=["Image text"],
+    )
+
+    lca.execute()
+
+    output = lca.get_buffer().data(persistent=True)
+
+    assert lca.get_buffer().size() == 1
+    assert output["documents"][0] == "Page 0\nImage text"
+    assert output["filepath"][0] is None
+    assert lca._client.calls == [
+        {
+            "model": "glm-ocr",
+            "messages": [{"role": "user", "images": ["image-content"]}],
+        },
+    ]
+
+
 def test_ollama_pdf_data_url_calls_mocked_client_once_per_page(monkeypatch):
     monkeypatch.setattr(
         DataUtils,
@@ -298,6 +334,7 @@ def test_ollama_pdf_data_url_calls_mocked_client_once_per_page(monkeypatch):
         ],
     )
     lca = install_mocked_ollama_ocr_action(
+        monkeypatch,
         "data:application/pdf;base64,pdf-content",
         answers=["First page text", "Second page text"],
     )
@@ -328,6 +365,7 @@ def test_ollama_pdf_data_url_supports_different_output_keys(monkeypatch):
         lambda pdf_base64: ["data:image/png;base64,page-image"],
     )
     lca = install_mocked_ollama_ocr_action(
+        monkeypatch,
         "data:application/pdf;base64,pdf-content",
         answers=["Only page text"],
         output_keys=["d", "fp"],
@@ -344,8 +382,8 @@ def test_ollama_pdf_data_url_supports_different_output_keys(monkeypatch):
     assert "filepath" not in output
 
 
-def test_ollama_empty_parent_value_does_not_call_client():
-    lca = install_mocked_ollama_ocr_action("", answers=[])
+def test_ollama_empty_parent_value_does_not_call_client(monkeypatch):
+    lca = install_mocked_ollama_ocr_action(monkeypatch, "", answers=[])
 
     lca.execute()
 
@@ -363,3 +401,15 @@ def test_serialize_ollama_ocr_response_extracts_object_content():
     lca = LLMOCRAction()
 
     assert lca._serialize_ollama_ocr_response(FakeOllamaResponse("  OCR text  ")) == "OCR text"
+
+
+def test_serialize_ollama_ocr_response_keeps_page_numbers_for_response_lists():
+    lca = LLMOCRAction()
+
+    response = [
+        FakeOllamaResponse("First page"),
+        FakeOllamaResponse(""),
+        FakeOllamaResponse("Third page"),
+    ]
+
+    assert lca._serialize_ollama_ocr_response(response) == "Page 0\nFirst page\n\nPage 2\nThird page"

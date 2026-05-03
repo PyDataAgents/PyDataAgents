@@ -103,9 +103,13 @@ class LLMOCRAction(BufferNode, Action):
             # glm-ocr via ollama
             elif self.model == "glm-ocr":
                 responses = []
+                if isinstance(image_ref, str):
+                    image_refs = [image_ref]
+                else:
+                    image_refs = image_ref
+                image_refs = [_image.split(",", 1)[1] if "," in _image else _image for _image in image_refs]
                 try:
-                    image_ref = [_image.split(",", 1)[1] for _image in image_ref]
-                    for _img in image_ref:
+                    for _img in image_refs:
                         message = {"role":"user",
                             "images": [_img] 
                             }
@@ -119,8 +123,7 @@ class LLMOCRAction(BufferNode, Action):
                         print(f"Model {self.model} not found locally. Pulling now...")
                         import ollama
                         ollama.pull(self.model)
-                        image_ref = [_image.split(",", 1)[1] for _image in image_ref]
-                        for _img in image_ref: 
+                        for _img in image_refs: 
                             message = {"role":"user",
                             "images": [_img] 
                             } 
