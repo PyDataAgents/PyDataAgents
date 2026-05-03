@@ -76,7 +76,7 @@ class DictBuffer(Buffer):
                 else:
                     if batch_len > 1:
                         elements[self.timestamps_key] = [ts_val] * batch_len
-                    # batch_len == 1 keeps scalar
+                    # batch_len == 1 keeps scalars or strings.
 
             if self.index_enabled and self.index_key in elements:
                 idx_val = elements[self.index_key]
@@ -86,7 +86,7 @@ class DictBuffer(Buffer):
                 else:
                     if batch_len > 1:
                         elements[self.index_key] = [idx_val] * batch_len
-                    # batch_len == 1 keeps scalar
+                    # batch_len == 1 keeps scalars or strings
             # Determine existing non-meta columns; always exclude meta columns from alignment padding.
             meta_keys = {self.timestamps_key, self.index_key}
             excluded = set()
@@ -137,7 +137,7 @@ class DictBuffer(Buffer):
                     # List of length batch_len
                     self._elements[k].extend(v)
                 else:
-                    # Scalar (batch_len == 1 case)
+                    # Scalar or strings (batch_len == 1 case)
                     self._elements[k].append(v)
             et = time.perf_counter_ns() # end ns timer
             el = et - st # elapsed time in ns for precise timestamp insertion
