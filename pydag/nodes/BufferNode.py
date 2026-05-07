@@ -19,8 +19,7 @@ class BufferNode(Node):
     buffer_id : str = field(default=None, metadata={"description": "unique ID of the buffer"})
     persistent : bool = field(default=True, metadata={"description": "specifies whether data is removed (False) from parent or not (True)"})
     n : int = field(default=0, metadata={"description": "specifies how much data is retrieved from parent buffer. Default 0 -> all data"})
-    input_keys : list[str] = field(default_factory=list, metadata={"description": "list of input key names used to extract data from parent buffers. If input_selector_mode is True, each entry can also be a selector over ordered parent keys: an integer index (e.g. '1' or '-1'), a Python-style slice string (e.g. '1:3' or '0:5:2', stop exclusive), or a type selector ('type:string' for text-like values, 'type:number' for numeric and bool values). Multiple selectors are combined with OR semantics, duplicates are removed while preserving first-match order. If empty, all parent keys are returned"})
-    input_selector_mode : bool = field(default=False, metadata={"description": "if True, input_keys support selector syntax (exact names, integer index selectors, slice strings, and type selectors). If False, input_keys are treated as literal key names only"})
+    input_keys : list[str] | list[int] | str = field(default_factory=None, metadata={"description": "list of input key names used to extract data from parent buffers. If input_selector_mode is True, each entry can also be a selector over ordered parent keys: an integer index (e.g. '1' or '-1'), a Python-style slice string (e.g. '1:3' or '0:5:2', stop exclusive), or a type selector ('type:string' for text-like values, 'type:number' for numeric and bool values). Multiple selectors are combined with OR semantics, duplicates are removed while preserving first-match order. If empty, all parent keys are returned"})
     output_keys : list[str] = field(default_factory=list, metadata={"description": "optional explicit output key names written by this node. output_keys are literal names only and do not support selector syntax. If empty, the node uses its default output naming"})
     ignore_keys : list[str] = field(default_factory=list, metadata={"description": "list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys"})        
     ignore_empty_parents : bool = field(default=True, metadata={"description": "if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True)"})
@@ -70,8 +69,8 @@ class BufferNode(Node):
                 )
                 self.buffer_id = self._buffer.id            
             self._buffer.install(agent)
-        NodeUtils.validate_key_names("input_keys", self.input_keys, allow_special=self.input_selector_mode)
-        NodeUtils.validate_key_names("output_keys", self.output_keys)
+        BufferNode.validate_keys(self.input_keys)
+        BufferNode.validate_keys(self.output_keys)
         
     def _on_uninstall(self, agent : 'Agent' = None):
         self._buffer : Buffer = None
@@ -125,69 +124,63 @@ class BufferNode(Node):
         - ignore_keys are removed from the final result regardless of source
         
         """
-        data = {}
         if len(self._parents) > 0:
-            if len(self._parents) == 1:
-                parent = next(iter(self._parents))
+            data = {}
+            has_buffer_parent : bool = False
+            for parent in self._parents:
                 if isinstance(parent, BufferNode):
                     if parent.get_buffer() is None:
-                        raise NodeException(f"{Buffer.__name__} not initialized in parent {parent.id}")                        
+                        raise NodeException(f"{Buffer.__name__} not initialized in parent {parent.id}")
                     d = parent.get_buffer().data(n = self.n, persistent = self.persistent)
-                    if len(self.input_keys) > 0 and d is not None:
-                        data = NodeUtils.filter_data_by_selectors(d, self.input_keys, input_selector_mode=self.input_selector_mode)
-                        if len(data) == 0 and len(d) > 0:
-                            if not self.ignore_empty_parents:
-                                raise NodeException("None of the specified input_keys were found in the parent buffer data")
-                    else:
-                        if d:
-                            data = d
-                        else:
-                            if not self.ignore_empty_parents and len(data) == 0:
-                                raise NodeException("No data was found in the parent buffer")
-                            else:
-                                data = {}
-                else:
-                    raise NodeException("Parent is not a " + BufferNode.cname())
-            else:
-                data = {}
-                for parent in self._parents:
-                    if isinstance(parent, BufferNode):
-                        if parent.get_buffer() is None:
-                            raise NodeException(f"{Buffer.__name__} not initialized in parent {parent.id}")
-                        d = parent.get_buffer().data(n = self.n, persistent = self.persistent)
-                        if d is not None:
-                            if len(d) > 0:
-                                if len(self.input_keys) > 0:
-                                    filtered = NodeUtils.filter_data_by_selectors(d, self.input_keys, input_selector_mode=self.input_selector_mode)
-                                    for dk, dv in filtered.items():
-                                        values = dv if isinstance(dv, list) else [dv]
-                                        if dk in data:
-                                            data[dk].extend(values)
+                    if d is not None:
+                        if len(d) > 0:
+                            if isinstance(self.input_keys, list[str]):
+                                for ik in self.input_keys:
+                                    if ik in d:
+                                        values = d[ik]
+                                        if ik in data:
+                                            data[ik].extend(values)
                                         else:
-                                            data[dk] = values
-                                else:
-                                    for key, value in d.items():
-                                        if key in data:
-                                            data[key].extend(value)
-                                        else:
-                                            if isinstance(value, list):
-                                                data[key] = value
+                                            if isinstance(values, list):
+                                                data[ik] = value
                                             else:
-                                                data[key] = [value]
-                    else:
-                        logger.debug("Parent is not a " + BufferNode.cname())
-                if len(data) == 0:
-                    if not self.ignore_empty_parents:
-                        if len(self.input_keys) > 0:
-                            raise NodeException("None of the specified input_keys were found in the parent buffers data")                            
-                        else:
-                            raise NodeException("No data was found in the parent buffer data")
+                                                data[ik] = [value]
+                            elif isinstance(self.input_keys, list[int]):
+                                pass
+                            elif isinstance(self.input_keys, str):
+                                pass
+                            elif self.input_keys is None:
+                                for key, value in d.items():
+                                    if key in data:
+                                        data[key].extend(value)
+                                    else:
+                                        if isinstance(value, list):
+                                            data[key] = value
+                                        else:
+                                            data[key] = [value] 
+                else:
+                    logger.debug("Parent is not a " + BufferNode.cname())
+            
+            if not has_buffer_parent:
+                raise NodeException(f"No parent {BufferNode.__name__} was specified for this {self.__class__.__name__}, get_parent_data() cannot be executed")
+            
             for ik in self.ignore_keys:
                 if ik in data:
-                    del data[ik]
-        if by_rows:
-            data = DataUtils.dict_to_list(data)
-        return data
+                    del data[ik]            
+            
+            if len(data) == 0:
+                if not self.ignore_empty_parents:
+                    if len(self.input_keys) > 0:
+                        raise NodeException("None of the specified input_keys were found in the parent buffers data")                            
+                    else:
+                        raise NodeException("No data was found in the parent buffer data")
+            
+            if by_rows:
+                data = DataUtils.dict_to_list(data)
+            
+            return data
+        else:
+            raise NodeException(f"No parent {Node.__name__} was specified for this {self.__class__.__name__}, get_parent_data() cannot be executed")
         
     def get_meta_info(self) -> dict:
         """
@@ -255,4 +248,31 @@ class BufferNode(Node):
         if meta is not None:
             for key in meta:
                 if hasattr(self._buffer, key):
-                    setattr(self._buffer, key, meta[key]) 
+                    setattr(self._buffer, key, meta[key])
+                    
+    @staticmethod
+    def validate_keys(keys : list[str] | list[int] | str):
+        if keys is None:
+            return
+        
+        if not isinstance(keys, (list[str], list[int], str)):
+            raise NodeException(f"keys must be a list of str | int or a str")
+
+        if isinstance(keys, list[str]):
+            seen = set()
+            for key in keys:
+                if not isinstance(key, str) or key.strip() == "":
+                    raise NodeException(f"keys must contain only non-empty strings")
+                normalized = key.strip()
+                if normalized in seen:
+                    raise NodeException(f"keys must contain unique entries")
+                seen.add(normalized)
+        elif isinstance(keys, list[int]):
+            # do nothing at the moment
+            return
+            
+        elif isinstance(keys, str):
+            return
+        
+        else:
+            raise NodeException("Wrong input type for keys")
