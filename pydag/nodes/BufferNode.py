@@ -1,9 +1,9 @@
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING
+import re
+from typing import TYPE_CHECKING, Any
 from loguru import logger
 
 from ..utils.DataUtils import DataUtils
-from ..utils.NodeUtils import NodeUtils
 from ..nodes.NodeException import NodeException
 from ..agents.AgentConfig import AgentConfig
 from ..buffers.DictBuffer import DictBuffer
@@ -12,6 +12,11 @@ from .Node import Node
 
 if TYPE_CHECKING:
     from ..agents.Agent import Agent
+
+TYPE_STRING = "type:string"
+TYPE_NUMBER = "type:number"
+INDEX_PATTERN = re.compile(r"^\s*-?\d+\s*$")
+SLICE_PATTERN = re.compile(r"^\s*(-?\d*)\s*:\s*(-?\d*)\s*(?::\s*(-?\d*)\s*)?$")
 
 @dataclass
 class BufferNode(Node):
@@ -69,8 +74,8 @@ class BufferNode(Node):
                 )
                 self.buffer_id = self._buffer.id            
             self._buffer.install(agent)
-        BufferNode.validate_keys(self.input_keys)
-        BufferNode.validate_keys(self.output_keys)
+        BufferNode._validate_keys(self.input_keys)
+        BufferNode._validate_keys(self.output_keys)
         
     def _on_uninstall(self, agent : 'Agent' = None):
         self._buffer : Buffer = None
@@ -142,22 +147,43 @@ class BufferNode(Node):
                                             data[ik].extend(values)
                                         else:
                                             if isinstance(values, list):
-                                                data[ik] = value
+                                                data[ik] = values
                                             else:
-                                                data[ik] = [value]
+                                                data[ik] = [values]
                             elif isinstance(self.input_keys, list[int]):
-                                pass
-                            elif isinstance(self.input_keys, str):
-                                pass
-                            elif self.input_keys is None:
-                                for key, value in d.items():
-                                    if key in data:
-                                        data[key].extend(value)
-                                    else:
-                                        if isinstance(value, list):
-                                            data[key] = value
+                                i : int = 0
+                                for k, values in d.items():
+                                    if i in self.input_keys:
+                                        if k in data:
+                                            data[k].extend(values)
                                         else:
-                                            data[key] = [value] 
+                                            if isinstance(values, list):
+                                                data[k] = values
+                                            else:
+                                                data[k] = [values]
+                                    i += 1
+                            elif isinstance(self.input_keys, str):
+                                selected_keys = BufferNode._parse_keys(list(d.keys()), self.input_keys, d)
+                                for k in selected_keys:
+                                    if k in d:
+                                        values = d[k]
+                                        if k in data:
+                                            data[k].extend(values)
+                                        else:
+                                            if isinstance(values, list):
+                                                data[k] = values
+                                            else:
+                                                data[k] = [values]
+                                
+                            elif self.input_keys is None:
+                                for key, values in d.items():
+                                    if key in data:
+                                        data[key].extend(values)
+                                    else:
+                                        if isinstance(values, list):
+                                            data[key] = values
+                                        else:
+                                            data[key] = [values] 
                 else:
                     logger.debug("Parent is not a " + BufferNode.cname())
             
@@ -251,28 +277,67 @@ class BufferNode(Node):
                     setattr(self._buffer, key, meta[key])
                     
     @staticmethod
-    def validate_keys(keys : list[str] | list[int] | str):
+    def _validate_keys(keys : list[str] | list[int] | str):
         if keys is None:
             return
         
-        if not isinstance(keys, (list[str], list[int], str)):
-            raise NodeException(f"keys must be a list of str | int or a str")
+        if not isinstance(keys, list):
+            if not isinstance(keys, str):
+                raise NodeException(f"keys must be a list of str | int or a str")
 
-        if isinstance(keys, list[str]):
-            seen = set()
-            for key in keys:
-                if not isinstance(key, str) or key.strip() == "":
-                    raise NodeException(f"keys must contain only non-empty strings")
-                normalized = key.strip()
-                if normalized in seen:
-                    raise NodeException(f"keys must contain unique entries")
-                seen.add(normalized)
-        elif isinstance(keys, list[int]):
-            # do nothing at the moment
-            return
+        if isinstance(keys, list):
+            if isinstance(keys[0], str):
+                seen = set()
+                for key in keys:
+                    if not isinstance(key, str) or key.strip() == "":
+                        raise NodeException(f"keys must contain only non-empty strings")
+                    normalized = key.strip()
+                    if normalized in seen:
+                        raise NodeException(f"keys must contain unique entries")
+                    seen.add(normalized)
+            elif isinstance(keys[0], int):
+                for k in keys:
+                    if not isinstance(k, int):
+                        raise NodeException("keys must contain all integer entries")
+            else:
+                raise NodeException("keys must be either all int or str entries")
             
         elif isinstance(keys, str):
             return
         
         else:
             raise NodeException("Wrong input type for keys")
+        
+    @staticmethod
+    def _parse_keys(keys : list[str], input_key_pattern : str, data : dict[str, list[Any]]) -> list[str]:
+        if input_key_pattern == TYPE_STRING:
+            return [key for key in keys if isinstance(BufferNode._sample_value(data[key]), str)]
+        if input_key_pattern == TYPE_NUMBER:
+            return [ key for key in keys if isinstance(BufferNode._sample_value(data[key]), (int, float, bool))]
+
+        match = SLICE_PATTERN.match(input_key_pattern)
+        if match:
+            return keys[slice(*(BufferNode._to_int(value) for value in match.groups()))]
+
+        if input_key_pattern in keys:
+            return [input_key_pattern]
+
+        if INDEX_PATTERN.match(input_key_pattern):
+            index = int(input_key_pattern)
+            if -len(keys) <= index < len(keys):
+                return [keys[index]]
+
+        return []
+
+    @staticmethod
+    def _sample_value(value):
+        if isinstance(value, list):
+            for item in value:
+                if item is not None:
+                    return item
+            return None
+        return value
+    
+    @staticmethod
+    def _to_int(value: str):
+        return None if value is None or value == "" else int(value)
