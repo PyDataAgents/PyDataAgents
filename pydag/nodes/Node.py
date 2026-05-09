@@ -78,7 +78,6 @@ class Node(AgentElement):
     def _check_state(self, next_state : AgentElementState):
         match(next_state):
             case AgentElementState.UNINSTALLED:
-                # any prior state is allowed
                 return
                 
             case AgentElementState.INSTALLED:

@@ -24,7 +24,7 @@ class BufferNode(Node):
     buffer_id : str = field(default=None, metadata={"description": "unique ID of the buffer"})
     persistent : bool = field(default=True, metadata={"description": "specifies whether data is removed (False) from parent or not (True)"})
     n : int = field(default=0, metadata={"description": "specifies how much data is retrieved from parent buffer. Default 0 -> all data"})
-    input_keys : list[str] | list[int] | str = field(default_factory=list, metadata={"description": "list of input key names used to extract data from parent buffers. If input_selector_mode is True, each entry can also be a selector over ordered parent keys: an integer index (e.g. '1' or '-1'), a Python-style slice string (e.g. '1:3' or '0:5:2', stop exclusive), or a type selector ('type:string' for text-like values, 'type:number' for numeric and bool values). Multiple selectors are combined with OR semantics, duplicates are removed while preserving first-match order. If empty, all parent keys are returned"})
+    input_keys : list[str] | list[int] | str = field(default_factory=list, metadata={"description": "list of input key names used to extract data from parent buffers. input_keys can also be a list of integers for indices or a Python-style slice string (e.g. '-1' for last index, '1:3' or '0:5:2' for start:stop:step exclusive indexing), or a type selector ('type:string' for text-like values, 'type:number' for numeric and bool values). Duplicates are removed while preserving first-match order. If empty, all parent keys are returned"})
     output_keys : list[str] = field(default_factory=list, metadata={"description": "optional explicit output key names written by this node. output_keys are literal names only and do not support selector syntax. If empty, the node uses its default output naming"})
     ignore_keys : list[str] = field(default_factory=list, metadata={"description": "list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys"})        
     ignore_empty_parents : bool = field(default=True, metadata={"description": "if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True)"})
@@ -134,34 +134,45 @@ class BufferNode(Node):
             has_buffer_parent : bool = False
             for parent in self._parents:
                 if isinstance(parent, BufferNode):
+                    has_buffer_parent = True
                     if parent.get_buffer() is None:
                         raise NodeException(f"{Buffer.__name__} not initialized in parent {parent.id}")
                     d = parent.get_buffer().data(n = self.n, persistent = self.persistent)
                     if d is not None:
                         if len(d) > 0:
-                            if isinstance(self.input_keys, list[str]):
-                                for ik in self.input_keys:
-                                    if ik in d:
-                                        values = d[ik]
-                                        if ik in data:
-                                            data[ik].extend(values)
+                            if isinstance(self.input_keys, list):
+                                if len(self.input_keys) == 0:
+                                    for key, values in d.items():
+                                        if key in data:
+                                            data[key].extend(values)
                                         else:
                                             if isinstance(values, list):
-                                                data[ik] = values
+                                                data[key] = values
                                             else:
-                                                data[ik] = [values]
-                            elif isinstance(self.input_keys, list[int]):
-                                i : int = 0
-                                for k, values in d.items():
-                                    if i in self.input_keys:
-                                        if k in data:
-                                            data[k].extend(values)
-                                        else:
-                                            if isinstance(values, list):
-                                                data[k] = values
+                                                data[key] = [values]
+                                elif isinstance(self.input_keys[0], str):
+                                    for ik in self.input_keys:
+                                        if ik in d:
+                                            values = d[ik]
+                                            if ik in data:
+                                                data[ik].extend(values)
                                             else:
-                                                data[k] = [values]
-                                    i += 1
+                                                if isinstance(values, list):
+                                                    data[ik] = values
+                                                else:
+                                                    data[ik] = [values]
+                                elif isinstance(self.input_keys[0], int):
+                                    i : int = 0
+                                    for k, values in d.items():
+                                        if i in self.input_keys:
+                                            if k in data:
+                                                data[k].extend(values)
+                                            else:
+                                                if isinstance(values, list):
+                                                    data[k] = values
+                                                else:
+                                                    data[k] = [values]
+                                        i += 1
                             elif isinstance(self.input_keys, str):
                                 selected_keys = BufferNode._parse_keys(list(d.keys()), self.input_keys, d)
                                 for k in selected_keys:
@@ -174,16 +185,6 @@ class BufferNode(Node):
                                                 data[k] = values
                                             else:
                                                 data[k] = [values]
-                                
-                            elif self.input_keys is None:
-                                for key, values in d.items():
-                                    if key in data:
-                                        data[key].extend(values)
-                                    else:
-                                        if isinstance(values, list):
-                                            data[key] = values
-                                        else:
-                                            data[key] = [values] 
                 else:
                     logger.debug("Parent is not a " + BufferNode.cname())
             

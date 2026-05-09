@@ -297,10 +297,10 @@ def test_060():
     # Act
     service.start()
     # Wait for thread to finish (ONLY_ONCE runs observer once and returns)
-    service._observer_thread._thread.join(timeout=2)
+    service._thread.join(timeout=2)
 
     # Assert
     # StartAction inherits Action but doesn't increment count; CountAction increments once
     assert a2.count == 1, f"Expected CountAction to execute once, executed {a2.count} times"
-    assert service._observer_thread.is_running() is False or service._observer_thread._thread.is_alive() is False
+    assert service._thread.is_alive() is False
     

@@ -1,6 +1,20 @@
 id: G1
+buffer_store:
+  B1:
+    type: pydag.buffers.SignalBuffer
+    id: B1
+    signal:
+      type: pydag.buffers.signals.Sine
+    capacity: 1      
 service_store:
-  OPC1:
-    type: pydag.services.opcua.OpcUaService
-    id: OPC1
-    endpoint: opc.tcp://jh:48010
+  CSV1:
+    type: pydag.services.csv.CsvWriteService
+    id: CSV1
+    folder: "tests/unit/agents/data"
+    file_post_fix: test
+    max_samples: 50
+    observing_time: 150
+    thread_type: MILLI_SECOND
+    mapping_type: WRITE
+    n: 1
+    persistent: False

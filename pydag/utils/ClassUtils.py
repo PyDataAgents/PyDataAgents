@@ -39,15 +39,18 @@ class ClassUtils:
     def set_property(obj, property_name, value):
         """
         Set a property of an object.
-        """        
+        """
         from pydag.agents.AgentConfig import AgentConfig
         if hasattr(obj, property_name):
-            attr = getattr(obj, property_name)            
+            attr = getattr(obj, property_name)
+            if attr is None:
+                if property_name in obj.__annotations__:
+                    attr = obj.__annotations__[property_name]
             #print(type(attr))
             from ..agents.AgentElement import AgentElement
             if isinstance(attr, AgentElement):
                 if isinstance(value, dict):
-                    # If the value is a dictionary, set properties of the AgentElement
+                    # If the value is a dictionary, set properties of the AgentElement or dataclass
                     if AgentConfig.TYPE in value:
                         # If the dictionary contains a type, create an instance of that type
                         sub_obj = ClassUtils.create_instance(value[AgentConfig.TYPE])
@@ -94,6 +97,19 @@ class ClassUtils:
                             setattr(obj, property_name, value)
                 else:
                     raise AgentException(f"Expected a list for property '{property_name}' of {obj}")
+            elif isinstance(attr, type):
+                if issubclass(attr, AgentElement):
+                    if isinstance(value, dict):
+                        # If the value is a dictionary, set properties of the AgentElement or dataclass
+                        if AgentConfig.TYPE in value:
+                            # If the dictionary contains a type, create an instance of that type
+                            sub_obj = ClassUtils.create_instance(value[AgentConfig.TYPE])
+                            ClassUtils.set_properties(sub_obj, value)
+                            setattr(obj, property_name, sub_obj)
+                        else:
+                            raise AgentException(f"Expected a dictionary with '{AgentConfig.TYPE}' for property '{property_name}' of {obj}, but got {value}.")
+                    else:
+                        raise AgentException(f"Expected a dictionary for property '{property_name}' of {obj}, but got {type(value).__name__}.")
             else:
                 setattr(obj, property_name, value)
         else:

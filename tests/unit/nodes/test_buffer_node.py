@@ -71,6 +71,58 @@ def test_parse_keys_with_indices():
     print(keys)
     assert len(keys) == 2, "wrong keys were parsed from sample DATA"
     
+def test_parse_keys_with_lastindex():
+    keys = BufferNode._parse_keys(list(DATA.keys()), "-1", DATA)
+    print(keys)
+    assert len(keys) == 1, "wrong keys were parsed from sample DATA"
+
+def test_parse_keys_with_last2index():
+    keys = BufferNode._parse_keys(list(DATA.keys()), "-2:", DATA)
+    print(keys)
+    assert len(keys) == 2, "wrong keys were parsed from sample DATA"
+    
+def test_copy_data_with_list_int_input_keys():
+    buf = DictBuffer()
+    buf.install()
+    buf.push(DATA)
+    
+    lba = LinkBufferAction()
+    lba.set_buffer(buf)
+    lba.install()
+    
+    buf2 = DictBuffer(index_enabled=False, timestamps_enabled=False)
+    
+    ca = CopyDataAction(input_keys=[1,3])
+    ca.set_buffer(buf2)
+    ca.add_parent(lba)
+    ca.install()
+    
+    ca.execute()
+    
+    data = ca.get_buffer().data()
+    assert len(data) == 2, "wrong number of keys extracted"
+    
+def test_copy_data_with_list_int_input_keys2():
+    buf = DictBuffer()
+    buf.install()
+    buf.push(DATA)
+    
+    lba = LinkBufferAction()
+    lba.set_buffer(buf)
+    lba.install()
+    
+    buf2 = DictBuffer(index_enabled=False, timestamps_enabled=False)
+    
+    ca = CopyDataAction(input_keys=[1,3,100])
+    ca.set_buffer(buf2)
+    ca.add_parent(lba)
+    ca.install()
+    
+    ca.execute()
+    
+    data = ca.get_buffer().data()
+    assert len(data) == 2, "wrong number of keys extracted"
+    
 def test_copy_data_with_list_str_input_keys():
     buf = DictBuffer()
     buf.install()
@@ -80,7 +132,10 @@ def test_copy_data_with_list_str_input_keys():
     lba.set_buffer(buf)
     lba.install()
     
-    ca = CopyDataAction(input_keys=[1,3])
+    buf2 = DictBuffer(index_enabled=False, timestamps_enabled=False)
+    
+    ca = CopyDataAction(input_keys=["status", "pressure"])
+    ca.set_buffer(buf2)
     ca.add_parent(lba)
     ca.install()
     
@@ -89,4 +144,24 @@ def test_copy_data_with_list_str_input_keys():
     data = ca.get_buffer().data()
     assert len(data) == 2, "wrong number of keys extracted"
     
+ 
+def test_copy_data_with_str_slice():
+    buf = DictBuffer()
+    buf.install()
+    buf.push(DATA)
     
+    lba = LinkBufferAction()
+    lba.set_buffer(buf)
+    lba.install()
+    
+    buf2 = DictBuffer(index_enabled=False, timestamps_enabled=False)
+    
+    ca = CopyDataAction(input_keys=["status", "pressure"])
+    ca.set_buffer(buf2)
+    ca.add_parent(lba)
+    ca.install()
+    
+    ca.execute()
+    
+    data = ca.get_buffer().data()
+    assert len(data) == 2, "wrong number of keys extracted"    

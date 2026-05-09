@@ -1,4 +1,4 @@
-id: 6214abf1-e7e4-46be-ac5e-4eac4643fe00
+id: 6ad96329-dd43-4147-8f37-e56f36194a50
 create_config: false
 load_on_install: false
 with_persistence: false
@@ -6,18 +6,18 @@ with_rest_api: false
 description: null
 buffer_store: {}
 service_store:
-  c3795295-d825-45ef-a8c9-d1d991229ea9:
+  3752d01b-308a-4909-ac28-6c9e4bddf421:
     type: pydag.services.statemachine.SFCService
-    id: c3795295-d825-45ef-a8c9-d1d991229ea9
+    id: 3752d01b-308a-4909-ac28-6c9e4bddf421
     load_on_install: false
     auto_start: true
     thread_type: INSTANT
     observing_time: 0
     week_days: null
     nodes:
-      57186f52-afc6-4922-8e69-edb49957f94d:
+      f365bbea-4830-4966-a490-4404a1e391be:
         type: pydag.nodes.utils.StartAction
-        id: 57186f52-afc6-4922-8e69-edb49957f94d
+        id: f365bbea-4830-4966-a490-4404a1e391be
         load_on_install: false
         child_ids: []
     retry_error_nodes: false
