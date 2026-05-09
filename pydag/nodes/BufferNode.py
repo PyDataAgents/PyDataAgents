@@ -24,7 +24,7 @@ class BufferNode(Node):
     buffer_id : str = field(default=None, metadata={"description": "unique ID of the buffer"})
     persistent : bool = field(default=True, metadata={"description": "specifies whether data is removed (False) from parent or not (True)"})
     n : int = field(default=0, metadata={"description": "specifies how much data is retrieved from parent buffer. Default 0 -> all data"})
-    input_keys : list[str] | list[int] | str = field(default_factory=None, metadata={"description": "list of input key names used to extract data from parent buffers. If input_selector_mode is True, each entry can also be a selector over ordered parent keys: an integer index (e.g. '1' or '-1'), a Python-style slice string (e.g. '1:3' or '0:5:2', stop exclusive), or a type selector ('type:string' for text-like values, 'type:number' for numeric and bool values). Multiple selectors are combined with OR semantics, duplicates are removed while preserving first-match order. If empty, all parent keys are returned"})
+    input_keys : list[str] | list[int] | str = field(default_factory=list, metadata={"description": "list of input key names used to extract data from parent buffers. If input_selector_mode is True, each entry can also be a selector over ordered parent keys: an integer index (e.g. '1' or '-1'), a Python-style slice string (e.g. '1:3' or '0:5:2', stop exclusive), or a type selector ('type:string' for text-like values, 'type:number' for numeric and bool values). Multiple selectors are combined with OR semantics, duplicates are removed while preserving first-match order. If empty, all parent keys are returned"})
     output_keys : list[str] = field(default_factory=list, metadata={"description": "optional explicit output key names written by this node. output_keys are literal names only and do not support selector syntax. If empty, the node uses its default output naming"})
     ignore_keys : list[str] = field(default_factory=list, metadata={"description": "list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys"})        
     ignore_empty_parents : bool = field(default=True, metadata={"description": "if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True)"})
@@ -286,23 +286,32 @@ class BufferNode(Node):
                 raise NodeException(f"keys must be a list of str | int or a str")
 
         if isinstance(keys, list):
-            if isinstance(keys[0], str):
-                seen = set()
-                for key in keys:
-                    if not isinstance(key, str) or key.strip() == "":
-                        raise NodeException(f"keys must contain only non-empty strings")
-                    normalized = key.strip()
-                    if normalized in seen:
-                        raise NodeException(f"keys must contain unique entries")
-                    seen.add(normalized)
-            elif isinstance(keys[0], int):
-                for k in keys:
-                    if not isinstance(k, int):
-                        raise NodeException("keys must contain all integer entries")
-            else:
-                raise NodeException("keys must be either all int or str entries")
+            if len(keys) > 0:
+                if isinstance(keys[0], str):
+                    seen = set()
+                    for key in keys:
+                        if not isinstance(key, str) or key.strip() == "":
+                            raise NodeException(f"keys must contain only non-empty strings")
+                        normalized = key.strip()
+                        if normalized in seen:
+                            raise NodeException(f"keys must contain unique entries")
+                        seen.add(normalized)
+                elif isinstance(keys[0], int):
+                    for k in keys:
+                        if not isinstance(k, int):
+                            raise NodeException("keys must contain all integer entries")
+                else:
+                    raise NodeException("keys must be either all int or str entries")
             
         elif isinstance(keys, str):
+            if keys.startswith("type:"):
+                known_type_pattern : bool = False
+                if keys == TYPE_STRING:
+                    known_type_pattern = True
+                elif keys == TYPE_NUMBER:
+                    known_type_pattern = True
+                if not known_type_pattern:
+                    raise NodeException("unknown string pattern for keys was specified")
             return
         
         else:
