@@ -6,8 +6,6 @@ import os
 import numpy as np
 import pandas as pd
 from loguru import logger 
-import fitz
-
 
 class DataUtils:
     
@@ -238,34 +236,6 @@ class DataUtils:
             encoded_string = base64.b64encode(image_file.read()).decode("utf-8")
             data_url = f"data:{mime_type};base64,{encoded_string}"
             return data_url
-    
-    @staticmethod
-    def pdf_base64_to_image_base64(pdf_base64: str, max_pages: int = 1000) -> list[str]:
-        # Remove data URL prefix if present
-        if "," in pdf_base64:
-            pdf_base64 = pdf_base64.split(",", 1)[1]
-
-        pdf_bytes = base64.b64decode(pdf_base64)
-
-        doc = fitz.open(stream=pdf_bytes, filetype="pdf")
-
-        image_refs = []
-
-        for page_index in range(min(max_pages, len(doc))):
-            page = doc[page_index]
-
-            pix = page.get_pixmap(
-                matrix=fitz.Matrix(2, 2),
-                alpha=False
-            )
-
-            png_bytes = pix.tobytes("png")
-            png_base64 = base64.b64encode(png_bytes).decode("utf-8")
-
-            image_refs.append(f"data:image/png;base64,{png_base64}")
-
-        return image_refs
-    
     
     
     @staticmethod

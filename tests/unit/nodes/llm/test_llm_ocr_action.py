@@ -3,8 +3,8 @@ import pytest
 from pydag.buffers.ListBuffer import ListBuffer
 from pydag.nodes.buffers.LinkBufferAction import LinkBufferAction
 from pydag.services.llm.LLMService import LLMService
+import pydag.nodes.llm.LLMOCRAction as llm_ocr_action_module
 from pydag.nodes.llm.LLMOCRAction import LLMOCRAction
-from pydag.utils.DataUtils import DataUtils
 import os
 import re
 import sys
@@ -326,12 +326,13 @@ def test_ollama_image_data_url_calls_mocked_client_without_data_url_prefix(monke
 
 def test_ollama_pdf_data_url_calls_mocked_client_once_per_page(monkeypatch):
     monkeypatch.setattr(
-        DataUtils,
-        "pdf_base64_to_image_base64",
+        llm_ocr_action_module,
+        "_pdf_base64_to_image_base64",
         lambda pdf_base64: [
             "data:image/png;base64,page-one-image",
             "data:image/png;base64,page-two-image",
         ],
+        raising=False,
     )
     lca = install_mocked_ollama_ocr_action(
         monkeypatch,
@@ -360,9 +361,10 @@ def test_ollama_pdf_data_url_calls_mocked_client_once_per_page(monkeypatch):
 
 def test_ollama_pdf_data_url_supports_different_output_keys(monkeypatch):
     monkeypatch.setattr(
-        DataUtils,
-        "pdf_base64_to_image_base64",
+        llm_ocr_action_module,
+        "_pdf_base64_to_image_base64",
         lambda pdf_base64: ["data:image/png;base64,page-image"],
+        raising=False,
     )
     lca = install_mocked_ollama_ocr_action(
         monkeypatch,

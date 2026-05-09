@@ -2,6 +2,7 @@ from dataclasses import dataclass, field
 from ...utils.DataUtils import DataUtils
 import os
 from loguru import logger
+import fitz
 
 
 
@@ -171,9 +172,36 @@ class LLMOCRAction(BufferNode, Action):
                 return {
                     "type": "document_url",
                     "document_url": str(image_ref),
-                }, image_path, DataUtils.pdf_base64_to_image_base64(image_ref)
+                }, image_path, _pdf_base64_to_image_base64(image_ref)
 
         return None, None, None
+
+
+    def _pdf_base64_to_image_base64(pdf_base64: str, max_pages: int = 1000) -> list[str]:
+        # Remove data URL prefix if present
+        if "," in pdf_base64:
+            pdf_base64 = pdf_base64.split(",", 1)[1]
+
+        pdf_bytes = base64.b64decode(pdf_base64)
+
+        doc = fitz.open(stream=pdf_bytes, filetype="pdf")
+
+        image_refs = []
+
+        for page_index in range(min(max_pages, len(doc))):
+            page = doc[page_index]
+
+            pix = page.get_pixmap(
+                matrix=fitz.Matrix(2, 2),
+                alpha=False
+            )
+
+            png_bytes = pix.tobytes("png")
+            png_base64 = base64.b64encode(png_bytes).decode("utf-8")
+
+            image_refs.append(f"data:image/png;base64,{png_base64}")
+
+        return image_refs
 
     
     def _serialize_ollama_ocr_response(self, response) -> str:
