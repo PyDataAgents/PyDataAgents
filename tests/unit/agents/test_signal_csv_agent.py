@@ -89,9 +89,6 @@ def test_signal_csv_agent_rest():
     ag.release(blocking=False)
     
     time.sleep(5)
-    
-    t = ag.state_tree()
-    print(t)
-    
+        
     ag.terminate()
     

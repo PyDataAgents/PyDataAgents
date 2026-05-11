@@ -26,6 +26,7 @@ class AgentConfig:
     TYPE = "type"
     ID = "id"
     DESCRIPTION = "description"
+    VALUE = "value"
     
     # Service Keywords    
     ADDRESS = "address"
@@ -75,32 +76,56 @@ class AgentConfig:
             # check for fields with metadata only
             if len(f.metadata) > 0:
                 value = getattr(obj, f.name)
-                if with_descriptions:
-                    result[f.name] = {
-                        "value": value,
-                        "description": f.metadata.get("description", "")
-                    }
-                else:
-                    if isinstance(value, AgentElement):
+                if isinstance(value, AgentElement):
+                    if with_descriptions:
+                        result[f.name] = {
+                            "value": value.config_options(with_descriptions),
+                            "description": f.metadata.get("description", "")
+                        }
+                    else:
                         result[f.name] = value.config_options(with_descriptions)
-                    elif isinstance(value, list):
-                        li = list()
-                        for item in value:
-                            if isinstance(item, AgentElement):
-                                li.append(item.config_options())
-                            else:
-                                li.append(item)
+                elif isinstance(value, list):
+                    li = list()
+                    for item in value:
+                        if isinstance(item, AgentElement):
+                            li.append(item.config_options())
+                        else:
+                            li.append(item)
+                    if with_descriptions:
+                        result[f.name] = {
+                            "value": li,
+                            "description": f.metadata.get("description", "")
+                        }
+                    else:
                         result[f.name] = li
-                    elif isinstance(value, dict):
-                        d = dict()
-                        for k, v in value.items():
-                            if isinstance(v, AgentElement):
-                                d[k] = v.config_options()
-                            else:
-                                d[k] = v
+                elif isinstance(value, dict):
+                    d = dict()
+                    for k, v in value.items():
+                        if isinstance(v, AgentElement):
+                            d[k] = v.config_options()
+                        else:
+                            d[k] = v
+                    if with_descriptions:
+                        result[f.name] = {
+                            "value": d,
+                            "description": f.metadata.get("description", "")
+                        }
+                    else:
                         result[f.name] = d
-                    elif hasattr(value, "__dict__"):
+                elif hasattr(value, "__dict__"):
+                    if with_descriptions:
+                        result[f.name] = {
+                            "value": AgentConfig.config_options(value),
+                            "description": f.metadata.get("description", "")
+                        }
+                    else:
                         result[f.name] = AgentConfig.config_options(value)
+                else:
+                    if with_descriptions:
+                        result[f.name] = {
+                            "value": value,
+                            "description": f.metadata.get("description", "")
+                        }
                     else:
                         result[f.name] = value
         return result

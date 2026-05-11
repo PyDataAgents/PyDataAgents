@@ -111,7 +111,14 @@ class ClassUtils:
                     else:
                         raise AgentException(f"Expected a dictionary for property '{property_name}' of {obj}, but got {type(value).__name__}.")
             else:
-                setattr(obj, property_name, value)
+                # check if property is an int
+                current_value = getattr(obj, property_name)
+                if isinstance(current_value, int) and not isinstance(current_value, bool):
+                    setattr(obj, property_name, int(value))
+                elif isinstance(current_value, bool):
+                    setattr(obj, property_name, bool(value))
+                else:
+                    setattr(obj, property_name, value)
         else:
             raise AgentException(f"Object {obj} has no attribute {property_name}")
         

@@ -10,14 +10,13 @@ from pydag.buffers.ListBuffer import ListBuffer
 from pydag.agents.AgentConfig import AgentConfig
 from pydag.agents.YAMLConfig import YAMLConfig
 from pydag.agents.Agent import Agent
-from pydag.services.MappingService import MappingService
 from pydag.services.ThreadType import ThreadType
 from pydag.utils.ClassUtils import ClassUtils
 from tests.unit.agents.ConfigObject import ConfigObject
 
 
 def test_000():
-    yaml_file = open(os.path.dirname(__file__) + "\\config.yaml", "r")
+    yaml_file = open(os.path.dirname(__file__) + "\\config.yaml", "r", encoding="utf-8")
     d = yaml.safe_load(yaml_file)
     print(d)
     

@@ -52,9 +52,5 @@ class AgentRESTAPI:
             if element_definition.requires_install:
                 element.install(agent)
             return {"success": True, "message": f"Property '{element_definition.prop}' of element with id '{id}' updated successfully to {element_definition.value}."}
-        
-        @router.get("/mgmt/states")
-        def get_state_tree() -> dict:
-            return agent.state_tree()
-                
+                        
         return router

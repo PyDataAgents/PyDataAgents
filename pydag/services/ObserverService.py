@@ -51,6 +51,8 @@ class ObserverService(Service):
     
     def _on_install(self, agent : Agent = None):
         super()._on_install(agent)
+    
+    def _create_thread(self):
         name = f"Thread-{self.__class__.__name__} {self.id}"
         match self.thread_type:
             case ThreadType.MILLI_SECOND.value:                    
@@ -88,6 +90,10 @@ class ObserverService(Service):
     
     def _on_uninstall(self, agent = None):
         super()._on_uninstall(agent)
+        self._thread = None
+        self._observers.clear()
+        self._scheduler = None
+        self._scheduled_job = None
         
     def add_observer(self, observer : Observer):
         """ adds a new `Observer` to `ObserverThread`        
@@ -102,6 +108,7 @@ class ObserverService(Service):
         """
         if len(self._observers) > 0:
             if not self._is_running:
+                self._create_thread()
                 # exclude TRIGGERED threads from being started
                 if self.thread_type != ThreadType.TRIGGERED.value:
                     with self._lock:
