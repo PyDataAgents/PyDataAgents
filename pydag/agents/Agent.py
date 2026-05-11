@@ -6,6 +6,9 @@ from dataclasses import dataclass, field
 import uuid
 from loguru import logger
 
+from pydag.agents.AgentStates import AgentElementState, ServiceState
+from pydag.utils.ClassUtils import ClassUtils
+
 from .AgentElementException import AgentElementException
 from .AgentException import AgentException
 from ..utils.FileUtils import FileUtils
@@ -317,81 +320,73 @@ class Agent():
                 logger.error(f"no {Node.cname()} with id={id} was found!")
                 return None
     
-    def state_tree(self) -> dict:
-        """ returns a dictionary tree structure with (Mapping)Services and their contained Nodes, Buffers
-        with their respective state, possible next iterations or other relevant info
-
-        Returns:
-            dict: dictionary with element tree
+    def edit_element(self, id : str, config_options : dict[str, Any]):
+        """ edits the `AgentElement` specified by id with the given `config_options` 
+        and correctly stops / reinstalls / starts associated `AgentElement`'s
+        
+        Args:
+            id: 
+            config_options:
+            
         """
-        tree : dict = {}
-        service : Service
-        for k, service in self.service_store.items():
-            if isinstance(service, MappingService):
-                sd : dict = {
-                    "type": service.type,
-                    "state": service.get_state(),
-                    "last_update": service.get_last_update(),
-                    "next_update": service.get_next_update(),
-                    "buffers": {}
-                }                
-                if len(service.get_buffers()) > 0:
-                    buffer : Buffer
-                    for kk, buffer in service.get_buffers().items():
-                        bd = {
-                            "type": buffer.type,
-                            "size": buffer.size(),
-                            "capacity": buffer.capacity,
-                            "state": buffer.get_state(),
-                            "last_access": buffer.get_last_access() 
-                        }
-                        sd["buffers"][buffer.id] = bd
-                tree[service.id] = sd
-            elif isinstance(service, StatemachineService):
-                nds : dict = {}
-                node : Node
-                for kk, node in service.nodes.items():
-                    nd : dict = {
-                        "type": node.type,
-                        "state": node.get_state(),
-                        "last_execution": node.get_last_timestamp(),
-                        "active": node.is_active(),
-                    }
-                    if isinstance(node, BufferNode):
-                        if node.get_buffer():
-                            nd["buffer"] = {
-                                "id": node.get_buffer().id,
-                                "type": node.get_buffer().type,
-                                "size": node.get_buffer().size(),
-                                "capacity": node.get_buffer().capacity,
-                                "state": node.get_buffer().get_state(),
-                                "last_access": node.get_buffer().get_last_access()
-                            }
-                        
-                    nds[node.id] = nd
-                sd : dict = {
-                    "type": service.type,
-                    "state": service.get_state(),
-                    "last_update": service.get_last_update(),
-                    "next_update": service.get_next_update(),
-                    "nodes": nds                
-                }
-                tree[service.id] = sd
-            elif isinstance(service, ObserverService):                
-                sd : dict = {
-                    "type": service.type,
-                    "state": service.get_state(),
-                    "last_update": service.get_last_update(),
-                    "next_update": service.get_next_update()
-                }
-                tree[service.id] = sd
-            else:
-                sd : dict = {
-                    "type": service.type,
-                    "state": service.get_state()
-                }
-                tree[service.id] = sd
-        return tree
+        agent_element : AgentElement = self.get_element(id)
+        if agent_element:
+            from ..buffers.Buffer import Buffer
+            from ..services.Service import Service
+            services_for_restart : list[Service] = []
+            elements_for_reinstall : list[AgentElement] = []
+            elements_for_reinstall.append(agent_element)                
+            if isinstance(agent_element, Buffer):
+                for k, service in self.service_store.items():                    
+                    if service.contains_element(id):
+                        services_for_restart.append(service)
+                    if isinstance(service, StatemachineService):
+                        for kk, node in service.nodes.items():
+                            if node.contains_element(id):
+                                elements_for_reinstall.append(node)
+                                services_for_restart.append(service)
+            elif isinstance(agent_element, Service):
+                services_for_restart.append(agent_element)                
+            elif isinstance(agent_element, Node):
+                for k, service in self.service_store.items():
+                    if isinstance(service, StatemachineService):
+                        if service.contains_element(id):
+                            services_for_restart.append(service)
+            elif isinstance(agent_element, AgentElement):
+                for k, service in self.service_store.items():
+                    if service.contains_element(id):
+                        services_for_restart.append(service)
+                    if isinstance(service, StatemachineService):
+                        for kk, node in service.nodes.items():
+                            if node.contains_element(id):
+                                elements_for_reinstall.append(node)
+                                services_for_restart.append(service)
+                for k, buffer in self.buffer_store.items():
+                    if buffer.contains_element(id):
+                        elements_for_reinstall.append(buffer)
+            
+            # stop all required services
+            for service in services_for_restart:
+                if service.get_state() == ServiceState.RUNNING:
+                    service.stop()
+                    
+            # uninstall all required elements
+            for element in  elements_for_reinstall:
+                element.uninstall(self)
+                
+            # set new properties
+            ClassUtils.set_properties(agent_element, config_options)
+            
+            # install all required elements
+            for element in elements_for_reinstall:
+                element.install(self)
+                
+            # restart required services
+            for service in services_for_restart:
+                if service.get_state() == AgentElementState.INSTALLED:
+                    service.start()
+        else:
+            raise AgentException(f"Could not find any {AgentElement.__name__} with id={id} in {Agent.__name__}")                
     
     def _get_deep_element(self, id : str) -> AgentElement:
         """checks for nested `AgentElement`s
@@ -406,15 +401,31 @@ class Agent():
             for attr_name, attr_value in vars(service).items():
                 #print(f"{attr_name}: {type(attr_value)}")
                 if isinstance(attr_value, AgentElement):
-                    if attr_value.id == id:
-                        return attr_value
+                    return Agent._recursive_element_search(attr_value, id)
+
             # special case for statemachine services, look into nodes
             if isinstance(service, StatemachineService):
                 for node in service.nodes.values():
-                    if cast(Node, node).id == id:
-                        return node
+                    return Agent._recursive_element_search(node, id)
+        
+        for buffer in self.buffer_store.values():
+            for attr_name, attr_value in vars(buffer).items():
+                #print(f"{attr_name}: {type(attr_value)}")
+                if isinstance(attr_value, AgentElement):
+                    return Agent._recursive_element_search(attr_value, id)
         return None
     
+    @staticmethod
+    def _recursive_element_search(root_element : AgentElement, id : str) -> AgentElement:
+        if root_element.id == id:
+            return root_element
+        else:
+            for attr_name, attr_value in vars(root_element).items():
+                if isinstance(attr_value, AgentElement):
+                    if attr_value.id == id:
+                        return attr_value
+                    return Agent._recursive_element_search(attr_value, id)
+        
     def is_running(self) -> bool:
         """Check if the Agent is currently running.
         
