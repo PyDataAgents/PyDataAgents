@@ -106,8 +106,8 @@
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
-| `id` | `str` | `` | unique identifier of element in DataGrabber application |
-| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 
 
 ```python
@@ -116,7 +116,7 @@ from pydag.nodes.Action import Action  # Adjust import if needed
 
 obj = Action()
 obj.child_ids='list()'
-obj.id="<string>"
+obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
 obj.load_on_install=False
 ```
 
@@ -126,8 +126,8 @@ obj.load_on_install=False
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
-| `id` | `str` | `` | unique identifier of element in DataGrabber application |
-| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 
 
 ```python
@@ -136,7 +136,7 @@ from pydag.nodes.AgentNode import AgentNode  # Adjust import if needed
 
 obj = AgentNode()
 obj.child_ids='list()'
-obj.id="<string>"
+obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
 obj.load_on_install=False
 ```
 
@@ -146,8 +146,8 @@ obj.load_on_install=False
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
-| `id` | `str` | `` | unique identifier of element in DataGrabber application |
-| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `buffer_id` | `str` | `` | unique ID of the buffer |
 | `persistent` | `bool` | `True` | specifies whether data is removed (False) from parent or not (True) |
 | `n` | `int` | `0` | specifies how much data is retrieved from parent buffer. Default 0 -> all data |
@@ -163,7 +163,7 @@ from pydag.nodes.BufferNode import BufferNode  # Adjust import if needed
 
 obj = BufferNode()
 obj.child_ids='list()'
-obj.id="<string>"
+obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
 obj.load_on_install=False
 obj.buffer_id="<string>"
 obj.persistent=True
@@ -189,8 +189,8 @@ It extends the BufferNode class and provides additional functionality specific t
 | `output_keys` | `list[str]` | `'list()'` | optional explicit output key names written by this node. output_keys are literal names only and do not support selector syntax. If empty, the node uses its default output naming |
 | `ignore_keys` | `list[str]` | `'list()'` | list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys |
 | `ignore_empty_parents` | `bool` | `True` | if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True) |
-| `id` | `str` | `` | unique identifier of element in DataGrabber application |
-| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `min_learning_samples` | `int` | `0` | Minimum number of samples required for learning. |
 | `min_inference_samples` | `int` | `0` | Number of Samples to do inference on. |
 | `sample_length` | `int` | `0` | Expected length of each sample. If 0, a sample with shape (1, min_learning_samples) is assumed. Otherwise, (1, sample_length) is assumed. |
@@ -211,7 +211,7 @@ obj.input_keys='list()'
 obj.output_keys='list()'
 obj.ignore_keys='list()'
 obj.ignore_empty_parents=True
-obj.id="<string>"
+obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
 obj.load_on_install=False
 obj.min_learning_samples=0
 obj.min_inference_samples=0
@@ -225,8 +225,8 @@ obj.nan_to_num=False
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| `id` | `str` | `` | unique identifier of element in DataGrabber application |
-| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
 
 
@@ -235,7 +235,7 @@ obj.nan_to_num=False
 from pydag.nodes.Node import Node  # Adjust import if needed
 
 obj = Node()
-obj.id="<string>"
+obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
 obj.load_on_install=False
 obj.child_ids='list()'
 ```
@@ -248,8 +248,8 @@ Inherits from Node and adds functionality specific to service nodes.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
-| `id` | `str` | `` | unique identifier of element in DataGrabber application |
-| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `service_id` | `str` | `` | ID of the service |
 
 
@@ -259,7 +259,7 @@ from pydag.nodes.ServiceNode import ServiceNode  # Adjust import if needed
 
 obj = ServiceNode()
 obj.child_ids='list()'
-obj.id="<string>"
+obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
 obj.load_on_install=False
 obj.service_id="<string>"
 ```
@@ -272,8 +272,8 @@ A `Transition` `Node` that defines conditions for state transitions in a state m
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
-| `id` | `str` | `` | unique identifier of element in DataGrabber application |
-| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 
 
 ```python
@@ -282,7 +282,7 @@ from pydag.nodes.Transition import Transition  # Adjust import if needed
 
 obj = Transition()
 obj.child_ids='list()'
-obj.id="<string>"
+obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
 obj.load_on_install=False
 ```
 
@@ -294,8 +294,8 @@ but are rather started from external events and trigger the execution `Statemach
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
-| `id` | `str` | `` | unique identifier of element in DataGrabber application |
-| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 
 
 ```python
@@ -304,7 +304,7 @@ from pydag.nodes.TriggerAction import TriggerAction  # Adjust import if needed
 
 obj = TriggerAction()
 obj.child_ids='list()'
-obj.id="<string>"
+obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
 obj.load_on_install=False
 ```
 
@@ -315,8 +315,8 @@ Action to add a buffer to the agent node.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
-| `id` | `str` | `` | unique identifier of element in DataGrabber application |
-| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `config` | `dict` | `` | Configuration for the buffer to be added. |
 
 
@@ -326,7 +326,7 @@ from pydag.nodes.buffers.AddBufferAction import AddBufferAction  # Adjust import
 
 obj = AddBufferAction()
 obj.child_ids='list()'
-obj.id="<string>"
+obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
 obj.load_on_install=False
 obj.config={}
 ```
@@ -346,8 +346,8 @@ If the buffer is empty, the transition is successful.
 | `output_keys` | `list[str]` | `'list()'` | optional explicit output key names written by this node. output_keys are literal names only and do not support selector syntax. If empty, the node uses its default output naming |
 | `ignore_keys` | `list[str]` | `'list()'` | list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys |
 | `ignore_empty_parents` | `bool` | `True` | if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True) |
-| `id` | `str` | `` | unique identifier of element in DataGrabber application |
-| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 
 
 ```python
@@ -363,7 +363,7 @@ obj.input_keys='list()'
 obj.output_keys='list()'
 obj.ignore_keys='list()'
 obj.ignore_empty_parents=True
-obj.id="<string>"
+obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
 obj.load_on_install=False
 ```
 
@@ -382,8 +382,8 @@ This `Action` can only be applied on if the specified buffer is of type `DictBuf
 | `output_keys` | `list[str]` | `'list()'` | optional explicit output key names written by this node. output_keys are literal names only and do not support selector syntax. If empty, the node uses its default output naming |
 | `ignore_keys` | `list[str]` | `'list()'` | list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys |
 | `ignore_empty_parents` | `bool` | `True` | if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True) |
-| `id` | `str` | `` | unique identifier of element in DataGrabber application |
-| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `extract_buffer_id` | `str` | `` | id of the buffer to extract data from |
 
 
@@ -400,7 +400,7 @@ obj.input_keys='list()'
 obj.output_keys='list()'
 obj.ignore_keys='list()'
 obj.ignore_empty_parents=True
-obj.id="<string>"
+obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
 obj.load_on_install=False
 obj.extract_buffer_id="<string>"
 ```
@@ -420,8 +420,8 @@ If the buffer matches the target, the transition is successful.
 | `output_keys` | `list[str]` | `'list()'` | optional explicit output key names written by this node. output_keys are literal names only and do not support selector syntax. If empty, the node uses its default output naming |
 | `ignore_keys` | `list[str]` | `'list()'` | list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys |
 | `ignore_empty_parents` | `bool` | `True` | if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True) |
-| `id` | `str` | `` | unique identifier of element in DataGrabber application |
-| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `comparator` | `str` | `` | the comparison operator to use |
 | `upper_limit` | `any` | `` | the upper limit of the range |
 | `lower_limit` | `any` | `` | the lower limit of the range |
@@ -440,7 +440,7 @@ obj.input_keys='list()'
 obj.output_keys='list()'
 obj.ignore_keys='list()'
 obj.ignore_empty_parents=True
-obj.id="<string>"
+obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
 obj.load_on_install=False
 obj.comparator="<string>"
 obj.upper_limit="<value>"
@@ -462,8 +462,8 @@ If the buffer is not empty, the transition is successful.
 | `output_keys` | `list[str]` | `'list()'` | optional explicit output key names written by this node. output_keys are literal names only and do not support selector syntax. If empty, the node uses its default output naming |
 | `ignore_keys` | `list[str]` | `'list()'` | list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys |
 | `ignore_empty_parents` | `bool` | `True` | if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True) |
-| `id` | `str` | `` | unique identifier of element in DataGrabber application |
-| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 
 
 ```python
@@ -479,7 +479,7 @@ obj.input_keys='list()'
 obj.output_keys='list()'
 obj.ignore_keys='list()'
 obj.ignore_empty_parents=True
-obj.id="<string>"
+obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
 obj.load_on_install=False
 ```
 
@@ -496,8 +496,8 @@ obj.load_on_install=False
 | `output_keys` | `list[str]` | `'list()'` | optional explicit output key names written by this node. output_keys are literal names only and do not support selector syntax. If empty, the node uses its default output naming |
 | `ignore_keys` | `list[str]` | `'list()'` | list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys |
 | `ignore_empty_parents` | `bool` | `True` | if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True) |
-| `id` | `str` | `` | unique identifier of element in DataGrabber application |
-| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 
 
 ```python
@@ -513,7 +513,7 @@ obj.input_keys='list()'
 obj.output_keys='list()'
 obj.ignore_keys='list()'
 obj.ignore_empty_parents=True
-obj.id="<string>"
+obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
 obj.load_on_install=False
 ```
 
@@ -532,8 +532,8 @@ If the buffer matches the target, the transition is successful.
 | `output_keys` | `list[str]` | `'list()'` | optional explicit output key names written by this node. output_keys are literal names only and do not support selector syntax. If empty, the node uses its default output naming |
 | `ignore_keys` | `list[str]` | `'list()'` | list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys |
 | `ignore_empty_parents` | `bool` | `True` | if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True) |
-| `id` | `str` | `` | unique identifier of element in DataGrabber application |
-| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `comparator` | `str` | `` | The comparison operator to use. |
 | `value` | `any` | `` | The value to compare against the buffer. |
 
@@ -551,7 +551,7 @@ obj.input_keys='list()'
 obj.output_keys='list()'
 obj.ignore_keys='list()'
 obj.ignore_empty_parents=True
-obj.id="<string>"
+obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
 obj.load_on_install=False
 obj.comparator="<string>"
 obj.value="<value>"
@@ -572,8 +572,8 @@ The copy procedure makes a deep of all the parent's `Buffer` elements
 | `output_keys` | `list[str]` | `'list()'` | optional explicit output key names written by this node. output_keys are literal names only and do not support selector syntax. If empty, the node uses its default output naming |
 | `ignore_keys` | `list[str]` | `'list()'` | list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys |
 | `ignore_empty_parents` | `bool` | `True` | if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True) |
-| `id` | `str` | `` | unique identifier of element in DataGrabber application |
-| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 
 
 ```python
@@ -589,7 +589,7 @@ obj.input_keys='list()'
 obj.output_keys='list()'
 obj.ignore_keys='list()'
 obj.ignore_empty_parents=True
-obj.id="<string>"
+obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
 obj.load_on_install=False
 ```
 
@@ -609,8 +609,8 @@ Before this `Node`s `Buffer` is filled, all other elements are cleared.
 | `output_keys` | `list[str]` | `'list()'` | optional explicit output key names written by this node. output_keys are literal names only and do not support selector syntax. If empty, the node uses its default output naming |
 | `ignore_keys` | `list[str]` | `'list()'` | list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys |
 | `ignore_empty_parents` | `bool` | `True` | if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True) |
-| `id` | `str` | `` | unique identifier of element in DataGrabber application |
-| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `clear_first` | `bool` | `True` | if set to true, this Buffer's content is cleared before copying |
 
 
@@ -627,7 +627,7 @@ obj.input_keys='list()'
 obj.output_keys='list()'
 obj.ignore_keys='list()'
 obj.ignore_empty_parents=True
-obj.id="<string>"
+obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
 obj.load_on_install=False
 obj.clear_first=True
 ```
@@ -645,8 +645,8 @@ obj.clear_first=True
 | `output_keys` | `list[str]` | `'list()'` | optional explicit output key names written by this node. output_keys are literal names only and do not support selector syntax. If empty, the node uses its default output naming |
 | `ignore_keys` | `list[str]` | `'list()'` | list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys |
 | `ignore_empty_parents` | `bool` | `True` | if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True) |
-| `id` | `str` | `` | unique identifier of element in DataGrabber application |
-| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `row_filter` | `str` | `` | pandas filter command to apply to filter the rows of the buffer converted to dataframe |
 | `column_filter` | `list[str]` | `'list()'` | list of columns to filter for |
 
@@ -664,7 +664,7 @@ obj.input_keys='list()'
 obj.output_keys='list()'
 obj.ignore_keys='list()'
 obj.ignore_empty_parents=True
-obj.id="<string>"
+obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
 obj.load_on_install=False
 obj.row_filter="<string>"
 obj.column_filter='list()'
@@ -685,8 +685,8 @@ If this `Node`'s parents contain more than one `BufferNode`, only the first is r
 | `output_keys` | `list[str]` | `'list()'` | optional explicit output key names written by this node. output_keys are literal names only and do not support selector syntax. If empty, the node uses its default output naming |
 | `ignore_keys` | `list[str]` | `'list()'` | list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys |
 | `ignore_empty_parents` | `bool` | `True` | if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True) |
-| `id` | `str` | `` | unique identifier of element in DataGrabber application |
-| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `clear_first` | `bool` | `True` | if set to true, this Buffer's content is cleared before copying |
 | `buffer_ids` | `list[str]` | `'list()'` | ids of the buffers to copy data to |
 
@@ -704,7 +704,7 @@ obj.input_keys='list()'
 obj.output_keys='list()'
 obj.ignore_keys='list()'
 obj.ignore_empty_parents=True
-obj.id="<string>"
+obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
 obj.load_on_install=False
 obj.clear_first=True
 obj.buffer_ids='list()'
@@ -723,8 +723,8 @@ obj.buffer_ids='list()'
 | `output_keys` | `list[str]` | `'list()'` | optional explicit output key names written by this node. output_keys are literal names only and do not support selector syntax. If empty, the node uses its default output naming |
 | `ignore_keys` | `list[str]` | `'list()'` | list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys |
 | `ignore_empty_parents` | `bool` | `True` | if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True) |
-| `id` | `str` | `` | unique identifier of element in DataGrabber application |
-| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `create_new` | `bool` | `True` | specifies whether to create a new Buffer or append the referenced one |
 | `format_keys` | `list[str]` | `'list[str]()'` | specifies the keys to use from original buffer(s) to format new column |
 | `new_key` | `str` | `` | specifies the new column key for the formatted data |
@@ -744,7 +744,7 @@ obj.input_keys='list()'
 obj.output_keys='list()'
 obj.ignore_keys='list()'
 obj.ignore_empty_parents=True
-obj.id="<string>"
+obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
 obj.load_on_install=False
 obj.create_new=True
 obj.format_keys='list[str]()'
@@ -767,8 +767,8 @@ using its parent's buffer to create the new string
 | `output_keys` | `list[str]` | `'list()'` | optional explicit output key names written by this node. output_keys are literal names only and do not support selector syntax. If empty, the node uses its default output naming |
 | `ignore_keys` | `list[str]` | `'list()'` | list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys |
 | `ignore_empty_parents` | `bool` | `True` | if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True) |
-| `id` | `str` | `` | unique identifier of element in DataGrabber application |
-| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `template` | `str` | `` | string template to insert the data from the parent buffer into, e.g. 'Hi {}, are you from {}' |
 
 
@@ -785,7 +785,7 @@ obj.input_keys='list()'
 obj.output_keys='list()'
 obj.ignore_keys='list()'
 obj.ignore_empty_parents=True
-obj.id="<string>"
+obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
 obj.load_on_install=False
 obj.template="<string>"
 ```
@@ -805,8 +805,8 @@ therefore an empty execute method is provided
 | `output_keys` | `list[str]` | `'list()'` | optional explicit output key names written by this node. output_keys are literal names only and do not support selector syntax. If empty, the node uses its default output naming |
 | `ignore_keys` | `list[str]` | `'list()'` | list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys |
 | `ignore_empty_parents` | `bool` | `True` | if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True) |
-| `id` | `str` | `` | unique identifier of element in DataGrabber application |
-| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 
 
 ```python
@@ -822,7 +822,7 @@ obj.input_keys='list()'
 obj.output_keys='list()'
 obj.ignore_keys='list()'
 obj.ignore_empty_parents=True
-obj.id="<string>"
+obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
 obj.load_on_install=False
 ```
 
@@ -839,8 +839,8 @@ obj.load_on_install=False
 | `output_keys` | `list[str]` | `'list()'` | optional explicit output key names written by this node. output_keys are literal names only and do not support selector syntax. If empty, the node uses its default output naming |
 | `ignore_keys` | `list[str]` | `'list()'` | list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys |
 | `ignore_empty_parents` | `bool` | `True` | if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True) |
-| `id` | `str` | `` | unique identifier of element in DataGrabber application |
-| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `signal` | `SampledSignal` | `` |  |
 
 
@@ -857,7 +857,7 @@ obj.input_keys='list()'
 obj.output_keys='list()'
 obj.ignore_keys='list()'
 obj.ignore_empty_parents=True
-obj.id="<string>"
+obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
 obj.load_on_install=False
 obj.signal="<value>"
 ```
@@ -882,8 +882,8 @@ Returns the deviation as well as the outlier-decision to the first distribution 
 | `sample_length` | `int` | `0` | Expected length of each sample. If 0, a sample with shape (1, min_learning_samples) is assumed. Otherwise, (1, sample_length) is assumed. |
 | `normalize` | `bool` | `False` | Flag to indicate whether to normalize the input data using z-score normalization on the input batch. |
 | `nan_to_num` | `bool` | `False` | If True, replace NaN/Inf values with finite numbers (0.0). |
-| `id` | `str` | `` | unique identifier of element in DataGrabber application |
-| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `inference_buffer_size` | `int` | `10000000.0` | Size of the buffer for the inference data. This is the data which is appended to the training data to calculate the distribution to compare with the distribution of the training data. |
 | `bin_count` | `int` | `10` | number of bins per dimension of the grid. Each dimension is spanned by one value of the input data, e.g. if you have data like [[10,2,2],....,[12,2,5]], the first dimension is spanned by the values [10, ..., 12 ] and so on. Can be imagined as the # of squares in x and y direction. The features are binned to the number of bins to calculate the distribution. |
 | `compare_mode` | `str` | `'CompareMode.JSD.value'` | The comparison function which is used to compare the distribution of the training data with the distribution of the inference data. |
@@ -912,7 +912,7 @@ obj.min_inference_samples=0
 obj.sample_length=0
 obj.normalize=False
 obj.nan_to_num=False
-obj.id="<string>"
+obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
 obj.load_on_install=False
 obj.inference_buffer_size=10000000.0
 obj.bin_count=10
@@ -940,8 +940,8 @@ Args:
 | `output_keys` | `list[str]` | `'list()'` | optional explicit output key names written by this node. output_keys are literal names only and do not support selector syntax. If empty, the node uses its default output naming |
 | `ignore_keys` | `list[str]` | `'list()'` | list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys |
 | `ignore_empty_parents` | `bool` | `True` | if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True) |
-| `id` | `str` | `` | unique identifier of element in DataGrabber application |
-| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `index` | `str | list` | `'list()'` |  |
 | `columns` | `str | list` | `'list()'` |  |
 | `values` | `str | list` | `'list()'` |  |
@@ -961,7 +961,7 @@ obj.input_keys='list()'
 obj.output_keys='list()'
 obj.ignore_keys='list()'
 obj.ignore_empty_parents=True
-obj.id="<string>"
+obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
 obj.load_on_install=False
 obj.index='list()'
 obj.columns='list()'
@@ -984,8 +984,8 @@ obj.aggfunc='list()'
 | `output_keys` | `list[str]` | `'list()'` | optional explicit output key names written by this node. output_keys are literal names only and do not support selector syntax. If empty, the node uses its default output naming |
 | `ignore_keys` | `list[str]` | `'list()'` | list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys |
 | `ignore_empty_parents` | `bool` | `True` | if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True) |
-| `id` | `str` | `` | unique identifier of element in DataGrabber application |
-| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `connection_str` | `str` | `` | connection string for the specific SQL database |
 | `query` | `str` | `` | SQL query to execute. If `input_keys` are defined, the query is treated as a parameterized query and values are taken from the buffers. |
 
@@ -1003,7 +1003,7 @@ obj.input_keys='list()'
 obj.output_keys='list()'
 obj.ignore_keys='list()'
 obj.ignore_empty_parents=True
-obj.id="<string>"
+obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
 obj.load_on_install=False
 obj.connection_str="<string>"
 obj.query="<string>"
@@ -1028,8 +1028,8 @@ Hence sample_length should be larger than the number of dimensions.
 | `sample_length` | `int` | `0` | Expected length of each sample. If 0, a sample with shape (1, min_learning_samples) is assumed. Otherwise, (1, sample_length) is assumed. |
 | `normalize` | `bool` | `False` | Flag to indicate whether to normalize the input data using z-score normalization on the input batch. |
 | `nan_to_num` | `bool` | `False` | If True, replace NaN/Inf values with finite numbers (0.0). |
-| `id` | `str` | `` | unique identifier of element in DataGrabber application |
-| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `dimensions` | `int` | `2` | number of dimensions to reduce the data to |
 | `output_keys` | `list[str]` | `'list()'` | optional explicit output keys; if empty, default naming is used |
 
@@ -1051,7 +1051,7 @@ obj.min_inference_samples=0
 obj.sample_length=0
 obj.normalize=False
 obj.nan_to_num=False
-obj.id="<string>"
+obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
 obj.load_on_install=False
 obj.dimensions=2
 obj.output_keys='list()'
@@ -1076,8 +1076,8 @@ Hence sample_length should be larger than the number of dimensions.
 | `sample_length` | `int` | `0` | Expected length of each sample. If 0, a sample with shape (1, min_learning_samples) is assumed. Otherwise, (1, sample_length) is assumed. |
 | `normalize` | `bool` | `False` | Flag to indicate whether to normalize the input data using z-score normalization on the input batch. |
 | `nan_to_num` | `bool` | `False` | If True, replace NaN/Inf values with finite numbers (0.0). |
-| `id` | `str` | `` | unique identifier of element in DataGrabber application |
-| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `dimensions` | `int` | `2` |  |
 | `output_keys` | `list[str]` | `'list()'` | optional explicit output keys; if empty, default naming is used |
 
@@ -1099,7 +1099,7 @@ obj.min_inference_samples=0
 obj.sample_length=0
 obj.normalize=False
 obj.nan_to_num=False
-obj.id="<string>"
+obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
 obj.load_on_install=False
 obj.dimensions=2
 obj.output_keys='list()'
@@ -1124,8 +1124,8 @@ Hence sample_length should be larger than the number of dimensions.
 | `sample_length` | `int` | `0` | Expected length of each sample. If 0, a sample with shape (1, min_learning_samples) is assumed. Otherwise, (1, sample_length) is assumed. |
 | `normalize` | `bool` | `False` | Flag to indicate whether to normalize the input data using z-score normalization on the input batch. |
 | `nan_to_num` | `bool` | `False` | If True, replace NaN/Inf values with finite numbers (0.0). |
-| `id` | `str` | `` | unique identifier of element in DataGrabber application |
-| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `dimensions` | `int` | `2` |  |
 | `output_keys` | `list[str]` | `'list()'` | optional explicit output keys; if empty, default naming is used |
 
@@ -1147,7 +1147,7 @@ obj.min_inference_samples=0
 obj.sample_length=0
 obj.normalize=False
 obj.nan_to_num=False
-obj.id="<string>"
+obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
 obj.load_on_install=False
 obj.dimensions=2
 obj.output_keys='list()'
@@ -1161,8 +1161,8 @@ obj.output_keys='list()'
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
-| `id` | `str` | `` | unique identifier of element in DataGrabber application |
-| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `source_file` | `str` | `` | path of the source file for being compressed. If source_file is a folder, the whole folder will be compressed. |
 | `target_file` | `str` | `` | new target filepath. If a folder is specified, the name of the source file is used. If no target filepath is specified, the file is compressed in place. |
 
@@ -1173,7 +1173,7 @@ from pydag.nodes.documents.CompressAction import CompressAction  # Adjust import
 
 obj = CompressAction()
 obj.child_ids='list()'
-obj.id="<string>"
+obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
 obj.load_on_install=False
 obj.source_file="path/to/file.txt"
 obj.target_file="path/to/file.txt"
@@ -1192,8 +1192,8 @@ obj.target_file="path/to/file.txt"
 | `output_keys` | `list[str]` | `'list()'` | optional explicit output key names written by this node. output_keys are literal names only and do not support selector syntax. If empty, the node uses its default output naming |
 | `ignore_keys` | `list[str]` | `'list()'` | list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys |
 | `ignore_empty_parents` | `bool` | `True` | if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True) |
-| `id` | `str` | `` | unique identifier of element in DataGrabber application |
-| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `file_paths` | `list[str]` | `'list()'` | path to the file to convert to base64, e.g. PNG | JPG | PDF | MP4 | AVI | MOV | MP3 |
 
 
@@ -1210,7 +1210,7 @@ obj.input_keys='list()'
 obj.output_keys='list()'
 obj.ignore_keys='list()'
 obj.ignore_empty_parents=True
-obj.id="<string>"
+obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
 obj.load_on_install=False
 obj.file_paths='list()'
 ```
@@ -1228,8 +1228,8 @@ obj.file_paths='list()'
 | `output_keys` | `list[str]` | `'list()'` | optional explicit output key names written by this node. output_keys are literal names only and do not support selector syntax. If empty, the node uses its default output naming |
 | `ignore_keys` | `list[str]` | `'list()'` | list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys |
 | `ignore_empty_parents` | `bool` | `True` | if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True) |
-| `id` | `str` | `` | unique identifier of element in DataGrabber application |
-| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `target_folder` | `str` | `` | target folder to copy all the files to in Buffer |
 
 
@@ -1246,7 +1246,7 @@ obj.input_keys='list()'
 obj.output_keys='list()'
 obj.ignore_keys='list()'
 obj.ignore_empty_parents=True
-obj.id="<string>"
+obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
 obj.load_on_install=False
 obj.target_folder="path/to/folder"
 ```
@@ -1259,8 +1259,8 @@ obj.target_folder="path/to/folder"
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
-| `id` | `str` | `` | unique identifier of element in DataGrabber application |
-| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `source_file` | `str` | `` | path of the source file for being compressed. If source_file is a folder, the whole folder will be compressed. |
 | `target_dir` | `str` | `` | new target filepath. If a folder is specified, the name of the source file is used. If no target filepath is specified, the file is compressed in place. |
 
@@ -1271,7 +1271,7 @@ from pydag.nodes.documents.DecompressAction import DecompressAction  # Adjust im
 
 obj = DecompressAction()
 obj.child_ids='list()'
-obj.id="<string>"
+obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
 obj.load_on_install=False
 obj.source_file="path/to/file.txt"
 obj.target_dir="<string>"
@@ -1293,8 +1293,8 @@ buffers of parent elements can be used to populate the docx file, if `buffer_id`
 | `output_keys` | `list[str]` | `'list()'` | optional explicit output key names written by this node. output_keys are literal names only and do not support selector syntax. If empty, the node uses its default output naming |
 | `ignore_keys` | `list[str]` | `'list()'` | list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys |
 | `ignore_empty_parents` | `bool` | `True` | if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True) |
-| `id` | `str` | `` | unique identifier of element in DataGrabber application |
-| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `output_path` | `str` | `'output.docx'` | output path for the template to be saved to |
 | `template_path` | `str` | `` | template file path |
 
@@ -1312,7 +1312,7 @@ obj.input_keys='list()'
 obj.output_keys='list()'
 obj.ignore_keys='list()'
 obj.ignore_empty_parents=True
-obj.id="<string>"
+obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
 obj.load_on_install=False
 obj.output_path='output.docx'
 obj.template_path="<string>"
@@ -1330,8 +1330,8 @@ obj.template_path="<string>"
 | `input_keys` | `list[str] | list[int] | str` | `'list()'` | list of input key names used to extract data from parent buffers. input_keys can also be a list of integers for indices or a Python-style slice string (e.g. '-1' for last index, '1:3' or '0:5:2' for start:stop:step exclusive indexing), or a type selector ('type:string' for text-like values, 'type:number' for numeric and bool values). Duplicates are removed while preserving first-match order. If empty, all parent keys are returned |
 | `ignore_keys` | `list[str]` | `'list()'` | list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys |
 | `ignore_empty_parents` | `bool` | `True` | if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True) |
-| `id` | `str` | `` | unique identifier of element in DataGrabber application |
-| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `path` | `str` | `` | output folder or filepath to write the HTML files to, if a file is specified, then all html strings retrieved are (over)written to this location, if a folder is specified, then all html strings are written to files in this folder with the name schema <key>_<COUNTER>.html |
 | `encoding` | `str` | `'utf-8'` | encoding for html file(s), defalts to utf-8 |
 | `output_keys` | `list[str]` | `"lambda: ['path']()"` | default output_keys are 'path', for this node only ever one output key is required |
@@ -1349,7 +1349,7 @@ obj.n=0
 obj.input_keys='list()'
 obj.ignore_keys='list()'
 obj.ignore_empty_parents=True
-obj.id="<string>"
+obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
 obj.load_on_install=False
 obj.path="<string>"
 obj.encoding='utf-8'
@@ -1370,8 +1370,8 @@ By default it outputs the HTML to a key named 'html' for child `Node`s to consum
 | `input_keys` | `list[str] | list[int] | str` | `'list()'` | list of input key names used to extract data from parent buffers. input_keys can also be a list of integers for indices or a Python-style slice string (e.g. '-1' for last index, '1:3' or '0:5:2' for start:stop:step exclusive indexing), or a type selector ('type:string' for text-like values, 'type:number' for numeric and bool values). Duplicates are removed while preserving first-match order. If empty, all parent keys are returned |
 | `ignore_keys` | `list[str]` | `'list()'` | list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys |
 | `ignore_empty_parents` | `bool` | `True` | if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True) |
-| `id` | `str` | `` | unique identifier of element in DataGrabber application |
-| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `output_keys` | `list[str]` | `"lambda: ['html']()"` |  |
 
 
@@ -1387,7 +1387,7 @@ obj.n=0
 obj.input_keys='list()'
 obj.ignore_keys='list()'
 obj.ignore_empty_parents=True
-obj.id="<string>"
+obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
 obj.load_on_install=False
 obj.output_keys="lambda: ['html']()"
 ```
@@ -1405,8 +1405,8 @@ obj.output_keys="lambda: ['html']()"
 | `output_keys` | `list[str]` | `'list()'` | optional explicit output key names written by this node. output_keys are literal names only and do not support selector syntax. If empty, the node uses its default output naming |
 | `ignore_keys` | `list[str]` | `'list()'` | list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys |
 | `ignore_empty_parents` | `bool` | `True` | if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True) |
-| `id` | `str` | `` | unique identifier of element in DataGrabber application |
-| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `ical_path` | `str` | `` | path for ics file export, full path to the file |
 | `date_format` | `str` | `'%d.%m.%Y'` | date format to parse the incoming date fields from |
 | `name_key` | `str` | `` | name of the key that contains the event name |
@@ -1430,7 +1430,7 @@ obj.input_keys='list()'
 obj.output_keys='list()'
 obj.ignore_keys='list()'
 obj.ignore_empty_parents=True
-obj.id="<string>"
+obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
 obj.load_on_install=False
 obj.ical_path="<string>"
 obj.date_format='%d.%m.%Y'
@@ -1455,8 +1455,8 @@ obj.time_zone='Europe/Berlin'
 | `output_keys` | `list[str]` | `'list()'` | optional explicit output key names written by this node. output_keys are literal names only and do not support selector syntax. If empty, the node uses its default output naming |
 | `ignore_keys` | `list[str]` | `'list()'` | list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys |
 | `ignore_empty_parents` | `bool` | `True` | if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True) |
-| `id` | `str` | `` | unique identifier of element in DataGrabber application |
-| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `folder` | `str` | `` | folder to list the files from into a Buffer |
 | `pattern` | `Union[str | list[str]]` | `` | pattern to look for in file names, can be str or list, e.g. ['png', 'jpg'] |
 | `extension` | `str` | `` | extension to include |
@@ -1477,7 +1477,7 @@ obj.input_keys='list()'
 obj.output_keys='list()'
 obj.ignore_keys='list()'
 obj.ignore_empty_parents=True
-obj.id="<string>"
+obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
 obj.load_on_install=False
 obj.folder="path/to/folder"
 obj.pattern="<string>"
@@ -1504,8 +1504,8 @@ Raises:
 | `output_keys` | `list[str]` | `'list()'` | optional explicit output key names written by this node. output_keys are literal names only and do not support selector syntax. If empty, the node uses its default output naming |
 | `ignore_keys` | `list[str]` | `'list()'` | list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys |
 | `ignore_empty_parents` | `bool` | `True` | if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True) |
-| `id` | `str` | `` | unique identifier of element in DataGrabber application |
-| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `target_folder` | `str` | `` | target folder to move all the files to in Buffer |
 
 
@@ -1522,7 +1522,7 @@ obj.input_keys='list()'
 obj.output_keys='list()'
 obj.ignore_keys='list()'
 obj.ignore_empty_parents=True
-obj.id="<string>"
+obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
 obj.load_on_install=False
 obj.target_folder="path/to/folder"
 ```
@@ -1539,8 +1539,8 @@ Extract context-rich AcroForm fields from PDF files using PyMuPDF.
 | `n` | `int` | `0` | specifies how much data is retrieved from parent buffer. Default 0 -> all data |
 | `ignore_keys` | `list[str]` | `'list()'` | list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys |
 | `ignore_empty_parents` | `bool` | `True` | if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True) |
-| `id` | `str` | `` | unique identifier of element in DataGrabber application |
-| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `input_keys` | `list[str]` | `"lambda: ['values']()"` | parent buffer keys to scan for PDF file paths |
 | `output_keys` | `list[str]` | `"lambda: ['filepath', 'metadata', 'fields', 'full_text_content', 'llm_prompt']()"` | output columns for source path, metadata, extracted fields, page text, and the llm_prompt bridge column used by downstream form-filling LLM steps; exactly 5 output_keys are mandatory, and llm_prompt must remain present even when include_bridge_prompt=False (it is then emitted as an empty string) |
 | `row_mode` | `str` | `'per_pdf'` | row shape of emitted data: per_pdf emits one row per file, per_field emits one row per field |
@@ -1564,7 +1564,7 @@ obj.persistent=True
 obj.n=0
 obj.ignore_keys='list()'
 obj.ignore_empty_parents=True
-obj.id="<string>"
+obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
 obj.load_on_install=False
 obj.input_keys="lambda: ['values']()"
 obj.output_keys="lambda: ['filepath', 'metadata', 'fields', 'full_text_content', 'llm_prompt']()"
@@ -1591,8 +1591,8 @@ Write LLM- or user-provided values into PDF AcroForm fields using PyMuPDF.
 | `input_keys` | `list[str] | list[int] | str` | `'list()'` | list of input key names used to extract data from parent buffers. input_keys can also be a list of integers for indices or a Python-style slice string (e.g. '-1' for last index, '1:3' or '0:5:2' for start:stop:step exclusive indexing), or a type selector ('type:string' for text-like values, 'type:number' for numeric and bool values). Duplicates are removed while preserving first-match order. If empty, all parent keys are returned |
 | `ignore_keys` | `list[str]` | `'list()'` | list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys |
 | `ignore_empty_parents` | `bool` | `True` | if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True) |
-| `id` | `str` | `` | unique identifier of element in DataGrabber application |
-| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `path_input_keys` | `list[str]` | `"lambda: ['values', 'filepath', 'pdf_path']()"` | parent buffer keys to scan for source PDF file paths |
 | `fill_input_keys` | `list[str]` | `"lambda: ['answer', 'answers', 'fields', 'field_values', 'llm_data', 'content']()"` | parent buffer keys to scan for strict field_updates payloads whose field values are the final PDF write instructions: each update uses internal_field_id plus either value for text/dropdown/list fields or selected_state for checkbox/radio fields |
 | `row_mode` | `str` | `'per_pdf'` | payload interpretation mode: per_pdf expects one payload per file, per_field can merge field-level rows |
@@ -1617,7 +1617,7 @@ obj.n=0
 obj.input_keys='list()'
 obj.ignore_keys='list()'
 obj.ignore_empty_parents=True
-obj.id="<string>"
+obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
 obj.load_on_install=False
 obj.path_input_keys="lambda: ['values', 'filepath', 'pdf_path']()"
 obj.fill_input_keys="lambda: ['answer', 'answers', 'fields', 'field_values', 'llm_data', 'content']()"
@@ -1646,8 +1646,8 @@ obj.require_pdf_extension=True
 | `output_keys` | `list[str]` | `'list()'` | optional explicit output key names written by this node. output_keys are literal names only and do not support selector syntax. If empty, the node uses its default output naming |
 | `ignore_keys` | `list[str]` | `'list()'` | list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys |
 | `ignore_empty_parents` | `bool` | `True` | if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True) |
-| `id` | `str` | `` | unique identifier of element in DataGrabber application |
-| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `plot_path` | `str` | `` | path for plotly html file |
 | `data` | `list[dict]` | `'list[dict]()'` | plotly data dictionary with buffer keys for x,y,z data |
 | `layout` | `dict` | `'dict()'` | plotly layout dictionary |
@@ -1669,7 +1669,7 @@ obj.input_keys='list()'
 obj.output_keys='list()'
 obj.ignore_keys='list()'
 obj.ignore_empty_parents=True
-obj.id="<string>"
+obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
 obj.load_on_install=False
 obj.plot_path="<string>"
 obj.data='list[dict]()'
@@ -1692,8 +1692,8 @@ obj.colors="<string>"
 | `output_keys` | `list[str]` | `'list()'` | optional explicit output key names written by this node. output_keys are literal names only and do not support selector syntax. If empty, the node uses its default output naming |
 | `ignore_keys` | `list[str]` | `'list()'` | list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys |
 | `ignore_empty_parents` | `bool` | `True` | if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True) |
-| `id` | `str` | `` | unique identifier of element in DataGrabber application |
-| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `file_path` | `str` | `` | path to the csv file to read the data from |
 | `delimiter` | `str` | `';'` | delimiter character(s) for this csv file |
 
@@ -1711,7 +1711,7 @@ obj.input_keys='list()'
 obj.output_keys='list()'
 obj.ignore_keys='list()'
 obj.ignore_empty_parents=True
-obj.id="<string>"
+obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
 obj.load_on_install=False
 obj.file_path="path/to/file.txt"
 obj.delimiter=';'
@@ -1738,8 +1738,8 @@ Raises:
 | `output_keys` | `list[str]` | `'list()'` | optional explicit output key names written by this node. output_keys are literal names only and do not support selector syntax. If empty, the node uses its default output naming |
 | `ignore_keys` | `list[str]` | `'list()'` | list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys |
 | `ignore_empty_parents` | `bool` | `True` | if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True) |
-| `id` | `str` | `` | unique identifier of element in DataGrabber application |
-| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `excel_file` | `str` | `` | path to the excel files to read the range from |
 | `worksheet` | `Union[str | int]` | `` | name of the worksheet inside the excel to read from or the index of the worksheet starting with 0 for the first worksheet |
 | `range` | `str` | `` | address of the range in the worksheet inside the excel to read from |
@@ -1759,7 +1759,7 @@ obj.input_keys='list()'
 obj.output_keys='list()'
 obj.ignore_keys='list()'
 obj.ignore_empty_parents=True
-obj.id="<string>"
+obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
 obj.load_on_install=False
 obj.excel_file="path/to/file.txt"
 obj.worksheet="<string>"
@@ -1780,8 +1780,8 @@ obj.has_header=False
 | `output_keys` | `list[str]` | `'list()'` | optional explicit output key names written by this node. output_keys are literal names only and do not support selector syntax. If empty, the node uses its default output naming |
 | `ignore_keys` | `list[str]` | `'list()'` | list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys |
 | `ignore_empty_parents` | `bool` | `True` | if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True) |
-| `id` | `str` | `` | unique identifier of element in DataGrabber application |
-| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `excel_file` | `str` | `` | path to the excel files to read named table from |
 | `table_name` | `str` | `` | name of the table inside the excel to read from |
 
@@ -1799,7 +1799,7 @@ obj.input_keys='list()'
 obj.output_keys='list()'
 obj.ignore_keys='list()'
 obj.ignore_empty_parents=True
-obj.id="<string>"
+obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
 obj.load_on_install=False
 obj.excel_file="path/to/file.txt"
 obj.table_name="John Doe"
@@ -1829,8 +1829,8 @@ Raises:
 | `output_keys` | `list[str]` | `'list()'` | optional explicit output key names written by this node. output_keys are literal names only and do not support selector syntax. If empty, the node uses its default output naming |
 | `ignore_keys` | `list[str]` | `'list()'` | list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys |
 | `ignore_empty_parents` | `bool` | `True` | if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True) |
-| `id` | `str` | `` | unique identifier of element in DataGrabber application |
-| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `excel_file` | `str` | `` | Path to the Excel file to read from |
 | `worksheet` | `Union[str, int]` | `` | Name (str) or index (int, 0-based) of the worksheet. If None, reads from first worksheet with data |
 | `start_range` | `str` | `` | Cell address to start reading from (e.g., 'A1'). If None, auto-detects the first connected data range |
@@ -1850,7 +1850,7 @@ obj.input_keys='list()'
 obj.output_keys='list()'
 obj.ignore_keys='list()'
 obj.ignore_empty_parents=True
-obj.id="<string>"
+obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
 obj.load_on_install=False
 obj.excel_file="path/to/file.txt"
 obj.worksheet="<string>"
@@ -1871,8 +1871,8 @@ obj.has_header=True
 | `output_keys` | `list[str]` | `'list()'` | optional explicit output key names written by this node. output_keys are literal names only and do not support selector syntax. If empty, the node uses its default output naming |
 | `ignore_keys` | `list[str]` | `'list()'` | list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys |
 | `ignore_empty_parents` | `bool` | `True` | if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True) |
-| `id` | `str` | `` | unique identifier of element in DataGrabber application |
-| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `file_path` | `str` | `` | path to the json file to read the data from |
 | `json_path` | `str` | `` | json schema to parse the file for |
 | `encoding` | `str` | `'utf-8'` | name of the file encoding to use, e.g. utf-8 (default), utf-16, ... |
@@ -1891,7 +1891,7 @@ obj.input_keys='list()'
 obj.output_keys='list()'
 obj.ignore_keys='list()'
 obj.ignore_empty_parents=True
-obj.id="<string>"
+obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
 obj.load_on_install=False
 obj.file_path="path/to/file.txt"
 obj.json_path="<string>"
@@ -1911,8 +1911,8 @@ obj.encoding='utf-8'
 | `output_keys` | `list[str]` | `'list()'` | optional explicit output key names written by this node. output_keys are literal names only and do not support selector syntax. If empty, the node uses its default output naming |
 | `ignore_keys` | `list[str]` | `'list()'` | list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys |
 | `ignore_empty_parents` | `bool` | `True` | if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True) |
-| `id` | `str` | `` | unique identifier of element in DataGrabber application |
-| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `file_path` | `str` | `` | path to the *.npz file to read the data from |
 
 
@@ -1929,7 +1929,7 @@ obj.input_keys='list()'
 obj.output_keys='list()'
 obj.ignore_keys='list()'
 obj.ignore_empty_parents=True
-obj.id="<string>"
+obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
 obj.load_on_install=False
 obj.file_path="path/to/file.txt"
 ```
@@ -1950,8 +1950,8 @@ return an empty `fields` list.
 | `n` | `int` | `0` | specifies how much data is retrieved from parent buffer. Default 0 -> all data |
 | `ignore_keys` | `list[str]` | `'list()'` | list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys |
 | `ignore_empty_parents` | `bool` | `True` | if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True) |
-| `id` | `str` | `` | unique identifier of element in DataGrabber application |
-| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `input_keys` | `list[str]` | `"lambda: ['values']()"` | keys to read file paths from parent buffer data |
 | `output_keys` | `list[str]` | `"lambda: ['filepath', 'metadata', 'fields', 'full_text_content']()"` | output keys in the order [filepath, metadata, fields, full_text_content] |
 | `label_y_tolerance` | `float` | `18.0` | Maximum vertical distance (PDF points) between a form field and nearby text considered as label context. |
@@ -1970,7 +1970,7 @@ obj.persistent=True
 obj.n=0
 obj.ignore_keys='list()'
 obj.ignore_empty_parents=True
-obj.id="<string>"
+obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
 obj.load_on_install=False
 obj.input_keys="lambda: ['values']()"
 obj.output_keys="lambda: ['filepath', 'metadata', 'fields', 'full_text_content']()"
@@ -1992,8 +1992,8 @@ obj.require_pdf_extension=True
 | `output_keys` | `list[str]` | `'list()'` | optional explicit output key names written by this node. output_keys are literal names only and do not support selector syntax. If empty, the node uses its default output naming |
 | `ignore_keys` | `list[str]` | `'list()'` | list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys |
 | `ignore_empty_parents` | `bool` | `True` | if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True) |
-| `id` | `str` | `` | unique identifier of element in DataGrabber application |
-| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `file_path` | `str` | `` | path to the xml file to read the data from |
 | `xpath` | `str` | `` | xml xpath schema to parse the file for |
 
@@ -2011,7 +2011,7 @@ obj.input_keys='list()'
 obj.output_keys='list()'
 obj.ignore_keys='list()'
 obj.ignore_empty_parents=True
-obj.id="<string>"
+obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
 obj.load_on_install=False
 obj.file_path="path/to/file.txt"
 obj.xpath="<string>"
@@ -2030,8 +2030,8 @@ obj.xpath="<string>"
 | `input_keys` | `list[str] | list[int] | str` | `'list()'` | list of input key names used to extract data from parent buffers. input_keys can also be a list of integers for indices or a Python-style slice string (e.g. '-1' for last index, '1:3' or '0:5:2' for start:stop:step exclusive indexing), or a type selector ('type:string' for text-like values, 'type:number' for numeric and bool values). Duplicates are removed while preserving first-match order. If empty, all parent keys are returned |
 | `ignore_keys` | `list[str]` | `'list()'` | list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys |
 | `ignore_empty_parents` | `bool` | `True` | if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True) |
-| `id` | `str` | `` | unique identifier of element in DataGrabber application |
-| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `path_input_keys` | `list[str]` | `"lambda: ['values', 'filepath']()"` | keys used to extract source PDF paths from parent data |
 | `fill_input_keys` | `list[str]` | `"lambda: ['answer', 'answers', 'fields', 'form_fields', 'field_values', 'content']()"` | keys used to extract filled form payloads from parent data |
 | `output_keys` | `list[str]` | `"lambda: ['filepath', 'output_filepath', 'written_fields', 'written_field_count']()"` | output keys in the order [filepath, output_filepath, written_fields, written_field_count] |
@@ -2054,7 +2054,7 @@ obj.n=0
 obj.input_keys='list()'
 obj.ignore_keys='list()'
 obj.ignore_empty_parents=True
-obj.id="<string>"
+obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
 obj.load_on_install=False
 obj.path_input_keys="lambda: ['values', 'filepath']()"
 obj.fill_input_keys="lambda: ['answer', 'answers', 'fields', 'form_fields', 'field_values', 'content']()"
@@ -2084,8 +2084,8 @@ This `DataElement` represents a time series feature extraction model using a 1D 
 | `sample_length` | `int` | `0` | Expected length of each sample. If 0, a sample with shape (1, min_learning_samples) is assumed. Otherwise, (1, sample_length) is assumed. |
 | `normalize` | `bool` | `False` | Flag to indicate whether to normalize the input data using z-score normalization on the input batch. |
 | `nan_to_num` | `bool` | `False` | If True, replace NaN/Inf values with finite numbers (0.0). |
-| `id` | `str` | `` | unique identifier of element in DataGrabber application |
-| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `input_length` | `int` | `5` |  |
 | `input_features` | `int` | `1` |  |
 | `epochs` | `int` | `10` |  |
@@ -2115,7 +2115,7 @@ obj.min_inference_samples=0
 obj.sample_length=0
 obj.normalize=False
 obj.nan_to_num=False
-obj.id="<string>"
+obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
 obj.load_on_install=False
 obj.input_length=5
 obj.input_features=1
@@ -2146,8 +2146,8 @@ Chronos Extractor for time series data. Returns 384-dimensional embeddings for e
 | `sample_length` | `int` | `0` | Expected length of each sample. If 0, a sample with shape (1, min_learning_samples) is assumed. Otherwise, (1, sample_length) is assumed. |
 | `normalize` | `bool` | `False` | Flag to indicate whether to normalize the input data using z-score normalization on the input batch. |
 | `nan_to_num` | `bool` | `False` | If True, replace NaN/Inf values with finite numbers (0.0). |
-| `id` | `str` | `` | unique identifier of element in DataGrabber application |
-| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `model_name` | `str` | `'amazon/chronos-bolt-mini'` | name of available pretrained models, e.g. 'amazon/chronos-bolt-mini'. For further information look here: https://github.com/amazon-science/chronos-forecasting |
 | `min_inference_samples` | `int` | `1` | Number of Samples to do inference on. |
 | `output_keys` | `list[str]` | `'list()'` | optional explicit output keys; if empty, default naming is used |
@@ -2169,7 +2169,7 @@ obj.min_learning_samples=0
 obj.sample_length=0
 obj.normalize=False
 obj.nan_to_num=False
-obj.id="<string>"
+obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
 obj.load_on_install=False
 obj.model_name='amazon/chronos-bolt-mini'
 obj.min_inference_samples=1
@@ -2194,8 +2194,8 @@ PSD for time series data. Returns 261-dimensional embeddings for each input time
 | `sample_length` | `int` | `0` | Expected length of each sample. If 0, a sample with shape (1, min_learning_samples) is assumed. Otherwise, (1, sample_length) is assumed. |
 | `normalize` | `bool` | `False` | Flag to indicate whether to normalize the input data using z-score normalization on the input batch. |
 | `nan_to_num` | `bool` | `False` | If True, replace NaN/Inf values with finite numbers (0.0). |
-| `id` | `str` | `` | unique identifier of element in DataGrabber application |
-| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `min_inference_samples` | `int` | `1` | Number of Samples to do inference on. |
 | `output_keys` | `list[str]` | `'list()'` | optional explicit output keys; if empty, default naming is used |
 
@@ -2216,7 +2216,7 @@ obj.min_learning_samples=0
 obj.sample_length=0
 obj.normalize=False
 obj.nan_to_num=False
-obj.id="<string>"
+obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
 obj.load_on_install=False
 obj.min_inference_samples=1
 obj.output_keys='list()'
@@ -2252,8 +2252,8 @@ Notes:
 | `min_learning_samples` | `int` | `0` | Minimum number of samples required for learning. |
 | `normalize` | `bool` | `False` | Flag to indicate whether to normalize the input data using z-score normalization on the input batch. |
 | `nan_to_num` | `bool` | `False` | If True, replace NaN/Inf values with finite numbers (0.0). |
-| `id` | `str` | `` | unique identifier of element in DataGrabber application |
-| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `min_inference_samples` | `int` | `1` | Number of samples to accumulate before inference. |
 | `sample_length` | `int` | `64` | Length of each input time series sample; must be >= MIN_SERIES_LENGTH for meaningful features. |
 | `MIN_SERIES_LENGTH` | `int` | `` |  |
@@ -2275,7 +2275,7 @@ obj.ignore_empty_parents=True
 obj.min_learning_samples=0
 obj.normalize=False
 obj.nan_to_num=False
-obj.id="<string>"
+obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
 obj.load_on_install=False
 obj.min_inference_samples=1
 obj.sample_length=64
@@ -2299,8 +2299,8 @@ https://www.sktime.net/en/stable/api_reference/auto_generated/sktime.transformat
 | `ignore_empty_parents` | `bool` | `True` | if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True) |
 | `sample_length` | `int` | `0` | Expected length of each sample. If 0, a sample with shape (1, min_learning_samples) is assumed. Otherwise, (1, sample_length) is assumed. |
 | `nan_to_num` | `bool` | `False` | If True, replace NaN/Inf values with finite numbers (0.0). |
-| `id` | `str` | `` | unique identifier of element in DataGrabber application |
-| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `num_of_kernels` | `int` | `10000` | Number of kernels used in the ROCKET model. |
 | `min_learning_samples` | `int` | `1` | Number of Samples to learn on. Keep this, since ROCKET needs the sample only to instantiate the random kernels. Having more points does not improve performance. |
 | `min_inference_samples` | `int` | `1` | Number of Samples to do inference on. |
@@ -2322,7 +2322,7 @@ obj.ignore_keys='list()'
 obj.ignore_empty_parents=True
 obj.sample_length=0
 obj.nan_to_num=False
-obj.id="<string>"
+obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
 obj.load_on_install=False
 obj.num_of_kernels=10000
 obj.min_learning_samples=1
@@ -2351,8 +2351,8 @@ for more information.
 | `sample_length` | `int` | `0` | Expected length of each sample. If 0, a sample with shape (1, min_learning_samples) is assumed. Otherwise, (1, sample_length) is assumed. |
 | `normalize` | `bool` | `False` | Flag to indicate whether to normalize the input data using z-score normalization on the input batch. |
 | `nan_to_num` | `bool` | `False` | If True, replace NaN/Inf values with finite numbers (0.0). |
-| `id` | `str` | `` | unique identifier of element in DataGrabber application |
-| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `prediction_length` | `int` | `64` | length of the prediction horizon |
 | `output_keys` | `list[str]` | `'list()'` | optional explicit output keys; if empty, default naming is used |
 
@@ -2374,7 +2374,7 @@ obj.min_inference_samples=0
 obj.sample_length=0
 obj.normalize=False
 obj.nan_to_num=False
-obj.id="<string>"
+obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
 obj.load_on_install=False
 obj.prediction_length=64
 obj.output_keys='list()'
@@ -2393,8 +2393,8 @@ obj.output_keys='list()'
 | `output_keys` | `list[str]` | `'list()'` | optional explicit output key names written by this node. output_keys are literal names only and do not support selector syntax. If empty, the node uses its default output naming |
 | `ignore_keys` | `list[str]` | `'list()'` | list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys |
 | `ignore_empty_parents` | `bool` | `True` | if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True) |
-| `id` | `str` | `` | unique identifier of element in DataGrabber application |
-| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `url` | `str` | `` | url for HTTP GET method |
 | `headers` | `dict[str]` | `` | headers to be used in the HTTP requests, e.g. {'Content-Type': 'application/json', 'Authorization' : 'Bearer token'} |
 | `timeout` | `float` | `10` | timeout for requests |
@@ -2414,7 +2414,7 @@ obj.input_keys='list()'
 obj.output_keys='list()'
 obj.ignore_keys='list()'
 obj.ignore_empty_parents=True
-obj.id="<string>"
+obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
 obj.load_on_install=False
 obj.url="https://example.com"
 obj.headers="<string>"
@@ -2436,8 +2436,8 @@ obj.json_path="<string>"
 | `output_keys` | `list[str]` | `'list()'` | optional explicit output key names written by this node. output_keys are literal names only and do not support selector syntax. If empty, the node uses its default output naming |
 | `ignore_keys` | `list[str]` | `'list()'` | list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys |
 | `ignore_empty_parents` | `bool` | `True` | if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True) |
-| `id` | `str` | `` | unique identifier of element in DataGrabber application |
-| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `url` | `str` | `` |  |
 | `headers` | `dict[str]` | `` | headers to be used in the HTTP requests, e.g. {'Content-Type': 'application/json', 'Authorization' : 'Bearer token'} |
 | `timeout` | `float` | `10` | timeout for requests |
@@ -2457,7 +2457,7 @@ obj.input_keys='list()'
 obj.output_keys='list()'
 obj.ignore_keys='list()'
 obj.ignore_empty_parents=True
-obj.id="<string>"
+obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
 obj.load_on_install=False
 obj.url="https://example.com"
 obj.headers="<string>"
@@ -2479,8 +2479,8 @@ obj.json_path="<string>"
 | `output_keys` | `list[str]` | `'list()'` | optional explicit output key names written by this node. output_keys are literal names only and do not support selector syntax. If empty, the node uses its default output naming |
 | `ignore_keys` | `list[str]` | `'list()'` | list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys |
 | `ignore_empty_parents` | `bool` | `True` | if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True) |
-| `id` | `str` | `` | unique identifier of element in DataGrabber application |
-| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `url` | `str` | `` |  |
 | `headers` | `dict[str]` | `` | headers to be used in the HTTP requests, e.g. {'Content-Type': 'application/json', 'Authorization' : 'Bearer token'} |
 | `timeout` | `float` | `10` | timeout for requests |
@@ -2500,7 +2500,7 @@ obj.input_keys='list()'
 obj.output_keys='list()'
 obj.ignore_keys='list()'
 obj.ignore_empty_parents=True
-obj.id="<string>"
+obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
 obj.load_on_install=False
 obj.url="https://example.com"
 obj.headers="<string>"
@@ -2520,8 +2520,8 @@ obj.json_path="<string>"
 | `input_keys` | `list[str] | list[int] | str` | `'list()'` | list of input key names used to extract data from parent buffers. input_keys can also be a list of integers for indices or a Python-style slice string (e.g. '-1' for last index, '1:3' or '0:5:2' for start:stop:step exclusive indexing), or a type selector ('type:string' for text-like values, 'type:number' for numeric and bool values). Duplicates are removed while preserving first-match order. If empty, all parent keys are returned |
 | `output_keys` | `list[str]` | `'list()'` | optional explicit output key names written by this node. output_keys are literal names only and do not support selector syntax. If empty, the node uses its default output naming |
 | `ignore_empty_parents` | `bool` | `True` | if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True) |
-| `id` | `str` | `` | unique identifier of element in DataGrabber application |
-| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `task` | `str` | `` | task category of the model to use, e.g. image-classification, text-generation, sentiment-analysis, ... execute HuggingFaceNode.tasklist for full list |
 | `model` | `str` | `` |  |
 | `ignore_keys` | `list[str]` | `"lambda: ['index', 'timestamps']()"` | list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys |
@@ -2539,7 +2539,7 @@ obj.n=0
 obj.input_keys='list()'
 obj.output_keys='list()'
 obj.ignore_empty_parents=True
-obj.id="<string>"
+obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
 obj.load_on_install=False
 obj.task="<string>"
 obj.model="<string>"
@@ -2567,8 +2567,8 @@ Usage modes:
 | `ignore_keys` | `list[str]` | `'list()'` | list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys |
 | `ignore_empty_parents` | `bool` | `True` | if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True) |
 | `service_id` | `str` | `` | ID of the service |
-| `id` | `str` | `` | unique identifier of element in DataGrabber application |
-| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `template` | `str` | `` | 
             Legacy question template fallback when question_key/question_value are not configured.
             For example: 'How much costs the article number {}?' or
@@ -2601,7 +2601,7 @@ obj.input_keys='list()'
 obj.ignore_keys='list()'
 obj.ignore_empty_parents=True
 obj.service_id="<string>"
-obj.id="<string>"
+obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
 obj.load_on_install=False
 obj.template="<string>"
 obj.question_key="<string>"
@@ -2648,8 +2648,8 @@ The output has the following format:
 | `input_keys` | `list[str] | list[int] | str` | `'list()'` | list of input key names used to extract data from parent buffers. input_keys can also be a list of integers for indices or a Python-style slice string (e.g. '-1' for last index, '1:3' or '0:5:2' for start:stop:step exclusive indexing), or a type selector ('type:string' for text-like values, 'type:number' for numeric and bool values). Duplicates are removed while preserving first-match order. If empty, all parent keys are returned |
 | `ignore_keys` | `list[str]` | `'list()'` | list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys |
 | `ignore_empty_parents` | `bool` | `True` | if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True) |
-| `id` | `str` | `` | unique identifier of element in DataGrabber application |
-| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `template` | `str` | `` | Not in use for the LLMOCRAction, as the message format is fixed for image inputs. |
 | `output_keys` | `list[str]` | `"lambda: ['question', 'answer', 'filepath']()"` |  |
 | `question` | `str` | `' '` | The question to ask the LLM about the image content. |
@@ -2667,7 +2667,7 @@ obj.n=0
 obj.input_keys='list()'
 obj.ignore_keys='list()'
 obj.ignore_empty_parents=True
-obj.id="<string>"
+obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
 obj.load_on_install=False
 obj.template="<string>"
 obj.output_keys="lambda: ['question', 'answer', 'filepath']()"
@@ -2718,8 +2718,8 @@ See https://docs.mistral.ai/capabilities/document_ai/basic_ocr for more details.
 | `input_keys` | `list[str] | list[int] | str` | `'list()'` | list of input key names used to extract data from parent buffers. input_keys can also be a list of integers for indices or a Python-style slice string (e.g. '-1' for last index, '1:3' or '0:5:2' for start:stop:step exclusive indexing), or a type selector ('type:string' for text-like values, 'type:number' for numeric and bool values). Duplicates are removed while preserving first-match order. If empty, all parent keys are returned |
 | `ignore_keys` | `list[str]` | `'list()'` | list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys |
 | `ignore_empty_parents` | `bool` | `True` | if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True) |
-| `id` | `str` | `` | unique identifier of element in DataGrabber application |
-| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `api_key` | `str` | `` | a mistral ai api key |
 | `output_keys` | `list[str]` | `"lambda: ['documents', 'filepath']()"` |  |
 | `model` | `str` | `'mistral-ocr-latest'` | Mistral OCR model name |
@@ -2738,7 +2738,7 @@ obj.n=0
 obj.input_keys='list()'
 obj.ignore_keys='list()'
 obj.ignore_empty_parents=True
-obj.id="<string>"
+obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
 obj.load_on_install=False
 obj.api_key="<string>"
 obj.output_keys="lambda: ['documents', 'filepath']()"
@@ -2766,8 +2766,8 @@ obj.include_image_base64=False
 | `sample_length` | `int` | `0` | Expected length of each sample. If 0, a sample with shape (1, min_learning_samples) is assumed. Otherwise, (1, sample_length) is assumed. |
 | `normalize` | `bool` | `False` | Flag to indicate whether to normalize the input data using z-score normalization on the input batch. |
 | `nan_to_num` | `bool` | `False` | If True, replace NaN/Inf values with finite numbers (0.0). |
-| `id` | `str` | `` | unique identifier of element in DataGrabber application |
-| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `system_message` | `str` | `'SYS_PYTHON_EXPERT'` | Default System message to give to the LLM Agent |
 | `human_msg` | `str` | `` | Human message to give to the LLM Agent for generating code |
 | `service_id` | `str` | `` | unique id of the LLM service required for this DataElement |
@@ -2791,7 +2791,7 @@ obj.min_inference_samples=0
 obj.sample_length=0
 obj.normalize=False
 obj.nan_to_num=False
-obj.id="<string>"
+obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
 obj.load_on_install=False
 obj.system_message='SYS_PYTHON_EXPERT'
 obj.human_msg="<string>"
@@ -2811,8 +2811,8 @@ obj.service_id="<string>"
 | `output_keys` | `list[str]` | `'list()'` | optional explicit output key names written by this node. output_keys are literal names only and do not support selector syntax. If empty, the node uses its default output naming |
 | `ignore_keys` | `list[str]` | `'list()'` | list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys |
 | `ignore_empty_parents` | `bool` | `True` | if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True) |
-| `id` | `str` | `` | unique identifier of element in DataGrabber application |
-| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 
 
 ```python
@@ -2828,7 +2828,7 @@ obj.input_keys='list()'
 obj.output_keys='list()'
 obj.ignore_keys='list()'
 obj.ignore_empty_parents=True
-obj.id="<string>"
+obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
 obj.load_on_install=False
 ```
 
@@ -2845,8 +2845,8 @@ obj.load_on_install=False
 | `output_keys` | `list[str]` | `'list()'` | optional explicit output key names written by this node. output_keys are literal names only and do not support selector syntax. If empty, the node uses its default output naming |
 | `ignore_keys` | `list[str]` | `'list()'` | list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys |
 | `ignore_empty_parents` | `bool` | `True` | if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True) |
-| `id` | `str` | `` | unique identifier of element in DataGrabber application |
-| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 
 
 ```python
@@ -2862,7 +2862,7 @@ obj.input_keys='list()'
 obj.output_keys='list()'
 obj.ignore_keys='list()'
 obj.ignore_empty_parents=True
-obj.id="<string>"
+obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
 obj.load_on_install=False
 ```
 
@@ -2885,8 +2885,8 @@ Base Classes:
 | `output_keys` | `list[str]` | `'list()'` | optional explicit output key names written by this node. output_keys are literal names only and do not support selector syntax. If empty, the node uses its default output naming |
 | `ignore_keys` | `list[str]` | `'list()'` | list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys |
 | `ignore_empty_parents` | `bool` | `True` | if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True) |
-| `id` | `str` | `` | unique identifier of element in DataGrabber application |
-| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `max_windows` | `int` | `10` | number of windows to keep |
 | `date_format` | `str` | `'%Y-%m-%d %H:%M:%S'` | dateformat to convert the new keys to |
 | `date_separator` | `str` | `'#'` | separator for splitting original key and timestamp, this should never be a word/character that could exist in the date_format |
@@ -2905,7 +2905,7 @@ obj.input_keys='list()'
 obj.output_keys='list()'
 obj.ignore_keys='list()'
 obj.ignore_empty_parents=True
-obj.id="<string>"
+obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
 obj.load_on_install=False
 obj.max_windows=10
 obj.date_format='%Y-%m-%d %H:%M:%S'
@@ -2931,8 +2931,8 @@ Code Service to do Regression on Inputs
 | `sample_length` | `int` | `0` | Expected length of each sample. If 0, a sample with shape (1, min_learning_samples) is assumed. Otherwise, (1, sample_length) is assumed. |
 | `normalize` | `bool` | `False` | Flag to indicate whether to normalize the input data using z-score normalization on the input batch. |
 | `nan_to_num` | `bool` | `False` | If True, replace NaN/Inf values with finite numbers (0.0). |
-| `id` | `str` | `` | unique identifier of element in DataGrabber application |
-| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `model_name` | `str` | `'Tirex'` | name of the model to use for regression. Default is Tirex |
 | `learning_required` | `bool` | `True` | whether the model requires a learning phase before inference |
 | `prediction_length` | `int` | `64` | length of the prediction horizon |
@@ -2956,7 +2956,7 @@ obj.min_inference_samples=0
 obj.sample_length=0
 obj.normalize=False
 obj.nan_to_num=False
-obj.id="<string>"
+obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
 obj.load_on_install=False
 obj.model_name='Tirex'
 obj.learning_required=True
@@ -2982,8 +2982,8 @@ obj.output_keys='list()'
 | `input_keys` | `list[str] | list[int] | str` | `'list()'` | list of input key names used to extract data from parent buffers. input_keys can also be a list of integers for indices or a Python-style slice string (e.g. '-1' for last index, '1:3' or '0:5:2' for start:stop:step exclusive indexing), or a type selector ('type:string' for text-like values, 'type:number' for numeric and bool values). Duplicates are removed while preserving first-match order. If empty, all parent keys are returned |
 | `ignore_keys` | `list[str]` | `'list()'` | list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys |
 | `ignore_empty_parents` | `bool` | `True` | if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True) |
-| `id` | `str` | `` | unique identifier of element in DataGrabber application |
-| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `script_path` | `str` | `` | Python code snippet defining a script to process buffer data |
 | `output_keys` | `list[str]` | `'list()'` | keys to extract from the script and store their values into this element's buffer. If empty, no data is stored in the buffer. |
 | `use_parent_data` | `bool` | `True` | whether to use data from parent buffers. If set to false, the script will only receive data from its own buffer. This can be useful if you want to execute a script that does not depend on parent data, but you still may want to use the output_keys to store data in the buffer. |
@@ -3001,7 +3001,7 @@ obj.n=0
 obj.input_keys='list()'
 obj.ignore_keys='list()'
 obj.ignore_empty_parents=True
-obj.id="<string>"
+obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
 obj.load_on_install=False
 obj.script_path="<string>"
 obj.output_keys='list()'
@@ -3021,8 +3021,8 @@ obj.use_parent_data=True
 | `ignore_keys` | `list[str]` | `'list()'` | list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys |
 | `ignore_empty_parents` | `bool` | `True` | if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True) |
 | `service_id` | `str` | `` | ID of the service |
-| `id` | `str` | `` | unique identifier of element in DataGrabber application |
-| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `folder` | `str` | `` | folder to wach for file events |
 | `recursive` | `bool` | `False` | listen to events in subfolders as well |
 | `create_events` | `bool` | `True` | listen to create events |
@@ -3045,7 +3045,7 @@ obj.input_keys='list()'
 obj.ignore_keys='list()'
 obj.ignore_empty_parents=True
 obj.service_id="<string>"
-obj.id="<string>"
+obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
 obj.load_on_install=False
 obj.folder="path/to/folder"
 obj.recursive=False
@@ -3065,8 +3065,8 @@ trigger event occurs. This `Node` does not define `start_trigger`, but rather ex
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
 | `service_id` | `str` | `` | ID of the service |
-| `id` | `str` | `` | unique identifier of element in DataGrabber application |
-| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 
 
 ```python
@@ -3076,7 +3076,7 @@ from pydag.nodes.triggers.ObserverTriggerAction import ObserverTriggerAction  # 
 obj = ObserverTriggerAction()
 obj.child_ids='list()'
 obj.service_id="<string>"
-obj.id="<string>"
+obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
 obj.load_on_install=False
 ```
 
@@ -3102,8 +3102,8 @@ Raises:
 | `output_keys` | `list[str]` | `'list()'` | optional explicit output key names written by this node. output_keys are literal names only and do not support selector syntax. If empty, the node uses its default output naming |
 | `ignore_keys` | `list[str]` | `'list()'` | list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys |
 | `ignore_empty_parents` | `bool` | `True` | if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True) |
-| `id` | `str` | `` | unique identifier of element in DataGrabber application |
-| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `option` | `str` | `` | option to configure with new value |
 | `element_id` | `str` | `` | id of the element to change the option for |
 
@@ -3121,7 +3121,7 @@ obj.input_keys='list()'
 obj.output_keys='list()'
 obj.ignore_keys='list()'
 obj.ignore_empty_parents=True
-obj.id="<string>"
+obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
 obj.load_on_install=False
 obj.option="<string>"
 obj.element_id="<string>"
@@ -3134,8 +3134,8 @@ Action that counts the number of times it has been called.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
-| `id` | `str` | `` | unique identifier of element in DataGrabber application |
-| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 
 
 ```python
@@ -3144,7 +3144,7 @@ from pydag.nodes.utils.CountAction import CountAction  # Adjust import if needed
 
 obj = CountAction()
 obj.child_ids='list()'
-obj.id="<string>"
+obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
 obj.load_on_install=False
 ```
 
@@ -3155,8 +3155,8 @@ A transition that counts the number of times it has been triggered.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
-| `id` | `str` | `` | unique identifier of element in DataGrabber application |
-| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 
 
 ```python
@@ -3165,7 +3165,7 @@ from pydag.nodes.utils.CountTransition import CountTransition  # Adjust import i
 
 obj = CountTransition()
 obj.child_ids='list()'
-obj.id="<string>"
+obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
 obj.load_on_install=False
 ```
 
@@ -3176,8 +3176,8 @@ A transition that always returns False.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
-| `id` | `str` | `` | unique identifier of element in DataGrabber application |
-| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 
 
 ```python
@@ -3186,7 +3186,7 @@ from pydag.nodes.utils.FalseTransition import FalseTransition  # Adjust import i
 
 obj = FalseTransition()
 obj.child_ids='list()'
-obj.id="<string>"
+obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
 obj.load_on_install=False
 ```
 
@@ -3196,8 +3196,8 @@ obj.load_on_install=False
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
-| `id` | `str` | `` | unique identifier of element in DataGrabber application |
-| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 
 
 ```python
@@ -3206,7 +3206,7 @@ from pydag.nodes.utils.JoinTransition import JoinTransition  # Adjust import if 
 
 obj = JoinTransition()
 obj.child_ids='list()'
-obj.id="<string>"
+obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
 obj.load_on_install=False
 ```
 
@@ -3216,8 +3216,8 @@ obj.load_on_install=False
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
-| `id` | `str` | `` | unique identifier of element in DataGrabber application |
-| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `smtp_server` | `str` | `` | host of the mail server to use |
 | `port` | `int` | `` | port of the smtp server |
 | `mail_account` | `str` | `` | mail account to use for login |
@@ -3235,7 +3235,7 @@ from pydag.nodes.utils.MailAction import MailAction  # Adjust import if needed
 
 obj = MailAction()
 obj.child_ids='list()'
-obj.id="<string>"
+obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
 obj.load_on_install=False
 obj.smtp_server="<string>"
 obj.port=1
@@ -3276,8 +3276,8 @@ Raises:
 | `output_keys` | `list[str]` | `'list()'` | optional explicit output key names written by this node. output_keys are literal names only and do not support selector syntax. If empty, the node uses its default output naming |
 | `ignore_keys` | `list[str]` | `'list()'` | list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys |
 | `ignore_empty_parents` | `bool` | `True` | if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True) |
-| `id` | `str` | `` | unique identifier of element in DataGrabber application |
-| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `smtp_server` | `str` | `` | host of the mail server to use |
 | `port` | `int` | `` | port of the smtp server |
 | `mail_account` | `str` | `` | mail account to use for login |
@@ -3299,7 +3299,7 @@ obj.buffer_id="<string>"
 obj.output_keys='list()'
 obj.ignore_keys='list()'
 obj.ignore_empty_parents=True
-obj.id="<string>"
+obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
 obj.load_on_install=False
 obj.smtp_server="<string>"
 obj.port=1
@@ -3321,8 +3321,8 @@ obj.n=0
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
-| `id` | `str` | `` | unique identifier of element in DataGrabber application |
-| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `executable` | `str` | `` | The executable to kill, e.g. 'python.exe' |
 
 
@@ -3332,7 +3332,7 @@ from pydag.nodes.utils.OSKillProcessAction import OSKillProcessAction  # Adjust 
 
 obj = OSKillProcessAction()
 obj.child_ids='list()'
-obj.id="<string>"
+obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
 obj.load_on_install=False
 obj.executable="<string>"
 ```
@@ -3350,8 +3350,8 @@ obj.executable="<string>"
 | `output_keys` | `list[str]` | `'list()'` | optional explicit output key names written by this node. output_keys are literal names only and do not support selector syntax. If empty, the node uses its default output naming |
 | `ignore_keys` | `list[str]` | `'list()'` | list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys |
 | `ignore_empty_parents` | `bool` | `True` | if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True) |
-| `id` | `str` | `` | unique identifier of element in DataGrabber application |
-| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `executable` | `str` | `` | The executable to run, e.g., 'python.exe' |
 | `arguments` | `list` | `'list()'` | List of arguments to pass to the executable |
 | `detached` | `bool` | `True` | Whether to run the process in a detached state |
@@ -3371,7 +3371,7 @@ obj.input_keys='list()'
 obj.output_keys='list()'
 obj.ignore_keys='list()'
 obj.ignore_empty_parents=True
-obj.id="<string>"
+obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
 obj.load_on_install=False
 obj.executable="<string>"
 obj.arguments='list()'
@@ -3386,8 +3386,8 @@ An action that prints a message when executed.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
-| `id` | `str` | `` | unique identifier of element in DataGrabber application |
-| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `message` | `str` | `` |  |
 
 
@@ -3397,7 +3397,7 @@ from pydag.nodes.utils.PrintAction import PrintAction  # Adjust import if needed
 
 obj = PrintAction()
 obj.child_ids='list()'
-obj.id="<string>"
+obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
 obj.load_on_install=False
 obj.message="<string>"
 ```
@@ -3420,8 +3420,8 @@ Args:
 | `output_keys` | `list[str]` | `'list()'` | optional explicit output key names written by this node. output_keys are literal names only and do not support selector syntax. If empty, the node uses its default output naming |
 | `ignore_keys` | `list[str]` | `'list()'` | list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys |
 | `ignore_empty_parents` | `bool` | `True` | if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True) |
-| `id` | `str` | `` | unique identifier of element in DataGrabber application |
-| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 
 
 ```python
@@ -3437,7 +3437,7 @@ obj.input_keys='list()'
 obj.output_keys='list()'
 obj.ignore_keys='list()'
 obj.ignore_empty_parents=True
-obj.id="<string>"
+obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
 obj.load_on_install=False
 ```
 
@@ -3448,8 +3448,8 @@ An action that sleeps for a specified number of seconds.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
-| `id` | `str` | `` | unique identifier of element in DataGrabber application |
-| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `sleep_time` | `int` | `0` | number of seconds to sleep for |
 
 
@@ -3459,7 +3459,7 @@ from pydag.nodes.utils.SleepAction import SleepAction  # Adjust import if needed
 
 obj = SleepAction()
 obj.child_ids='list()'
-obj.id="<string>"
+obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
 obj.load_on_install=False
 obj.sleep_time=0
 ```
@@ -3471,8 +3471,8 @@ An action that sleeps until the specified daytime.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
-| `id` | `str` | `` | unique identifier of element in DataGrabber application |
-| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `daytime` | `str` | `` | day time when the sleep should end, format hh:mm:ss |
 
 
@@ -3482,7 +3482,7 @@ from pydag.nodes.utils.SleepUntilAction import SleepUntilAction  # Adjust import
 
 obj = SleepUntilAction()
 obj.child_ids='list()'
-obj.id="<string>"
+obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
 obj.load_on_install=False
 obj.daytime="<string>"
 ```
@@ -3494,8 +3494,8 @@ An action that starts the state machine.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
-| `id` | `str` | `` | unique identifier of element in DataGrabber application |
-| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 
 
 ```python
@@ -3504,7 +3504,7 @@ from pydag.nodes.utils.StartAction import StartAction  # Adjust import if needed
 
 obj = StartAction()
 obj.child_ids='list()'
-obj.id="<string>"
+obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
 obj.load_on_install=False
 ```
 
@@ -3515,8 +3515,8 @@ An action that stops the state machine.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
-| `id` | `str` | `` | unique identifier of element in DataGrabber application |
-| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 
 
 ```python
@@ -3525,7 +3525,7 @@ from pydag.nodes.utils.StopAction import StopAction  # Adjust import if needed
 
 obj = StopAction()
 obj.child_ids='list()'
-obj.id="<string>"
+obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
 obj.load_on_install=False
 ```
 
@@ -3537,8 +3537,8 @@ This is used to test the statemachine without any conditions.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
-| `id` | `str` | `` | unique identifier of element in DataGrabber application |
-| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 
 
 ```python
@@ -3547,7 +3547,7 @@ from pydag.nodes.utils.TrueTransition import TrueTransition  # Adjust import if 
 
 obj = TrueTransition()
 obj.child_ids='list()'
-obj.id="<string>"
+obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
 obj.load_on_install=False
 ```
 
@@ -3573,8 +3573,8 @@ https://tesseract-ocr.github.io/tessdoc/Installation.html and https://github.com
 | `output_keys` | `list[str]` | `'list()'` | optional explicit output key names written by this node. output_keys are literal names only and do not support selector syntax. If empty, the node uses its default output naming |
 | `ignore_keys` | `list[str]` | `'list()'` | list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys |
 | `ignore_empty_parents` | `bool` | `True` | if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True) |
-| `id` | `str` | `` | unique identifier of element in DataGrabber application |
-| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `path_key` | `str` | `'path'` | Key for the source file path in the output dictionary. |
 | `text_key` | `str` | `'text'` | Key for text output in the output dictionary. |
 
@@ -3592,7 +3592,7 @@ obj.input_keys='list()'
 obj.output_keys='list()'
 obj.ignore_keys='list()'
 obj.ignore_empty_parents=True
-obj.id="<string>"
+obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
 obj.load_on_install=False
 obj.path_key='path'
 obj.text_key='text'
@@ -3605,8 +3605,8 @@ obj.text_key='text'
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
 | `service_id` | `str` | `` | ID of the service |
-| `id` | `str` | `` | unique identifier of element in DataGrabber application |
-| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 
 
 ```python
@@ -3616,7 +3616,7 @@ from pydag.nodes.webbrowser.BrowserAutomationAction import BrowserAutomationActi
 obj = BrowserAutomationAction()
 obj.child_ids='list()'
 obj.service_id="<string>"
-obj.id="<string>"
+obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
 obj.load_on_install=False
 ```
 
@@ -3627,8 +3627,8 @@ obj.load_on_install=False
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
 | `service_id` | `str` | `` | ID of the service |
-| `id` | `str` | `` | unique identifier of element in DataGrabber application |
-| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `xpath` | `str` | `` | XPath definition to locate the element to get a value from |
 | `wait` | `int` | `0` | maximum wait time before the UI element is accessed |
 | `scroll_into_view` | `bool` | `False` | scrolls the element into view before attempting click |
@@ -3643,7 +3643,7 @@ from pydag.nodes.webbrowser.BrowserClickElementAction import BrowserClickElement
 obj = BrowserClickElementAction()
 obj.child_ids='list()'
 obj.service_id="<string>"
-obj.id="<string>"
+obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
 obj.load_on_install=False
 obj.xpath="<string>"
 obj.wait=0
@@ -3665,8 +3665,8 @@ obj.wait_for_modal="<string>"
 | `input_keys` | `list[str] | list[int] | str` | `'list()'` | list of input key names used to extract data from parent buffers. input_keys can also be a list of integers for indices or a Python-style slice string (e.g. '-1' for last index, '1:3' or '0:5:2' for start:stop:step exclusive indexing), or a type selector ('type:string' for text-like values, 'type:number' for numeric and bool values). Duplicates are removed while preserving first-match order. If empty, all parent keys are returned |
 | `ignore_keys` | `list[str]` | `'list()'` | list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys |
 | `ignore_empty_parents` | `bool` | `True` | if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True) |
-| `id` | `str` | `` | unique identifier of element in DataGrabber application |
-| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `xpath` | `str` | `` | XPath definition to locate the element to get a value from |
 | `attribute` | `str` | `` | specifies the name of the attribute to retrieve data from, defaults to None, then only the inner text of element is retrieved |
 | `output_keys` | `list[str]` | `"lambda: ['tags', 'values']()"` |  |
@@ -3685,7 +3685,7 @@ obj.n=0
 obj.input_keys='list()'
 obj.ignore_keys='list()'
 obj.ignore_empty_parents=True
-obj.id="<string>"
+obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
 obj.load_on_install=False
 obj.xpath="<string>"
 obj.attribute="<string>"
@@ -3704,8 +3704,8 @@ obj.output_keys="lambda: ['tags', 'values']()"
 | `output_keys` | `list[str]` | `'list()'` | optional explicit output key names written by this node. output_keys are literal names only and do not support selector syntax. If empty, the node uses its default output naming |
 | `ignore_keys` | `list[str]` | `'list()'` | list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys |
 | `ignore_empty_parents` | `bool` | `True` | if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True) |
-| `id` | `str` | `` | unique identifier of element in DataGrabber application |
-| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `xpath` | `str` | `` | XPath definition to locate the element to set a value to |
 | `persistent` | `bool` | `False` | specifies whether data is removed (False) from parent or not (True) |
 | `n` | `int` | `1` | specifies how much data is retrieved from parent buffer. Here Default 1 -> only one value per Set Action |
@@ -3723,7 +3723,7 @@ obj.input_keys='list()'
 obj.output_keys='list()'
 obj.ignore_keys='list()'
 obj.ignore_empty_parents=True
-obj.id="<string>"
+obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
 obj.load_on_install=False
 obj.xpath="<string>"
 obj.persistent=False
@@ -3741,8 +3741,8 @@ Raises:
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
 | `service_id` | `str` | `` | ID of the service |
-| `id` | `str` | `` | unique identifier of element in DataGrabber application |
-| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `url` | `str` | `` | url to navigate to in browser |
 | `sleep_time` | `float` | `0.0` | time to wait after navigation (in seconds) |
 
@@ -3754,7 +3754,7 @@ from pydag.nodes.webbrowser.BrowserUrlNavigateAction import BrowserUrlNavigateAc
 obj = BrowserUrlNavigateAction()
 obj.child_ids='list()'
 obj.service_id="<string>"
-obj.id="<string>"
+obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
 obj.load_on_install=False
 obj.url="https://example.com"
 obj.sleep_time=0.0
