@@ -455,7 +455,7 @@ def test_feature_form_filler_agent_end_to_end_local_example():
 
     try:
         agent.release(blocking=False)
-        action_service.get_observer_thread()._thread.join(timeout=240)
+        action_service._thread.join(timeout=240)
         _assert_form_pipeline_result(
             list_files_action=list_files_action,
             read_pdf_form_action=read_pdf_form_action,
@@ -538,7 +538,7 @@ def test_feature_form_filler_agent_end_to_end_openai_example():
 
     try:
         agent.release(blocking=False)
-        action_service.get_observer_thread()._thread.join(timeout=240)
+        action_service._thread.join(timeout=240)
         llm_data = llm_fill_action.get_buffer().data()
         read_data = read_pdf_form_action.get_buffer().data()
         if "answer" not in llm_data or len(llm_data.get("answer", [])) == 0:
@@ -651,7 +651,7 @@ def test_feature_form_filler_agent_end_to_end_openai_nordlichter_context3():
 
     try:
         agent.release(blocking=False)
-        action_service.get_observer_thread()._thread.join(timeout=240)
+        action_service._thread.join(timeout=240)
 
         listed_data = list_files_action.get_buffer().data()
         assert listed_data.get("values", []) == [str(pdf_path)]

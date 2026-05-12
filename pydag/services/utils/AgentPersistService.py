@@ -20,10 +20,6 @@ class PersistObserver(Observer):
                 if isinstance(buffer, AgentElement):
                     if buffer.load_on_install:
                         buffer.save()
-            for adapter in self._service.get_agent().adapter_store.values():
-                if isinstance(adapter, AgentElement):
-                    if adapter.load_on_install:
-                        adapter.save()
             for service in self._service.get_agent().service_store.values():
                 if isinstance(service, AgentElement):
                     if service.load_on_install:
@@ -40,7 +36,7 @@ class AgentPersistService(ObserverService):
     def _on_install(self, agent = None):
         super()._on_install(agent)
         observer = PersistObserver(self)
-        self._observer_thread.add_observer(observer)
+        self.add_observer(observer)
         if not FileUtils.exists_folder(AgentConfig.SAVE_FOLDER):
             FileUtils.create_dir(AgentConfig.SAVE_FOLDER)
 

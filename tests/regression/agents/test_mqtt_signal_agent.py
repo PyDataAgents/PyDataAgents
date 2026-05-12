@@ -1,11 +1,10 @@
         
-from pydag.adapters.mqtt.MQTTAdapter import MQTTAdapter
+from pydag.services.mqtt.MQTTService import MQTTService
 from pydag.buffers.SignalBuffer import SignalBuffer
 from pydag.buffers.signals.LinearTrend import LinearTrend
 from pydag.buffers.signals.Sine import Sine
 from pydag.agents.Agent import Agent
-from pydag.services.mappings.MappingService import MappingService
-from pydag.services.mappings.MappingType import MappingType
+from pydag.services.MappingType import MappingType
 from pydag.services.ThreadType import ThreadType
 
 
@@ -39,28 +38,24 @@ def test_000():
 
     ag.add_buffer(linear_buf)
 
-    mqtt_adapter = MQTTAdapter()
-    mqtt_adapter.id = "MQTT-1"
-    mqtt_adapter.endpoint  = "localhost"
-    mqtt_adapter.port = 1883
-    mqtt_adapter.qos = 1
-    mqtt_adapter.force_numeric = True
+    mqtt_srv = MQTTService(
+        id = "MQTT-1",
+        endpoint  = "localhost",
+        port = 1883,
+        qos = 1,
+        force_numeric = True,
+        addresses = ["signals/sine", "signals/linear"],
+        thread_type = ThreadType.MILLI_SECOND.value,
+        mapping_type = MappingType.WRITE.value,
+        observing_time = 1000,
+        n = 0,
+        persistent = False,
+        auto_start = True
+    )
+    mqtt_srv.add_buffer(sine_buf)
+    mqtt_srv.add_buffer(linear_buf)
     
-    ag.add_adapter(mqtt_adapter)
-
-    m1 = MappingService()
-    m1.id = "M1"
-    m1.set_adapter(mqtt_adapter)
-    m1.addresses = ["signals/sine", "signals/linear"]
-    m1.set_buffers({sine_buf.id : sine_buf, linear_buf.id: linear_buf})
-    m1.thread_type = ThreadType.MILLI_SECOND.value
-    m1.mapping_type = MappingType.WRITE.value
-    m1.observing_time = 1000
-    m1.n = 0
-    m1.persistent = False
-    m1.auto_start = True
-
-    ag.add_service(m1)
+    ag.add_service(mqtt_srv)
 
     ag.release()
 

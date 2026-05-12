@@ -40,7 +40,7 @@ class Buffer(AgentElement):
 
     def _on_install(self, agent: Agent = None):
         if self.initial_values is not None:
-            self._elements = self.initial_values
+            self._on_push(self.initial_values)
             # remove the initial values to keep buffer object small
             self.initial_values = None
         if len(self._duplicates) > 0:
@@ -96,8 +96,8 @@ class Buffer(AgentElement):
                     raise BufferException(f"{Buffer.__name__} {self.id} must be installed before storing data!")
                     
             case BufferState.RETRIEVING:
-                if self._state != AgentElementState.INSTALLED:
-                    raise BufferException(f"{Buffer.__name__} {self.id} must be installed before retrieving data!")    
+                if self._state == AgentElementState.UNINSTALLED or self._state == AgentElementState.ERROR:
+                    raise BufferException(f"{Buffer.__name__} {self.id} must be installed before retrieving data!")
     
     def push(self, elements):
         """

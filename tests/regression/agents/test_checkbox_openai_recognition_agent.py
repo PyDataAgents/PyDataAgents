@@ -7,6 +7,7 @@ from pathlib import Path
 
 from langchain_openai import ChatOpenAI
 from pypdf import PdfReader
+import pytest
 
 # Fallback for environments where graphviz is not installed.
 if "graphviz" not in sys.modules:

@@ -74,7 +74,7 @@ class ListBuffer(Buffer):
                 dic[AgentConfig.VALUES] = d
                 return dic
         else:
-            logger.warning("buffer is empty")
+            #logger.warning("buffer is empty")
             return {}
 
     def data_with_meta(self, n = 0, persistent = True) -> dict:        

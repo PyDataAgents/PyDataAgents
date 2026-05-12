@@ -52,7 +52,7 @@ class FolderObserveMailService(ObserverService):
         self._file_history_buffer.capacity = self.max_entries
         self._file_history_buffer.description = "Buffer to keep track of file history in the observed folder."# create new thread for update interval of folder observation
         observer = FolderMailObserver(self)
-        self._observer_thread.add_observer(observer)
+        self.add_observer(observer)
     
     def get_file_history(self) -> DictBuffer:
         return self._file_history_buffer
@@ -62,9 +62,9 @@ class FolderMailObserver(Observer):
     Observer to handle the folder observation events.
     """
     
-    def __init__(self, folderObserveMailService: FolderObserveMailService):
+    def __init__(self, service : FolderObserveMailService):
         super().__init__()
-        self._service = folderObserveMailService
+        self._service = service
             
     def observe(self):
         # Logic to check the folder for new files and send mail if necessary

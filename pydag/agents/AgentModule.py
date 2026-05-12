@@ -1,17 +1,16 @@
 class AgentModule:
     
     @staticmethod
-    def load_core_modules():
-        # adapters
-        
+    def load_core_modules():        
         # services
         import pydag.services.rest.RestService
         import pydag.services.ObserverService
-        import pydag.services.mappings.MappingService
+        import pydag.services.MappingService
         import pydag.services.statemachine.SimpleActionService
         import pydag.services.statemachine.SimpleStatemachine
         import pydag.services.statemachine.SFCService
         import pydag.services.plot.PlotlifyService
+        import pydag.services.ui.UIService
         
         # nodes
         import pydag.nodes.script.ScriptAction
@@ -24,19 +23,17 @@ class AgentModule:
     
     @staticmethod
     def load_iiot_modules(skip_ads : bool = False):
-        # adapters
-        if not skip_ads:
-            import pydag.adapters.ads.AdsAdapter
-        import pydag.adapters.mqtt.MQTTAdapter
-        import pydag.adapters.audio.AudioAdapter
-        import pydag.adapters.opcua.OpcUaAdapter
-        import pydag.adapters.s7.S7Adapter
-        import pydag.adapters.socket.SerialAdapter
-        import pydag.adapters.socket.TCPClientAdapter
-        import pydag.adapters.socket.WebSocketAdapter
-        import pydag.adapters.socket.ifmvse.VSEAdapter
-        
         # services
+        if not skip_ads:
+            import pydag.services.ads.AdsService
+        import pydag.services.mqtt.MQTTService
+        import pydag.services.audio.AudioService
+        import pydag.services.opcua.OpcUaService
+        import pydag.services.s7.S7Service
+        import pydag.services.socket.SerialService
+        import pydag.services.socket.TCPClientService
+        import pydag.services.socket.WebSocketService
+        import pydag.services.socket.ifmvse.VSEService        
         import pydag.services.office.MSGraphService
         
         # nodes
@@ -47,7 +44,6 @@ class AgentModule:
     
     @staticmethod
     def load_database_modules():
-        # adapters
         
         # services
         
@@ -57,7 +53,6 @@ class AgentModule:
     
     @staticmethod
     def load_document_modules():
-        # adapters
         
         # services
         
@@ -67,7 +62,6 @@ class AgentModule:
     
     @staticmethod
     def load_llm_modules():
-        # adapters
         
         # services
         import pydag.services.llm.LLMService
@@ -85,10 +79,8 @@ class AgentModule:
     
     @staticmethod
     def load_vision_modules():
-        # adapters
-        import pydag.adapters.vision.WebcamAdapter
-        
         # services
+        import pydag.services.vision.WebcamService        
         import pydag.services.vision.WebcamVideoRollbackService
         
         # nodes

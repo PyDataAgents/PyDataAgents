@@ -1,5 +1,6 @@
 from __future__ import annotations
 import json
+import builtins
 from typing import TYPE_CHECKING
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
@@ -7,6 +8,7 @@ import uuid
 from loguru import logger
 
 
+from .AgentElementException import AgentElementException
 from .AgentStates import AgentElementState
 from ..utils.ClassUtils import ClassUtils
 from ..utils.FileUtils import FileUtils
@@ -76,10 +78,15 @@ class AgentElement(ABC):
            if agent is not None, it can be used to reference or create other agent elements
            the method should always be used in child classes with super().install()
         """
-        if self.load_on_install:
-            self.load()
-        self._on_install(agent)
-        self._state = AgentElementState.INSTALLED
+        try:
+            self._check_state(AgentElementState.INSTALLED)
+            if self.load_on_install:
+                self.load()
+            self._on_install(agent)
+            self._state = AgentElementState.INSTALLED
+        except AgentElementException as e:
+            self._state = AgentElementState.ERROR
+            raise AgentElementException(f"Could not install {self.__class__.__name__}") from e
         
     def uninstall(self, agent : Agent = None):
         """resets the element, this method can be used to stop internal element logic or reset objects that were initialized on creation
@@ -123,3 +130,40 @@ class AgentElement(ABC):
             state (AgentElementState): state enum
         """
         self._state = state
+    
+    def _check_state(self, next_state : AgentElementState):
+        match(next_state):
+            case AgentElementState.UNINSTALLED:
+                if self._state != AgentElementState.ERROR and self._state != AgentElementState.INSTALLED:
+                    raise AgentElementException(f"{self.__class__.__name__} {self.id} cannot be running when uninstalling!")
+                
+            case AgentElementState.INSTALLED:
+                # any prior state is allowed
+                return
+                
+            case AgentElementState.ERROR:
+                # any prior state is allowed
+                return
+            
+            case _:
+                raise AgentElementException(f"Unknown {AgentElementState.__name__} was found!")
+        
+    def contains_element(self, id : str) -> bool:
+        """ checks whether this `AgentElement` contains another `AgentElement` specified by `id`"""
+        seen = {builtins.id(self)}
+        stack = list(vars(self).values())
+        while stack:
+            value = stack.pop()
+            if isinstance(value, AgentElement):
+                value_obj_id = builtins.id(value)
+                if value_obj_id in seen:
+                    continue
+                if value.id == id:
+                    return True
+                seen.add(value_obj_id)
+                stack.extend(vars(value).values())
+            elif isinstance(value, dict):
+                stack.extend(value.values())
+            elif isinstance(value, (list, tuple, set)):
+                stack.extend(value)
+        return False

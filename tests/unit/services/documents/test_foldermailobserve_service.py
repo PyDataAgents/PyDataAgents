@@ -27,7 +27,7 @@ def test_000():
     folder_service = FolderObserveMailService()
     folder_service.id = "TestFolderObserveMailService"
     folder_service.folder = str(Path.home() / "Downloads")
-    folder_service.interval = 10 # Check every x seconds
+    folder_service.observing_time = 10 # Check every x seconds
     folder_service.skip_weekends = False
     folder_service.max_entries = 5
     folder_service.list_files = True

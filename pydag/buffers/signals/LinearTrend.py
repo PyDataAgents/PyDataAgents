@@ -19,7 +19,7 @@ class LinearTrend(Signal):
     def value(self, t : int = None) -> Tuple[int, float]:
         ti, tf = super().value(t)
         if tf > self.duration:
-            self.reset()
+            self.install()
         return ti, self._trend(tf)
     
     def _trend(self, tf : float) -> float:
@@ -28,5 +28,3 @@ class LinearTrend(Signal):
         """        
         v = self.min + (self.max - self.min) * (tf / self.duration) + (self.min + self.max) / 2 * self.noise * (2 * MathUtils.rand() - 1)
         return tf, v
-        
-        

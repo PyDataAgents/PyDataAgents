@@ -27,7 +27,7 @@ class ObserverTriggerAction(ServiceNode, TriggerAction):
     
     def _on_trigger(self):
         if isinstance(self._service, ObserverService):
-            self._service.get_observer_thread().notify_observers()
+            self._service.notify_observers()
             
     def start_trigger(self):
         """ Base `TriggerNode` that does nothing during `start_trigger`, but can be used via API to trigger events

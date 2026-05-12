@@ -25,6 +25,7 @@ if "graphviz" not in sys.modules:
     graphviz_stub.Digraph = _DummyDigraph
     sys.modules["graphviz"] = graphviz_stub
 
+from pydag.agents.AgentElementException import AgentElementException
 from pydag.buffers.DictBuffer import DictBuffer
 from pydag.nodes.NodeException import NodeException
 from pydag.nodes.buffers.LinkBufferAction import LinkBufferAction
@@ -116,7 +117,7 @@ def test_install_enforces_rag_service_only():
     action = LLMChatAction(question_value="hello")
     action.set_service(LLMService(id="LLM1"))
 
-    with pytest.raises(NodeException):
+    with pytest.raises(AgentElementException):
         action.install()
 
 
@@ -125,7 +126,7 @@ def test_install_rejects_duplicate_output_keys():
     action = LLMChatAction(output_keys=["question", "question"])
     action.set_service(service)
 
-    with pytest.raises(NodeException, match="must contain unique entries"):
+    with pytest.raises(AgentElementException):
         action.install()
 
 

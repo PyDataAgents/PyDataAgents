@@ -2,18 +2,22 @@ from abc import abstractmethod
 from dataclasses import dataclass, field
 from typing import Tuple
 
+from ...agents.Agent import Agent 
+from ...agents.AgentElement import AgentElement
+
 
 @dataclass
-class SampledSignal():
+class SampledSignal(AgentElement):
     """
     A class representing a sampled signal for continuously sampled data
     """
     sample_rate : float = field(default=1.0, metadata={"description": "sample rate of the signal in Hz"})
             
     def __post_init__(self):
+        super().__post_init__()
         self.sample_count : int = 0
 
-    def reset(self):        
+    def _on_install(self, agent : Agent = None):        
         """
         Resets the signal's start time and sample count.
         """

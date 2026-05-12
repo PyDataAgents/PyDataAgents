@@ -51,14 +51,11 @@ class DictBuffer(Buffer):
             else:
                 batch_len = 1  # scalar-only insert
 
-            # Broadcast scalars if any list present
+            # Broadcast samples if any list present
             if batch_len > 1:
                 for k, v in list(elements.items()):
                     if not isinstance(v, list):
-                        if not isinstance(v, (int, float)):
-                            raise ValueError(f"Unsupported type for key '{k}': {type(v)}. Only lists and scalars (int, float) are supported.")
-                        else:
-                            elements[k] = [v] * batch_len
+                        elements[k] = [v] * batch_len
 
             # Prevent empty batch inserts (e.g., pushing a dict with empty lists)
             # This avoids alignment padding and timestamp/index generation on zero-length pushes.

@@ -1,6 +1,6 @@
-from pydag.adapters.Adapter import Adapter
-from pydag.adapters.csv.CsvReadAdapter import CsvReadAdapter
 from pydag.agents.AgentElement import AgentElement
+from pydag.services.Service import Service
+from pydag.services.csv.CsvReadService import CsvReadService
 from pydag.utils.ClassUtils import ClassUtils
 
 
@@ -12,7 +12,7 @@ def test_000():
     
     
 def test_020():
-    print(ClassUtils.get_superclasses(CsvReadAdapter))
+    print(ClassUtils.get_superclasses(CsvReadService))
     
 def test_030():
-    print(ClassUtils.get_subclasses(Adapter))
+    print(ClassUtils.get_subclasses(Service))

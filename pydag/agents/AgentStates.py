@@ -12,23 +12,12 @@ class AgentElementState():
 class BufferState(AgentElementState):
     RETRIEVING = "RETRIEVING"
     STORING = "STORING"
-       
-class AdapterState(AgentElementState):
-    CONNECTED = "CONNECTED"
-    DISCONNECTED = "DISCONNECTED"
-    READING = "READING"
-    WRITING = "WRITING"
-    SUBSCRIBING = "SUBSCRIBING"
-    PUBLISHING = "PUBLISHING"
-    DISCOVERING = "DISCOVERING"
-    BROWSING = "BROWSING"
- 
+        
 class NodeState(AgentElementState):
     EXECUTING = "EXECUTING"
     
 class ServiceState(AgentElementState):
     RUNNING = "RUNNING"
-    STOPPED = "STOPPED"
     
 class LearningState(NodeState):
     LEARNING = "LEARNING"

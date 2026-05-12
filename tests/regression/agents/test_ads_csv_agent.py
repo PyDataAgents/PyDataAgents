@@ -1,65 +1,57 @@
 import os
 import pytest
 
-try:
-    from pydag.adapters.ads.AdsAdapter import AdsAdapter
-except (ImportError, OSError, FileNotFoundError) as exc:
-    pytest.skip(f"ADS tests require pyads/TcAdsDll: {exc}", allow_module_level=True)
-
-from pydag.adapters.csv.CsvWriteAdapter import CsvWriteAdapter
+from pydag.services.csv.CsvWriteService import CsvWriteService
 from pydag.buffers.ListBuffer import ListBuffer
 from pydag.agents.AgentConfig import AgentConfig
 from pydag.agents.YAMLConfig import YAMLConfig
 from pydag.agents.Agent import Agent
-from pydag.services.mappings.MappingService import MappingService
+try:    
+    from pydag.services.ads.AdsService import AdsService
+except (ImportError, OSError, FileNotFoundError) as exc:
+    pytest.skip(f"ADS tests require pyads/TcAdsDll: {exc}", allow_module_level=True)
+
 
 
 def test_000():
-    g = Agent()
-    g.id = "AG1"
+    g = Agent(id = "AG1")
     
-    ads = AdsAdapter()
-    ads.id = "A1"
-    ads.ams_net_id = "191.1.1.1.1.1"
+    buf = ListBuffer(
+        id = "B1",
+        capacity = 1,
+        data_type = "NUMERIC"
+    )
     
-    csv = CsvWriteAdapter()
-    csv.id = "A2"
-    csv.folder = os.path.dirname(__file__)
-    csv.decimal_precision = 3
-    csv.delimiter = ";"
-    csv.file_extension = "csv"
-    csv.max_samples = 1000000
-    csv.file_post_fix = "125kN"
-    
-    buf = ListBuffer()
-    buf.id = "B1"
-    buf.capacity = 1
-    buf.data_type = "NUMERIC"
-    
-    m1 = MappingService()
-    m1.id = "M1"
-    m1.buffer_ids = [buf.id]
-    m1.adapter_id = ads.id
-    m1.addresses = ["MAIN.AdsCsvGrabberTest"]
-    m1.thread_type = "MILLI_SECOND"
-    m1.mapping_type = "READ"
-    m1.n = 1
-    m1.observing_time = 10
-    
-    m2 = MappingService()
-    m2.id = "M2"
-    m2.buffer_ids = [buf.id]
-    m2.adapter_id = csv.id
-    m2.mapping_type = "WRITE"
-    m2.persistent = False
-    m2.observing_time = 10
-    m2.thread_type = "MILLI_SECOND"
-    
-    g.add_adapter(ads)
-    g.add_adapter(csv)
     g.add_buffer(buf)
-    g.add_service(m1)
-    g.add_service(m2)
+    
+    ads = AdsService(
+        id = "A1",
+        ams_net_id = "191.1.1.1.1.1",
+        buffer_ids = [buf.id],
+        addresses = ["MAIN.AdsCsvGrabberTest"],
+        thread_type = "MILLI_SECOND",
+        mapping_type = "READ",
+        n = 1,
+        observing_time = 10
+    )
+    g.add_service(ads)
+    
+    csv = CsvWriteService(
+        id = "A2",
+        folder = os.path.dirname(__file__),
+        decimal_precision = 3,
+        delimiter = ";",
+        file_extension = "csv",
+        max_samples = 1000000,
+        file_post_fix = "125kN",
+        buffer_ids = [buf.id],
+        mapping_type = "WRITE",
+        persistent = False,
+        observing_time = 10,
+        thread_type = "MILLI_SECOND"
+    )
+    
+    g.add_service(csv)
     
     gc = AgentConfig(g)
     yc = YAMLConfig(os.path.dirname(__file__) + "\\ads_csv.yaml")

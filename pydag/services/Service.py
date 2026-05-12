@@ -2,6 +2,7 @@ from __future__ import annotations
 from abc import abstractmethod
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Union
+from loguru import logger
 
 
 from .ServiceException import ServiceException
@@ -38,9 +39,13 @@ class Service(AgentElement):
         Raises:
             ServiceException: if this `Service` cannot be started
         """
-        self._check_state(ServiceState.RUNNING)
-        self._state = ServiceState.RUNNING
-        self._on_start()
+        try:
+            self._check_state(ServiceState.RUNNING)
+            self._state = ServiceState.RUNNING        
+            self._on_start()
+        except ServiceException as e:
+            self._state = AgentElementState.ERROR
+            raise ServiceException(f"Could not start {self.__class__.__name__}") from e
     
     @abstractmethod
     def _on_start(self):
@@ -60,9 +65,9 @@ class Service(AgentElement):
         service. Subclasses shall call `super().stop()` to ensure the internal
         `_is_running` flag is cleared (set to False) once the service has stopped.
         """
-        self._check_state(ServiceState.STOPPED)
+        self._check_state(ServiceState.INSTALLED)
         self._on_stop()
-        self._state = ServiceState.STOPPED
+        self._state = ServiceState.INSTALLED
         
     
     @abstractmethod
@@ -79,20 +84,16 @@ class Service(AgentElement):
                     raise ServiceException(f"{Service.__name__} {self.id} cannot be running when uninstalling!")
                 
             case AgentElementState.INSTALLED:
-                if self._state == ServiceState.RUNNING:
-                    raise ServiceException(f"{Service.__name__} {self.id} cannot be running when installing!")
+                # any prior state is allowed
+                return
                 
             case AgentElementState.ERROR:
                 # any prior state is allowed
                 return
             
             case ServiceState.RUNNING:
-                if self._state != ServiceState.INSTALLED and self._state != ServiceState.STOPPED:
-                    raise ServiceException(f"{Service.__name__} {self.id} must be installed or stopped before starting!")
-                
-            case ServiceState.STOPPED:
-                if self._state != ServiceState.RUNNING:
-                    raise ServiceException(f"{Service.__name__} {self.id} must be running before stopping!")
+                if self._state != ServiceState.INSTALLED:
+                    raise ServiceException(f"{Service.__name__} {self.id} must be installed before starting!")
                 
     def get_agent(self) -> Agent:
         """ returns the `Agent`

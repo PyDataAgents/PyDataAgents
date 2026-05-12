@@ -25,15 +25,12 @@ __pycache__
 /tests/**/test_*.html
 
 # test docx files
-/tests/**/*.docx
+/tests/**/*test*.docx
 
 # test images
-/tests/**/image_*.jpg
-/tests/**/image_*.png
-/tests/**/image_*.jpeg
-/tests/**/test_*.jpg
-/tests/**/test_*.jpeg
-/tests/**/test_*.png
+/tests/**/*test_*.jpg
+/tests/**/*test_*.jpeg
+/tests/**/*test_*.png
 
 # test *.zip files
 /tests/**/*.zip
@@ -43,15 +40,15 @@ __pycache__
 /tests/**/*.avi
 
 # test ical files
-/tests/**/test*.ics
-/tests/**/test*.ical
+/tests/**/*test*.ics
+/tests/**/*test*.ical
 
 # test sqlite files
-/tests/**/test*.sqlite
+/tests/**/*test*.sqlite
 
 
 # ignore csv test files
-/tests/**/*test.csv
+/tests/**/*test*.csv
 
 
 # ignore txt test files
@@ -60,16 +57,12 @@ __pycache__
 
 
 # ignore PDF test files
-/tests/**/test_*.pdf
+/tests/**/*test_*.pdf
 /tests/**/Test_*.pdf
 
 # ignore test step files
 /tests/**/*.stp
 /tests/**/Test_*.pdf
-
-
-# test ical file
-/tests/**/test*.ics
 
 # .save folder for agent persistence
 .save/

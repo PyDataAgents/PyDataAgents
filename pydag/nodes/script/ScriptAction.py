@@ -2,7 +2,6 @@ from dataclasses import dataclass, field
 from loguru import logger
 
 from pydag.utils.FileUtils import FileUtils
-from pydag.utils.NodeUtils import NodeUtils
 from ...agents.Agent import Agent
 from ..BufferNode import BufferNode
 from ..Action import Action
@@ -31,11 +30,8 @@ class ScriptAction(BufferNode, Action):
     def _on_install(self, agent : Agent = None):
         BufferNode._on_install(self, agent)
         if self.use_parent_data:
-            NodeUtils.validate_key_names("input_keys", self.input_keys)
             if len(self.input_keys) == 0:
                 raise NodeException("input_keys must be provided if use_parent_data is True.")
-        if len(self.output_keys) > 0:
-            NodeUtils.validate_key_names("output_keys", self.output_keys)
         if self.script_path:
             if FileUtils.exists_file(self.script_path):
                 with open(self.script_path, 'r', encoding='utf-8') as file:
