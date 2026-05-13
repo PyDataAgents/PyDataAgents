@@ -23,6 +23,7 @@ class SampledBuffer(TimedBuffer):
 
     def _on_install(self, agent : Agent = None):
         super()._on_install(agent)
+        self.signal.install(agent)
         self._scheduler = BackgroundScheduler()
         self._scheduler.add_job(self.signal_task, 'interval', seconds=self.sampling_period / 1000.0)
         self._scheduler.start()

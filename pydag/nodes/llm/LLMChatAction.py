@@ -4,7 +4,6 @@ import re
 from typing import Any
 
 from pydag.utils.DataUtils import DataUtils
-from pydag.utils.NodeUtils import NodeUtils
 
 from ...nodes.NodeException import NodeException
 from ...agents.Agent import Agent
@@ -103,10 +102,8 @@ class LLMChatAction(BufferNode, ServiceNode, Action):
     def _on_install(self, agent: Agent = None):
         BufferNode._on_install(self, agent)
         ServiceNode._on_install(self, agent)
-        NodeUtils.validate_key_names("input_keys", self.input_keys)
-        NodeUtils.validate_key_names("output_keys", self.output_keys)
-        NodeUtils.validate_key_names("input_context_keys", self.input_context_keys)
-        NodeUtils.validate_key_names("pass_through_keys", self.pass_through_keys)
+        BufferNode._validate_keys(self.input_context_keys)
+        BufferNode._validate_keys(self.pass_through_keys)
         if not isinstance(self._service, RAGService):
             raise NodeException("referenced service is not an instance of " + RAGService.cname())
         if len(self.output_keys) < 2:

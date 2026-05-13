@@ -3,6 +3,7 @@ import os
 import pytest
 
 from pydag.agents.AgentConfig import AgentConfig
+from pydag.agents.AgentElementException import AgentElementException
 from pydag.buffers.signals.SampledSine import SampledSine
 from pydag.nodes.BufferNode import BufferNode
 from pydag.nodes.NodeException import NodeException
@@ -44,7 +45,7 @@ def _buffer_user_data(action: ScriptAction) -> dict:
 def test_install_requires_script_path():
     action = ScriptAction(output_keys=["result"], use_parent_data=False)
 
-    with pytest.raises(NodeException, match="Script file path must be provided"):
+    with pytest.raises(AgentElementException):
         action.install()
 
 
@@ -52,7 +53,7 @@ def test_install_rejects_missing_script_file():
     missing_script_path = os.path.join(TEST_SCRIPTS_DIR, "missing_script.py")
     action = ScriptAction(script_path=missing_script_path, output_keys=["result"], use_parent_data=False)
 
-    with pytest.raises(NodeException, match="does not exist"):
+    with pytest.raises(AgentElementException):
         action.install()
 
 

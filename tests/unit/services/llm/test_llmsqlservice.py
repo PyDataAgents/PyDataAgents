@@ -67,23 +67,4 @@ def test_010():
     ans = lss.chat("What is the most popular artist based on invoices of customers?")
     print(ans)
 
-@pytest.mark.skip(reason="Requires OLLAMA server running locally")      
-def test_011():    
-    #config = configparser.ConfigParser()
-    #config.read("config.ini")    
-    lss = LLMSQLService()
-    lss.id = "S1"
-    lss.endpoint = "http://localhost:11434"
-    lss.model = "sqlcoder:latest"
-    lss.model_provider = "OLLAMA"
-    lss.sql_connection = "sqlite:///" + os.path.dirname(__file__).replace("\\", "/") + "/Chinook.db"
-    
-    lss.install()
-    
-    lss.start()
-    
-    ans = lss.chat("What is the most popular artist based on invoices of customers?")
-    print(ans)
-    
-    lss.stop()
     

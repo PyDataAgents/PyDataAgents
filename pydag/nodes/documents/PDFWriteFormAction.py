@@ -10,7 +10,6 @@ from typing import Any
 from ...agents.Agent import Agent
 from ...buffers.DictBuffer import DictBuffer
 from ...utils.FileUtils import FileUtils
-from ...utils.NodeUtils import NodeUtils
 from ...utils.PDFUtils import PDFUtils as _pdf_utils
 from ..Action import Action
 from ..BufferNode import BufferNode
@@ -74,9 +73,8 @@ class PDFWriteFormAction(BufferNode, Action):
         BufferNode._on_install(self, agent)
         if not isinstance(self._buffer, DictBuffer):
             raise NodeException("Only DictBuffer is supported for " + self.cname())
-        NodeUtils.validate_key_names("path_input_keys", self.path_input_keys)
-        NodeUtils.validate_key_names("fill_input_keys", self.fill_input_keys)
-        NodeUtils.validate_key_names("output_keys", self.output_keys)
+        BufferNode._validate_keys(self.path_input_keys)
+        BufferNode._validate_keys(self.fill_input_keys)
         if len(self.output_keys) != 4:
             raise NodeException(f"{self.cname()} requires exactly 4 output_keys, got {len(self.output_keys)}")
         if self.row_mode not in {"per_pdf", "per_field"}:

@@ -34,6 +34,7 @@ run to help find the answer. Unless the user specifies in his question a
 specific number of examples they wish to obtain, always limit your query to
 at most {top_k} results. You can order the results by a relevant column to
 return the most interesting examples in the database.
+You should only return the SQL query, nothing else, so it can be used directly. Do not add 'sql:' or anything in front of query result.
 Never query for all the columns from a specific table, only ask for a the
 few relevant columns given the question.
 Pay attention to use only the column names that you can see in the schema description.
@@ -87,7 +88,10 @@ class LLMSQLService(LLMService):
     
     def _write_query(self, state: State):
         """Generate SQL query to fetch information."""        
-        #print(self.db.get_context())        
+        #print(self._db.get_context())
+        #print(self._db.get_table_info())
+        #print(self._db.get_table_names())
+        #print(self._db.get_usable_table_names())
         prompt = self._messages.invoke(
             {
                 "dialect": self._db.dialect,
@@ -97,12 +101,17 @@ class LLMSQLService(LLMService):
             }
         )
         if self.model_provider == ModelProvider.OLLAMA.value:
-            result = self._llm.invoke(prompt)
+            result = self._llm.invoke(prompt).strip()
             # extract sql only from result
             sql_start = result.lower().find("select")
-            sql_end = result.lower().rfind(";")
-            if sql_start != -1 and sql_end != -1 and sql_end > sql_start:
-                sql_query = result[sql_start:sql_end+1]
+            #sql_end = result.lower().rfind(";")
+            #if sql_start != -1 and sql_end != -1 and sql_end > sql_start:
+                    #sql_query = result[sql_start:sql_end+1]
+            if sql_start != -1:
+                if result.lower().startswith("select"):
+                    sql_query = result
+                else:
+                    sql_query = result[sql_start:]
                 return {QUERY: sql_query}
             else:
                 raise ServiceException("Could not extract SQL query from LLM response")

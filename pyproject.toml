@@ -26,11 +26,16 @@ dependencies = [
     "numpy",
     "pandas",
     "fastapi[standard]",
-    "APScheduler",
-    "graphviz",       
+    "APScheduler",     
 ]
 
 [project.optional-dependencies]
+ui = [  
+    "graphviz", 
+    "nicegui",
+    "plotly"
+]
+
 iiot = [
    "opcua",
     "pyads",

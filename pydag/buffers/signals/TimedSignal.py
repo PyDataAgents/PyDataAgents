@@ -1,5 +1,6 @@
 from dataclasses import dataclass, field
 
+from ...utils.TimeUtils import TimeUtils
 from ...buffers.signals.Signal import Signal
 
 
@@ -14,13 +15,13 @@ class TimedSignal(Signal):
     
     def __post_init__(self):
         super().__post_init__()
-        self.count = 0
+        self._count = 0
     
     def value(self, t : int = None) -> tuple[int, float]:
         ti, tf = super().value(t)
-        if  self.times[self.count] <= tf:
-            self.count += 1
-            if self.count >= len(self.times):
-                self.count = 0
-                self.reset()
-        return ti, self.values[self.count]
+        if  self.times[self._count] <= tf:
+            self._count += 1
+            if self._count >= len(self.times):
+                self._count = 0
+                self.set(TimeUtils.utc_ms())
+        return ti, self.values[self._count]

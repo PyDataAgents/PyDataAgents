@@ -15,6 +15,14 @@
 | [`TimedBuffer`](#timedbuffer-in-pydagbufferstimedbufferpy) | A buffer that stores data with timestamps.Inherits from `ListBuffer`. | ![TimedBuffer](element_icons/TimedBuffer.png)
 | [`TransformsBuffer`](#transformsbuffer-in-pydagbufferstransformsbufferpy) | TransformsBuffer is a subclass of ListBuffer that allows for data transformation.It is used to transform data from one format to another. | ![TransformsBuffer](element_icons/TransformsBuffer.png)
 | [`GeometryBuffer`](#geometrybuffer-in-pydagbuffersgeometrygeometrybufferpy) |  | ![GeometryBuffer](element_icons/GeometryBuffer.png)
+| [`LinearTrend`](#lineartrend-in-pydagbufferssignalslineartrendpy) | A signal that simulates a linear trend | ![LinearTrend](element_icons/LinearTrend.png)
+| [`RandBoolean`](#randboolean-in-pydagbufferssignalsrandbooleanpy) |  | ![RandBoolean](element_icons/RandBoolean.png)
+| [`SampledSignal`](#sampledsignal-in-pydagbufferssignalssampledsignalpy) | A class representing a sampled signal for continuously sampled data | ![SampledSignal](element_icons/SampledSignal.png)
+| [`SampledSine`](#sampledsine-in-pydagbufferssignalssampledsinepy) | A class to represent a sampled sine wave signal.Attributes:    f (float): The frequency of the sine wave in Hz.    a (float): The amplitude of the sine wave.    sample_rate (int): The number of samples per second.    p (float): The phase of the sine wave in °. | ![SampledSine](element_icons/SampledSine.png)
+| [`Sawtooth`](#sawtooth-in-pydagbufferssignalssawtoothpy) | A class to represent a sawtooth wave signal. | ![Sawtooth](element_icons/Sawtooth.png)
+| [`Signal`](#signal-in-pydagbufferssignalssignalpy) | Abstract base class for signals. | ![Signal](element_icons/Signal.png)
+| [`Sine`](#sine-in-pydagbufferssignalssinepy) | A class to represent a sine wave signal. | ![Sine](element_icons/Sine.png)
+| [`TimedSignal`](#timedsignal-in-pydagbufferssignalstimedsignalpy) | A signal that emits values at specified time intervals. | ![TimedSignal](element_icons/TimedSignal.png)
 | [`ClippingTransformation`](#clippingtransformation-in-pydagbufferstransformationsclippingtransformationpy) |  | ![ClippingTransformation](element_icons/ClippingTransformation.png)
 
 
@@ -24,8 +32,8 @@
 Abstract base class for buffers.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| `id` | `str` | `` | unique identifier of element in DataGrabber application |
-| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `capacity` | `int` | `'AgentConfig.INFINITE_CAPACITY'` | Number of elements that can be stored in buffer before being discarded in FiFo fashion. If set to -1, then there is no capacity for this buffer. |
 | `data_type` | `str` | `'DataType.FLOAT.value'` | datatype to expect from buffer elements, can be DataType enum or list of enums |
 | `initial_values` | `any` | `` | initial values in buffer |
@@ -39,7 +47,7 @@ Abstract base class for buffers.
 from pydag.buffers.Buffer import Buffer  # Adjust import if needed
 
 obj = Buffer()
-obj.id="<string>"
+obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
 obj.load_on_install=False
 obj.capacity='AgentConfig.INFINITE_CAPACITY'
 obj.data_type='DataType.FLOAT.value'
@@ -66,8 +74,8 @@ A `Buffer` that loads a dataset and stores it in its elements
 | `timestamps_key` | `str` | `'timestamps'` | Key under which timestamps are exposed. |
 | `index_enabled` | `bool` | `False` | Whether an index column is enabled for this buffer. The index column is a simple integer sequence starting from 0 and adds +1 per point. If the parent buffer has an index column which is named in the same way as this buffer's index_key, those indices will be copied over. If set to False and an index column is present in the input data, it will be ignored. |
 | `index_key` | `str` | `'index'` | Key name for index column. |
-| `id` | `str` | `` | unique identifier of element in DataGrabber application |
-| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `dataset_name` | `str` | `'DatasetNames.Blobs.value'` | Dataset names. Tested are:
                                                                                 ArrowHead: https://www.timeseriesclassification.com/description.php?Dataset=ArrowHead,
                                                                                 AbnormalHeartbeat: https://www.timeseriesclassification.com/description.php?Dataset=AbnormalHeartbeat,
@@ -106,7 +114,7 @@ obj.timestamps_enabled=False
 obj.timestamps_key='timestamps'
 obj.index_enabled=False
 obj.index_key='index'
-obj.id="<string>"
+obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
 obj.load_on_install=False
 obj.dataset_name='DatasetNames.Blobs.value'
 obj.sort_by_y=False
@@ -124,8 +132,8 @@ Buffer that stores its values in a dictionary column-wise (each key -> list).
 | `unit` | `any` | `` | unit of element values in this buffer, can be string or list of strings |
 | `description` | `str` | `` | buffer description |
 | `duplicate_ids` | `list` | `'list()'` | id's of the other buffers used for duplicating the data |
-| `id` | `str` | `` | unique identifier of element in DataGrabber application |
-| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `timestamps_enabled` | `bool` | `False` | Whether timestamps are enabled for this buffer. If the parent buffer has a timestamps column which is named in the same way as this buffer's timestamps_key, those timestamps will be copied over. If set to False and a timestamp column is present in the input data, it will be ignored. |
 | `timestamps_key` | `str` | `'timestamps'` | Key under which timestamps are exposed. |
 | `index_enabled` | `bool` | `False` | Whether an index column is enabled for this buffer. The index column is a simple integer sequence starting from 0 and adds +1 per point. If the parent buffer has an index column which is named in the same way as this buffer's index_key, those indices will be copied over. If set to False and an index column is present in the input data, it will be ignored. |
@@ -143,7 +151,7 @@ obj.initial_values="<value>"
 obj.unit="<value>"
 obj.description="<string>"
 obj.duplicate_ids='list()'
-obj.id="<string>"
+obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
 obj.load_on_install=False
 obj.timestamps_enabled=False
 obj.timestamps_key='timestamps'
@@ -164,8 +172,8 @@ obj.index_key='index'
 | `unit` | `any` | `` | unit of element values in this buffer, can be string or list of strings |
 | `description` | `str` | `` | buffer description |
 | `duplicate_ids` | `list` | `'list()'` | id's of the other buffers used for duplicating the data |
-| `id` | `str` | `` | unique identifier of element in DataGrabber application |
-| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 
 
 ```python
@@ -179,7 +187,7 @@ obj.initial_values="<value>"
 obj.unit="<value>"
 obj.description="<string>"
 obj.duplicate_ids='list()'
-obj.id="<string>"
+obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
 obj.load_on_install=False
 ```
 
@@ -189,8 +197,8 @@ obj.load_on_install=False
 Abstract base class for object transformations for buffers
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| `id` | `str` | `` | unique identifier of element in DataGrabber application |
-| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `datatype` | `str` | `'DataType.FLOAT.value'` | type of data expected for the transform |
 
 
@@ -199,7 +207,7 @@ Abstract base class for object transformations for buffers
 from pydag.buffers.ObjectTransformation import ObjectTransformation  # Adjust import if needed
 
 obj = ObjectTransformation()
-obj.id="<string>"
+obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
 obj.load_on_install=False
 obj.datatype='DataType.FLOAT.value'
 ```
@@ -215,8 +223,8 @@ obj.datatype='DataType.FLOAT.value'
 | `unit` | `any` | `` | unit of element values in this buffer, can be string or list of strings |
 | `description` | `str` | `` | buffer description |
 | `duplicate_ids` | `list` | `'list()'` | id's of the other buffers used for duplicating the data |
-| `id` | `str` | `` | unique identifier of element in DataGrabber application |
-| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `input_observers` | `list[BufferObserver]` | `'list()'` | list of observers that observe new input to the buffer inside the push method |
 | `output_observers` | `list[BufferObserver]` | `'list()'` | list of observers that observe output of the buffer inside the data method |
 
@@ -232,7 +240,7 @@ obj.initial_values="<value>"
 obj.unit="<value>"
 obj.description="<string>"
 obj.duplicate_ids='list()'
-obj.id="<string>"
+obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
 obj.load_on_install=False
 obj.input_observers='list()'
 obj.output_observers='list()'
@@ -250,8 +258,8 @@ obj.output_observers='list()'
 | `unit` | `any` | `` | unit of element values in this buffer, can be string or list of strings |
 | `description` | `str` | `` | buffer description |
 | `duplicate_ids` | `list` | `'list()'` | id's of the other buffers used for duplicating the data |
-| `id` | `str` | `` | unique identifier of element in DataGrabber application |
-| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `signal` | `SampledSignal` | `` | a signal object to simulate data |
 | `sampling_period` | `int` | `100` | interval in milliseconds for update |
 | `n` | `int` | `1` | number of samples to create at once |
@@ -268,7 +276,7 @@ obj.initial_values="<value>"
 obj.unit="<value>"
 obj.description="<string>"
 obj.duplicate_ids='list()'
-obj.id="<string>"
+obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
 obj.load_on_install=False
 obj.signal="<value>"
 obj.sampling_period=100
@@ -287,8 +295,8 @@ obj.n=1
 | `unit` | `any` | `` | unit of element values in this buffer, can be string or list of strings |
 | `description` | `str` | `` | buffer description |
 | `duplicate_ids` | `list` | `'list()'` | id's of the other buffers used for duplicating the data |
-| `id` | `str` | `` | unique identifier of element in DataGrabber application |
-| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `signal` | `Signal` | `` | a signal object to simulate data |
 | `sampling_period` | `int` | `100` | interval in milliseconds for update |
 
@@ -304,7 +312,7 @@ obj.initial_values="<value>"
 obj.unit="<value>"
 obj.description="<string>"
 obj.duplicate_ids='list()'
-obj.id="<string>"
+obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
 obj.load_on_install=False
 obj.signal="<value>"
 obj.sampling_period=100
@@ -323,8 +331,8 @@ Inherits from `ListBuffer`.
 | `unit` | `any` | `` | unit of element values in this buffer, can be string or list of strings |
 | `description` | `str` | `` | buffer description |
 | `duplicate_ids` | `list` | `'list()'` | id's of the other buffers used for duplicating the data |
-| `id` | `str` | `` | unique identifier of element in DataGrabber application |
-| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 
 
 ```python
@@ -338,7 +346,7 @@ obj.initial_values="<value>"
 obj.unit="<value>"
 obj.description="<string>"
 obj.duplicate_ids='list()'
-obj.id="<string>"
+obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
 obj.load_on_install=False
 ```
 
@@ -355,8 +363,8 @@ It is used to transform data from one format to another.
 | `unit` | `any` | `` | unit of element values in this buffer, can be string or list of strings |
 | `description` | `str` | `` | buffer description |
 | `duplicate_ids` | `list` | `'list()'` | id's of the other buffers used for duplicating the data |
-| `id` | `str` | `` | unique identifier of element in DataGrabber application |
-| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `transformations` | `list[ObjectTransformation]` | `[]` | List of transformations to apply to the data |
 
 
@@ -371,7 +379,7 @@ obj.initial_values="<value>"
 obj.unit="<value>"
 obj.description="<string>"
 obj.duplicate_ids='list()'
-obj.id="<string>"
+obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
 obj.load_on_install=False
 obj.transformations=[]
 ```
@@ -391,8 +399,8 @@ obj.transformations=[]
 | `timestamps_key` | `str` | `'timestamps'` | Key under which timestamps are exposed. |
 | `index_enabled` | `bool` | `False` | Whether an index column is enabled for this buffer. The index column is a simple integer sequence starting from 0 and adds +1 per point. If the parent buffer has an index column which is named in the same way as this buffer's index_key, those indices will be copied over. If set to False and an index column is present in the input data, it will be ignored. |
 | `index_key` | `str` | `'index'` | Key name for index column. |
-| `id` | `str` | `` | unique identifier of element in DataGrabber application |
-| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `resolution` | `list[int]` | `'list()'` |  |
 
 
@@ -411,9 +419,202 @@ obj.timestamps_enabled=False
 obj.timestamps_key='timestamps'
 obj.index_enabled=False
 obj.index_key='index'
-obj.id="<string>"
+obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
 obj.load_on_install=False
 obj.resolution='list()'
+```
+
+[Go to Summary](#summary)
+## `LinearTrend` (in `pydag\buffers\signals\LinearTrend.py`)
+
+A signal that simulates a linear trend
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
+| `min` | `float` | `0.0` | minimum value of the trend |
+| `max` | `float` | `100.0` | maximum value of the trend |
+| `duration` | `int` | `'1000 * 1000'` | duration of the trend in milliseconds |
+| `noise` | `float` | `0.0` | noise to add to the trend [0..1] |
+
+
+```python
+# Example usage of `LinearTrend`
+from pydag.buffers.signals.LinearTrend import LinearTrend  # Adjust import if needed
+
+obj = LinearTrend()
+obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
+obj.load_on_install=False
+obj.min=0.0
+obj.max=100.0
+obj.duration='1000 * 1000'
+obj.noise=0.0
+```
+
+[Go to Summary](#summary)
+## `RandBoolean` (in `pydag\buffers\signals\RandBoolean.py`)
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
+
+
+```python
+# Example usage of `RandBoolean`
+from pydag.buffers.signals.RandBoolean import RandBoolean  # Adjust import if needed
+
+obj = RandBoolean()
+obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
+obj.load_on_install=False
+```
+
+[Go to Summary](#summary)
+## `SampledSignal` (in `pydag\buffers\signals\SampledSignal.py`)
+
+A class representing a sampled signal for continuously sampled data
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
+| `sample_rate` | `float` | `1.0` | sample rate of the signal in Hz |
+
+
+```python
+# Example usage of `SampledSignal`
+from pydag.buffers.signals.SampledSignal import SampledSignal  # Adjust import if needed
+
+obj = SampledSignal()
+obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
+obj.load_on_install=False
+obj.sample_rate=1.0
+```
+
+[Go to Summary](#summary)
+## `SampledSine` (in `pydag\buffers\signals\SampledSine.py`)
+
+A class to represent a sampled sine wave signal.
+
+Attributes:
+    f (float): The frequency of the sine wave in Hz.
+    a (float): The amplitude of the sine wave.
+    sample_rate (int): The number of samples per second.
+    p (float): The phase of the sine wave in °.
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `sample_rate` | `float` | `1.0` | sample rate of the signal in Hz |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
+| `f` | `float` | `1.0` | frequency of sine wave in Hz |
+| `a` | `float` | `1.0` | amplitude of sine wave |
+| `p` | `float` | `0.0` | phase angle of sine wave in ° |
+| `n` | `float` | `0.0` | noise level of sine wave in respect to ampltidue [0..1] |
+
+
+```python
+# Example usage of `SampledSine`
+from pydag.buffers.signals.SampledSine import SampledSine  # Adjust import if needed
+
+obj = SampledSine()
+obj.sample_rate=1.0
+obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
+obj.load_on_install=False
+obj.f=1.0
+obj.a=1.0
+obj.p=0.0
+obj.n=0.0
+```
+
+[Go to Summary](#summary)
+## `Sawtooth` (in `pydag\buffers\signals\Sawtooth.py`)
+
+A class to represent a sawtooth wave signal.
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
+| `f` | `float` | `1.0` | frequency of sawtooth wave in Hz |
+| `a` | `float` | `1.0` | amplitude of sawtooth wave |
+
+
+```python
+# Example usage of `Sawtooth`
+from pydag.buffers.signals.Sawtooth import Sawtooth  # Adjust import if needed
+
+obj = Sawtooth()
+obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
+obj.load_on_install=False
+obj.f=1.0
+obj.a=1.0
+```
+
+[Go to Summary](#summary)
+## `Signal` (in `pydag\buffers\signals\Signal.py`)
+
+Abstract base class for signals.
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
+
+
+```python
+# Example usage of `Signal`
+from pydag.buffers.signals.Signal import Signal  # Adjust import if needed
+
+obj = Signal()
+obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
+obj.load_on_install=False
+```
+
+[Go to Summary](#summary)
+## `Sine` (in `pydag\buffers\signals\Sine.py`)
+
+A class to represent a sine wave signal.
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
+| `f` | `float` | `1.0` | frequency of sine wave in Hz |
+| `a` | `float` | `1.0` | amplitude of sine wave |
+| `p` | `float` | `0.0` | phase angle of sine wave in ° |
+| `n` | `float` | `0.0` | noise level of sine wave in respect to ampltidue [0..1] |
+
+
+```python
+# Example usage of `Sine`
+from pydag.buffers.signals.Sine import Sine  # Adjust import if needed
+
+obj = Sine()
+obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
+obj.load_on_install=False
+obj.f=1.0
+obj.a=1.0
+obj.p=0.0
+obj.n=0.0
+```
+
+[Go to Summary](#summary)
+## `TimedSignal` (in `pydag\buffers\signals\TimedSignal.py`)
+
+A signal that emits values at specified time intervals.
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
+| `times` | `list[float]` | `'list()'` | list of times in seconds when the signal should emit a value |
+| `values` | `list[float]` | `'list()'` | list of values to emit at the specified times |
+
+
+```python
+# Example usage of `TimedSignal`
+from pydag.buffers.signals.TimedSignal import TimedSignal  # Adjust import if needed
+
+obj = TimedSignal()
+obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
+obj.load_on_install=False
+obj.times='list()'
+obj.values='list()'
 ```
 
 [Go to Summary](#summary)
@@ -422,8 +623,8 @@ obj.resolution='list()'
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `datatype` | `str` | `'DataType.FLOAT.value'` | type of data expected for the transform |
-| `id` | `str` | `` | unique identifier of element in DataGrabber application |
-| `load_on_install` | `bool` | `False` | specifies whether the GrabberElement should try to load from local json config file on install |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `lower_limit` | `float` | `0.0` | lower limit for clipping |
 | `upper_limit` | `float` | `1.0` | upper limit for clipping |
 
@@ -434,7 +635,7 @@ from pydag.buffers.transformations.ClippingTransformation import ClippingTransfo
 
 obj = ClippingTransformation()
 obj.datatype='DataType.FLOAT.value'
-obj.id="<string>"
+obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
 obj.load_on_install=False
 obj.lower_limit=0.0
 obj.upper_limit=1.0

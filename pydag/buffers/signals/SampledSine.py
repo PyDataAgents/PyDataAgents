@@ -1,4 +1,6 @@
 from dataclasses import dataclass, field
+
+from ...agents.Agent import Agent
 from ...buffers.signals.SampledSignal import SampledSignal
 from ...utils.MathUtils import MathUtils
 
@@ -18,6 +20,12 @@ class SampledSine(SampledSignal):
     a : float = field(default=1.0, metadata={"description": "amplitude of sine wave"})
     p : float = field(default=0.0, metadata={"description": "phase angle of sine wave in °"})
     n : float = field(default=0.0, metadata={"description": "noise level of sine wave in respect to ampltidue [0..1]"})
+    
+    def _on_install(self, agent : Agent = None):
+        return
+    
+    def _on_uninstall(self, agent : Agent = None):
+        return
             
     def sample(self) -> tuple[float, float]:
         """

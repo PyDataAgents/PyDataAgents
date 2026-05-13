@@ -3,7 +3,6 @@ import re
 
 from ..NodeException import NodeException
 from ...utils.DataUtils import DataUtils
-from ...utils.NodeUtils import NodeUtils
 from ...buffers.DataType import DataType
 from ...buffers.ListBuffer import ListBuffer
 from ...buffers.DictBuffer import DictBuffer
@@ -23,8 +22,6 @@ class FormattedStringAction(BufferNode, Action):
     template : str = field(default=None, metadata={"description": "string template to insert the data from the parent buffer into, e.g. 'Hi {}, are you from {}'"})
                 
     def _on_install(self, agent : Agent = None):
-        NodeUtils.validate_key_names("input_keys", self.input_keys)
-        NodeUtils.validate_key_names("output_keys", self.output_keys)
         if self._buffer is None:
             if agent is not None:
                 if self.buffer_id is not None:

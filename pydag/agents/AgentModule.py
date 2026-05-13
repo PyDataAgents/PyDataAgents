@@ -10,6 +10,7 @@ class AgentModule:
         import pydag.services.statemachine.SimpleStatemachine
         import pydag.services.statemachine.SFCService
         import pydag.services.plot.PlotlifyService
+        import pydag.services.ui.UIService
         
         # nodes
         import pydag.nodes.script.ScriptAction

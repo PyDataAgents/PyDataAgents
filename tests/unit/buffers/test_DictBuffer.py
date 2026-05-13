@@ -355,6 +355,7 @@ def test_timestamps_mixed_provided_then_missing():
     buf.push({"a": [12, 14, 15]})    
     data = buf.data()
     ts = data.get(buf.timestamps_key)
+    print(ts)
     assert ts is not None
     assert len(ts) == 7
     assert ts[:3] == provided

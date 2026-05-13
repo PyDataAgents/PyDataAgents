@@ -84,8 +84,8 @@ class Service(AgentElement):
                     raise ServiceException(f"{Service.__name__} {self.id} cannot be running when uninstalling!")
                 
             case AgentElementState.INSTALLED:
-                if self._state == ServiceState.RUNNING:
-                    raise ServiceException(f"{Service.__name__} {self.id} cannot be running when installing!")
+                # any prior state is allowed
+                return
                 
             case AgentElementState.ERROR:
                 # any prior state is allowed

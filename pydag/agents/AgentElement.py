@@ -1,17 +1,14 @@
 from __future__ import annotations
 import json
+import builtins
 from typing import TYPE_CHECKING
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 import uuid
 from loguru import logger
 
-from pydag.agents.AgentElementException import AgentElementException
-from pydag.buffers.BufferException import BufferException
-from pydag.nodes.NodeException import NodeException
-from pydag.services.ServiceException import ServiceException
 
-
+from .AgentElementException import AgentElementException
 from .AgentStates import AgentElementState
 from ..utils.ClassUtils import ClassUtils
 from ..utils.FileUtils import FileUtils
@@ -141,12 +138,32 @@ class AgentElement(ABC):
                     raise AgentElementException(f"{self.__class__.__name__} {self.id} cannot be running when uninstalling!")
                 
             case AgentElementState.INSTALLED:
-                if self._state != AgentElementState.ERROR and self._state != AgentElementState.UNINSTALLED:
-                    raise AgentElementException(f"{self.__class__.__name__} {self.id} cannot be running when installing!")
+                # any prior state is allowed
+                return
                 
             case AgentElementState.ERROR:
                 # any prior state is allowed
                 return
             
             case _:
-                raise AgentElementException("")
+                raise AgentElementException(f"Unknown {AgentElementState.__name__} was found!")
+        
+    def contains_element(self, id : str) -> bool:
+        """ checks whether this `AgentElement` contains another `AgentElement` specified by `id`"""
+        seen = {builtins.id(self)}
+        stack = list(vars(self).values())
+        while stack:
+            value = stack.pop()
+            if isinstance(value, AgentElement):
+                value_obj_id = builtins.id(value)
+                if value_obj_id in seen:
+                    continue
+                if value.id == id:
+                    return True
+                seen.add(value_obj_id)
+                stack.extend(vars(value).values())
+            elif isinstance(value, dict):
+                stack.extend(value.values())
+            elif isinstance(value, (list, tuple, set)):
+                stack.extend(value)
+        return False
