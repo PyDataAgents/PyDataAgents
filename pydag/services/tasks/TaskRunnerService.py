@@ -5,7 +5,7 @@ import os
 import inspect
 from typing import Any
 
-
+from ..ServiceException import ServiceException
 from ..Observer import Observer
 from ...agents.Agent import Agent
 from ..ObserverService import ObserverService
@@ -50,6 +50,12 @@ class TaskRunnerService(ObserverService):
             if len(self.task_sequence) == len(self.inputs) and len(self.task_sequence) == len(self.outputs):
                 for task_str in self.task_sequence:        
                     if task_str in available_funcs:
+                        func = available_funcs[task_str]
+                        sig = inspect.signature(func)
+                        ip : int = len(sig.parameters)
+                        if ip != len(self.inputs[i]):
+                            raise ServiceException("number of specified inputs does not match method signature")
+                        
                         self.add_task(available_funcs[task_str], self.inputs[i], self.outputs[i])
                     i += 1
         observer : Observer = TaskObserver(self)
