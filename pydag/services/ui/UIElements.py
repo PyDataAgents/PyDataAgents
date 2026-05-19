@@ -38,7 +38,8 @@ def determine_samples(buffer : Buffer) -> int:
 class UIPage():
     """ Base Page class to build nicegui pages """
     
-    path : str = "/"    
+    path : str = "/"
+    with_nav_bar : bool    
     
     def __init__(self, service : UIService, refresh_interval : int = 1.0):
         self._service : UIService = service

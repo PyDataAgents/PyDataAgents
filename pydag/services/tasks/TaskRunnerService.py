@@ -10,6 +10,13 @@ from ..Observer import Observer
 from ...agents.Agent import Agent
 from ..ObserverService import ObserverService
 
+@dataclass
+class TaskRunnerDescription:
+    input_fields : list[str]
+    input_types : list[type]
+    output_fields : list[str]
+    output_types : list[type]
+
 class TaskObserver(Observer):
 
     def __init__(self, service: TaskRunnerService):
@@ -52,12 +59,32 @@ class TaskRunnerService(ObserverService):
                     if task_str in available_funcs:
                         func = available_funcs[task_str]
                         sig = inspect.signature(func)
-                        ip : int = len(sig.parameters)
-                        if ip != len(self.inputs[i]):
+                        cp = 0 # compulsory parameters
+                        op = 0 # optional parameters
+                        for name, param in sig.parameters.items():
+                            if param.default is not inspect.Parameter.empty:
+                                op += 1
+                            else:
+                                cp += 1
+                        if len(self.inputs[i]) < cp or len(self.inputs[i]) > cp + op:
                             raise ServiceException("number of specified inputs does not match method signature")
                         
                         self.add_task(available_funcs[task_str], self.inputs[i], self.outputs[i])
                     i += 1
+        else:
+            i : int = 0
+            for func in self._funcs:
+                sig = inspect.signature(func)
+                cp = 0 # compulsory parameters
+                op = 0 # optional parameters
+                for name, param in sig.parameters.items():
+                    if param.default is not inspect.Parameter.empty:
+                        op += 1
+                    else:
+                        cp += 1
+                if len(self.inputs[i]) < cp or len(self.inputs[i]) > cp + op:
+                    raise ServiceException("number of specified inputs does not match method signature")
+                i += 1
         observer : Observer = TaskObserver(self)
         self.add_observer(observer)
 
@@ -84,6 +111,18 @@ class TaskRunnerService(ObserverService):
             new_context.update(data)
             i += 1
         return new_context
+    
+    def get_description(self) -> TaskRunnerDescription:
+        all_inputs = {}
+        for i in self.inputs:
+            for ii in i:
+                all_inputs.update(ii, ii)
+        all_outputs = {}
+        for o in self.outputs:
+            for oo in o:
+                all_outputs.update(oo, oo)
+        # TODO
+        
     
     def add_task(self, func : callable, input_keys : list[str], output_keys : list[str]):
         self._funcs.append(func)

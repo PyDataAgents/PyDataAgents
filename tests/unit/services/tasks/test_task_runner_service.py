@@ -1,6 +1,7 @@
 import os
 
 from pydag.services.tasks.TaskRunnerService import TaskRunnerService
+from pydag.utils.FileUtils import FileUtils
 from tests.unit.services.tasks.tasktest import hello, goodbye, count
 
 def test_specify_sequence_by_file():
@@ -43,3 +44,11 @@ def test_specify_sequence_in_script2():
     data = trs.run({"name": "John"})
     print(data)
     assert len(data) == 4, "context length does not fit"
+    
+def test_static_func():
+    trs : TaskRunnerService = TaskRunnerService()
+    trs.add_task(FileUtils.list_files, ["folder", "pattern"], ["files"])
+    trs.install()
+    folder = os.path.dirname(__file__)
+    data = trs.run({"folder": folder, "pattern": "py"})
+    print(data)
