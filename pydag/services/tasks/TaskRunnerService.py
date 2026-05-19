@@ -42,6 +42,8 @@ class TaskRunnerService(ObserverService):
     def __post_init__(self):
         super().__post_init__()
         self._funcs : list[callable] = list()
+        self._input_types : list[list[type]] = list()
+        self._output_types : list[list[type]] = list()
         
     def _on_install(self, agent : Agent = None):
         super()._on_install(agent)
@@ -53,8 +55,8 @@ class TaskRunnerService(ObserverService):
                 for _, obj in inspect.getmembers(module):
                     if callable(obj):
                         available_funcs[obj.__name__] = obj
-            i : int = 0
             if len(self.task_sequence) == len(self.inputs) and len(self.task_sequence) == len(self.outputs):
+                i : int = 0
                 for task_str in self.task_sequence:        
                     if task_str in available_funcs:
                         func = available_funcs[task_str]
@@ -71,20 +73,28 @@ class TaskRunnerService(ObserverService):
                         
                         self.add_task(available_funcs[task_str], self.inputs[i], self.outputs[i])
                     i += 1
-        else:
-            i : int = 0
-            for func in self._funcs:
-                sig = inspect.signature(func)
-                cp = 0 # compulsory parameters
-                op = 0 # optional parameters
-                for name, param in sig.parameters.items():
-                    if param.default is not inspect.Parameter.empty:
-                        op += 1
-                    else:
-                        cp += 1
-                if len(self.inputs[i]) < cp or len(self.inputs[i]) > cp + op:
-                    raise ServiceException("number of specified inputs does not match method signature")
-                i += 1
+        if len(self._funcs) == 0:
+            raise ServiceException("no tasks were specified")
+        i : int = 0
+        for func in self._funcs:
+            sig = inspect.signature(func)
+            cp = 0 # compulsory parameters
+            op = 0 # optional parameters
+            input_types : list[type] = list()
+            for name, param in sig.parameters.items():
+                if param.default is not inspect.Parameter.empty:
+                    op += 1
+                else:
+                    cp += 1
+                if param.annotation is inspect.Parameter.empty:
+                    input_types.append(None)
+                else:
+                    input_types.append(param.annotation)
+            self._input_types.append(input_types)
+            if len(self.inputs[i]) < cp or len(self.inputs[i]) > cp + op:
+                raise ServiceException("number of specified inputs does not match method signature")
+            i += 1
+        
         observer : Observer = TaskObserver(self)
         self.add_observer(observer)
 
@@ -96,7 +106,32 @@ class TaskRunnerService(ObserverService):
             input_keys = self.inputs[i]
             if len(input_keys) > 0:
                 args = [new_context[k] for k in input_keys]
-                result = func(*args)
+                # check for list input, where only scalar input is expected
+                list_indices : list[int] = list()
+                list_counts : list[int] = list()
+                a : int = 0
+                for arg in args:
+                    if isinstance(arg, list):
+                        if not isinstance(self._input_types[i][a], list):
+                            list_indices.append(a)
+                            list_counts.append(len(arg))
+                if len(list_indices) > 0:
+                    if all(c == list_counts[0] for c in list_counts):                        
+                        for j in range(list_counts[0]):
+                            sub_args = []
+                            a = 0
+                            for arg in args:
+                                if a in list_indices:
+                                    sub_args.append(arg[j])
+                                else:
+                                    sub_args.append(arg)                                             
+                            sub_result = func(*sub_args)
+                            if isinstance(sub_result, tuple):
+                                
+                    else:
+                        raise ServiceException("number of list elements must be the same if list values are specififed for scalar input")
+                else:
+                    result = func(*args)
             else:
                 result = func()
             output_keys = self.outputs[i]
@@ -113,15 +148,15 @@ class TaskRunnerService(ObserverService):
         return new_context
     
     def get_description(self) -> TaskRunnerDescription:
-        all_inputs = {}
-        for i in self.inputs:
-            for ii in i:
-                all_inputs.update(ii, ii)
-        all_outputs = {}
-        for o in self.outputs:
-            for oo in o:
-                all_outputs.update(oo, oo)
-        # TODO
+        input_fields = {}
+        output_fields = {}
+        input_types = {}
+        output_types = {}
+        f : int = 0
+        for func in self._funcs:
+            sig = inspect.signature(func)
+            
+        
         
     
     def add_task(self, func : callable, input_keys : list[str], output_keys : list[str]):

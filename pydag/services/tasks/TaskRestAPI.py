@@ -1,10 +1,14 @@
-from fastapi import APIRouter
+from typing import Any
+
+from fastapi import APIRouter, Body, Path
+
+from pydag.services.Service import Service
 
 from ...agents.Agent import Agent
 from ..tasks.TaskRunnerService import TaskRunnerService
 
 
-ROOT_URL : str = "/api/v1/tasks"
+ROOT_URL : str = "/api/v1/taskrunners"
 
 
 class TaskRestAPI():
@@ -19,5 +23,9 @@ class TaskRestAPI():
         router = APIRouter(prefix=ROOT_URL, tags=[TaskRunnerService.__name__])
         
         @router.get("/")
-        def tasks():
-            return True
+        def task_runners() -> list[Service]:
+            return agent.get_services(TaskRunnerService.__class__)
+        
+        @router.put("/{id}/run")
+        def run_taskrunner(id : str = Path(description=""), data : dict[str, Any] = Body(..., description="")) -> dict[str, Any]:
+            pass
