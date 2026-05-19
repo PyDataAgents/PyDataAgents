@@ -52,3 +52,12 @@ def test_static_func():
     folder = os.path.dirname(__file__)
     data = trs.run({"folder": folder, "pattern": "py"})
     print(data)
+    
+def test_static_func2():
+    trs : TaskRunnerService = TaskRunnerService()
+    trs.add_task(FileUtils.list_files, ["folder", "pattern"], ["files"])
+    trs.add_task(FileUtils.get_file_bytes, ["files"], ["bytes"])
+    trs.install()
+    folder = os.path.dirname(__file__)
+    data = trs.run({"folder": folder, "pattern": "py"})
+    print(data)
