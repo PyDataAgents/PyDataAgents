@@ -115,8 +115,10 @@ class TaskRunnerService(ObserverService):
                         if not isinstance(self._input_types[i][a], list):
                             list_indices.append(a)
                             list_counts.append(len(arg))
+                    a += 1
                 if len(list_indices) > 0:
                     if all(c == list_counts[0] for c in list_counts):                        
+                        result : tuple = tuple([] for _ in range(len(self.outputs[i])))
                         for j in range(list_counts[0]):
                             sub_args = []
                             a = 0
@@ -127,7 +129,13 @@ class TaskRunnerService(ObserverService):
                                     sub_args.append(arg)                                             
                             sub_result = func(*sub_args)
                             if isinstance(sub_result, tuple):
-                                
+                                k : int = 0
+                                for item in sub_result:
+                                    result[0].append(item)
+                                    k += 1
+                            else:
+                                result[0].append(sub_result)
+
                     else:
                         raise ServiceException("number of list elements must be the same if list values are specififed for scalar input")
                 else:
@@ -154,10 +162,7 @@ class TaskRunnerService(ObserverService):
         output_types = {}
         f : int = 0
         for func in self._funcs:
-            sig = inspect.signature(func)
-            
-        
-        
+            sig = inspect.signature(func)        
     
     def add_task(self, func : callable, input_keys : list[str], output_keys : list[str]):
         self._funcs.append(func)
