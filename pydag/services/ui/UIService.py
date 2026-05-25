@@ -9,7 +9,7 @@ from loguru import logger
 from pydag.services.ui.UIAgentMgmtPage import UIAgentMgmtPage
 
 from .UIBufferPage import UIBufferPage
-from .UIElements import UIPage
+from .UIElements import UIHomePage, UIPage
 from ..Service import Service
 
 @dataclass
@@ -30,6 +30,8 @@ class UIService(Service):
     def _on_install(self, agent=None):
         super()._on_install(agent)
         os.environ.setdefault("NICEGUI_SCREEN_TEST_PORT", f"{self.port}")
+        # add home page
+        self.add_page(UIHomePage(self))
         if self.with_buffer_ui:
             self.add_page(UIBufferPage(self, 1.0 / 30.0))
         if self.with_mgmt_ui:
@@ -55,11 +57,16 @@ class UIService(Service):
         
     def clear_pages(self):
         self._pages.clear()
+        
+    def get_pages(self) -> list[UIPage]:
+        return self._pages
     
     def _run_ui_server(self):
         ui.run(host=self.host, port=self.port, reload=False, root=self._create_pages)
         
     def _create_pages(self):
+        # enable dark mode
+        ui.dark_mode().enable()
         # define default color schema
         ui.colors(
             primary='#005B95',

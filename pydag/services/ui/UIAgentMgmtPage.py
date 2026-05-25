@@ -11,9 +11,7 @@ class UIAgentMgmtPage(UIPage):
     path = "/mgmt"
     
     def _render(self):
-        with ui.header().classes('bg-primary text-white'):
-            ui.label('Agent Management - Dashboard').classes('font-bold text-lg')
-                
+        self.create_header('Agent Management - Dashboard')                
         with ui.grid(columns=2).classes("w-full gap-2"):
             with ui.element('div'):
                 ui.label(f"{Buffer.__name__}s").classes("text-2xl font-bold")

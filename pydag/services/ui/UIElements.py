@@ -39,7 +39,7 @@ class UIPage():
     """ Base Page class to build nicegui pages """
     
     path : str = "/"
-    with_nav_bar : bool = True    
+    with_nav_bar : bool = True
     
     def __init__(self, service : UIService, refresh_interval : int = 1.0):
         self._service : UIService = service
@@ -82,8 +82,34 @@ class UIPage():
     
     def get_service(self) -> Service:
         return self._service
-        
     
+    def create_header(self, title : str):
+        """ creates a standard header with title and home link """
+        with ui.header().classes('bg-primary text-white'):
+            ui.label(f"{title}").classes("font-bold text-lg")
+            ui.space()
+            with ui.link(target="/").classes("flex items-center gap-2 text-white"):
+                ui.icon("home").classes("text-xl")
+   
+class UIHomePage(UIPage):
+    """ Main/Home Page with navigation cards for other UI Pages """
+    
+    path : str = "/"
+    
+    def _render(self):
+        from .UIService import UIService
+        self.create_header(f"{UIService.__name__} - Dashboard")
+        with ui.grid(columns=4).classes("w-full gap-2"):
+            if isinstance(self._service, UIService):
+                for page in self._service.get_pages():
+                    link = page.path
+                    title = page.__class__.__name__
+                    desc = page.__doc__
+                    with ui.card().classes('p-4 cursor-pointer'):
+                        ui.link(title, target=link)
+                        if desc:
+                            ui.label(desc).classes("text-sm text-gray-500")
+
 class UIComponent():
     """ Base UI Component class """ 
     

@@ -9,8 +9,7 @@ class UIBufferPage(UIPage):
     path = "/buffers"
     
     def _render(self):
-        with ui.header().classes('bg-primary text-white'):
-            ui.label('Buffer Store - Dashboard').classes('font-bold text-lg')
+        self.create_header('Buffer Store - Dashboard')
         
         def toggle_timer():
             self._timer.active = not self._timer.active
