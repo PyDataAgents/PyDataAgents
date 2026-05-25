@@ -4,18 +4,13 @@ import importlib.util
 import os
 import inspect
 from typing import Any
+import typing
 
 from ..ServiceException import ServiceException
 from ..Observer import Observer
 from ...agents.Agent import Agent
 from ..ObserverService import ObserverService
 
-@dataclass
-class TaskRunnerDescription:
-    input_fields : list[str]
-    input_types : list[type]
-    output_fields : list[str]
-    output_types : list[type]
 
 class TaskObserver(Observer):
 
@@ -38,12 +33,15 @@ class TaskRunnerService(ObserverService):
     inputs : list[list[str]] = field(default_factory=list, metadata={})
     outputs : list[list[str]] = field(default_factory=list, metadata={})
     auto_start : bool = field(default=False, metadata={"description": "specifies whether to start the mapping with agent start"})
+    description : str = field(default=None, metadata={"description": "description of the task runner service"})
     
     def __post_init__(self):
         super().__post_init__()
         self._funcs : list[callable] = list()
-        self._input_types : list[list[type]] = list()
-        self._output_types : list[list[type]] = list()
+        self._inputs : list[list[type]] = list()
+        self._outputs : list[list[type]] = list()        
+        self._input_fields : dict[str, type] = dict()
+        self._output_fields : dict[str, type] = dict()
         
     def _on_install(self, agent : Agent = None):
         super()._on_install(agent)
@@ -77,6 +75,7 @@ class TaskRunnerService(ObserverService):
             raise ServiceException("no tasks were specified")
         i : int = 0
         for func in self._funcs:
+            # get input type hints
             sig = inspect.signature(func)
             cp = 0 # compulsory parameters
             op = 0 # optional parameters
@@ -90,10 +89,39 @@ class TaskRunnerService(ObserverService):
                     input_types.append(None)
                 else:
                     input_types.append(param.annotation)
-            self._input_types.append(input_types)
+            self._inputs.append(input_types)
             if len(self.inputs[i]) < cp or len(self.inputs[i]) > cp + op:
                 raise ServiceException("number of specified inputs does not match method signature")
+            
+            # get output type hints
+            hints = typing.get_type_hints(func)
+            if "return" in hints:
+                self._outputs.append([hints["return"]])
+            else:
+                self._outputs.append([None])
+            
+            # go over defined input and output field lists and combine them to create
+            # a mapping of remaining required external inputs and remaining expected outputs
+            # of the task sequence based on the specified sequence and inputs/outputs for each task        
+            input_fields = self.inputs[i]
+            if len(input_fields) <= len(input_types):
+                for j, input_field in enumerate(input_fields):
+                    self._input_fields[input_field] = input_types[j]
+            output_fields = self.outputs[i]
+            if len(output_fields) == len(self._outputs[i]):
+                for j, output_field in enumerate(output_fields):
+                    self._output_fields[output_field] = self._outputs[i][j]
             i += 1
+        
+        # find inputs and outputs to remove from expected input/output fields based on inputs/outputs of previous tasks in the sequence
+        input_fields_copy = dict(self._input_fields)
+        output_fields_copy = dict(self._output_fields)
+        for key, value in output_fields_copy.items():
+            if key in self._input_fields:
+                del self._input_fields[key]
+        for key, value in input_fields_copy.items():
+            if key in self._output_fields:
+                del self._output_fields[key]
         
         observer : Observer = TaskObserver(self)
         self.add_observer(observer)
@@ -110,9 +138,11 @@ class TaskRunnerService(ObserverService):
                 list_indices : list[int] = list()
                 list_counts : list[int] = list()
                 a : int = 0
+                it = iter(self._inputs[i])
                 for arg in args:
+                    item = next(it)
                     if isinstance(arg, list):
-                        if not isinstance(self._input_types[i][a], list):
+                        if not isinstance(item, list):
                             list_indices.append(a)
                             list_counts.append(len(arg))
                     a += 1
@@ -153,21 +183,18 @@ class TaskRunnerService(ObserverService):
                 data[output_keys[0]] = result           
             new_context.update(data)
             i += 1
-        return new_context
-    
-    def get_description(self) -> TaskRunnerDescription:
-        input_fields = {}
-        output_fields = {}
-        input_types = {}
-        output_types = {}
-        f : int = 0
-        for func in self._funcs:
-            sig = inspect.signature(func)        
+        return new_context            
     
     def add_task(self, func : callable, input_keys : list[str], output_keys : list[str]):
         self._funcs.append(func)
         self.inputs.append(input_keys)
         self.outputs.append(output_keys)
+    
+    def get_input_fields(self) -> dict[str, type]:
+        return self._input_fields
+    
+    def get_output_fields(self) -> dict[str, type]:
+        return self._output_fields
             
     def _load_module_from_path(self, file_path: str):
         file_path = os.path.abspath(file_path)

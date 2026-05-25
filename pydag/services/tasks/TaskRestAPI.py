@@ -1,6 +1,6 @@
 from typing import Any
 
-from fastapi import APIRouter, Body, Path
+from fastapi import APIRouter, Body, Path, HTTPException
 
 from pydag.services.Service import Service
 
@@ -28,4 +28,9 @@ class TaskRestAPI():
         
         @router.put("/{id}/run")
         def run_taskrunner(id : str = Path(description=""), data : dict[str, Any] = Body(..., description="")) -> dict[str, Any]:
-            pass
+            service : TaskRunnerService = agent.get_service(id)
+            if isinstance(service, TaskRunnerService):
+                return service.run(data)
+            else:
+                raise HTTPException(status_code=404, detail=f"TaskRunnerService with id '{id}' not found")
+            

@@ -39,7 +39,7 @@ class UIPage():
     """ Base Page class to build nicegui pages """
     
     path : str = "/"
-    with_nav_bar : bool    
+    with_nav_bar : bool = True    
     
     def __init__(self, service : UIService, refresh_interval : int = 1.0):
         self._service : UIService = service

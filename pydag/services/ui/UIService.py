@@ -60,6 +60,14 @@ class UIService(Service):
         ui.run(host=self.host, port=self.port, reload=False, root=self._create_pages)
         
     def _create_pages(self):
+        # define default color schema
+        ui.colors(
+            primary='#005B95',
+            secondary='#A8A8A9',
+            accent='#C43726',
+            positive='#00B050',
+            negative='#C43726',
+        )
         page : UIPage
         for page in self._pages:
             page.register()

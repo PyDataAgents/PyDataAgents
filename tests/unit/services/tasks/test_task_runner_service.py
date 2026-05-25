@@ -1,4 +1,5 @@
 import os
+import typing
 
 from pydag.services.tasks.TaskRunnerService import TaskRunnerService
 from pydag.utils.FileUtils import FileUtils
@@ -61,3 +62,13 @@ def test_static_func2():
     folder = os.path.dirname(__file__)
     data = trs.run({"folder": folder, "pattern": "py"})
     print(data)
+    
+
+def method1() -> tuple[int, str]:
+    return 1, "hello"
+
+def test_method_output_types():
+    hints = typing.get_type_hints(method1)
+    if 'return' in hints:
+        print(type(hints['return']))
+        print(hints['return'])
