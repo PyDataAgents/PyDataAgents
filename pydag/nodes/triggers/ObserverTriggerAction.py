@@ -24,6 +24,7 @@ class ObserverTriggerAction(ServiceNode, TriggerAction):
                 raise NodeException(f"{self.cname()} must be connected to an {ObserverService.cname()} with {ThreadType.__class__.__name__}={ThreadType.TRIGGERED.value}")
         else:
             raise NodeException(f"{self.cname()} must be connected to an {ObserverService.cname()}")
+      
     
     def _on_trigger(self):
         if isinstance(self._service, ObserverService):

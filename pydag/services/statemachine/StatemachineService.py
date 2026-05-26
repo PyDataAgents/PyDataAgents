@@ -24,6 +24,7 @@ class StatemachineService(ObserverService):
     nodes : dict[str, Node] = field(default_factory=dict[str, Node], metadata={"description": "dictionary of nodes in the statemachine service"})
     thread_type : str = field(default=ThreadType.INSTANT.value, metadata={"description": "default thread type is INSTANT"})
     observing_time : int = field(default=0, metadata={"description": "observing time that specifies the interval the observer thread should run for"})
+    description : str = field(default=None, metadata={"description": "description of the statemachine service"})
     
     def _on_install(self, agent : Agent = None):
         super()._on_install(agent)

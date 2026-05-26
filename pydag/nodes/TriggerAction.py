@@ -3,7 +3,7 @@ from dataclasses import dataclass
 import time
 
 
-from ..agents.AgentStates import NodeState
+from ..agents.AgentStates import AgentElementState, NodeState
 from .Action import Action
 
 
@@ -25,10 +25,10 @@ class TriggerAction(Action):
     def trigger(self):
         """ method that sets of the trigger action
         """
-        self._state = NodeState.EXECUTING
+        #self._state = NodeState.EXECUTING
         self._on_trigger()
         self._last_trigger = time.time()
-        self._state = NodeState.IDLE
+        #self._state = AgentElementState.INSTALLED
     
     @abstractmethod
     def _on_trigger(self):
