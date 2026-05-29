@@ -43,16 +43,17 @@ class OCRAction(BufferNode, Action):
                     for fp in d:
                         if ".pdf" in fp.lower():
                             # process pdf
-                            s = self._process_pdf(fp)
+                            s = OCRAction.process_pdf(fp)
                             dic = {self.path_key: fp, self.text_key: s}
                             self.add_data(dic)
                         else:
                             # process image
-                            s = self._process_image(fp)
+                            s = OCRAction.process_image(fp)
                             dic = {self.path_key: fp, self.text_key: s}
                             self.add_data(dic)            
-                                     
-    def _process_pdf(self, pdf_path : str) -> str:
+    
+    @staticmethod
+    def process_pdf(pdf_path : str) -> str:
         """Helper method to process an pdf file and extract text using OCR.
 
         Args:
@@ -65,7 +66,8 @@ class OCRAction(BufferNode, Action):
             all_text += text + "\n"
         return all_text
     
-    def _process_image(self, image_path : str) -> str:
+    @staticmethod
+    def process_image(image_path : str) -> str:
         """Helper method to process an image file and extract text using OCR.
 
         Args:
