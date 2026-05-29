@@ -80,33 +80,33 @@ db = [
 ]
 
 dsp = [    
-    "numba",
-    "torch",
-    "sktime",
-    "seaborn",
-    "tirex-ts @ git+https://github.com/NX-AI/tirex",
-    "chronos-forecasting",
-    "librosa",
+  "numba",
+  "torch",
+  "sktime",
+  "seaborn",
+  "tirex-ts @ git+https://github.com/NX-AI/tirex",
+  "chronos-forecasting",
+  "librosa",
 ]
 
 ocr = [
   "pdf2image",
   "pytesseract",
   "pillow",
-  "mistralai",
 ]
 
 llm = [
-    "langchain-ollama",
-    "langchain-chroma",
-    "langchain-unstructured",
-    "langchain-tavily",
-    "langchain[huggingface,openai,all]",
-    "sentence-transformers",
-    "langchain_text_splitters",
-    "langchain_community",
-    "langgraph>=1.0.10",
-    "hf_xet",
+  "langchain-ollama",
+  "langchain-chroma",
+  "langchain-unstructured",
+  "langchain-tavily",
+  "langchain[huggingface,openai,all]",
+  "sentence-transformers",
+  "langchain_text_splitters",
+  "langchain_community",
+  "langgraph>=1.0.10",
+  "hf_xet",
+  "mistralai",
 ]
 
 sim = [
