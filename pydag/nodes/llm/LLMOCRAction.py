@@ -2,6 +2,7 @@ from dataclasses import dataclass, field
 from ...utils.DataUtils import DataUtils
 import os
 from loguru import logger
+from mistralai import Mistral
 
 
 from ...nodes.BufferNode import BufferNode
@@ -57,8 +58,6 @@ class LLMOCRAction(BufferNode, Action):
 
     def _on_install(self, agent : Agent = None):
         super()._on_install(agent)
-        from mistralai import Mistral
-
         self._client = Mistral(api_key=self.api_key)
 
     def _on_execute(self):    
