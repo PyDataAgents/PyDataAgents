@@ -19,7 +19,6 @@ class UITaskRunnerSubPage(UIPage):
         self._result_element : Element = None
     
     def register(self):
-        
         @ui.page(self.path)
         def page():
             self._ui_components.clear()
@@ -121,6 +120,9 @@ class UITaskRunnerPage(UIPage):
         self._sub_pages : dict[str, UIPage] = dict()
     
     def register(self):
+        self._sync_sub_pages()
+        for sub_page in self._sub_pages.values():
+            sub_page.register()
         
         @ui.page(self.path)
         def page():
@@ -136,15 +138,10 @@ class UITaskRunnerPage(UIPage):
                 self._timer = ui.timer(self._refresh_interval, lambda: [
                     component.update() for component in self._ui_components if component.requires_update 
                 ])
-            # register sub pages
-            for sub_page in self._sub_pages.values():
-                sub_page.register()
     
     def _render(self):
+        self._sync_sub_pages()
         self._create_main_page()
-        for service in self._service.get_agent().get_services(TaskRunnerService):
-            if service.id not in self._sub_pages:
-                self._create_sub_page(service.id)
     
     def _create_main_page(self):
         # find all task runner services and display them as cards with link to sub page
@@ -162,3 +159,8 @@ class UITaskRunnerPage(UIPage):
     def _create_sub_page(self, id : str):
         sub_page : UIPage = UITaskRunnerSubPage(self._service, id)
         self._sub_pages[id] = sub_page      
+
+    def _sync_sub_pages(self):
+        for service in self._service.get_agent().get_services(TaskRunnerService):
+            if service.id not in self._sub_pages:
+                self._create_sub_page(service.id)

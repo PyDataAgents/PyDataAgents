@@ -2,7 +2,7 @@ from __future__ import annotations
 import threading
 #from collections import deque
 from dataclasses import dataclass, field
-from nicegui import ui
+from nicegui import app, ui
 import os
 from loguru import logger
 
@@ -18,7 +18,9 @@ class UIService(Service):
     
     host: str = field(default="localhost", metadata={"description": "host of the NiceGUI server"})
     port: int = field(default=8081, metadata={"description": "port of the NiceGUI server"})
-    title : str = field(default=None, metadata={"description": "dashboard title"})
+    title : str = field(default="NiceGUI", metadata={"description": "dashboard title"})
+    dark_mode : bool = field(default=True, metadata={"description": "enables dark mode"})
+    color_schema : dict = field(default_factory=dict, metadata={"description": "color schema for the ui, see https://nicegui.io/docs/colors for more details"})
     with_buffer_ui : bool = field(default=True, metadata={"description": "creates a ui page for buffer visualization"})
     with_mgmt_ui : bool = field(default=True, metadata={"description": "creates a ui page for agent management"}) 
     
@@ -57,24 +59,29 @@ class UIService(Service):
         
     def clear_pages(self):
         self._pages.clear()
-        
+
     def get_pages(self) -> list[UIPage]:
         return self._pages
-    
+
     def _run_ui_server(self):
-        ui.run(host=self.host, port=self.port, reload=False, root=self._create_pages)
+        self._configure_app()
+        self._create_pages()
+        ui.run(host=self.host, port=self.port, reload=False, dark=self.dark_mode, title=self.title)
         
+    def _configure_app(self):
+        # define default color schema        
+        if len(self.color_schema) > 0:
+            app.colors(**self.color_schema)
+        else:
+            app.colors(
+                primary='#005B95',
+                secondary='#A8A8A9',
+                accent='#C43726',
+                positive='#00B050', 
+                negative='#C43726',
+            )
+
     def _create_pages(self):
-        # enable dark mode
-        ui.dark_mode().enable()
-        # define default color schema
-        ui.colors(
-            primary='#005B95',
-            secondary='#A8A8A9',
-            accent='#C43726',
-            positive='#00B050',
-            negative='#C43726',
-        )
         page : UIPage
         for page in self._pages:
             page.register()
