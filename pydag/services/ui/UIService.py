@@ -14,7 +14,15 @@ from ..Service import Service
 
 @dataclass
 class UIService(Service):
-    """ A `Service` class that auto generates a web ui based on NiceGUI """
+    """ A `Service` class that serves web ui pages based on NiceGUI.
+    This class is a Singleton, meaning that only one instance of this class can exist at a time.
+    This is because the NiceGUI server can only be started once, and is shared across all pages.
+    The `UIService` is responsible for starting the NiceGUI server, and for managing the pages
+    that are registered to it. Pages can be added to the `UIService` using the `add_page` method,
+    and will be automatically registered to the NiceGUI server when it starts.
+    The `UIService` also provides some default pages, such as a home page and
+    a buffer visualization page, which can be enabled or disabled using the `with_buffer_ui` and
+    `with_mgmt_ui` parameters. """
     
     host: str = field(default="localhost", metadata={"description": "host of the NiceGUI server"})
     port: int = field(default=8081, metadata={"description": "port of the NiceGUI server"})
@@ -23,6 +31,16 @@ class UIService(Service):
     color_schema : dict = field(default_factory=dict, metadata={"description": "color schema for the ui, see https://nicegui.io/docs/colors for more details"})
     with_buffer_ui : bool = field(default=True, metadata={"description": "creates a ui page for buffer visualization"})
     with_mgmt_ui : bool = field(default=True, metadata={"description": "creates a ui page for agent management"}) 
+    
+    _instance = None    # singleton instance
+    _lock : threading.Lock = threading.RLock() # object lock for thread safety when creating singleton instance
+    
+    def __new__(cls, *args, **kwargs):
+        if not cls._instance:
+            with cls._lock:
+                if not cls._instance:
+                    cls._instance = super(UIService, cls).__new__(cls)
+        return cls._instance
     
     def __post_init__(self):
         super().__post_init__()
