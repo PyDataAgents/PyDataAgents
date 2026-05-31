@@ -22,6 +22,7 @@ class FormattedStringAction(BufferNode, Action):
     template : str = field(default=None, metadata={"description": "string template to insert the data from the parent buffer into, e.g. 'Hi {}, are you from {}'"})
                 
     def _on_install(self, agent : Agent = None):
+        BufferNode._on_install(self, agent)
         if self._buffer is None:
             if agent is not None:
                 if self.buffer_id is not None:
