@@ -245,11 +245,13 @@ class Agent():
                 pages_str = "\n".join(pages_paths)
                 logger.info("Available NiceGui Pages:\n" + pages_str)
                 os.environ.setdefault("NICEGUI_SCREEN_TEST_PORT", f"{self.port}")
-                ui.run_with(self._app, dark=self.dark_mode, title=self.__class__.__name__ + " UI")
-            else:
-                multiprocessing.freeze_support()  # For Windows support
-                uvicorn.run(self._app, host=host, port=self.port, reload=False, workers=1)
+                ui.run_with(self._app, dark=self.dark_mode, title=self.__class__.__name__ + " UI")                
+            multiprocessing.freeze_support()  # For Windows support
+            uvicorn.run(self._app, host=host, port=self.port, reload=False, workers=1)
         elif len(self._ui_pages) > 0:
+            pages_paths = [f"http://{host}:{self.port}{page.path}" for page in self._ui_pages]
+            pages_str = "\n".join(pages_paths)
+            logger.info("Available NiceGui Pages:\n" + pages_str)                
             os.environ.setdefault("NICEGUI_SCREEN_TEST_PORT", f"{self.port}")
             ui.run(host=host, port = self.port, reload=False, dark=self.dark_mode, title=self.__class__.__name__ + " UI")
         else:

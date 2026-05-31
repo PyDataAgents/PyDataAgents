@@ -10,11 +10,6 @@ def test_000():
     buf = ListBuffer(id="B1", capacity=10)
     agent.add_buffer(buf)
     
-    agent.release(blocking=False)
-    
-    time.sleep(5)
-    
-    agent.terminate()
-    
+    agent.release()
     
     

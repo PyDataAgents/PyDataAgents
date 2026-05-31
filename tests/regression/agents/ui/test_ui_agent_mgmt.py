@@ -13,7 +13,25 @@ def test_000():
     ag.release()
     
 def test_010():
-    ag = Agent(with_api=True, with_ui=True)
+    ag = Agent(with_api=True)
+    
+    s1 = Sine(f=10)
+    buf = SignalBuffer(signal=s1, capacity=1000, sampling_period=200)    
+    ag.add_buffer(buf)
+    
+    ag.release()
+        
+def test_020():
+    ag = Agent(with_ui=True)
+    
+    s1 = Sine(f=10)
+    buf = SignalBuffer(signal=s1, capacity=1000, sampling_period=200)    
+    ag.add_buffer(buf)
+    
+    ag.release()
+    
+def test_030():
+    ag = Agent(with_ui=True, with_api=True)
     
     s1 = Sine(f=10)
     buf = SignalBuffer(signal=s1, capacity=1000, sampling_period=10)    

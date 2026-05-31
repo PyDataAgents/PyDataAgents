@@ -1,4 +1,5 @@
 import time
+from pydag.agents.Agent import Agent
 from pydag.buffers.SignalBuffer import SignalBuffer
 from pydag.buffers.signals.Sine import Sine
 
@@ -29,5 +30,21 @@ def test_010():
         i = i + 1
         
     sb.uninstall()
+    
+def test_020():
+    ag = Agent()
+    
+    s = Sine()
+    s.f = 1.0
+    s.a = 1.0
+    s.p = 0.0
+    s.n = 0.1
+    sb = SignalBuffer(signal = s, capacity=10, sampling_period=100)
+    
+    ag.add_buffer(sb)
+    
+    ag.release(blocking=False)
+    time.sleep(3)
+    ag.terminate()
     
     

@@ -22,12 +22,13 @@ class SignalBuffer(TimedBuffer):
         super()._on_install(agent)
         self.signal.install(agent)
         self._scheduler = BackgroundScheduler()
+        #self._scheduler.add_job(self.signal_task, 'interval', seconds=self.sampling_period / 1000.0, max_instances=1, coalesce=True, misfire_grace_time=1)
         self._scheduler.add_job(self.signal_task, 'interval', seconds=self.sampling_period / 1000.0)
         self._scheduler.start()
             
     def _on_uninstall(self, agent : Agent = None):
         super()._on_uninstall(agent)
-        self._scheduler.shutdown()    
+        self._scheduler.shutdown(wait=False)
     
     def signal_task(self):
         """
