@@ -11,9 +11,8 @@ from fastapi.security import APIKeyHeader
 
 from ...utils.HTMLUtils import HTMLUtils
 
-if TYPE_CHECKING:    
-    from .RestService import RestService
-
+if TYPE_CHECKING:
+    from ..Agent import Agent
 
 class APIRole(str, Enum):
     ADMIN = "ADMIN"
@@ -33,12 +32,12 @@ class RESTAPIManager:
     
     API_KEY_TEMPLATE = os.path.dirname(__file__) + os.sep + "API_KEY_TEMPLATE.html"
     
-    REST_SERVICE : RestService = None
+    REQUIRES_API_KEYS : bool = True  # Set to False to disable API key checks
     
     @staticmethod
-    def generate_api_keys(api_key_file : str = None, service : RestService = None):
+    def generate_api_keys(api_key_file : str = None, agent : Agent = None):
         """Generate a API keys for this application and roles."""        
-        RESTAPIManager.REST_SERVICE = service  # Set the REST_SERVICE reference for API key checks
+        RESTAPIManager.REQUIRES_API_KEYS = agent.api_key_file is not None  # Set the REST_SERVICE reference for API key checks
         # check if api_key_file already exists and load existing keys if so
         if api_key_file and os.path.exists(api_key_file):
             soup = HTMLUtils.open_html_doc(api_key_file)
@@ -65,7 +64,7 @@ class RESTAPIManager:
     @staticmethod
     def get_api_key(api_key: str = Security(APIKeyHeader(name="Authorization", auto_error=False))) -> str:
         """Get the role associated with the provided API key."""
-        if not RESTAPIManager.REST_SERVICE:
+        if not RESTAPIManager.REQUIRES_API_KEYS:
             return None  # If API keys are not required, return None
         if not api_key:
            raise HTTPException(status_code=401, detail="Missing Authorization header")                
@@ -73,7 +72,7 @@ class RESTAPIManager:
 
     @staticmethod
     def get_role(api_key: str = Depends(get_api_key)) -> APIRole:
-        if not RESTAPIManager.REST_SERVICE:
+        if not RESTAPIManager.REQUIRES_API_KEYS:
             return APIRole.ADMIN  # If API keys are not required, treat all requests as ADMIN
         for role, key in RESTAPIManager.API_KEYS.items():
             if api_key == key:

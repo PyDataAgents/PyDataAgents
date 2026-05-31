@@ -1,19 +1,22 @@
-from typing import Any, Dict
+from __future__ import annotations
+from typing import TYPE_CHECKING, Any, Dict
 from fastapi import APIRouter, Depends, Path
 from pydantic import BaseModel, Field
 
 
-from ..Service import Service
+from ...services.Service import Service
 from ...nodes.TriggerAction import TriggerAction
 from ...services.statemachine.StatemachineService import StatemachineService
-from ...agents.AgentConfig import AgentConfig
-from ...agents.Agent import Agent
+from ..AgentConfig import AgentConfig
 from ...utils.ClassUtils import ClassUtils
 from ...nodes.Node import Node
-from ..rest.RESTAPIManager import APIRole, RESTAPIManager
+from .RESTAPIManager import APIRole, RESTAPIManager
+
+if TYPE_CHECKING:
+    from ..Agent import Agent
 
 ROOT_URL : str = "/api/v1/nodes"
- 
+
 class NodeDefinition(BaseModel):
     definition : Dict[str, Any] = Field(default=None, title="node config")
         
@@ -96,11 +99,11 @@ class NodeRESTAPI:
                         else:                
                             return {"error" : "No type was defined for " + Node.cname() + " creation"}
                     else:
-                        return {"error": Node.cname() + " of type=" + type + " is not available in this " + Agent.__class__.__name__ + ""}
+                        return {"error": Node.cname() + " of type=" + type + " is not available in this Agent"}
                 else:
                     return {"error" : "The specified " + Service.cname() + " is not of type " + StatemachineService.cname()}  
             else:
-                return {"error" : "No " + Service.cname() + " with id=" + service_id + " exists in this " + Agent.__class__.__name__ + ""}            
+                return {"error" : "No " + Service.cname() + " with id=" + service_id + " exists in this Agent"}            
             
         
         @router.get("/{id}/trigger")

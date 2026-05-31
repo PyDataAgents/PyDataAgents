@@ -3,7 +3,6 @@ from pydag.agents.Agent import Agent
 from pydag.services.ThreadType import ThreadType
 from pydag.nodes.documents.ConvertFile2Base64Action import ConvertFile2Base64Action
 from pydag.nodes.utils.StopAction import StopAction
-from pydag.services.rest.RestService import RestService
 from pydag.services.statemachine.SimpleActionService import SimpleActionService
 from pydag.buffers.ListBuffer import ListBuffer
 from pydag.nodes.documents.ListFilesAction import ListFilesAction
@@ -11,11 +10,8 @@ from pydag.nodes.documents.ListFilesAction import ListFilesAction
 
 def test_020():
     
-    ag = Agent()
-    
-    rs = RestService(port=8001)
-    ag.add_service(rs)
-    
+    ag = Agent(with_api=True, port=8001)
+        
     file_paths = [os.path.dirname(__file__) + os.sep + "This is a Test PDF.pdf", os.path.dirname(__file__) + os.sep + "test-image.png"]
     cf2b64a = ConvertFile2Base64Action(file_paths=file_paths)
     
@@ -31,7 +27,7 @@ def test_020():
     ag.release()
     
 def test_000():
-    ag = Agent()
+    ag = Agent(with_api=True, port=8001)
     
     buf = ListBuffer(id="B1")
     ag.add_buffer(buf)    
@@ -52,9 +48,6 @@ def test_000():
     sas.add_node(lfa)
     sas.add_node(cba)
     ag.add_service(sas)
-    
-    rs = RestService(port=10009)
-    ag.add_service(rs)
-    
+        
     ag.release()
     

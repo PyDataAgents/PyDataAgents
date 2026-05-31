@@ -3,7 +3,7 @@ import os
 import pytest
 
 from pydag.agents.Agent import Agent
-from pydag.services.llm.LLMRestService import LLMRestService
+from pydag.services.llm.LLMRestAPI import LLMRestAPI
 from pydag.services.llm.LLMSQLService import LLMSQLService
 
 
@@ -13,7 +13,7 @@ def test_000():
     if not config.has_section("OPENAI") or not config.has_option("OPENAI", "OPENAI_API_KEY"):
         pytest.skip("Skipping LLMSQLService agent regression test: missing OPENAI_API_KEY in [OPENAI] of config.ini")
     
-    ag = Agent()
+    ag = Agent(port=10004)
     
     lss = LLMSQLService()
     lss.id = "S1"
@@ -23,9 +23,8 @@ def test_000():
     lss.sql_connection = "sqlite:///" + os.path.dirname(__file__).replace("\\", "/") + "/Chinook.db"
     
     ag.add_service(lss)
-    
-    lrs = LLMRestService(id="S2", port=10004)
-    
-    ag.add_service(lrs)
-    
+        
+    ag.create_api(no_default_routers=True)  # Create API without default routers to avoid conflicts with other tests
+    ag.add_api(LLMRestAPI.get_api_router(ag))
+            
     ag.release()

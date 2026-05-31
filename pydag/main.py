@@ -3,7 +3,7 @@ from pydag.agents.Agent import Agent
 from pydag.agents.AgentConfig import AgentConfig
 from pydag.agents.AgentModule import AgentModule
 from pydag.agents.YAMLConfig import YAMLConfig
-from pydag.services.rest.RestService import RestService
+
 if __name__ == "__main__":
     #AgentModule.load_iiot_modules(skip_ads=True)      
     AgentModule.load_core_modules()
@@ -15,11 +15,6 @@ if __name__ == "__main__":
         print(gc)
         agent = gc.create()
     else:
-        agent = Agent()
-        agent.id = "G1"
-        service = RestService()
-        service.id = "S1"
-        service.port = 8001
-        agent.add_service(service)
+        agent = Agent(id = "A1", with_api=True)
 
     agent.release()

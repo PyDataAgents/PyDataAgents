@@ -1,12 +1,12 @@
 import os
 
 from pydag.agents.Agent import Agent
+from pydag.services.datamodel.DataModelRestAPI import DataModelRestAPI
 from pydag.services.datamodel.DataModelService import DataModelService
-from pydag.services.datamodel.DataModelRestService import DataModelRestService
 
 def test_000():
     
-    agent = Agent()
+    agent = Agent(port=8092)
     
     dms = DataModelService()
     dms.model_name = "SimpleDataModel"
@@ -14,7 +14,7 @@ def test_000():
     
     agent.add_service(dms)
     
-    dmrs = DataModelRestService(port=8092)
-    agent.add_service(dmrs)
+    agent.create_api(no_default_apis=True)
+    agent.add_api(DataModelRestAPI.get_api_router(agent))
     
     agent.release()

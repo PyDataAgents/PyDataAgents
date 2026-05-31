@@ -1,16 +1,19 @@
-from typing import Any, Dict, List, Union
+from __future__ import annotations
+from typing import TYPE_CHECKING, Any, Dict, List, Union
 from fastapi import APIRouter, Body, Depends, Path, Query
 from pydantic import BaseModel, Field
 
 
-from ..rest.RESTAPIManager import APIRole, RESTAPIManager
+from .RESTAPIManager import APIRole, RESTAPIManager
 from ...buffers.DictBuffer import DictBuffer
-from ...agents.AgentConfig import AgentConfig
+from ..AgentConfig import AgentConfig
 from ...utils.DataUtils import DataUtils
 from ...buffers.Buffer import Buffer
 from ...buffers.DataType import DataType
-from ...agents.Agent import Agent
 from ...utils.ClassUtils import ClassUtils
+
+if TYPE_CHECKING:
+    from ..Agent import Agent
 
 ROOT_URL : str = "/api/v1/buffers"
  

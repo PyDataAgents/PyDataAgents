@@ -17,7 +17,6 @@ from pydag.services.llm.RAGService import RAGService
 from pydag.nodes.llm.LLMOCRAction import LLMOCRAction
 from pydag.agents.Agent import Agent
 from pydag.services.statemachine.SimpleActionService import SimpleActionService
-from pydag.services.rest.RestService import RestService
 from pydag.buffers.DictBuffer import DictBuffer
 from pydag.nodes.documents.ListFilesAction import ListFilesAction
 from pydag.nodes.script.ScriptAction import ScriptAction
@@ -182,7 +181,7 @@ def test_ocr_agent_restapi():
     if not config.has_section("MISTRAL") or not config.has_option("MISTRAL", "MISTRAL_API_KEY"):
         pytest.skip("Skipping OCR image analysis regression test: missing MISTRAL_API_KEY in [MISTRAL] of config.ini")
     
-    ag = Agent(description="OCR Image Analysis Agent with REST API")
+    ag = Agent(description="OCR Image Analysis Agent with REST API", with_api=True, port=10901)
     
     b64_buf = ListBuffer(id="B64-BUF", capacity=AgentConfig.INFINITE_CAPACITY)
     b64_ocr_buf = ListBuffer(id="B64-OCR-BUF", capacity=1)
@@ -194,10 +193,8 @@ def test_ocr_agent_restapi():
     ag.add_buffer(q_buf)
     ag.add_buffer(a_buf)    
     
-    rs = RestService(id="REST-SERVICE", port=10901)
     llms = RAGService(id="LLM-SERVICE", api_key=config["OPENAI"]["OPENAI_API_KEY"], model="gpt-4o", model_provider="OPENAI")
     
-    ag.add_service(rs)
     ag.add_service(llms)
     
     sas1 = SimpleActionService(id="SAS1", thread_type=ThreadType.TRIGGERED.value) 

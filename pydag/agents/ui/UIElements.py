@@ -8,15 +8,14 @@ from nicegui.element import Element
 import plotly.graph_objs as go
 
 
-from ..Service import Service
-from ...agents.AgentConfig import AgentConfig
-from ...agents.AgentElement import AgentElement
-from ...agents.AgentStates import AgentElementState, ServiceState, BufferState, NodeState
+from ..AgentConfig import AgentConfig
+from ..AgentElement import AgentElement
+from ..AgentStates import AgentElementState, ServiceState, BufferState, NodeState
 from ...buffers.TimedBuffer import TimedBuffer
 from ...buffers.Buffer import Buffer
 
 if TYPE_CHECKING:
-    from .UIService import UIService
+    from ..Agent import Agent
 
 class UIType(str, enum.Enum):
     PLOT = "PLOT"
@@ -41,8 +40,8 @@ class UIPage():
     path : str = "/"
     with_nav_bar : bool = True
     
-    def __init__(self, service : UIService, refresh_interval : int = 1.0):
-        self._service : UIService = service
+    def __init__(self, agent : Agent, refresh_interval : int = 1.0):
+        self._agent : Agent = agent
         self._ui_components : deque[UIComponent] = deque()
         self._refresh_interval : int = refresh_interval
         self._timer : ui.timer = None
@@ -80,8 +79,8 @@ class UIPage():
     def get_ui_components(self) -> deque[UIComponent]:
         return self._ui_components
     
-    def get_service(self) -> Service:
-        return self._service
+    def get_agent(self) -> Agent:
+        return self._agent
     
     def create_header(self, title : str):
         """ creates a standard header with title and home link """
@@ -97,18 +96,16 @@ class UIHomePage(UIPage):
     path : str = "/"
     
     def _render(self):
-        from .UIService import UIService
-        self.create_header(f"{UIService.__name__} - Dashboard")
+        self.create_header("UI Home - Dashboard")
         with ui.grid(columns=4).classes("w-full gap-2"):
-            if isinstance(self._service, UIService):
-                for page in self._service.get_pages():
-                    link = page.path
-                    title = page.__class__.__name__
-                    desc = page.__doc__
-                    with ui.card().classes('p-4 cursor-pointer'):
-                        ui.link(title, target=link)
-                        if desc:
-                            ui.label(desc).classes("text-sm text-gray-500")
+            for page in self._agent.get_ui_pages():
+                link = page.path
+                title = page.__class__.__name__
+                desc = page.__doc__
+                with ui.card().classes('p-4 cursor-pointer'):
+                    ui.link(title, target=link)
+                    if desc:
+                        ui.label(desc).classes("text-sm text-gray-500")
 
 class UIComponent():
     """ Base UI Component class """ 

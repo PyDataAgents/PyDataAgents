@@ -1,6 +1,6 @@
 from nicegui import ui
 
-from pydag.services.ui.UIElements import PlotCard, UIPage
+from pydag.agents.ui.UIElements import PlotCard, UIPage
 
 
 class UIBufferPage(UIPage):
@@ -17,7 +17,7 @@ class UIBufferPage(UIPage):
         button = ui.button('Pause', on_click=toggle_timer)
         
         with ui.grid(columns=2).classes("w-full gap-4"):
-            for k, b in self._service.get_agent().buffer_store.items():
+            for k, b in self.get_agent().buffer_store.items():
                 plot_card = PlotCard(self, b)
                 self.add_ui_component(plot_card)
                 #self._service.get_update_routines().append(plot_card.update)

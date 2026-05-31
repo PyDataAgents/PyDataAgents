@@ -2,17 +2,17 @@ from typing import Any
 from nicegui import ui
 from nicegui.element import Element
 
-from ..Service import Service
-from ..tasks.TaskRunnerService import TaskRunnerService
+from ..Agent import Agent
+from ...services.Service import Service
+from ...services.tasks.TaskRunnerService import TaskRunnerService
 from .UIElements import UIPage
-from .UIService import UIService
 
 DO_FILTER : bool = False
 
 class UITaskRunnerSubPage(UIPage):
     
-    def __init__(self, service : UIService, id : str):
-        super().__init__(service)
+    def __init__(self, agent : Agent, id : str):
+        super().__init__(agent)
         self.task_runner_id = id
         self.path = f"/task_runner/{id}"
         self._task_service : TaskRunnerService = None
@@ -36,7 +36,7 @@ class UITaskRunnerSubPage(UIPage):
     
     def _render(self):
         self.create_header(f"{TaskRunnerService.__name__} [{self.task_runner_id}] - Dashboard")
-        task_service : Service = self._service.get_agent().get_service(self.task_runner_id)
+        task_service : Service = self.get_agent().get_service(self.task_runner_id)
         if isinstance(task_service, TaskRunnerService):
             self._task_service = task_service
             ui.label(f"{TaskRunnerService.__name__} Description: {self._task_service.description}")
@@ -115,8 +115,8 @@ class UITaskRunnerPage(UIPage):
     
     path : str = "/task_runner"
     
-    def __init__(self, service : UIService):
-        super().__init__(service)
+    def __init__(self, agent : Agent):
+        super().__init__(agent)
         self._sub_pages : dict[str, UIPage] = dict()
     
     def register(self):
@@ -145,7 +145,7 @@ class UITaskRunnerPage(UIPage):
     
     def _create_main_page(self):
         # find all task runner services and display them as cards with link to sub page
-        services : list[Service] = self._service.get_agent().get_services(TaskRunnerService)
+        services : list[Service] = self.get_agent().get_services(TaskRunnerService)
         self.create_header(f"{TaskRunnerService.__name__} - Dashboard")
         with ui.grid(columns=4).classes('gap-4'):
             for service in services:
@@ -157,10 +157,10 @@ class UITaskRunnerPage(UIPage):
                             ui.label(service.description).classes("text-sm text-gray-500")
     
     def _create_sub_page(self, id : str):
-        sub_page : UIPage = UITaskRunnerSubPage(self._service, id)
-        self._sub_pages[id] = sub_page      
+        sub_page : UIPage = UITaskRunnerSubPage(self.get_agent(), id)
+        self._sub_pages[id] = sub_page
 
     def _sync_sub_pages(self):
-        for service in self._service.get_agent().get_services(TaskRunnerService):
+        for service in self.get_agent().get_services(TaskRunnerService):
             if service.id not in self._sub_pages:
                 self._create_sub_page(service.id)

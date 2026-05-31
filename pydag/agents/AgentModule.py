@@ -3,14 +3,12 @@ class AgentModule:
     @staticmethod
     def load_core_modules():        
         # services
-        import pydag.services.rest.RestService
         import pydag.services.ObserverService
         import pydag.services.MappingService
         import pydag.services.statemachine.SimpleActionService
         import pydag.services.statemachine.SimpleStatemachine
         import pydag.services.statemachine.SFCService
         import pydag.services.plot.PlotlifyService
-        import pydag.services.ui.UIService
         
         # nodes
         import pydag.nodes.script.ScriptAction
@@ -65,7 +63,6 @@ class AgentModule:
         
         # services
         import pydag.services.llm.LLMService
-        import pydag.services.llm.LLMRestService
         import pydag.services.llm.LLMSQLService
         import pydag.services.llm.RAGService
         

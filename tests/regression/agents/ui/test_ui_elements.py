@@ -1,7 +1,7 @@
 from pydag.buffers.DictBuffer import DictBuffer
-from pydag.services.ui.UIBufferPage import UIBufferPage
-from pydag.services.ui.UIElements import BufferTable, PlotCard
-from pydag.services.ui.UIService import UIService
+from pydag.agents.ui.UIBufferPage import UIBufferPage
+from pydag.agents.ui.UIElements import BufferTable, PlotCard
+from pydag.agents.ui.UIService import UIService
 
 
 def test_000():

@@ -2,7 +2,7 @@ from pydag.agents.Agent import Agent
 from pydag.buffers.SignalBuffer import SignalBuffer
 from pydag.buffers.signals.Sine import Sine
 from pydag.buffers.signals.TimedSignal import TimedSignal
-from pydag.services.ui.UIService import UIService
+from pydag.agents.ui.UIService import UIService
 
 
 def test_000():

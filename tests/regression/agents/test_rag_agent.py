@@ -6,10 +6,9 @@ import pytest
 pytest.importorskip("langgraph")
 
 from pydag.agents.Agent import Agent
-from pydag.services.llm.LLMRestService import LLMRestService
 from pydag.services.llm.LLMService import LLMService
 from pydag.services.llm.RAGService import RAGService
-
+from pydag.services.llm.LLMRestAPI import LLMRestAPI
 
 def test_010():
     
@@ -18,7 +17,7 @@ def test_010():
     if not config.has_section("OPENAI") or not config.has_option("OPENAI", "OPENAI_API_KEY"):
         pytest.skip("Skipping RAG regression test: missing OPENAI_API_KEY in [OPENAI] of config.ini")
     
-    g = Agent()
+    ag = Agent()
     
     rs = RAGService()
     rs.id = "RAG1"
@@ -27,7 +26,7 @@ def test_010():
     rs.model_provider = "OPENAI"
     rs.retain_messages = True
         
-    g.add_service(rs)
+    ag.add_service(rs)
     
     ls = LLMService()
     ls.id = "LLM1"
@@ -36,15 +35,12 @@ def test_010():
     ls.model_provider = "OPENAI"
     ls.retain_messages = True
     
-    g.add_service(ls)
+    ag.add_service(ls)
     
-    lrs = LLMRestService()
-    lrs.id = "LLM-REST1"
-    lrs.port = 8001
+    ag.create_api(no_default_routers=True)  # Create API without default routers to avoid conflicts with other tests
+    ag.add_api(LLMRestAPI.get_api_router(ag))
     
-    g.add_service(lrs)
-    
-    g.release()
+    ag.release()
     
 def test_020():
     
@@ -63,11 +59,8 @@ def test_020():
     rs.retain_messages = True
         
     g.add_service(rs)
-        
-    lrs = LLMRestService()
-    lrs.id = "LLM-REST1"
-    lrs.port = 8001
-    
-    g.add_service(lrs)
+          
+    g.create_api(no_default_routers=True)  # Create API without default routers to avoid conflicts with other tests
+    g.add_api(LLMRestAPI.get_api_router(g))
     
     g.release()

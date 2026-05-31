@@ -5,17 +5,15 @@ from nicegui import ui
 from pydag.agents.Agent import Agent
 from pydag.buffers.Buffer import Buffer
 from pydag.buffers.DictBuffer import DictBuffer
-from pydag.services.rest.RestService import RestService
-from pydag.services.ui.UIElements import BufferTable, UIPage
-from pydag.services.ui.UIService import UIService
+from pydag.agents.ui.UIElements import BufferTable, UIPage
 
 class SubmitFormPage(UIPage):
     """ `UIPage` for diplaying a submit form that serves data to a referenced `Buffer` in `Agent` """
     
     path = "/form_test"
     
-    def __init__(self, service : UIService, buffer : Buffer):
-        super().__init__(service)
+    def __init__(self, agent : Agent, buffer : Buffer):
+        super().__init__(agent)
         self._buffer : Buffer = buffer
             
     def _handle_submit(self, data : dict[str, Any]):
@@ -53,17 +51,12 @@ class SubmitFormPage(UIPage):
             
 
 def test_000():
-    ag = Agent()
+    ag = Agent(with_ui=True)
     
     buf = DictBuffer()   
     ag.add_buffer(buf)
     
-    rs = RestService()
-    ag.add_service(rs)
-    
-    uis = UIService()
-    sp = SubmitFormPage(uis, buf)
-    uis.add_page(sp)
-    ag.add_service(uis)
+    sp = SubmitFormPage(ag, buf)
+    ag.add_ui_page(sp)
     
     ag.release()

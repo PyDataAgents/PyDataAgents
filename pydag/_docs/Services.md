@@ -19,7 +19,6 @@
 | [`SolidWorksService`](#solidworksservice-in-pydagservicescadsolidworksservicepy) |  | ![SolidWorksService](element_icons/SolidWorksService.png)
 | [`CsvReadService`](#csvreadservice-in-pydagservicescsvcsvreadservicepy) | `MappingService` for reading data from CSV files.     | ![CsvReadService](element_icons/CsvReadService.png)
 | [`CsvWriteService`](#csvwriteservice-in-pydagservicescsvcsvwriteservicepy) | `WriteService` for writing data to CSV files.     | ![CsvWriteService](element_icons/CsvWriteService.png)
-| [`DataModelRestService`](#datamodelrestservice-in-pydagservicesdatamodeldatamodelrestservicepy) | `Service` for creating a REST API for accessing DataModels     | ![DataModelRestService](element_icons/DataModelRestService.png)
 | [`DataModelService`](#datamodelservice-in-pydagservicesdatamodeldatamodelservicepy) | `Service` that enables modeling of data, in terms of script based computations on complex data relationships (e.g. to model machine elements or similar)<br>Model execution / model handlerthis file aggregates a chain of method calls, depending on the dependencies of the methods on dataclass variables.This means that only those methods are executed whose variables have changed.The model handler also registers variable inputs (from outside) and method outputs and then initiates the execution of methods accordingly.<br><br>Example of a model file:```pythonimport pandas as pdfrom pydag.services.datamodel.DataModel import DataModel@dataclassclass SimpleDataModel(DataModel):    a : float = field(default=None, metadata={"description": "variable 1"})    b : float = field(default=None, metadata={"description": "variable 2"})    c : float = field(default=None, metadata={"description": "variable 3", "hidden": True})    t : str = field(default=None, metadata={"description": "text variable 1", "hidden": True})    def method1(self):        self.b = self.a * 2 + 10.0        self.c = self.a + self.c        def method2(self):        self.t = f"Hello World {self.c}"        def method3(self, dms : DataModelService):        df = dms.lookup_table('NAME_OF_TABLE')        values = df.query(f"COL1 > 30 and COL2 <= {self.a}")        self.value = values["COL1"].to_list()[0]    ```<br>The model files always have to inherit from `DataModel`, they are `dataclasses` and all properties should be introduced as `fields`.<br><br>As an additional argument to `DataModel` methods the argument `dms` of type `DataModelService` can be passed, which allows acces to the lookup-tables via dms.lookup_store([Name of the table]) with Pandas Dataframes can be provided in order to lookup values based on model variables | ![DataModelService](element_icons/DataModelService.png)
 | [`MultiModelService`](#multimodelservice-in-pydagservicesdatamodelmultimodelservicepy) | `Service` that allows the management of multiple `Datamodel`s at once, enhancing the `DataModelService` capabilities     | ![MultiModelService](element_icons/MultiModelService.png)
 | [`InfluxDbService`](#influxdbservice-in-pydagservicesdbinfluxdbservicepy) | `MappingService` thats reads or writes to InfluxDB.<br>Address Schema:<br>address = "b=[bucket];m=[measurement];f=[field]" | ![InfluxDbService](element_icons/InfluxDbService.png)
@@ -35,7 +34,6 @@
 | [`FolderObserveMailService`](#folderobservemailservice-in-pydagservicesdocumentsfolderobservemailservicepy) | `Service` to observe a folder for new files and alert by mail on events. | ![FolderObserveMailService](element_icons/FolderObserveMailService.png)
 | [`NpzService`](#npzservice-in-pydagservicesdocumentsnpzservicepy) | `MappingService` that retrieves data from a *.npz numpy file         | ![NpzService](element_icons/NpzService.png)
 | [`HttpService`](#httpservice-in-pydagserviceshttphttpservicepy) | `MappingService` for reading and writing data from/to http endpoints     | ![HttpService](element_icons/HttpService.png)
-| [`LLMRestService`](#llmrestservice-in-pydagservicesllmllmrestservicepy) | `Service` for creating a REST API for accessing LLM Models     | ![LLMRestService](element_icons/LLMRestService.png)
 | [`LLMSQLService`](#llmsqlservice-in-pydagservicesllmllmsqlservicepy) | Service to interact with SQL databases.Taken in parts from https://python.langchain.com/docs/tutorials/sql_qa/ | ![LLMSQLService](element_icons/LLMSQLService.png)
 | [`LLMService`](#llmservice-in-pydagservicesllmllmservicepy) | `Service` for chat based LLM interaction     | ![LLMService](element_icons/LLMService.png)
 | [`LLMToolService`](#llmtoolservice-in-pydagservicesllmllmtoolservicepy) |  | ![LLMToolService](element_icons/LLMToolService.png)
@@ -45,7 +43,6 @@
 | [`OpcUaService`](#opcuaservice-in-pydagservicesopcuaopcuaservicepy) | `MappingService` for reading and writing data from/to OPC UA servers.     | ![OpcUaService](element_icons/OpcUaService.png)
 | [`DashPlotService`](#dashplotservice-in-pydagservicesplotdashplotservicepy) |  | ![DashPlotService](element_icons/DashPlotService.png)
 | [`PlotlifyService`](#plotlifyservice-in-pydagservicesplotplotlifyservicepy) |  | ![PlotlifyService](element_icons/PlotlifyService.png)
-| [`RestService`](#restservice-in-pydagservicesrestrestservicepy) | Service for creating a REST API for DataGrabber using FastAPI     | ![RestService](element_icons/RestService.png)
 | [`S7Service`](#s7service-in-pydagservicess7s7servicepy) | `MappingService`reading from and writing to S7 PLCs.     | ![S7Service](element_icons/S7Service.png)
 | [`ByteStreamService`](#bytestreamservice-in-pydagservicessocketbytestreamservicepy) | `MappingService` to read and write byte streams from/to a socket connection.<br>The service can be configured with different byte schemas for connecting, disconnecting,sending, and receiving data.<br>The bytescheams are defined as a string of data types, e.g. "Bhf5s" -> uint8, int16, float32, string of length 5<br>The addresses in read_from_source and write_to_sink are used to specify the buffer keys to read from or write to.<br>e.g. addresses = ["B1", "B3", "SENSOR1"]<br>The length of the addresses list must not match the number of buffers passed, all buffers are being searched for the keys in addresses.But it has to match the number of elements in the schema used for reading or writing. Omiting schema fields can be done by specifying None in the addresses list.<br>For Example:<br>schema = "BfI" -> addresses = ["ID1", None, "ID3"] | ![ByteStreamService](element_icons/ByteStreamService.png)
 | [`SerialService`](#serialservice-in-pydagservicessocketserialservicepy) | `ByteStreamService` for serial communication using pySerial.     | ![SerialService](element_icons/SerialService.png)
@@ -56,7 +53,7 @@
 | [`SimpleActionService`](#simpleactionservice-in-pydagservicesstatemachinesimpleactionservicepy) | `Service` for executing any number of `Action`s in sequence     | ![SimpleActionService](element_icons/SimpleActionService.png)
 | [`SimpleStatemachine`](#simplestatemachine-in-pydagservicesstatemachinesimplestatemachinepy) |  | ![SimpleStatemachine](element_icons/SimpleStatemachine.png)
 | [`StatemachineService`](#statemachineservice-in-pydagservicesstatemachinestatemachineservicepy) | abstract `ObserverService` class for Statemachines     | ![StatemachineService](element_icons/StatemachineService.png)
-| [`UIService`](#uiservice-in-pydagservicesuiuiservicepy) | A `Service` class that auto generates a web ui based on NiceGUI  | ![UIService](element_icons/UIService.png)
+| [`TaskRunnerService`](#taskrunnerservice-in-pydagservicestaskstaskrunnerservicepy) | A `Service` for running tasks chained together as methods with specified inputs  | ![TaskRunnerService](element_icons/TaskRunnerService.png)
 | [`AgentPersistService`](#agentpersistservice-in-pydagservicesutilsagentpersistservicepy) | `ObserverService` for continuously persisting `AgentElement` configurations to filesystem     | ![AgentPersistService](element_icons/AgentPersistService.png)
 | [`MappingRestartService`](#mappingrestartservice-in-pydagservicesutilsmappingrestartservicepy) | An `ObserverService` that attempts restarts on failed `MappingService`'sArgs:    ObserverService (Service): parent class | ![MappingRestartService](element_icons/MappingRestartService.png)
 | [`WebcamService`](#webcamservice-in-pydagservicesvisionwebcamservicepy) | An `MappingService` that captures webcam video feed into a `Buffer`     | ![WebcamService](element_icons/WebcamService.png)
@@ -78,7 +75,7 @@
 | `thread_type` | `str` | `` | type of thread, e.g. MILLI_SECONDS, MICRO_SECONDS, INSTANT, ONLY_ONCE, DAYTIME, DATE, ... |
 | `observing_time` | `Union[int | str]` | `` | observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for DAYTIME in %H:%M or %H:%M:%S, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ... |
 | `week_days` | `Optional[str]` | `` | specifies the week days the observer thread should run on, e.g. 'mon, fri, sun', 'mon - thu' or by numbers '0, 2, 4', where Monday = 0 and Sunday = 6 |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001E5AD05D100>` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 
 
@@ -91,7 +88,7 @@ obj.auto_start=True
 obj.thread_type="<string>"
 obj.observing_time="<string>"
 obj.week_days="<string>"
-obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
+obj.id=<dataclasses._MISSING_TYPE object at 0x000001E5AD05D100>
 obj.load_on_install=False
 ```
 
@@ -109,7 +106,7 @@ Args:
 | `thread_type` | `str` | `` | type of thread, e.g. MILLI_SECONDS, MICRO_SECONDS, INSTANT, ONLY_ONCE, DAYTIME, DATE, ... |
 | `observing_time` | `Union[int | str]` | `` | observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for DAYTIME in %H:%M or %H:%M:%S, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ... |
 | `week_days` | `Optional[str]` | `` | specifies the week days the observer thread should run on, e.g. 'mon, fri, sun', 'mon - thu' or by numbers '0, 2, 4', where Monday = 0 and Sunday = 6 |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001E5AD05D100>` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 
 
@@ -122,7 +119,7 @@ obj.auto_start=True
 obj.thread_type="<string>"
 obj.observing_time="<string>"
 obj.week_days="<string>"
-obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
+obj.id=<dataclasses._MISSING_TYPE object at 0x000001E5AD05D100>
 obj.load_on_install=False
 ```
 
@@ -142,7 +139,7 @@ Returns:
 | `thread_type` | `str` | `` | type of thread, e.g. MILLI_SECONDS, MICRO_SECONDS, INSTANT, ONLY_ONCE, DAYTIME, DATE, ... |
 | `observing_time` | `Union[int | str]` | `` | observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for DAYTIME in %H:%M or %H:%M:%S, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ... |
 | `week_days` | `Optional[str]` | `` | specifies the week days the observer thread should run on, e.g. 'mon, fri, sun', 'mon - thu' or by numbers '0, 2, 4', where Monday = 0 and Sunday = 6 |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001E5AD05D100>` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `buffer_ids` | `list[str]` | `'list()'` | list of buffer ids to map from |
 | `addresses` | `list[str]` | `'list()'` | list of addresses to read/subscribe from or write/publish to |
@@ -160,7 +157,7 @@ obj.auto_start=True
 obj.thread_type="<string>"
 obj.observing_time="<string>"
 obj.week_days="<string>"
-obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
+obj.id=<dataclasses._MISSING_TYPE object at 0x000001E5AD05D100>
 obj.load_on_install=False
 obj.buffer_ids='list()'
 obj.addresses='list()'
@@ -177,7 +174,7 @@ abstract base class for Services with ObserverThreads
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `auto_start` | `bool` | `True` | specifies whether to start the mapping with agent start |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001E5AD05D100>` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `thread_type` | `str` | `` | type of thread, e.g. MILLI_SECONDS, MICRO_SECONDS, INSTANT, ONLY_ONCE, DAYTIME, DATE, ... |
 | `observing_time` | `Union[int | str]` | `` | observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for DAYTIME in %H:%M or %H:%M:%S, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ... |
@@ -190,7 +187,7 @@ from pydag.services.ObserverService import ObserverService  # Adjust import if n
 
 obj = ObserverService()
 obj.auto_start=True
-obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
+obj.id=<dataclasses._MISSING_TYPE object at 0x000001E5AD05D100>
 obj.load_on_install=False
 obj.thread_type="<string>"
 obj.observing_time="<string>"
@@ -211,7 +208,7 @@ obj.week_days="<string>"
 | `mapping_type` | `str` | `` | type of mapping, e.g. READ, WRITE, SUB or PUB |
 | `n` | `int` | `0` | number of samples to insert or remove from buffers |
 | `persistent` | `bool` | `True` | specifies whether to remove or keep the values of the buffers when writing or publishing to a data sink |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001E5AD05D100>` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 
 
@@ -229,7 +226,7 @@ obj.addresses='list()'
 obj.mapping_type="<string>"
 obj.n=0
 obj.persistent=True
-obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
+obj.id=<dataclasses._MISSING_TYPE object at 0x000001E5AD05D100>
 obj.load_on_install=False
 ```
 
@@ -247,7 +244,7 @@ obj.load_on_install=False
 | `mapping_type` | `str` | `` | type of mapping, e.g. READ, WRITE, SUB or PUB |
 | `n` | `int` | `0` | number of samples to insert or remove from buffers |
 | `persistent` | `bool` | `True` | specifies whether to remove or keep the values of the buffers when writing or publishing to a data sink |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001E5AD05D100>` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 
 
@@ -265,7 +262,7 @@ obj.addresses='list()'
 obj.mapping_type="<string>"
 obj.n=0
 obj.persistent=True
-obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
+obj.id=<dataclasses._MISSING_TYPE object at 0x000001E5AD05D100>
 obj.load_on_install=False
 ```
 
@@ -276,7 +273,7 @@ abstract base class for agent Services
     
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001E5AD05D100>` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `auto_start` | `bool` | `True` | specifies whether to start the mapping with agent start |
 
@@ -286,7 +283,7 @@ abstract base class for agent Services
 from pydag.services.Service import Service  # Adjust import if needed
 
 obj = Service()
-obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
+obj.id=<dataclasses._MISSING_TYPE object at 0x000001E5AD05D100>
 obj.load_on_install=False
 obj.auto_start=True
 ```
@@ -305,7 +302,7 @@ obj.auto_start=True
 | `mapping_type` | `str` | `` | type of mapping, e.g. READ, WRITE, SUB or PUB |
 | `n` | `int` | `0` | number of samples to insert or remove from buffers |
 | `persistent` | `bool` | `True` | specifies whether to remove or keep the values of the buffers when writing or publishing to a data sink |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001E5AD05D100>` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 
 
@@ -323,7 +320,7 @@ obj.addresses='list()'
 obj.mapping_type="<string>"
 obj.n=0
 obj.persistent=True
-obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
+obj.id=<dataclasses._MISSING_TYPE object at 0x000001E5AD05D100>
 obj.load_on_install=False
 ```
 
@@ -341,7 +338,7 @@ obj.load_on_install=False
 | `mapping_type` | `str` | `` | type of mapping, e.g. READ, WRITE, SUB or PUB |
 | `n` | `int` | `0` | number of samples to insert or remove from buffers |
 | `persistent` | `bool` | `True` | specifies whether to remove or keep the values of the buffers when writing or publishing to a data sink |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001E5AD05D100>` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 
 
@@ -359,7 +356,7 @@ obj.addresses='list()'
 obj.mapping_type="<string>"
 obj.n=0
 obj.persistent=True
-obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
+obj.id=<dataclasses._MISSING_TYPE object at 0x000001E5AD05D100>
 obj.load_on_install=False
 ```
 
@@ -379,7 +376,7 @@ obj.load_on_install=False
 | `mapping_type` | `str` | `` | type of mapping, e.g. READ, WRITE, SUB or PUB |
 | `n` | `int` | `0` | number of samples to insert or remove from buffers |
 | `persistent` | `bool` | `True` | specifies whether to remove or keep the values of the buffers when writing or publishing to a data sink |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001E5AD05D100>` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `ams_net_id` | `str` | `` | AMS Net Id to connect to for ADS Connection |
 | `twincat` | `int` | `3` | Twincat version to use, e.g. 2 or 3 for TwinCAT 2/3 |
@@ -399,7 +396,7 @@ obj.addresses='list()'
 obj.mapping_type="<string>"
 obj.n=0
 obj.persistent=True
-obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
+obj.id=<dataclasses._MISSING_TYPE object at 0x000001E5AD05D100>
 obj.load_on_install=False
 obj.ams_net_id="<string>"
 obj.twincat=3
@@ -421,7 +418,7 @@ obj.twincat=3
 | `mapping_type` | `str` | `` | type of mapping, e.g. READ, WRITE, SUB or PUB |
 | `n` | `int` | `0` | number of samples to insert or remove from buffers |
 | `persistent` | `bool` | `True` | specifies whether to remove or keep the values of the buffers when writing or publishing to a data sink |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001E5AD05D100>` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `sample_rate` | `int` | `44100` | sample rate of audio channel, usually 44100 Hz |
 | `device` | `int` | `` | device number to use as input stream, if nothing is specified the default device is used |
@@ -441,7 +438,7 @@ obj.addresses='list()'
 obj.mapping_type="<string>"
 obj.n=0
 obj.persistent=True
-obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
+obj.id=<dataclasses._MISSING_TYPE object at 0x000001E5AD05D100>
 obj.load_on_install=False
 obj.sample_rate=44100
 obj.device=1
@@ -460,7 +457,7 @@ for help goto:
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `auto_start` | `bool` | `True` | specifies whether to start the mapping with agent start |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001E5AD05D100>` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `vault_name` | `str` | `` |  |
 | `user` | `str` | `` |  |
@@ -473,7 +470,7 @@ from pydag.services.cad.SolidPDMService import SolidPDMService  # Adjust import 
 
 obj = SolidPDMService()
 obj.auto_start=True
-obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
+obj.id=<dataclasses._MISSING_TYPE object at 0x000001E5AD05D100>
 obj.load_on_install=False
 obj.vault_name="John Doe"
 obj.user="<string>"
@@ -486,7 +483,7 @@ obj.password="<string>"
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `auto_start` | `bool` | `True` | specifies whether to start the mapping with agent start |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001E5AD05D100>` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 
 
@@ -496,7 +493,7 @@ from pydag.services.cad.SolidWorksService import SolidWorksService  # Adjust imp
 
 obj = SolidWorksService()
 obj.auto_start=True
-obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
+obj.id=<dataclasses._MISSING_TYPE object at 0x000001E5AD05D100>
 obj.load_on_install=False
 ```
 
@@ -516,7 +513,7 @@ obj.load_on_install=False
 | `mapping_type` | `str` | `` | type of mapping, e.g. READ, WRITE, SUB or PUB |
 | `n` | `int` | `0` | number of samples to insert or remove from buffers |
 | `persistent` | `bool` | `True` | specifies whether to remove or keep the values of the buffers when writing or publishing to a data sink |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001E5AD05D100>` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `file_path` | `str` | `` | path to the csv file to read |
 | `mode` | `str` | `'CsvReadMode.ONE_AT_A_TIME.value'` | read mode: ALL_AT_ONCE|ONE_AT_A_TIME|LOOP |
@@ -541,7 +538,7 @@ obj.addresses='list()'
 obj.mapping_type="<string>"
 obj.n=0
 obj.persistent=True
-obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
+obj.id=<dataclasses._MISSING_TYPE object at 0x000001E5AD05D100>
 obj.load_on_install=False
 obj.file_path="path/to/file.txt"
 obj.mode='CsvReadMode.ONE_AT_A_TIME.value'
@@ -568,7 +565,7 @@ obj.encoding='utf-8'
 | `mapping_type` | `str` | `` | type of mapping, e.g. READ, WRITE, SUB or PUB |
 | `n` | `int` | `0` | number of samples to insert or remove from buffers |
 | `persistent` | `bool` | `True` | specifies whether to remove or keep the values of the buffers when writing or publishing to a data sink |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001E5AD05D100>` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `folder` | `str` | `` | folder to save the csv files to |
 | `file_post_fix` | `str` | `` | postfix to use with every file |
@@ -592,7 +589,7 @@ obj.addresses='list()'
 obj.mapping_type="<string>"
 obj.n=0
 obj.persistent=True
-obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
+obj.id=<dataclasses._MISSING_TYPE object at 0x000001E5AD05D100>
 obj.load_on_install=False
 obj.folder="path/to/folder"
 obj.file_post_fix="path/to/file.txt"
@@ -600,32 +597,6 @@ obj.file_extension='csv'
 obj.max_samples=1000000
 obj.delimiter=';'
 obj.decimal_precision=3
-```
-
-[Go to Summary](#summary)
-## `DataModelRestService` (in `pydag\services\datamodel\DataModelRestService.py`)
-
-`Service` for creating a REST API for accessing DataModels
-    
-| Field | Type | Default | Description |
-|-------|------|---------|-------------|
-| `auto_start` | `bool` | `True` | specifies whether to start the mapping with agent start |
-| `port` | `int` | `8001` | port of the REST API endpoint |
-| `api_key_file` | `str` | `` | path to the file where API keys will be generated, if None then no API Key protection of endpoints is provided |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
-| `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
-
-
-```python
-# Example usage of `DataModelRestService`
-from pydag.services.datamodel.DataModelRestService import DataModelRestService  # Adjust import if needed
-
-obj = DataModelRestService()
-obj.auto_start=True
-obj.port=8001
-obj.api_key_file="path/to/file.txt"
-obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
-obj.load_on_install=False
 ```
 
 [Go to Summary](#summary)
@@ -670,7 +641,7 @@ class SimpleDataModel(DataModel):
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `auto_start` | `bool` | `True` | specifies whether to start the mapping with agent start |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001E5AD05D100>` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `model_path` | `str` | `` | path of the model.py file |
 | `model_name` | `str` | `` | name of the class to load from the model.py file |
@@ -682,7 +653,7 @@ from pydag.services.datamodel.DataModelService import DataModelService  # Adjust
 
 obj = DataModelService()
 obj.auto_start=True
-obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
+obj.id=<dataclasses._MISSING_TYPE object at 0x000001E5AD05D100>
 obj.load_on_install=False
 obj.model_path="<string>"
 obj.model_name="John Doe"
@@ -696,7 +667,7 @@ obj.model_name="John Doe"
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `auto_start` | `bool` | `True` | specifies whether to start the mapping with agent start |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001E5AD05D100>` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `model_paths` | `list[str]` | `` | paths of the model.py files |
 | `model_names` | `list[str]` | `` | name of the classes to load from the model.py file |
@@ -708,7 +679,7 @@ from pydag.services.datamodel.MultiModelService import MultiModelService  # Adju
 
 obj = MultiModelService()
 obj.auto_start=True
-obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
+obj.id=<dataclasses._MISSING_TYPE object at 0x000001E5AD05D100>
 obj.load_on_install=False
 obj.model_paths="<string>"
 obj.model_names="John Doe"
@@ -731,7 +702,7 @@ obj.model_names="John Doe"
 | `mapping_type` | `str` | `` | type of mapping, e.g. READ, WRITE, SUB or PUB |
 | `n` | `int` | `0` | number of samples to insert or remove from buffers |
 | `persistent` | `bool` | `True` | specifies whether to remove or keep the values of the buffers when writing or publishing to a data sink |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001E5AD05D100>` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `endpoint` | `str` | `'http://localhost:8086'` | The endpoint URL for the InfluxDB instance. |
 | `token` | `str` | `` | The authentication token for InfluxDB. |
@@ -752,7 +723,7 @@ obj.addresses='list()'
 obj.mapping_type="<string>"
 obj.n=0
 obj.persistent=True
-obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
+obj.id=<dataclasses._MISSING_TYPE object at 0x000001E5AD05D100>
 obj.load_on_install=False
 obj.endpoint='http://localhost:8086'
 obj.token="<string>"
@@ -773,7 +744,7 @@ obj.org='my-org'
 | `mapping_type` | `str` | `` | type of mapping, e.g. READ, WRITE, SUB or PUB |
 | `n` | `int` | `0` | number of samples to insert or remove from buffers |
 | `persistent` | `bool` | `True` | specifies whether to remove or keep the values of the buffers when writing or publishing to a data sink |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001E5AD05D100>` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `connection_str` | `str` | `` | connection string for the specific SQL database |
 
@@ -792,7 +763,7 @@ obj.addresses='list()'
 obj.mapping_type="<string>"
 obj.n=0
 obj.persistent=True
-obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
+obj.id=<dataclasses._MISSING_TYPE object at 0x000001E5AD05D100>
 obj.load_on_install=False
 obj.connection_str="<string>"
 ```
@@ -805,7 +776,7 @@ obj.connection_str="<string>"
 |-------|------|---------|-------------|
 | `auto_start` | `bool` | `True` | specifies whether to start the mapping with agent start |
 | `week_days` | `Optional[str]` | `` | specifies the week days the observer thread should run on, e.g. 'mon, fri, sun', 'mon - thu' or by numbers '0, 2, 4', where Monday = 0 and Sunday = 6 |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001E5AD05D100>` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `source_folders` | `list[str]` | `'list()'` | List of source folders to copy files from. |
 | `target_folder` | `str` | `` | Target folder where files will be copied to. |
@@ -822,7 +793,7 @@ from pydag.services.documents.CopyFileService import CopyFileService  # Adjust i
 obj = CopyFileService()
 obj.auto_start=True
 obj.week_days="<string>"
-obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
+obj.id=<dataclasses._MISSING_TYPE object at 0x000001E5AD05D100>
 obj.load_on_install=False
 obj.source_folders='list()'
 obj.target_folder="path/to/folder"
@@ -840,7 +811,7 @@ obj.observing_time='60 * 60 * 24'
 |-------|------|---------|-------------|
 | `auto_start` | `bool` | `True` | specifies whether to start the mapping with agent start |
 | `week_days` | `Optional[str]` | `` | specifies the week days the observer thread should run on, e.g. 'mon, fri, sun', 'mon - thu' or by numbers '0, 2, 4', where Monday = 0 and Sunday = 6 |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001E5AD05D100>` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `folders` | `list[str]` | `'list()'` | List of folders to delete files from. |
 | `older_than_milliseconds` | `int` | `` | If set, only files older than this time will be deleted. |
@@ -855,7 +826,7 @@ from pydag.services.documents.DeleteFileService import DeleteFileService  # Adju
 obj = DeleteFileService()
 obj.auto_start=True
 obj.week_days="<string>"
-obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
+obj.id=<dataclasses._MISSING_TYPE object at 0x000001E5AD05D100>
 obj.load_on_install=False
 obj.folders='list()'
 obj.older_than_milliseconds=1
@@ -880,7 +851,7 @@ obj.observing_time='60 * 60 * 24'
 | `mapping_type` | `str` | `` | type of mapping, e.g. READ, WRITE, SUB or PUB |
 | `n` | `int` | `0` | number of samples to insert or remove from buffers |
 | `persistent` | `bool` | `True` | specifies whether to remove or keep the values of the buffers when writing or publishing to a data sink |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001E5AD05D100>` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `file_path` | `str` | `` | the path to a file or a folder, that shall be screened for document texts |
 
@@ -899,7 +870,7 @@ obj.addresses='list()'
 obj.mapping_type="<string>"
 obj.n=0
 obj.persistent=True
-obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
+obj.id=<dataclasses._MISSING_TYPE object at 0x000001E5AD05D100>
 obj.load_on_install=False
 obj.file_path="path/to/file.txt"
 ```
@@ -922,7 +893,7 @@ If no addresses are specified all buffer keys are directly mapped to the context
 | `mapping_type` | `str` | `` | type of mapping, e.g. READ, WRITE, SUB or PUB |
 | `n` | `int` | `0` | number of samples to insert or remove from buffers |
 | `persistent` | `bool` | `True` | specifies whether to remove or keep the values of the buffers when writing or publishing to a data sink |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001E5AD05D100>` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `output_path` | `str` | `'output.docx'` |  |
 | `template_path` | `str` | `` |  |
@@ -942,7 +913,7 @@ obj.addresses='list()'
 obj.mapping_type="<string>"
 obj.n=0
 obj.persistent=True
-obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
+obj.id=<dataclasses._MISSING_TYPE object at 0x000001E5AD05D100>
 obj.load_on_install=False
 obj.output_path='output.docx'
 obj.template_path="<string>"
@@ -955,7 +926,7 @@ obj.template_path="<string>"
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `auto_start` | `bool` | `True` | specifies whether to start the mapping with agent start |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001E5AD05D100>` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `excel_file` | `str` | `` | path of the excel file to open for tables |
 
@@ -966,7 +937,7 @@ from pydag.services.documents.ExcelBufferService import ExcelBufferService  # Ad
 
 obj = ExcelBufferService()
 obj.auto_start=True
-obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
+obj.id=<dataclasses._MISSING_TYPE object at 0x000001E5AD05D100>
 obj.load_on_install=False
 obj.excel_file="path/to/file.txt"
 ```
@@ -979,7 +950,7 @@ File Embedding Service to embed documents from file links into an embedding stor
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `auto_start` | `bool` | `True` | specifies whether to start the mapping with agent start |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001E5AD05D100>` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `docs_folder` | `list[str] | str` | `` | Folder links to load documents from into embedded store on startup |
 | `embedding_model_name` | `str` | `'all-MiniLM-L6-v2'` | name of the embedding model to use for embedding store. Currently, only sentence transformer models are supported, e.g. all-MiniLM-L6-v2. See  |
@@ -992,7 +963,7 @@ from pydag.services.documents.FileEmbeddingService import FileEmbeddingService  
 
 obj = FileEmbeddingService()
 obj.auto_start=True
-obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
+obj.id=<dataclasses._MISSING_TYPE object at 0x000001E5AD05D100>
 obj.load_on_install=False
 obj.docs_folder="path/to/folder"
 obj.embedding_model_name='all-MiniLM-L6-v2'
@@ -1005,7 +976,7 @@ obj.store_name="John Doe"
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `auto_start` | `bool` | `True` | specifies whether to start the mapping with agent start |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001E5AD05D100>` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 
 
@@ -1015,7 +986,7 @@ from pydag.services.documents.FileTextSearchService import FileTextSearchService
 
 obj = FileTextSearchService()
 obj.auto_start=True
-obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
+obj.id=<dataclasses._MISSING_TYPE object at 0x000001E5AD05D100>
 obj.load_on_install=False
 ```
 
@@ -1025,7 +996,7 @@ obj.load_on_install=False
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `auto_start` | `bool` | `True` | specifies whether to start the mapping with agent start |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001E5AD05D100>` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `folders` | `list[str]` | `'list()'` | folders to watch for file events |
 | `recursive` | `bool` | `True` | specifies whether to watch subdirectories as well |
@@ -1038,7 +1009,7 @@ from pydag.services.documents.FileWatchdogService import FileWatchdogService  # 
 
 obj = FileWatchdogService()
 obj.auto_start=True
-obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
+obj.id=<dataclasses._MISSING_TYPE object at 0x000001E5AD05D100>
 obj.load_on_install=False
 obj.folders='list()'
 obj.recursive=True
@@ -1053,7 +1024,7 @@ obj.buffer_id="<string>"
 |-------|------|---------|-------------|
 | `auto_start` | `bool` | `True` | specifies whether to start the mapping with agent start |
 | `week_days` | `Optional[str]` | `` | specifies the week days the observer thread should run on, e.g. 'mon, fri, sun', 'mon - thu' or by numbers '0, 2, 4', where Monday = 0 and Sunday = 6 |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001E5AD05D100>` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `thread_type` | `str` | `'ThreadType.SECOND.value'` | second precision observerthread |
 | `observing_time` | `int` | `'60 * 60 * 24'` | Interval in seconds to check for new files. |
@@ -1073,7 +1044,7 @@ from pydag.services.documents.FolderObserveMailService import FolderObserveMailS
 obj = FolderObserveMailService()
 obj.auto_start=True
 obj.week_days="<string>"
-obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
+obj.id=<dataclasses._MISSING_TYPE object at 0x000001E5AD05D100>
 obj.load_on_install=False
 obj.thread_type='ThreadType.SECOND.value'
 obj.observing_time='60 * 60 * 24'
@@ -1103,7 +1074,7 @@ obj.skip_extensions='list[str]()'
 | `mapping_type` | `str` | `` | type of mapping, e.g. READ, WRITE, SUB or PUB |
 | `n` | `int` | `0` | number of samples to insert or remove from buffers |
 | `persistent` | `bool` | `True` | specifies whether to remove or keep the values of the buffers when writing or publishing to a data sink |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001E5AD05D100>` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `file_path` | `str` | `` | the path to a file or a folder, that shall be screened for document texts |
 
@@ -1122,7 +1093,7 @@ obj.addresses='list()'
 obj.mapping_type="<string>"
 obj.n=0
 obj.persistent=True
-obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
+obj.id=<dataclasses._MISSING_TYPE object at 0x000001E5AD05D100>
 obj.load_on_install=False
 obj.file_path="path/to/file.txt"
 ```
@@ -1143,7 +1114,7 @@ obj.file_path="path/to/file.txt"
 | `mapping_type` | `str` | `` | type of mapping, e.g. READ, WRITE, SUB or PUB |
 | `n` | `int` | `0` | number of samples to insert or remove from buffers |
 | `persistent` | `bool` | `True` | specifies whether to remove or keep the values of the buffers when writing or publishing to a data sink |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001E5AD05D100>` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `base_url` | `str` | `` | base URL for the HTTP requests, e.g. http://localhost:8080/api |
 | `headers` | `dict[str]` | `` | headers to be used in the HTTP requests, e.g. {'Content-Type': 'application/json', 'Authorization' : 'Bearer token'} |
@@ -1164,37 +1135,11 @@ obj.addresses='list()'
 obj.mapping_type="<string>"
 obj.n=0
 obj.persistent=True
-obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
+obj.id=<dataclasses._MISSING_TYPE object at 0x000001E5AD05D100>
 obj.load_on_install=False
 obj.base_url="https://example.com"
 obj.headers="<string>"
 obj.json_path=False
-```
-
-[Go to Summary](#summary)
-## `LLMRestService` (in `pydag\services\llm\LLMRestService.py`)
-
-`Service` for creating a REST API for accessing LLM Models
-    
-| Field | Type | Default | Description |
-|-------|------|---------|-------------|
-| `auto_start` | `bool` | `True` | specifies whether to start the mapping with agent start |
-| `port` | `int` | `8001` | port of the REST API endpoint |
-| `api_key_file` | `str` | `` | path to the file where API keys will be generated, if None then no API Key protection of endpoints is provided |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
-| `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
-
-
-```python
-# Example usage of `LLMRestService`
-from pydag.services.llm.LLMRestService import LLMRestService  # Adjust import if needed
-
-obj = LLMRestService()
-obj.auto_start=True
-obj.port=8001
-obj.api_key_file="path/to/file.txt"
-obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
-obj.load_on_install=False
 ```
 
 [Go to Summary](#summary)
@@ -1210,7 +1155,7 @@ Taken in parts from https://python.langchain.com/docs/tutorials/sql_qa/
 | `model_provider` | `str` | `'ModelProvider.OPENAI.value'` | name of the model provider, e.g. OPENAI | OLLAMA | .... . Consider that for sensitive data, a local model provider like OLLAMA is recommended. |
 | `model` | `str` | `'gpt-4.1-mini'` | name of the model, e.g. gpt-4o | gemma:1b | ... . If you use OLLAMA, the following recommendation applies: For normal tasks without any specific requirements, we recomment using 'deepseek-r1' as it is a versatile and powerful model. Alternatively you can use Llama 3.1 8B. For tasks which must be run on CPU and where inference is critical, use 'phi3.5' or if coding / JSON is of importance, 'qwen2.5:3b' is recommended as default.  |
 | `retain_messages` | `bool` | `False` | specify True if you want to retain the chat history for context |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001E5AD05D100>` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `system_message` | `str` | `'SYS_SQL_EXPERT'` | Default System message to give to the LLM Agent |
 | `sql_connection` | `str` | `` | connection string for accessing a SQL database, e.g. SQLite -> sqlite:////path/to/sqlite.db |
@@ -1227,7 +1172,7 @@ obj.endpoint="<string>"
 obj.model_provider='ModelProvider.OPENAI.value'
 obj.model='gpt-4.1-mini'
 obj.retain_messages=False
-obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
+obj.id=<dataclasses._MISSING_TYPE object at 0x000001E5AD05D100>
 obj.load_on_install=False
 obj.system_message='SYS_SQL_EXPERT'
 obj.sql_connection="<string>"
@@ -1241,7 +1186,7 @@ obj.sql_connection="<string>"
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `auto_start` | `bool` | `True` | specifies whether to start the mapping with agent start |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001E5AD05D100>` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `api_key` | `str` | `` | api token for a web based model provider, e.g. OPENAI |
 | `endpoint` | `str` | `` | endpoint of the LLM provider |
@@ -1257,7 +1202,7 @@ from pydag.services.llm.LLMService import LLMService  # Adjust import if needed
 
 obj = LLMService()
 obj.auto_start=True
-obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
+obj.id=<dataclasses._MISSING_TYPE object at 0x000001E5AD05D100>
 obj.load_on_install=False
 obj.api_key="<string>"
 obj.endpoint="<string>"
@@ -1279,7 +1224,7 @@ obj.system_message='SYS_GENERAL_ASSISTANT'
 | `model` | `str` | `'gpt-4.1-mini'` | name of the model, e.g. gpt-4o | gemma:1b | ... . If you use OLLAMA, the following recommendation applies: For normal tasks without any specific requirements, we recomment using 'deepseek-r1' as it is a versatile and powerful model. Alternatively you can use Llama 3.1 8B. For tasks which must be run on CPU and where inference is critical, use 'phi3.5' or if coding / JSON is of importance, 'qwen2.5:3b' is recommended as default.  |
 | `retain_messages` | `bool` | `False` | specify True if you want to retain the chat history for context |
 | `system_message` | `str` | `'SYS_GENERAL_ASSISTANT'` | Default System message to give to the LLM Agent |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001E5AD05D100>` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `tavily_websearch_apikey` | `str` | `` |  |
 
@@ -1296,7 +1241,7 @@ obj.model_provider='ModelProvider.OPENAI.value'
 obj.model='gpt-4.1-mini'
 obj.retain_messages=False
 obj.system_message='SYS_GENERAL_ASSISTANT'
-obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
+obj.id=<dataclasses._MISSING_TYPE object at 0x000001E5AD05D100>
 obj.load_on_install=False
 obj.tavily_websearch_apikey="<string>"
 ```
@@ -1314,7 +1259,7 @@ Retrieval Augmented Generation (RAG) Service for document based LLM knowledge re
 | `model` | `str` | `'gpt-4.1-mini'` | name of the model, e.g. gpt-4o | gemma:1b | ... . If you use OLLAMA, the following recommendation applies: For normal tasks without any specific requirements, we recomment using 'deepseek-r1' as it is a versatile and powerful model. Alternatively you can use Llama 3.1 8B. For tasks which must be run on CPU and where inference is critical, use 'phi3.5' or if coding / JSON is of importance, 'qwen2.5:3b' is recommended as default.  |
 | `retain_messages` | `bool` | `False` | specify True if you want to retain the chat history for context |
 | `system_message` | `str` | `'SYS_GENERAL_ASSISTANT'` | Default System message to give to the LLM Agent |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001E5AD05D100>` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `document_links` | `list[str]` | `'list()'` | list of document links to load into embedded store on startup |
 | `ignore_invalid_documents` | `bool` | `False` | deprecated compatibility field (no-op) |
@@ -1335,7 +1280,7 @@ obj.model_provider='ModelProvider.OPENAI.value'
 obj.model='gpt-4.1-mini'
 obj.retain_messages=False
 obj.system_message='SYS_GENERAL_ASSISTANT'
-obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
+obj.id=<dataclasses._MISSING_TYPE object at 0x000001E5AD05D100>
 obj.load_on_install=False
 obj.document_links='list()'
 obj.ignore_invalid_documents=False
@@ -1360,7 +1305,7 @@ obj.vector_store_path="<string>"
 | `mapping_type` | `str` | `` | type of mapping, e.g. READ, WRITE, SUB or PUB |
 | `n` | `int` | `0` | number of samples to insert or remove from buffers |
 | `persistent` | `bool` | `True` | specifies whether to remove or keep the values of the buffers when writing or publishing to a data sink |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001E5AD05D100>` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `endpoint` | `str` | `` | endpoint of the MQTT broker, e.g. test.mosquitto.org (public test broker) |
 | `port` | `int` | `1883` | port of the mqtt broker |
@@ -1384,7 +1329,7 @@ obj.addresses='list()'
 obj.mapping_type="<string>"
 obj.n=0
 obj.persistent=True
-obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
+obj.id=<dataclasses._MISSING_TYPE object at 0x000001E5AD05D100>
 obj.load_on_install=False
 obj.endpoint="<string>"
 obj.port=1883
@@ -1403,7 +1348,7 @@ obj.qos=0
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `auto_start` | `bool` | `True` | specifies whether to start the mapping with agent start |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001E5AD05D100>` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `client_id` | `str` | `` | client id for the msgraph api |
 | `tenant_id` | `str` | `` | tenant id for the msgraph api |
@@ -1418,7 +1363,7 @@ from pydag.services.office.MSGraphService import MSGraphService  # Adjust import
 
 obj = MSGraphService()
 obj.auto_start=True
-obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
+obj.id=<dataclasses._MISSING_TYPE object at 0x000001E5AD05D100>
 obj.load_on_install=False
 obj.client_id="<string>"
 obj.tenant_id="<string>"
@@ -1443,7 +1388,7 @@ obj.timeout=10
 | `mapping_type` | `str` | `` | type of mapping, e.g. READ, WRITE, SUB or PUB |
 | `n` | `int` | `0` | number of samples to insert or remove from buffers |
 | `persistent` | `bool` | `True` | specifies whether to remove or keep the values of the buffers when writing or publishing to a data sink |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001E5AD05D100>` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `endpoint` | `str` | `` | endpoint of the opc ua server, e.g. opc.tcp://localhost:48010 |
 
@@ -1462,7 +1407,7 @@ obj.addresses='list()'
 obj.mapping_type="<string>"
 obj.n=0
 obj.persistent=True
-obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
+obj.id=<dataclasses._MISSING_TYPE object at 0x000001E5AD05D100>
 obj.load_on_install=False
 obj.endpoint="<string>"
 ```
@@ -1473,7 +1418,7 @@ obj.endpoint="<string>"
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `auto_start` | `bool` | `True` | specifies whether to start the mapping with agent start |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001E5AD05D100>` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 
 
@@ -1483,7 +1428,7 @@ from pydag.services.plot.DashPlotService import DashPlotService  # Adjust import
 
 obj = DashPlotService()
 obj.auto_start=True
-obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
+obj.id=<dataclasses._MISSING_TYPE object at 0x000001E5AD05D100>
 obj.load_on_install=False
 ```
 
@@ -1493,7 +1438,7 @@ obj.load_on_install=False
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `auto_start` | `bool` | `True` | specifies whether to start the mapping with agent start |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001E5AD05D100>` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 
 
@@ -1503,34 +1448,8 @@ from pydag.services.plot.PlotlifyService import PlotlifyService  # Adjust import
 
 obj = PlotlifyService()
 obj.auto_start=True
-obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
+obj.id=<dataclasses._MISSING_TYPE object at 0x000001E5AD05D100>
 obj.load_on_install=False
-```
-
-[Go to Summary](#summary)
-## `RestService` (in `pydag\services\rest\RestService.py`)
-
-Service for creating a REST API for DataGrabber using FastAPI
-    
-| Field | Type | Default | Description |
-|-------|------|---------|-------------|
-| `auto_start` | `bool` | `True` | specifies whether to start the mapping with agent start |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
-| `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
-| `port` | `int` | `8001` | port of the REST API endpoint |
-| `api_key_file` | `str` | `` | path to the file where API keys will be generated, if None then no API Key protection of endpoints is provided |
-
-
-```python
-# Example usage of `RestService`
-from pydag.services.rest.RestService import RestService  # Adjust import if needed
-
-obj = RestService()
-obj.auto_start=True
-obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
-obj.load_on_install=False
-obj.port=8001
-obj.api_key_file="path/to/file.txt"
 ```
 
 [Go to Summary](#summary)
@@ -1549,7 +1468,7 @@ obj.api_key_file="path/to/file.txt"
 | `mapping_type` | `str` | `` | type of mapping, e.g. READ, WRITE, SUB or PUB |
 | `n` | `int` | `0` | number of samples to insert or remove from buffers |
 | `persistent` | `bool` | `True` | specifies whether to remove or keep the values of the buffers when writing or publishing to a data sink |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001E5AD05D100>` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `host` | `str` | `'127.0.0.1'` | The IP address or hostname of the S7 PLC. |
 | `rack` | `int` | `0` | The rack number of the S7 PLC. |
@@ -1570,7 +1489,7 @@ obj.addresses='list()'
 obj.mapping_type="<string>"
 obj.n=0
 obj.persistent=True
-obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
+obj.id=<dataclasses._MISSING_TYPE object at 0x000001E5AD05D100>
 obj.load_on_install=False
 obj.host='127.0.0.1'
 obj.rack=0
@@ -1601,7 +1520,7 @@ But it has to match the number of elements in the schema used for reading or wri
 | `mapping_type` | `str` | `` | type of mapping, e.g. READ, WRITE, SUB or PUB |
 | `n` | `int` | `0` | number of samples to insert or remove from buffers |
 | `persistent` | `bool` | `True` | specifies whether to remove or keep the values of the buffers when writing or publishing to a data sink |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001E5AD05D100>` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `host` | `str` | `` | name of the host to connect to, e.g. IP address or COM-Port |
 | `port` | `int` | `` | port of the host to connect to, in case of Serial Protocol this is ignored |
@@ -1630,7 +1549,7 @@ obj.addresses='list()'
 obj.mapping_type="<string>"
 obj.n=0
 obj.persistent=True
-obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
+obj.id=<dataclasses._MISSING_TYPE object at 0x000001E5AD05D100>
 obj.load_on_install=False
 obj.host="<string>"
 obj.port=1
@@ -1672,7 +1591,7 @@ obj.write_byte_schema="<string>"
 | `after_receive_bytes` | `bytes` | `` | bytes to send after each receive |
 | `read_byte_schema` | `str` | `` | schema of bytes to convert the received data to and store in buffers, e.g. s20iiff (string of length 20, int, int, float, float) |
 | `write_byte_schema` | `str` | `` | schema of bytes to convert the buffers data to and send it, e.g. ddfs10 (double, double, float, string of length 10) |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001E5AD05D100>` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `baud_rate` | `int` | `9600` | baud rate for serial communication |
 | `new_line_mode` | `bool` | `True` | whether to use new line mode for parsing serial communication |
@@ -1704,7 +1623,7 @@ obj.before_receive_bytes="<value>"
 obj.after_receive_bytes="<value>"
 obj.read_byte_schema="<string>"
 obj.write_byte_schema="<string>"
-obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
+obj.id=<dataclasses._MISSING_TYPE object at 0x000001E5AD05D100>
 obj.load_on_install=False
 obj.baud_rate=9600
 obj.new_line_mode=True
@@ -1736,7 +1655,7 @@ obj.delimiter=';'
 | `after_receive_bytes` | `bytes` | `` | bytes to send after each receive |
 | `read_byte_schema` | `str` | `` | schema of bytes to convert the received data to and store in buffers, e.g. s20iiff (string of length 20, int, int, float, float) |
 | `write_byte_schema` | `str` | `` | schema of bytes to convert the buffers data to and send it, e.g. ddfs10 (double, double, float, string of length 10) |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001E5AD05D100>` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 
 
@@ -1765,7 +1684,7 @@ obj.before_receive_bytes="<value>"
 obj.after_receive_bytes="<value>"
 obj.read_byte_schema="<string>"
 obj.write_byte_schema="<string>"
-obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
+obj.id=<dataclasses._MISSING_TYPE object at 0x000001E5AD05D100>
 obj.load_on_install=False
 ```
 
@@ -1785,7 +1704,7 @@ obj.load_on_install=False
 | `mapping_type` | `str` | `` | type of mapping, e.g. READ, WRITE, SUB or PUB |
 | `n` | `int` | `0` | number of samples to insert or remove from buffers |
 | `persistent` | `bool` | `True` | specifies whether to remove or keep the values of the buffers when writing or publishing to a data sink |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001E5AD05D100>` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `url` | `str` | `` | socket url, e.g. wss://localhost:10001 |
 
@@ -1804,7 +1723,7 @@ obj.addresses='list()'
 obj.mapping_type="<string>"
 obj.n=0
 obj.persistent=True
-obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
+obj.id=<dataclasses._MISSING_TYPE object at 0x000001E5AD05D100>
 obj.load_on_install=False
 obj.url="https://example.com"
 ```
@@ -1823,7 +1742,7 @@ obj.url="https://example.com"
 | `mapping_type` | `str` | `` | type of mapping, e.g. READ, WRITE, SUB or PUB |
 | `n` | `int` | `0` | number of samples to insert or remove from buffers |
 | `persistent` | `bool` | `True` | specifies whether to remove or keep the values of the buffers when writing or publishing to a data sink |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001E5AD05D100>` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `host` | `str` | `'192.168.0.1'` | ip address or host name of the vse host device |
 | `port` | `int` | `3321` | port of the vse host device |
@@ -1846,7 +1765,7 @@ obj.addresses='list()'
 obj.mapping_type="<string>"
 obj.n=0
 obj.persistent=True
-obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
+obj.id=<dataclasses._MISSING_TYPE object at 0x000001E5AD05D100>
 obj.load_on_install=False
 obj.host='192.168.0.1'
 obj.port=3321
@@ -1865,7 +1784,7 @@ obj.timeout=3
 | `nodes` | `dict[str, Node]` | `'dict[str, Node]()'` | dictionary of nodes in the statemachine service |
 | `thread_type` | `str` | `'ThreadType.INSTANT.value'` | default thread type is INSTANT |
 | `observing_time` | `int` | `0` | observing time that specifies the interval the observer thread should run for |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001E5AD05D100>` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `retry_error_nodes` | `bool` | `False` | Statemachine object containing actions and transitions to go through to represent a state machine program flow |
 
@@ -1880,7 +1799,7 @@ obj.week_days="<string>"
 obj.nodes='dict[str, Node]()'
 obj.thread_type='ThreadType.INSTANT.value'
 obj.observing_time=0
-obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
+obj.id=<dataclasses._MISSING_TYPE object at 0x000001E5AD05D100>
 obj.load_on_install=False
 obj.retry_error_nodes=False
 ```
@@ -1897,7 +1816,7 @@ obj.retry_error_nodes=False
 | `nodes` | `dict[str, Node]` | `'dict[str, Node]()'` | dictionary of nodes in the statemachine service |
 | `thread_type` | `str` | `'ThreadType.INSTANT.value'` | default thread type is INSTANT |
 | `observing_time` | `int` | `0` | observing time that specifies the interval the observer thread should run for |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001E5AD05D100>` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 
 
@@ -1911,7 +1830,7 @@ obj.week_days="<string>"
 obj.nodes='dict[str, Node]()'
 obj.thread_type='ThreadType.INSTANT.value'
 obj.observing_time=0
-obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
+obj.id=<dataclasses._MISSING_TYPE object at 0x000001E5AD05D100>
 obj.load_on_install=False
 ```
 
@@ -1925,7 +1844,7 @@ obj.load_on_install=False
 | `nodes` | `dict[str, Node]` | `'dict[str, Node]()'` | dictionary of nodes in the statemachine service |
 | `thread_type` | `str` | `'ThreadType.INSTANT.value'` | default thread type is INSTANT |
 | `observing_time` | `int` | `0` | observing time that specifies the interval the observer thread should run for |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001E5AD05D100>` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 
 
@@ -1939,7 +1858,7 @@ obj.week_days="<string>"
 obj.nodes='dict[str, Node]()'
 obj.thread_type='ThreadType.INSTANT.value'
 obj.observing_time=0
-obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
+obj.id=<dataclasses._MISSING_TYPE object at 0x000001E5AD05D100>
 obj.load_on_install=False
 ```
 
@@ -1953,7 +1872,7 @@ abstract `ObserverService` class for Statemachines
 |-------|------|---------|-------------|
 | `auto_start` | `bool` | `True` | specifies whether to start the mapping with agent start |
 | `week_days` | `Optional[str]` | `` | specifies the week days the observer thread should run on, e.g. 'mon, fri, sun', 'mon - thu' or by numbers '0, 2, 4', where Monday = 0 and Sunday = 6 |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001E5AD05D100>` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `nodes` | `dict[str, Node]` | `'dict[str, Node]()'` | dictionary of nodes in the statemachine service |
 | `thread_type` | `str` | `'ThreadType.INSTANT.value'` | default thread type is INSTANT |
@@ -1967,7 +1886,7 @@ from pydag.services.statemachine.StatemachineService import StatemachineService 
 obj = StatemachineService()
 obj.auto_start=True
 obj.week_days="<string>"
-obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
+obj.id=<dataclasses._MISSING_TYPE object at 0x000001E5AD05D100>
 obj.load_on_install=False
 obj.nodes='dict[str, Node]()'
 obj.thread_type='ThreadType.INSTANT.value'
@@ -1975,34 +1894,40 @@ obj.observing_time=0
 ```
 
 [Go to Summary](#summary)
-## `UIService` (in `pydag\services\ui\UIService.py`)
+## `TaskRunnerService` (in `pydag\services\tasks\TaskRunnerService.py`)
 
-A `Service` class that auto generates a web ui based on NiceGUI 
+A `Service` for running tasks chained together as methods with specified inputs 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| `auto_start` | `bool` | `True` | specifies whether to start the mapping with agent start |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `thread_type` | `str` | `` | type of thread, e.g. MILLI_SECONDS, MICRO_SECONDS, INSTANT, ONLY_ONCE, DAYTIME, DATE, ... |
+| `observing_time` | `Union[int | str]` | `` | observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for DAYTIME in %H:%M or %H:%M:%S, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ... |
+| `week_days` | `Optional[str]` | `` | specifies the week days the observer thread should run on, e.g. 'mon, fri, sun', 'mon - thu' or by numbers '0, 2, 4', where Monday = 0 and Sunday = 6 |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001E5AD05D100>` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
-| `host` | `str` | `'localhost'` | host of the NiceGUI server |
-| `port` | `int` | `8081` | port of the NiceGUI server |
-| `title` | `str` | `` | dashboard title |
-| `with_buffer_ui` | `bool` | `True` | creates a ui page for buffer visualization |
-| `with_mgmt_ui` | `bool` | `True` | creates a ui page for agent management |
+| `task_files` | `list[str]` | `'list()'` |  |
+| `task_sequence` | `list[str]` | `'list()'` |  |
+| `inputs` | `list[list[str]]` | `'list()'` |  |
+| `outputs` | `list[list[str]]` | `'list()'` |  |
+| `auto_start` | `bool` | `False` | specifies whether to start the mapping with agent start |
+| `description` | `str` | `` | description of the task runner service |
 
 
 ```python
-# Example usage of `UIService`
-from pydag.services.ui.UIService import UIService  # Adjust import if needed
+# Example usage of `TaskRunnerService`
+from pydag.services.tasks.TaskRunnerService import TaskRunnerService  # Adjust import if needed
 
-obj = UIService()
-obj.auto_start=True
-obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
+obj = TaskRunnerService()
+obj.thread_type="<string>"
+obj.observing_time="<string>"
+obj.week_days="<string>"
+obj.id=<dataclasses._MISSING_TYPE object at 0x000001E5AD05D100>
 obj.load_on_install=False
-obj.host='localhost'
-obj.port=8081
-obj.title="<string>"
-obj.with_buffer_ui=True
-obj.with_mgmt_ui=True
+obj.task_files='list()'
+obj.task_sequence='list()'
+obj.inputs='list()'
+obj.outputs='list()'
+obj.auto_start=False
+obj.description="<string>"
 ```
 
 [Go to Summary](#summary)
@@ -2016,7 +1941,7 @@ obj.with_mgmt_ui=True
 | `thread_type` | `str` | `` | type of thread, e.g. MILLI_SECONDS, MICRO_SECONDS, INSTANT, ONLY_ONCE, DAYTIME, DATE, ... |
 | `observing_time` | `Union[int | str]` | `` | observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for DAYTIME in %H:%M or %H:%M:%S, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ... |
 | `week_days` | `Optional[str]` | `` | specifies the week days the observer thread should run on, e.g. 'mon, fri, sun', 'mon - thu' or by numbers '0, 2, 4', where Monday = 0 and Sunday = 6 |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001E5AD05D100>` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 
 
@@ -2029,7 +1954,7 @@ obj.auto_start=True
 obj.thread_type="<string>"
 obj.observing_time="<string>"
 obj.week_days="<string>"
-obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
+obj.id=<dataclasses._MISSING_TYPE object at 0x000001E5AD05D100>
 obj.load_on_install=False
 ```
 
@@ -2044,7 +1969,7 @@ Args:
 |-------|------|---------|-------------|
 | `auto_start` | `bool` | `True` | specifies whether to start the mapping with agent start |
 | `week_days` | `Optional[str]` | `` | specifies the week days the observer thread should run on, e.g. 'mon, fri, sun', 'mon - thu' or by numbers '0, 2, 4', where Monday = 0 and Sunday = 6 |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001E5AD05D100>` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `thread_type` | `str` | `'ThreadType.SECOND'` | type of thread, e.g. MILLI_SECONDS, MICRO_SECONDS, INSTANT, ONLY_ONCE, DAYTIME, DATE, ... |
 | `observing_time` | `Union[int | str]` | `10` | interval of seconds for restarts attempts |
@@ -2058,7 +1983,7 @@ from pydag.services.utils.MappingRestartService import MappingRestartService  # 
 obj = MappingRestartService()
 obj.auto_start=True
 obj.week_days="<string>"
-obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
+obj.id=<dataclasses._MISSING_TYPE object at 0x000001E5AD05D100>
 obj.load_on_install=False
 obj.thread_type='ThreadType.SECOND'
 obj.observing_time=10
@@ -2081,7 +2006,7 @@ An `MappingService` that captures webcam video feed into a `Buffer`
 | `mapping_type` | `str` | `` | type of mapping, e.g. READ, WRITE, SUB or PUB |
 | `n` | `int` | `0` | number of samples to insert or remove from buffers |
 | `persistent` | `bool` | `True` | specifies whether to remove or keep the values of the buffers when writing or publishing to a data sink |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001E5AD05D100>` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `camera_index` | `int` | `0` | indexof installed cameras |
 | `resolution` | `list[int]` | `'list()'` | resolution [width, height] |
@@ -2105,7 +2030,7 @@ obj.addresses='list()'
 obj.mapping_type="<string>"
 obj.n=0
 obj.persistent=True
-obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
+obj.id=<dataclasses._MISSING_TYPE object at 0x000001E5AD05D100>
 obj.load_on_install=False
 obj.camera_index=0
 obj.resolution='list()'
@@ -2124,7 +2049,7 @@ additionally only the y last files are being kept before being deleted
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `auto_start` | `bool` | `True` | specifies whether to start the mapping with agent start |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001E5AD05D100>` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `output_folder` | `str` | `` | folder path to the video output folder |
 | `post_fix` | `str` | `'video'` | postfix to append to each file, all the files start with timestamp |
@@ -2143,7 +2068,7 @@ from pydag.services.vision.WebcamVideoRollbackService import WebcamVideoRollback
 
 obj = WebcamVideoRollbackService()
 obj.auto_start=True
-obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
+obj.id=<dataclasses._MISSING_TYPE object at 0x000001E5AD05D100>
 obj.load_on_install=False
 obj.output_folder="path/to/folder"
 obj.post_fix='video'
@@ -2162,7 +2087,7 @@ obj.codec='MJPG'
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `auto_start` | `bool` | `True` | specifies whether to start the mapping with agent start |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001E5AD05D100>` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `browser_type` | `str` | `'EDGE'` | type of browser, EDGE | FIREFOX | CHROME |
 
@@ -2173,7 +2098,7 @@ from pydag.services.webbrowser.BrowserAutomationService import BrowserAutomation
 
 obj = BrowserAutomationService()
 obj.auto_start=True
-obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
+obj.id=<dataclasses._MISSING_TYPE object at 0x000001E5AD05D100>
 obj.load_on_install=False
 obj.browser_type='EDGE'
 ```
@@ -2188,7 +2113,7 @@ Args:
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `auto_start` | `bool` | `True` | specifies whether to start the mapping with agent start |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001E5AD05D100>` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `folder_path` | `str` | `` |  |
 | `port` | `int` | `` |  |
@@ -2200,7 +2125,7 @@ from pydag.services.webserver.HttpFileService import HttpFileService  # Adjust i
 
 obj = HttpFileService()
 obj.auto_start=True
-obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
+obj.id=<dataclasses._MISSING_TYPE object at 0x000001E5AD05D100>
 obj.load_on_install=False
 obj.folder_path="path/to/folder"
 obj.port=1
@@ -2214,7 +2139,7 @@ obj.port=1
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `auto_start` | `bool` | `True` | specifies whether to start the mapping with agent start |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001E5AD05D100>` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `port` | `int` | `8099` | port of the http server |
 | `html` | `str` | `'<h1>Hello World!</h1>'` | html to show on the website |
@@ -2226,7 +2151,7 @@ from pydag.services.webserver.HttpHTMLService import HttpHTMLService  # Adjust i
 
 obj = HttpHTMLService()
 obj.auto_start=True
-obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
+obj.id=<dataclasses._MISSING_TYPE object at 0x000001E5AD05D100>
 obj.load_on_install=False
 obj.port=8099
 obj.html='<h1>Hello World!</h1>'
@@ -2238,7 +2163,7 @@ obj.html='<h1>Hello World!</h1>'
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `auto_start` | `bool` | `True` | specifies whether to start the mapping with agent start |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000002781848D070>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001E5AD05D100>` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `root` | `str` | `'.'` |  |
 | `host` | `str` | `'0.0.0.0'` |  |
@@ -2251,7 +2176,7 @@ from pydag.services.webserver.WebService import WebService  # Adjust import if n
 
 obj = WebService()
 obj.auto_start=True
-obj.id=<dataclasses._MISSING_TYPE object at 0x000002781848D070>
+obj.id=<dataclasses._MISSING_TYPE object at 0x000001E5AD05D100>
 obj.load_on_install=False
 obj.root='.'
 obj.host='0.0.0.0'

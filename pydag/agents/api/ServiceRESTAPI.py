@@ -1,13 +1,16 @@
-from typing import Any, Dict
+from __future__ import annotations
+from typing import TYPE_CHECKING, Any, Dict
 from fastapi import APIRouter, Depends, Path, Query
 from pydantic import BaseModel, Field
 
 
-from ..rest.RESTAPIManager import APIRole, RESTAPIManager
-from ...agents.AgentConfig import AgentConfig
+from .RESTAPIManager import APIRole, RESTAPIManager
+from ..AgentConfig import AgentConfig
 from ...services.Service import Service
-from ...agents.Agent import Agent
 from ...utils.ClassUtils import ClassUtils
+
+if TYPE_CHECKING:
+    from ..Agent import Agent
 
 ROOT_URL : str = "/api/v1/services"
 

@@ -3,8 +3,8 @@ from nicegui import ui
 from pydag.agents.Agent import Agent
 from pydag.buffers.SignalBuffer import SignalBuffer
 from pydag.buffers.signals.RandBoolean import RandBoolean
-from pydag.services.ui.UIElements import TrafficLight, UIPage
-from pydag.services.ui.UIService import UIService
+from pydag.agents.ui.UIElements import TrafficLight, UIPage
+from pydag.agents.ui.UIService import UIService
 
 
 class TrafficLightPage(UIPage):

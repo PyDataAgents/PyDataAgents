@@ -1,7 +1,7 @@
 from pydag.agents.Agent import Agent
-from pydag.services.ui.UIService import UIService
+from pydag.agents.ui.UIService import UIService
 from pydag.services.tasks.TaskRunnerService import TaskRunnerService
-from pydag.services.ui.UITaskRunnerPage import UITaskRunnerPage
+from pydag.agents.ui.UITaskRunnerPage import UITaskRunnerPage
 from pydag.utils.FileUtils import FileUtils
 
 def test_000():

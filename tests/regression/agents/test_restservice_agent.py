@@ -7,11 +7,10 @@ from pydag.buffers.DictBuffer import DictBuffer
 from pydag.buffers.ListBuffer import ListBuffer
 from pydag.buffers.SignalBuffer import SignalBuffer
 from pydag.buffers.signals.Sine import Sine
-from pydag.services.rest.RestService import RestService
 
 
 def test_000():
-    agent = Agent()
+    agent = Agent(with_api=True)
     agent.id = "G1"
     
     s = Sine()
@@ -25,16 +24,11 @@ def test_000():
 
     agent.add_buffer(b)
 
-    service = RestService()
-    service.id = "S1"
-    
-    agent.add_service(service)
-
     agent.release()
 
 def test_020():
     
-    agent = Agent()
+    agent = Agent(with_api=True, port=8001)
     agent.id = "G1"
     
     b1 = ListBuffer()
@@ -51,8 +45,5 @@ def test_020():
     
     s3 = SQLService()
     agent.add_service(s3)
-    
-    s4 = RestService(id = "S1", port=8001)
-    agent.add_service(s4)
-    
+        
     agent.release()

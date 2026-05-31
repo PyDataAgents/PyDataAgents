@@ -1,11 +1,14 @@
-from typing import Union
+from __future__ import annotations
+from typing import TYPE_CHECKING, Union
 from fastapi import APIRouter, Depends, Path
 from pydantic import BaseModel, Field
 
 
 from .RESTAPIManager import APIRole, RESTAPIManager
-from ...agents.AgentElement import AgentElement
-from ...agents.Agent import Agent
+from ..AgentElement import AgentElement
+
+if TYPE_CHECKING:
+    from ..Agent import Agent
 
 
 ROOT_URL : str = "/api/v1/agent"
@@ -24,6 +27,7 @@ class AgentRESTAPI:
     @staticmethod
     def get_api_router(agent : Agent) -> APIRouter:
         
+        from ..Agent import Agent 
         router = APIRouter(prefix=ROOT_URL, tags=[Agent.__name__])
         
         @router.get("/")
