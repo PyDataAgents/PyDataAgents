@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
 import enum
 
-from langchain_openai import ChatOpenAI
+from langchain_openai import AzureChatOpenAI, ChatOpenAI
 from langchain_ollama import OllamaLLM
 from langchain_core.prompts import PromptTemplate, ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.runnables import RunnableWithMessageHistory
@@ -18,6 +18,7 @@ SYS_GENERAL_ASSISTANT : str = "You are a helpful assistant. Answer the following
 class ModelProvider(str, enum.Enum):
     OPENAI = "OPENAI"
     OLLAMA = "OLLAMA"
+    AZURE = "AZURE"
     # Add other providers as needed
 
 
@@ -88,6 +89,14 @@ class LLMService(Service):
         match self.model_provider:
             case ModelProvider.OPENAI.value:
                 self._llm = ChatOpenAI(model_name=self.model, openai_api_key=self.api_key, temperature=1)
+            case ModelProvider.AZURE.value:
+                self._llm = AzureChatOpenAI(
+                    azure_deployment=self.model,
+                    api_version="2024-02-15-preview",
+                    azure_endpoint=self.endpoint,
+                    api_key=self.api_key,
+                    temperature=0
+                )
             case ModelProvider.OLLAMA.value:
                 try:
                     ModelUtils.ensure_ollama_model_available(self.model, self.endpoint)
