@@ -107,6 +107,7 @@ llm = [
   "langgraph>=1.0.10",
   "hf_xet",
   "mistralai",
+  "spacy",
 ]
 
 sim = [
