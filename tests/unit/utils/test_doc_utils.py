@@ -1,7 +1,7 @@
 from pathlib import Path
 from pydag.agents.AgentElement import AgentElement
 from pydag.services.Service import Service
-from pydag.utils.AutoDocUtils import generate_docs_for_type
+from pydag.utils.DocUtils import generate_docs_for_type
 
 
 def test_000():

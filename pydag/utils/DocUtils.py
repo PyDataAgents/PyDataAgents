@@ -4,8 +4,8 @@ from pathlib import Path
 from typing import List, Dict, Set
 
 from ..agents.AgentElement import AgentElement
-from ..utils.ClassUtils import ClassUtils
-from ..utils.TimeUtils import TimeUtils
+from .ClassUtils import ClassUtils
+from .TimeUtils import TimeUtils
 
 ICON_FOLDER = "element_icons"
 
