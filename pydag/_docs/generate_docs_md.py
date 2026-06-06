@@ -5,7 +5,7 @@ from pydag.buffers.Buffer import Buffer
 from pydag.services.Service import Service
 from pydag.nodes.Action import Action
 from pydag.nodes.Transition import Transition
-from pydag.utils.AutoDocUtils import generate_docs_for_type
+from pydag.utils.DocUtils import generate_docs_for_type
 
 
 # Run the whole process
