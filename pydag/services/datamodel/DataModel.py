@@ -6,6 +6,15 @@ from loguru import logger
 
 @dataclass
 class DataModel(ABC):
+    """ base class for data models, which are used to define computational methods, as well as the properties of the model itself.
+    The data model can be used to build physics based models, data models for web ui, cad configurators and more ... 
+    For the UI generation, the following metadata properties are used:
+    - `ui_type`: defines the type of the UI element to be used for this property, e.g. table, plot, dropdown, slider, etc.
+    - `ui_options`: defines the options for the UI element, e.g. for dropdowns, the options to be displayed
+    - `ui_group`: defines the group number for the UI element in order to group them with other properties in a expandable section in the frontend
+    - `ui_order`: defines the order of the UI element in the frontend, lower numbers are displayed first
+    - `ui_column`: defines the column number of the UI element in the frontend, if the frontend supports multiple columns, this can be used to display properties side by side
+    """
     
     model_id : str = field(default_factory=lambda: str(uuid.uuid4()), metadata={"description": "unique model id in UUID schema", "hidden": False})
     alias : str = field(default=None, metadata={"description": "short name of the model, must not be unique across sessions, but within sessions", "hidden": False})

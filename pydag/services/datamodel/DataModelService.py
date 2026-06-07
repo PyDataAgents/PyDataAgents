@@ -92,8 +92,8 @@ class DataModelService(Service):
         self._method_input_vars : dict[str, list[str]] = None
         self._method_output_vars : dict[str, list[str]] = None        
         self._method_arguments : dict[str, int] = {}
-        self._model_input_vars : set[str] = set()
-        self._model_output_vars : set[str] = set()
+        self._model_input_vars : dict[str, str] = dict()
+        self._model_output_vars : dict[str, str] = dict()
     
     def set_model(self, model_class : type):
         """ sets the model class for this service, this method can be used instead of specifying `model_path` and `model_name`
@@ -108,7 +108,7 @@ class DataModelService(Service):
         
         
     def _on_install(self, agent : Agent = None):
-        super()._on_install(agent)        
+        super()._on_install(agent)
         self._find_model_class()
         self._find_methods()
         self._find_method_vars()
@@ -143,7 +143,8 @@ class DataModelService(Service):
             model : DataModel = session.get_model(model_id)
             if not model:
                 # create a new empty model
-                model = ClassUtils.load_instance(self.model_path, self.model_name)
+                model = self._model_class()
+                #model = ClassUtils.load_instance(self.model_path, self.model_name)
                 model.model_id = model_id
                 session.add_model(model)
             
@@ -247,15 +248,16 @@ class DataModelService(Service):
         out_vars : set
         for k, out_vars in write_vars.items():
             for ov in out_vars:
-                self._model_output_vars.add(ov)
+                self._model_output_vars.update({ov: ov})
         input_vars : set
         for k, input_vars in read_vars.items():
             for iv in input_vars:
                 if iv not in self._model_output_vars:
-                    self._model_input_vars.add(iv)
+                    self._model_input_vars.update({iv: iv})
             
         # validate if method properties exist in model properties
-        data_model = ClassUtils.load_instance(self.model_path, self.model_name)
+        #data_model = ClassUtils.load_instance(self.model_path, self.model_name)
+        data_model = self._model_class()
         self._validate_properties(data_model, all_vars)
         
     def _validate_properties(self, data_model : DataModel, properties : set):
@@ -280,6 +282,15 @@ class DataModelService(Service):
     
     def get_source(self) -> str:
         return Path(self.model_path).read_text(encoding="utf-8")
+    
+    def get_input_variables(self) -> dict[str, str]:
+        return self._model_input_vars
+
+    def get_output_variables(self) -> dict[str, str]:
+        return self._model_output_vars
+    
+    def get_model_class(self) -> type:
+        return self._model_class
 
 class DataModelReadAccessVisitor(ast.NodeVisitor):
     def __init__(self):
