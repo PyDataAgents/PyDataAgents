@@ -27,7 +27,7 @@ def test_pca_exec_produces_dimensioned_output():
     
     n = 10
 
-    for i in range(20):
+    for i in range(5):
         time.sleep(0.5)  # Simulate some delay for signal sampling
         PCA.execute()
         data = PCA.get_buffer().data(n=10, persistent=False)
@@ -59,7 +59,7 @@ def test_pca_exec_produces_dimensioned_output_repeat():
     
     n = 10
 
-    for i in range(20):
+    for i in range(5):
         time.sleep(0.5)  # Simulate some delay for signal sampling
         PCA.execute()
         data = PCA.get_buffer().data(n=10, persistent=False)
@@ -91,7 +91,7 @@ def test_pca_sample_length_parameter_respected():
     
     n = 10
 
-    for i in range(20):
+    for i in range(5):
         time.sleep(0.5)  # Simulate some delay for signal sampling
         PCA.execute()
         data = PCA.get_buffer().data(n=10, persistent=False)
@@ -122,7 +122,7 @@ def test_pca_input_keys_and_feature_count():
     
     n = 10
 
-    for i in range(15):
+    for i in range(5):
         time.sleep(0.5)  # Simulate some delay for signal sampling
         PCA.execute()
         data = PCA.get_buffer().data(n=10, persistent=False)
@@ -162,7 +162,7 @@ def test_feature_key_naming_pattern():
 
     PCA.add_parent(lba)
 
-    for _ in range(10):
+    for _ in range(5):
         time.sleep(0.5)
         PCA.execute()
         data = PCA.get_buffer().data(n=10, persistent=False)

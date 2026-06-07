@@ -2,12 +2,11 @@ from pydag.agents.Agent import Agent
 from pydag.buffers.SignalBuffer import SignalBuffer
 from pydag.buffers.signals.Sine import Sine
 from pydag.buffers.signals.TimedSignal import TimedSignal
-from pydag.agents.ui.UIService import UIService
 
 
 def test_000():
     
-    ag = Agent()
+    ag = Agent(with_ui=True)
     
     s1 = Sine(f=10)
     buf = SignalBuffer(signal=s1, capacity=1000, sampling_period=10)    
@@ -27,14 +26,11 @@ def test_000():
     sb.sampling_period=100
     
     ag.add_buffer(sb)
-    
-    uis = UIService()
-    ag.add_service(uis)
-    
+        
     ag.release()
     
 def test_010():
-    ag = Agent()
+    ag = Agent(with_ui=True)
     
     s1 = Sine(f=10)
     buf = SignalBuffer(signal=s1, capacity=1000, sampling_period=10)    
@@ -54,9 +50,6 @@ def test_010():
     sb.sampling_period=100
     
     ag.add_buffer(sb)
-    
-    uis = UIService()
-    ag.add_service(uis)
     
     ag.release()
     

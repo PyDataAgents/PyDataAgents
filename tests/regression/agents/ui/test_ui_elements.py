@@ -1,12 +1,14 @@
+from pydag.agents.Agent import Agent
 from pydag.buffers.DictBuffer import DictBuffer
 from pydag.agents.ui.UIBufferPage import UIBufferPage
 from pydag.agents.ui.UIElements import BufferTable, PlotCard
-from pydag.agents.ui.UIService import UIService
 
 
 def test_000():
-    uis = UIService()
-    p = UIBufferPage(uis)
+    ag = Agent()
+    
+    p = UIBufferPage(ag)    
+    ag.add_ui_page(p)
     
     buf1 = DictBuffer()
     buf2 = DictBuffer()

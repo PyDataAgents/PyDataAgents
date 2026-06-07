@@ -70,7 +70,6 @@ class AgentModule:
         import pydag.nodes.llm.LLMChatAction
         import pydag.nodes.llm.LLMOCRAction
         import pydag.nodes.llm.LLMScriptElement
-        import pydag.nodes.llm.LLMImageAnalysisAction
         
         return
     

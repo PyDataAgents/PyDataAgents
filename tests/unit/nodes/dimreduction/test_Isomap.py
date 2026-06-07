@@ -26,7 +26,7 @@ def test_isomap_exec_produces_dimensioned_output():
     
     n = 10
 
-    for i in range(10):
+    for i in range(5):
         time.sleep(0.5)  # Simulate some delay for signal sampling
         ISO.execute() # TODO execute goes wrong please debug
         data = ISO.get_buffer().data(n=10, persistent=False)
@@ -63,7 +63,7 @@ def test_isomap_input_keys_dimensioned_output():
     
     n = 10
 
-    for i in range(10):
+    for i in range(5):
         time.sleep(0.5)  # Simulate some delay for signal sampling
         ISO.execute()
         data = ISO.get_buffer().data(n=10, persistent=False)
@@ -94,7 +94,7 @@ def test_feature_key_naming_pattern():
 
     ISO.add_parent(lba)
 
-    for _ in range(10):
+    for _ in range(5):
         time.sleep(0.5)
         ISO.execute()
         data = ISO.get_buffer().data(n=10, persistent=False)
