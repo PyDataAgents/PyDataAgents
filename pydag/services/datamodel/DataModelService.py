@@ -119,8 +119,9 @@ class DataModelService(Service):
     def _on_stop(self):
         return
 
-    def create_session(self) -> str:
-        session_id = str(uuid.uuid4())
+    def create_session(self, session_id : str = None) -> str:
+        if not session_id:
+            session_id = str(uuid.uuid4())
         self._sessions[session_id] = DataModelSession()
         self._session_locks[session_id] = asyncio.Lock()
         return session_id

@@ -14,6 +14,7 @@ class DataModel(ABC):
     - `ui_group`: defines the group number for the UI element in order to group them with other properties in a expandable section in the frontend
     - `ui_order`: defines the order of the UI element in the frontend, lower numbers are displayed first
     - `ui_column`: defines the column number of the UI element in the frontend, if the frontend supports multiple columns, this can be used to display properties side by side
+    - `ui_label`: defines the label to be used for the UI element in the frontend, if not set, the property name is used as label
     """
     
     model_id : str = field(default_factory=lambda: str(uuid.uuid4()), metadata={"description": "unique model id in UUID schema", "hidden": False})
