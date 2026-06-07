@@ -7,9 +7,8 @@ import os
 from typing import Any, Callable
 import typing
 
-from matplotlib.pyplot import step
 
-
+from ..ThreadType import ThreadType
 from ..ServiceException import ServiceException
 from ..Observer import Observer
 from ...agents.Agent import Agent
@@ -34,13 +33,14 @@ class TaskObserver(Observer):
 
 @dataclass
 class TaskRunnerService(ObserverService):
-    """A Service for running conventional callables and Action/BufferNode steps in one sequence."""
+    """ A Service for running conventional callables and Action/BufferNode steps in one sequence."""
 
     task_files: list[str] = field(default_factory=list, metadata={"description": ""})
     task_sequence: list[str] = field(default_factory=list, metadata={"description": ""})
     inputs: list[list[str]] = field(default_factory=list, metadata={})
     outputs: list[list[str]] = field(default_factory=list, metadata={})
     auto_start: bool = field(default=False, metadata={"description": "specifies whether to start the mapping with agent start"})
+    thread_type : str = field(default=ThreadType.TRIGGERED.value, metadata={"description": "type of thread to use for running tasks"})
     description: str = field(default=None, metadata={"description": "description of the task runner service"})
 
     def __post_init__(self):
