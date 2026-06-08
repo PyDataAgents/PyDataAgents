@@ -9,6 +9,7 @@ class DataModel(ABC):
     """ base class for data models, which are used to define computational methods, as well as the properties of the model itself.
     The data model can be used to build physics based models, data models for web ui, cad configurators and more ... 
     For the UI generation, the following metadata properties are used:
+    - `unit`: defines the unit of the property, e.g. m, kg, s, etc.
     - `ui_type`: defines the type of the UI element to be used for this property, e.g. table, plot, dropdown, slider, etc.
     - `ui_options`: defines the options for the UI element, e.g. for dropdowns, the options to be displayed
     - `ui_group`: defines the group number for the UI element in order to group them with other properties in a expandable section in the frontend

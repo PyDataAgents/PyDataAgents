@@ -19,8 +19,7 @@ class UIDataModelPage(UIPage):
         self.task_runner_id = id
         self.path = "/data_model"
         self._dms : DataModelService = dms
-        self._ui_input_elements : dict[str, Element] = {}
-        self._ui_output_elements : dict[str, Element] = {}
+        self._ui_field_elements : dict[str, Element] = {}
         self._ui_session_id_elem : Element = None
         self._ui_model_id_elem : Element = None
         
@@ -28,59 +27,44 @@ class UIDataModelPage(UIPage):
         self.create_header(f"Data Model {self._dms.model_name} - Dashboard")
         doc : str = self._dms.get_model_class().__doc__
         ui.label(doc)
-        data_fields : Tuple[field] = fields(self._dms.get_model_class())
-        self._create_input_form(self._dms.get_input_variables(), data_fields)
-        self._create_output_form(self._dms.get_output_variables(), data_fields)
+        self._create_fields(self._dms.get_input_variables())
+        self._create_fields(self._dms.get_output_variables(), read_only=True)
         ui.timer(0, self._init_model_session, once=True)
         
-    def _create_input_form(self, input_variables: dict[str, str], datafields : Tuple[field]):
+    def _create_fields(self, variables: dict[str, str], read_only : bool = False):        
+        data_fields : Tuple[field] = fields(self._dms.get_model_class())
         with ui.column().classes('gap-2 w-full'):
             # 🔁 create inputs dynamically
             f : field
-            for f in datafields:
+            for f in data_fields:
                 # check if field is in input variables
                 n : str = f.name
-                if n in input_variables:                    
+                if n in variables:                    
                     t = f.type
                     d : str = f.metadata.get("description", "")
                     h : bool = f.metadata.get("hidden", False)
                     v : Any = getattr(self._dms.get_model_class(), n, None)
+                    u : str = f.metadata.get("unit", None)
                     if not h:
+                        elem : Element = None
                         if t is int:
-                            self._ui_input_elements.update({n: ui.number(label=n, value=v, on_change=self._on_change).props(f"step=1 name={n}").tooltip(d)})
+                            elem = ui.number(label=n, value=v, on_change=self._on_change).props("step=1")
                         elif t is float:
-                            self._ui_input_elements.update({n: ui.number(label=n, value=v, on_change=self._on_change).props(f"name={n}").tooltip(d)})
+                            elem = ui.number(label=n, value=v, on_change=self._on_change)
                         elif t is bool:
-                            self._ui_input_elements.update({n: ui.switch(n, value=v, on_change=self._on_change).props(f"name={n}").tooltip(d)})
+                            elem = ui.switch(n, value=v, on_change=self._on_change)
                         elif get_origin(t) is list:
-                            self._ui_input_elements.update({n: ui.input_chips(label=n, value=v, new_value_mode="add", clearable=True, on_change=self._on_change).props(f"name={n}").tooltip(d)})
+                            elem = ui.input_chips(label=n, value=v, new_value_mode="add", clearable=True, on_change=self._on_change)
                         else:
-                            self._ui_input_elements.update({n: ui.input(label=n, value=v, on_change=self._on_change).props(f"name={n}").tooltip(d)})
-
-
-    def _create_output_form(self, output_variables: dict[str, str], datafields : Tuple[field]):
-        with ui.column().classes('gap-2 w-full'):
-            # 🔁 create inputs dynamically
-            f : field
-            for f in datafields:
-                # check if field is in input variables
-                n : str = f.name
-                if n in output_variables:                    
-                    t = f.type
-                    d : str = f.metadata.get("description", "")
-                    h : bool = f.metadata.get("hidden", False)
-                    v : Any = getattr(self._dms.get_model_class(), n, None)
-                    if not h:
-                        if t is int:
-                            self._ui_output_elements.update({n: ui.number(label=n, value=v).props(f"step=1 readonly name={n} input-class=bg-grey-2").tooltip(d)})
-                        elif t is float:
-                            self._ui_output_elements.update({n: ui.number(label=n, value=v).tooltip(d).props(f"readonly name={n} input-class=bg-grey-2")})
-                        elif t is bool:
-                            self._ui_output_elements.update({n: ui.switch(n, value=v).tooltip(d).props(f"readonly name={n} input-class=bg-grey-2")})
-                        elif get_origin(t) is list:
-                            self._ui_output_elements.update({n: ui.input_chips(label=n, value=v, new_value_mode="add", clearable=True).tooltip(d).props(f"readonly name={n} input-class=bg-grey-2")})
-                        else:
-                            self._ui_output_elements.update({n: ui.input(label=n, value=v).tooltip(d).props(f"readonly name={n} input-class=bg-grey-2")})
+                            elem = ui.input(label=n, value=v, on_change=self._on_change)
+                        
+                        elem.tooltip(d).props(f"name={n}")
+                        if read_only:
+                            elem.props("readonly input-class=bg-grey-2")
+                        if u:
+                            with elem.add_slot("append"):
+                                ui.label(u).classes("text-gray-500 text-sm pb-3").style("height:100%; display: flex; align-items:flex-end;")
+                        self._ui_field_elements.update({n: elem})
 
     async def _on_change(self, e):
         session_id = self._ui_session_id_elem.value
@@ -98,10 +82,8 @@ class UIDataModelPage(UIPage):
         if dm:
             data : dict[str, Any] = dm.to_dict()
             for k, v in data.items():
-                if k in self._ui_input_elements:
-                    self._ui_input_elements[k].set_value(v)
-                if k in self._ui_output_elements:
-                    self._ui_output_elements[k].set_value(v)
+                if k in self._ui_field_elements:
+                    self._ui_field_elements[k].set_value(v)
                             
     async def _init_model_session(self):
         await ui.run_javascript("""
