@@ -48,7 +48,7 @@ class UIDataModelPage(UIPage):
         self._create_fields()
         ui.timer(0, self._init_model_session, once=True)
         
-    def _create_fields(self):        
+    def _create_fields(self):
         data_fields : Tuple[Field] = fields(self._dms.get_model_class())        
         field : Field
         input_vars : dict[str, str] = self._dms.get_input_variables()
@@ -60,9 +60,9 @@ class UIDataModelPage(UIPage):
         self._columns.clear()
         # clear any previously stored field elements to avoid duplicate event handlers
         self._ui_field_elements.clear()
-        with ui.row().classes("w-full"):
+        with ui.row().classes("w-full no-wrap"):
             for _ in range(0, self._nc):
-                col : Element = ui.column()
+                col : Element = ui.column().classes(f"w-1/{self._nc}")
                 self._columns.append(col)
         
         divide_input_output : bool = False
@@ -108,15 +108,15 @@ class UIDataModelPage(UIPage):
                             if divide_input_output:
                                 if n in input_vars:
                                     with self._columns[0]:
-                                        g_elem = ui.expansion(text = g, value = False)
+                                        g_elem = ui.expansion(text = g, value = False).classes("w-full")
                                         group_elems.update({g: g_elem})
                                 else:
                                     with self._columns[1]:
-                                        g_elem = ui.expansion(text = g, value = False)
+                                        g_elem = ui.expansion(text = g, value = False).classes("w-full")
                                         group_elems.update({g: g_elem})
                             else:
                                 with self._columns[c]:
-                                    g_elem = ui.expansion(text = g, value = False)
+                                    g_elem = ui.expansion(text = g, value = False).classes("w-full")
                                     group_elems.update({g: g_elem})
                         parent = group_elems[g]
                     else:
