@@ -1,7 +1,7 @@
 import ast
 import inspect
 from pathlib import Path
-from dataclasses import dataclass, field
+from dataclasses import Field, dataclass, field, fields
 import threading
 from typing import TYPE_CHECKING, Any
 import uuid
@@ -255,6 +255,15 @@ class DataModelService(Service):
             for iv in input_vars:
                 if iv not in self._model_output_vars:
                     self._model_input_vars.update({iv: iv})
+                    
+        # collect special output variables: ui_type -> image
+        field : Field
+        for field in fields(self._model_class):
+            ut = field.metadata.get("ui_type", None)
+            if ut:
+                match ut:
+                    case "image":
+                        self._model_output_vars.update({field.name: field.name})
             
         # validate if method properties exist in model properties
         #data_model = ClassUtils.load_instance(self.model_path, self.model_name)
