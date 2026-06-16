@@ -1,7 +1,7 @@
 from dataclasses import Field, fields
 from pathlib import Path
 from typing import Any, Tuple, get_origin
-
+from loguru import logger
 from nicegui import app, ui
 from nicegui.element import Element
 from nicegui.elements.image import Image
@@ -45,10 +45,14 @@ class UIDataModelPage(UIPage):
             </style>
         """)
         ui.label(doc)
-        self._create_fields()
         ui.timer(0, self._init_model_session, once=True)
+        #self._create_fields()
         
     def _create_fields(self):
+        # get model and session id
+        session_id : str = self._ui_session_id_elem.value
+        model_id : str = self._ui_model_id_elem.value
+        # get model fields
         data_fields : Tuple[Field] = fields(self._dms.get_model_class())        
         field : Field
         input_vars : dict[str, str] = self._dms.get_input_variables()
@@ -137,7 +141,23 @@ class UIDataModelPage(UIPage):
                                 case "table":
                                     pass
                                 case "dropdown":
-                                    pass
+                                    if o:                                        
+                                        if isinstance(o, list) or isinstance(o, dict):
+                                             elem = ui.select(options=o, label=l, value=v)
+                                        elif isinstance(o, str):
+                                            if "@" in o:
+                                                fname : str = o.replace("@", "")
+                                                ops = getattr(self._dms.get_data_model(session_id, model_id), fname)
+                                                if isinstance(o, list) or isinstance(o, dict):
+                                                    elem = ui.select(options=ops, label=l, value=v)
+                                                else:
+                                                    raise UIException("ui_type 'slider' requires 'ui_options' with '@' to reference a list/dict field.")
+                                            else:
+                                                raise UIException("ui_type 'slider' requires str 'ui_options' to be specified as '@VARIABLE_NAME.")    
+                                        else:
+                                            raise UIException("ui_type 'slider' requires 'ui_options' to be specified as list/dict or str.")    
+                                    else:
+                                        raise UIException("ui_type 'slider' also requires 'ui_options' to be specified.")
                                 case "slider":
                                     pass
                                 case "plot":
@@ -173,15 +193,15 @@ class UIDataModelPage(UIPage):
             return
         self._suspend_on_change = True
         try:
-            session_id = self._ui_session_id_elem.value
-            model_id = self._ui_model_id_elem.value
+            session_id : str = self._ui_session_id_elem.value
+            model_id : str = self._ui_model_id_elem.value
             await self._dms.update(session_id, model_id, e.sender.props.get("name"), e.sender.value)
             # update ui elements
             self._update_fields()
             with self._ui_session_id_elem:
                 ui.notify(f"{DataModel.__name__} [{model_id}] updated in session [{session_id}]", color="green", position="bottom")
         except Exception as e:
-            print(e)
+            logger.error("could not update model or fields", e)
         finally:
             self._suspend_on_change = False
         
@@ -216,6 +236,8 @@ class UIDataModelPage(UIPage):
             with ui.row().classes("w-1/2 items-center gap-4"):
                 self._ui_session_id_elem = ui.input(label="Session ID", value=session_id).props("readonly name=session_id input-class=text-white label-color=white").classes("flex-1 text-white").style("width: fit-content")
                 self._ui_model_id_elem = ui.input(label="Model ID", value=model_id).props("readonly name=model_id input-class=text-white label-color=white").classes("flex-1 text-white")
+        # create fields
+        self._create_fields()
         # update the fields with the current model data
         self._update_fields()
 
