@@ -45,4 +45,3 @@ def test_020():
     
     print(cf2b64a.get_buffer().data())
     
-    
