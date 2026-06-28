@@ -133,7 +133,19 @@ class UIDataModelPage(UIPage):
                                 case "image":
                                     fname = Path(v).name
                                     app.add_static_file(local_file=v, url_path=f"assets/images/{fname}")
-                                    elem = ui.image(source = v).classes('w-64')
+                                    if o:
+                                        style_str : str = None
+                                        if "height" in o:
+                                            style_str = f"height:{o["height"]}"
+                                        elif "width" in o:
+                                            if style_str:
+                                                style_str = f"{style_str}; width:{o["width"]}"
+                                            else:
+                                                style_str = f"width:{o["width"]}"
+                                    if style_str:
+                                        elem = ui.image(source = v).style(style_str)
+                                    else:
+                                        elem = ui.image(source = v).classes("w-128")
                                 case "table":
                                     pass
                                 case "dropdown":
