@@ -1,4 +1,5 @@
 from __future__ import annotations
+import ast
 from dataclasses import MISSING, fields
 import importlib.util
 from pathlib import Path
@@ -264,3 +265,24 @@ class ClassUtils:
                 names.update({f"{sub.__module__}"})
             names.update(ClassUtils.get_subclasses(sub, ignore_abstract))
         return names
+    
+    @staticmethod
+    def find_subclasses(clazz : type, folder : str) -> tuple[str, str]:
+        sub_clazzes : list[str] = []
+        file_paths : list[str] = []
+        for file in Path(folder).rglob('*.py'):
+            try:
+                tree = ast.parse(file.read_text(encoding='utf-8'))
+                for node in list(ast.walk(tree)):
+                    if isinstance(node, ast.ClassDef):
+                        for base in node.bases:
+                            if isinstance(base, ast.Name) and base.id == clazz.__name__:
+                                file_paths.append(str(file))
+                                sub_clazzes.append(node.name)
+                            elif isinstance(base, ast.Attribute) and base.attr == clazz.__name__:
+                                file_paths.append(str(file))
+                                sub_clazzes.append(node.name)
+            except Exception:
+                continue  # skip invalid Python files
+
+        return tuple(zip(file_paths, sub_clazzes))
