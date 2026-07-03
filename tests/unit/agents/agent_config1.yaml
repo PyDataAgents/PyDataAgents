@@ -1,5 +1,5 @@
 id: G1
-description: null
+description: An Agent that retrieves data from an OPCUA server.
 create_config: false
 load_on_install: false
 with_persistence: false

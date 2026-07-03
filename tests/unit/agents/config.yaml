@@ -1,4 +1,5 @@
-id: G1
+id: G2
+description: An Agent that writes a simulated sine signal from a buffer to csv files.
 buffer_store:
   B1:
     type: pydag.buffers.SignalBuffer
