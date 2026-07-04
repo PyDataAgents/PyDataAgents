@@ -1,0 +1,5 @@
+users:
+  admin:
+    password: $argon2id$v=19$m=65536,t=3,p=4$SG6ZmV9vx59pIKmewDnNFQ$RvN7DQH2xmYSxi6qLf5O70dNFAzpnq6q6qh6KbBxIXc
+    roles:
+    - admin

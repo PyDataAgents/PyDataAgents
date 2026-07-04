@@ -16,6 +16,9 @@ __pycache__
 
 *.code-workspace
 
+# exclude nicegui temp folder
+/.nicegui
+
 # exclude llm models
 /resources
 
