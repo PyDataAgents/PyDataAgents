@@ -116,7 +116,7 @@ class LLMChatAction(BufferNode, ServiceNode, Action):
         if self._uses_legacy_template_question():
             self._validate_template_alignment()
 
-        data = self.get_parent_data()
+        data = data = self.get_parent_data() if len(self._parents) > 0 else {}
         rows = DataUtils.dict_to_list(data) if data else []
         if rows is None:
             rows = []
