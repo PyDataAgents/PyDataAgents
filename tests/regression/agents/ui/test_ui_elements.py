@@ -1,7 +1,11 @@
+import os
+
+from nicegui import ui
+
 from pydag.agents.Agent import Agent
 from pydag.buffers.DictBuffer import DictBuffer
 from pydag.agents.ui.UIBufferPage import UIBufferPage
-from pydag.agents.ui.UIElements import BufferTable, PlotCard
+from pydag.agents.ui.UIElements import BufferTable, EditableDictTable, PlotCard
 
 
 def test_000():
@@ -32,3 +36,18 @@ def test_buffer_table_data():
     ]
     assert [column["name"] for column in columns] == ["__row_id__", "a", "b"]
     
+def _build_editable_table_ui():
+    columns = {"A": "Column A", "B": "Column B"}
+    data = [{"A": 1, "B": "a"},
+            {"A": 2, "B": "b"}]
+    t = EditableDictTable(columns=columns, data=data)
+    
+    def print_handler(d):
+        print(d)
+        
+    t.on_change(print_handler)
+    
+    
+def test_editable_table():
+    os.environ.setdefault("NICEGUI_SCREEN_TEST_PORT", "10001")
+    ui.run(reload=True, port=10001, root=_build_editable_table_ui)

@@ -415,14 +415,81 @@ class TrafficLight(BufferComponent):
                     self._icon.classes(replace='text-4xl text-green-500')
                 else:
                     self._icon.classes(replace='text-4xl text-red-500')
+
                     
-class EditableTable(UIComponent):
-    """ UI element that renders a table with editable cells and submit button """
-    
-    def __init__(self, page : UIPage, columns : list[str], rows : list[dict]):
-        super().__init__(page)
-        pass
-    
-    def update(self):
-        pass
+class EditableDictTable(ui.element):
+
+    def __init__(self, columns : dict[str, str], data : list[dict[str, Any]] = []):
+        super().__init__("div")        
+        self._columns = columns
+        self._change_handler = None
+        if len(data) > 0:
+            first_row : dict = data[0]
+            if first_row.keys() != columns.keys():
+                raise ValueError("Data keys do not match columns keys")
+            self._data : dict[int, dict[str, Any]] = dict()
+            k : int = 0
+            for row in data:                
+                self._data[k] = row
+                k += 1                    
+        self._render()
+
+    def on_change(self, handler):
+        """ Register callback: handler(sender, data_dict) """
+        self._change_handler = handler
+        return self
+
+    def _render(self):
+        self.clear()
+        with self:
+            # header
+            with ui.row().classes('w-full bg-grey-3 p-2 items-center font-bold'):
+                for key, label in self._columns.items():
+                    ui.label(label).classes("flex items-center").props(f"name={key}")
+                # create space place holder for row with delete buttons
+                ui.label("#").classes("flex items-center")
+            # rows
+            row : dict
+            for index, row in self._data.items():
+                with ui.row().classes('w-full items-center'):
+                    for key, value in row.items():                        
+                        value_input = ui.input(value=value).classes("flex items-center").props(f"name={key}")
+
+                        def commit_change(i : int = index, k = key, inp = value_input):
+                            new_value = inp.value
+                            self._data[i][k] = new_value
+                            self._emit_change()
+                        
+                        value_input.on("blur", lambda _, f=commit_change: f())
+                        
+                    ui.button(icon="delete", color="negative", on_click=lambda k=index: self._remove_row(k)).props("flat")
+
+            ui.button("Add row", icon="add", on_click=self._add_row)
+
+    def _add_row(self):
+        key = max(self._data.keys(), default=-1) + 1
+        row = {c: "" for c in self._columns}
+        self._data[key] = row
+        self._render()
+
+    def _remove_row(self, key: str):
+        self._data.pop(key, None)
+        # recreate all data with new indices
+        new_data = {}
+        i : int = 0
+        for k, row in self._data.items():
+            new_data[i] = row
+            i += 1
+        self._data = new_data
+        self._emit_change()
+        self._render()
+
+    def _emit_change(self):
+        # IMPORTANT: emit full dict snapshot
+        # rearrange data before emit
+        emit_data : list = []
+        for k, row in self._data.items():
+            emit_data.append(row)
+        if self._change_handler:
+            self._change_handler(emit_data)
        
