@@ -415,3 +415,14 @@ class TrafficLight(BufferComponent):
                     self._icon.classes(replace='text-4xl text-green-500')
                 else:
                     self._icon.classes(replace='text-4xl text-red-500')
+                    
+class EditableTable(UIComponent):
+    """ UI element that renders a table with editable cells and submit button """
+    
+    def __init__(self, page : UIPage, columns : list[str], rows : list[dict]):
+        super().__init__(page)
+        pass
+    
+    def update(self):
+        pass
+       
