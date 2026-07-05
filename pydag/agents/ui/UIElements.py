@@ -419,19 +419,20 @@ class TrafficLight(BufferComponent):
                     
 class EditableDictTable(ui.element):
 
-    def __init__(self, columns : dict[str, str], data : list[dict[str, Any]] = []):
+    def __init__(self, columns : dict[str, str], data : list[dict[str, Any]] = None):
         super().__init__("div")        
         self._columns = columns
         self._change_handler = None
-        if len(data) > 0:
-            first_row : dict = data[0]
-            if first_row.keys() != columns.keys():
-                raise ValueError("Data keys do not match columns keys")
-            self._data : dict[int, dict[str, Any]] = dict()
-            k : int = 0
-            for row in data:                
-                self._data[k] = row
-                k += 1                    
+        if data:
+            if len(data) > 0:
+                first_row : dict = data[0]
+                if first_row.keys() != columns.keys():
+                    raise ValueError("Data keys do not match columns keys")
+                self._data : dict[int, dict[str, Any]] = dict()
+                k : int = 0
+                for row in data:                
+                    self._data[k] = row
+                    k += 1                    
         self._render()
 
     def on_change(self, handler):

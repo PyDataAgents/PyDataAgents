@@ -6,11 +6,9 @@ from nicegui import app, ui
 from nicegui.element import Element
 from nicegui.elements.image import Image
 
-from pydag.agents.ui.UIException import UIException
-
-
+from .UIException import UIException
 from ..Agent import Agent
-from .UIElements import UIPage
+from .UIElements import EditableDictTable, UIPage
 from ...services.datamodel.DataModel import DataModel
 from ...services.datamodel.DataModelService import DataModelService
 
@@ -147,8 +145,14 @@ class UIDataModelPage(UIPage):
                                     else:
                                         elem = ui.image(source = v).classes("w-128")
                                 case "table":
-                                    
-                                    pass
+                                    if o:
+                                        if "columns" in o:
+                                            columns : dict[str, str] = o.get("columns", None)
+                                            elem = EditableDictTable(columns=columns, data = v)
+                                        else:
+                                            raise UIException("type table requires 'columns' option in ui_options")
+                                    else:
+                                        raise UIException("type table requires ui_options")
                                 case "dropdown":
                                     pass
                                 case "slider":
@@ -169,7 +173,7 @@ class UIDataModelPage(UIPage):
                             else:
                                 elem = ui.input(label=l, value=v)
                         if n in input_vars:
-                            elem.on("change", self._on_change)                        
+                            elem.on("change", self._on_change)
                         elem.tooltip(d).props(f"name={n}")
                         if n in output_vars:
                             elem.props("readonly input-class=bg-grey-2")
