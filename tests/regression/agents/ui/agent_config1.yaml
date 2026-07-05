@@ -1,0 +1,38 @@
+id: G1
+description: An Agent that retrieves data from an OPCUA server.
+create_config: false
+load_on_install: false
+with_persistence: false
+port: 8081
+with_api: false
+api_key_file: null
+with_ui: false
+dark_mode: true
+color_schema: {}
+buffer_store:
+  B1:
+    type: pydag.buffers.ListBuffer
+    id: B1
+    load_on_install: false
+    capacity: 1000
+    data_type: FLOAT
+    initial_values: null
+    unit: null
+    description: Test buffer
+    duplicate_ids: []
+service_store:
+  A1:
+    type: pydag.services.opcua.OpcUaService
+    id: A1
+    load_on_install: false
+    auto_start: true
+    thread_type: MILLI_SECOND
+    observing_time: null
+    week_days: null
+    buffer_ids:
+    - B1
+    addresses: []
+    mapping_type: null
+    n: 0
+    persistent: true
+    endpoint: opc.tcp://localhost:4840/freeopcua/server/

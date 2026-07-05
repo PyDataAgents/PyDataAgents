@@ -67,5 +67,8 @@ __pycache__
 /tests/**/*.stp
 /tests/**/Test_*.pdf
 
+# ignore test log files
+*test*.log
+
 # .save folder for agent persistence
 .save/
