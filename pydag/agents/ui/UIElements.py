@@ -422,6 +422,7 @@ class EditableDictTable(ui.element):
     def __init__(self, columns : dict[str, str], data : list[dict[str, Any]] = []):
         super().__init__("div")        
         self._columns = columns
+        self._change_handler = None
         if len(data) > 0:
             first_row : dict = data[0]
             if first_row.keys() != columns.keys():
@@ -435,7 +436,7 @@ class EditableDictTable(ui.element):
 
     def on_change(self, handler):
         """ Register callback: handler(sender, data_dict) """
-        self.on('change', handler)
+        self._change_handler = handler
         return self
 
     def _render(self):
@@ -444,20 +445,23 @@ class EditableDictTable(ui.element):
             # header
             with ui.row().classes('w-full bg-grey-3 p-2 items-center font-bold'):
                 for key, label in self._columns.items():
-                    ui.label(label).props(f"name={key}")
+                    ui.label(label).classes("flex items-center").props(f"name={key}")
+                # create space place holder for row with delete buttons
+                ui.label("#").classes("flex items-center")
             # rows
             row : dict
             for index, row in self._data.items():
                 with ui.row().classes('w-full items-center'):
                     for key, value in row.items():                        
-                        value_input = ui.input(value=row).props(f"name={key}")
+                        value_input = ui.input(value=value).classes("flex items-center").props(f"name={key}")
 
-                        def commit_change(i : int):
-                            new_value = value_input.value
-                            self._data[i][key] = new_value
+                        def commit_change(i : int = index, k = key, inp = value_input):
+                            new_value = inp.value
+                            self._data[i][k] = new_value
                             self._emit_change()
                         
-                        value_input.on("blur", lambda _: commit_change(index))
+                        value_input.on("blur", lambda _, f=commit_change: f())
+                        
                     ui.button(icon="delete", color="negative", on_click=lambda k=index: self._remove_row(k)).props("flat")
 
             ui.button("Add row", icon="add", on_click=self._add_row)
@@ -466,11 +470,17 @@ class EditableDictTable(ui.element):
         key = max(self._data.keys(), default=-1) + 1
         row = {c: "" for c in self._columns}
         self._data[key] = row
-        self._emit_change()
         self._render()
 
     def _remove_row(self, key: str):
         self._data.pop(key, None)
+        # recreate all data with new indices
+        new_data = {}
+        i : int = 0
+        for k, row in self._data.items():
+            new_data[i] = row
+            i += 1
+        self._data = new_data
         self._emit_change()
         self._render()
 
@@ -480,5 +490,6 @@ class EditableDictTable(ui.element):
         emit_data : list = []
         for k, row in self._data.items():
             emit_data.append(row)
-        self.trigger('change', emit_data)
+        if self._change_handler:
+            self._change_handler(emit_data)
        

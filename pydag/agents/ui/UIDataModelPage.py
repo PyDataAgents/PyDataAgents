@@ -147,6 +147,7 @@ class UIDataModelPage(UIPage):
                                     else:
                                         elem = ui.image(source = v).classes("w-128")
                                 case "table":
+                                    
                                     pass
                                 case "dropdown":
                                     pass
