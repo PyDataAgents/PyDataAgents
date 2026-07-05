@@ -98,61 +98,60 @@ class UIAgentStorePage(UIPage):
     
     def _render(self):
         self.create_header("Agent Store - Dashboard")
-        with ui.grid().classes("w-full h-screen").style("grid-template-columns: 3fr 2fr;"):
-            # column for instantiated agents of this user            
-            self._agent_column = ui.column()
-            # column for available templates
-            self._template_column = ui.column()
-            self._refresh_dashboard()
-
-    def _refresh_dashboard(self):        
-        user = get_current_user()
+        with ui.grid().classes("w-full").style("grid-template-columns: 3fr 2fr;"):
+            self._agent_column = ui.column().classes("w-full")
+            self._template_column = ui.column().classes("w-full")
+            self._refresh()
+        
+    def _refresh(self):
+        user = app.storage.user.get("user")
         user_id = user.get("id")
         self._agent_column.clear()
         self._template_column.clear()
         with self._agent_column:
             user_agents = self._agent_store.get_user_agents(user_id)
             if len(user_agents) > 0:
+                ui.label("My Agents").classes("text-h4")
                 for agent in user_agents:
-                    with ui.card():
-                                                
-                        def release(aid=agent.id):
+                    with ui.card().classes("w-full mb-2"):                                                        
+                        with ui.row().classes("items-center justify-between w-full p-1"):
+                            ui.markdown(f"**{agent.__class__.__name__} - {agent.id}**")                                
+                            if agent.is_running():
+                                ui.label("RUNNING").classes("bg-green-500 text-white p-2 rounded")                                                    
+                            else:
+                                ui.label("STOPPED").classes("bg-gray-500 text-white p-2 rounded") 
+                            
+                        def release_agent(aid : str = agent.id):
                             self._agent_store.release_agent(user_id, aid)
-                            self._refresh_dashboard()  # Refresh the dashboard after releasing an agent
+                            self._refresh()  # Refresh the dashboard after releasing an agent
                         
-                        def reconfigure(aid=agent.id):
+                        def reconfigure_agent(aid: str = agent.id):
                             self._agent_store.configure_agent(user_id, aid)
-                            self._refresh_dashboard()  # Refresh the dashboard after reconfiguring an agent
+                            self._refresh()  # Refresh the dashboard after reconfiguring an agent
                         
-                        def terminate(aid=agent.id):
-                                self._agent_store.terminate_agent(user_id, aid)
-                                self._refresh_dashboard()  # Refresh the dashboard after terminating an agent       
+                        def terminate_agent(aid: str = agent.id):
+                            self._agent_store.terminate_agent(user_id, aid)
+                            self._refresh()  # Refresh the dashboard after terminating an agent                                                                      
                         
-                        ui.markdown(f"**{agent.id}**")
                         ui.label(agent.description or "")
                         if agent.is_running():
-                            ui.label("RUNNING").style("bg-green-500 text-white p-2 rounded")
-                            ui.button("Terminate", on_click=terminate)                                
-                            ui.button("Reconfigure", on_click=reconfigure)                                
-                        else:
-                            ui.label("STOPPED").style("bg-gray-500 text-white p-2 rounded")                                                         
-                            ui.button("Release", on_click=release)                            
-                            ui.button("Reconfigure", on_click=reconfigure)
-                            
+                            ui.button("Terminate", on_click=terminate_agent)                                
+                            ui.button("Reconfigure", on_click=reconfigure_agent)
+                        else:                                                                    
+                            ui.button("Release", on_click=release_agent)                            
+                            ui.button("Reconfigure", on_click=reconfigure_agent)
+                                
         with self._template_column:
             agent_configs = self._agent_store.get_templates()
-            if len(agent_configs) > 0:
+            if len(agent_configs) > 0:                    
+                ui.label("Agent Templates").classes("text-h4")
                 for agent_id, agent_config in agent_configs.items():
-                    with ui.card().classes("w-full mb-2"):
+                    with ui.card().classes("w-full mb-2 bg-secondary"):
                         ui.markdown(f"**{agent_id}**")
                         ui.label(agent_config.to_dict().get("description", ""))
                         
-                        def create_agent_from_template(aid=agent_id):
+                        def create_agent_from_template(aid : str = agent_id):
                             self._agent_store.add_agent_from_template(user_id, aid)
-                            self._refresh_dashboard()  # Refresh the dashboard after creating a new agent
-                        
-                        ui.button("Create Agent", on_click=create_agent_from_template)
+                            self._refresh()  # Refresh the dashboard after creating a new agent
         
-def get_current_user() -> dict:
-    user = app.storage.user.get("user")
-    return user
+                        ui.button("Create Agent", on_click=create_agent_from_template)

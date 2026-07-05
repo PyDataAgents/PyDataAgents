@@ -28,7 +28,7 @@ class AgentStore:
     port : int = field(default=10001, metadata={"description": "Port for the agent store server"})
     
     def __post_init__(self):
-        self._user_agents : dict[str, list[str]] = dict()
+        self._user_agents : dict[str, set[str]] = dict()
         self._agents : dict[str, Agent] = dict()
         self._templates : dict[str, AgentConfig] = dict()
         self._lock : Lock = Lock()
@@ -70,12 +70,14 @@ class AgentStore:
     def add_user(self, user_id : str):
         with self._lock:
             if user_id not in self._user_agents:
-                self._user_agents[user_id] = []
+                self._user_agents[user_id] = set()
     
     def add_agent(self, user_id : str, agent : Agent):
         with self._lock:
             if user_id in self._user_agents:
-                self._user_agents[user_id].append(agent.id)
+                self._user_agents[user_id].add(agent.id)
+            else:
+                self._user_agents[user_id] = {agent.id}
             self._agents[agent.id] = agent
             
     def add_agent_from_template(self, user_id : str, template_id : str):
@@ -85,6 +87,10 @@ class AgentStore:
                 new_agent = agent_config.create()
                 new_agent.id = str(uuid.uuid4())
                 self._agents[new_agent.id] = new_agent
+                if user_id in self._user_agents:
+                    self._user_agents[user_id].add(new_agent.id)
+                else:
+                    self._user_agents[user_id] = {new_agent.id}
             else:
                 raise AgentException(f"Template with ID {template_id} not found.")
             
@@ -128,6 +134,14 @@ class AgentStore:
 
     def create_ui(self):
         """ create the UI for the agent store """
+        # define default color schema        
+        app.colors(
+            primary='#005B95',
+            secondary='#A8A8A9',
+            accent='#C43726',
+            positive='#00B050', 
+            negative='#C43726',
+        )
         p = UIAgentStoreLoginPage(None)
         self._ui_pages.append(p)
         p = UIAgentStorePage(self)
