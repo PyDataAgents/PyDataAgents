@@ -23,3 +23,30 @@ def test_agent_store_open():
     
     ags : AgentStore = AgentStore(template_paths=[os.path.dirname(__file__)])
     ags.open()
+    
+thread_loggers = {}
+
+def _thread_logger_sink(message):
+    record = message.record
+    thread_id = record["thread"].id
+
+    # Create a logger for this thread if not exists
+    if thread_id not in thread_loggers:
+        file_name = f"{os.path.dirname(__file__)}{os.sep}logs{os.sep}test_thread_{thread_id}.log"
+        thread_loggers[thread_id] = open(file_name, "a")
+
+    # Write log to corresponding file
+    thread_loggers[thread_id].write(message)
+    thread_loggers[thread_id].flush()    
+    
+def test_agent_store_open2():
+    # Add file handler
+    logger.add(
+        _thread_logger_sink,
+        format="{time} | {level} | {name}:{function}:{line} - {message}"
+    )
+    
+    AuthManager(os.path.dirname(__file__) + os.sep + "users.yaml")
+    
+    ags : AgentStore = AgentStore(template_paths=[os.path.dirname(__file__)])
+    ags.open()

@@ -363,7 +363,7 @@ class AgentElementConfigForm(UIComponent):
     def _handle_submit(self, data : dict[str, Any]):
         #print(data)
         ui.notify(data, position="bottom", type="positive")
-        self._page.get_service().get_agent().edit_element(self._agent_element.id, data)
+        self._page.get_agent().edit_element(self._agent_element.id, data)
         self._render_form(expanded=True)
         
     def update(self):

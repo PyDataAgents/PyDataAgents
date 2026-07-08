@@ -37,29 +37,34 @@ class UIAgentStoreLoginPage(UIPage):
     path = "/agentstore/login"
     
     def _render(self):
-        username = ui.input("Username")
-        password = ui.input("Password", password=True)
+        self.create_header("AgentStore - Login")
+        with ui.column().classes("w-full h-screen flex items-center justify-center"):
+            with ui.card().classes("w-[350px] p-6 shadow-lg"):
 
-        def do_login():
+                ui.label("Login").classes("text-h6 mb-4 text-center")
+                username = ui.input("Username").classes("w-full")
+                password = ui.input("Password", password=True).classes("w-full")
 
-            user = AuthManager(None).authenticate(
-                username.value,
-                password.value,
-            )
+                def do_login():
 
-            if not user:
-                ui.notify("Invalid credentials")
-                return
+                    user = AuthManager(None).authenticate(
+                        username.value,
+                        password.value,
+                    )
 
-            token = TokenManager.create_token(user)
-            
-            # store per-user session (server-side)
-            app.storage.user["access_token"] = token
-            app.storage.user["user"] = user
+                    if not user:
+                        ui.notify("Invalid credentials")
+                        return
 
-            ui.navigate.to("/agentstore")
+                    token = TokenManager.create_token(user)
+                    
+                    # store per-user session (server-side)
+                    app.storage.user["access_token"] = token
+                    app.storage.user["user"] = user
 
-        ui.button("Login", on_click=do_login)
+                    ui.navigate.to("/agentstore")
+
+                ui.button("Login", on_click=do_login).classes("w-full mt-4")
             
 
 class UIAgentStorePage(UIPage):
@@ -119,8 +124,14 @@ class UIAgentStorePage(UIPage):
                             if agent.is_running():
                                 ui.label("RUNNING").classes("bg-green-500 text-white p-2 rounded")                                                    
                             else:
-                                ui.label("STOPPED").classes("bg-gray-500 text-white p-2 rounded") 
+                                ui.label("STOPPED").classes("bg-gray-500 text-white p-2 rounded")
                             
+                            def remove_agent(aid : str = agent.id):
+                                self._agent_store.remove_agent(user_id, aid)
+                                self._refresh()  # Refresh the dashboard after releasing an agent
+                                                        
+                            ui.button("X", on_click=remove_agent).tooltip("Remove Agent")  
+                        
                         def release_agent(aid : str = agent.id):
                             self._agent_store.release_agent(user_id, aid)
                             self._refresh()  # Refresh the dashboard after releasing an agent
@@ -135,11 +146,13 @@ class UIAgentStorePage(UIPage):
                         
                         ui.label(agent.description or "")
                         if agent.is_running():
-                            ui.button("Terminate", on_click=terminate_agent)                                
-                            ui.button("Reconfigure", on_click=reconfigure_agent)
+                            with ui.row():
+                                ui.button("Terminate", on_click=terminate_agent).tooltip("Terminate Agent")                    
+                                ui.button("Reconfigure", on_click=reconfigure_agent).tooltip("Reconfigure Agent")
                         else:                                                                    
-                            ui.button("Release", on_click=release_agent)                            
-                            ui.button("Reconfigure", on_click=reconfigure_agent)
+                            with ui.row():
+                                ui.button("Release", on_click=release_agent).tooltip("Terminate Agent") 
+                                ui.button("Reconfigure", on_click=reconfigure_agent).tooltip("Reconfigure Agent")
                                 
         with self._template_column:
             agent_configs = self._agent_store.get_templates()
@@ -147,6 +160,16 @@ class UIAgentStorePage(UIPage):
                 ui.label("Agent Templates").classes("text-h4")
                 for agent_id, agent_config in agent_configs.items():
                     with ui.card().classes("w-full mb-2 bg-secondary"):
+                        # 🔹 Dialog (centered by default)
+                        with ui.dialog() as dialog:
+                            with ui.card().classes("w-[600px] max-w-[90vw]"):
+                                ui.label("Agent Template Configuration").classes("text-h6 mb-2")
+                                ui.code(agent_config.to_json(), language="json").classes("w-full h-64")
+                                ui.button("Close", on_click=dialog.close).classes("mt-2")
+
+                        # 🔹 Top-right help button
+                        ui.button("?", on_click=dialog.open).props("flat round dense").classes("absolute top-2 right-2").tooltip("show configuration")
+                        
                         ui.markdown(f"**{agent_id}**")
                         ui.label(agent_config.to_dict().get("description", ""))
                         
@@ -154,4 +177,4 @@ class UIAgentStorePage(UIPage):
                             self._agent_store.add_agent_from_template(user_id, aid)
                             self._refresh()  # Refresh the dashboard after creating a new agent
         
-                        ui.button("Create Agent", on_click=create_agent_from_template)
+                        ui.button("Create Agent", on_click=create_agent_from_template).tooltip("create agent from template")

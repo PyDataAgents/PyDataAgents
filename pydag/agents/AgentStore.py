@@ -129,12 +129,27 @@ class AgentStore:
     def configure_agent(self, user_id : str, agent_id : str, config : dict[str, Any]):
         with self._lock:
             if user_id in self._user_agents and agent_id in self._user_agents[user_id]:
-                # TODO : Implement agent configuration logic here
-                pass
+                agent : Agent = self._agents[agent_id]
+                if agent.is_running():
+                    raise AgentException(f"{Agent.__name__} with id={agent_id} cannot be configured, while it's running.")
+                else:
+                    pass
+                    
 
+    def remove_agent(self, user_id : str, agent_id : str):
+        with self._lock:
+            if user_id in self._user_agents and agent_id in self._user_agents[user_id]:
+                agent : Agent = self._agents[agent_id]
+                if agent.is_running():
+                    raise AgentException(f"{Agent.__name__} with id={agent_id} cannot be removed, when it's running.")
+                else:
+                    self._agents.pop(agent_id)
+                    self._user_agents[user_id].remove(agent_id)
+    
     def create_ui(self):
         """ create the UI for the agent store """
-        # define default color schema        
+        # define default color schema
+        
         app.colors(
             primary='#005B95',
             secondary='#A8A8A9',
@@ -142,6 +157,7 @@ class AgentStore:
             positive='#00B050', 
             negative='#C43726',
         )
+        
         p = UIAgentStoreLoginPage(None)
         self._ui_pages.append(p)
         p = UIAgentStorePage(self)
