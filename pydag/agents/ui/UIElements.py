@@ -82,12 +82,12 @@ class UIPage():
     def get_agent(self) -> Agent:
         return self._agent
     
-    def create_header(self, title : str):
+    def create_header(self, title : str, home_path : str = "/"):
         """ creates a standard header with title and home link """
         with ui.header().classes('bg-primary text-white'):
             ui.label(f"{title}").classes("font-bold text-lg")
             ui.space()
-            with ui.link(target="/").classes("flex items-center gap-2 text-white"):
+            with ui.link(target=home_path).classes("flex items-center gap-2 text-white"):
                 ui.icon("home").classes("text-xl")
    
 class UIHomePage(UIPage):

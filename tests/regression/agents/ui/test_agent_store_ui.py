@@ -1,5 +1,7 @@
+import json
 import os
 from loguru import logger
+from nicegui import ui
 
 from pydag.agents.AgentStore import AgentStore
 from pydag.agents.auth.Auth import AuthManager
@@ -50,3 +52,26 @@ def test_agent_store_open2():
     
     ags : AgentStore = AgentStore(template_paths=[os.path.dirname(__file__)])
     ags.open()
+    
+    
+def test_code_editor_ui():
+    
+    def _root():
+        agent_config = {"name": "agent1", "temperature": 0.7}
+
+        editor = ui.codemirror(
+            value=json.dumps(agent_config, indent=2),
+            language="json",
+        ).classes("w-full h-64")
+
+        def save():
+            try:
+                updated = json.loads(editor.value)
+                print("Updated config:", updated)
+            except Exception as e:
+                ui.notify(f"Invalid JSON: {e}", color="red")
+
+        ui.button("Save", on_click=save)
+    
+    os.environ.setdefault("NICEGUI_SCREEN_TEST_PORT", "8080")
+    ui.run(root=_root, port = 8080)

@@ -1,5 +1,6 @@
 from __future__ import annotations
 from functools import wraps
+import json
 from nicegui import app, ui
 from typing import TYPE_CHECKING
 
@@ -37,7 +38,7 @@ class UIAgentStoreLoginPage(UIPage):
     path = "/agentstore/login"
     
     def _render(self):
-        self.create_header("AgentStore - Login")
+        self.create_header("AgentStore - Login", self.path)
         with ui.column().classes("w-full h-screen flex items-center justify-center"):
             with ui.card().classes("w-[350px] p-6 shadow-lg"):
 
@@ -102,7 +103,7 @@ class UIAgentStorePage(UIPage):
         ui.navigate.to(self.path)
     
     def _render(self):
-        self.create_header("Agent Store - Dashboard")
+        self.create_header("Agent Store - Dashboard", self.path + "/login")
         with ui.grid().classes("w-full").style("grid-template-columns: 3fr 2fr;"):
             self._agent_column = ui.column().classes("w-full")
             self._template_column = ui.column().classes("w-full")
@@ -137,8 +138,30 @@ class UIAgentStorePage(UIPage):
                             self._refresh()  # Refresh the dashboard after releasing an agent
                         
                         def reconfigure_agent(aid: str = agent.id):
-                            self._agent_store.configure_agent(user_id, aid)
-                            self._refresh()  # Refresh the dashboard after reconfiguring an agent
+                            with ui.dialog() as dialog:
+                                with ui.card():
+                                    ui.label("Configure Agent")
+                                    # get agent config
+                                    agent_config : dict = self._agent_store.get_agent(user_id, aid).config_options()
+                                    editor = ui.codemirror(value=json.dumps(agent_config, indent=2), language="json").classes("w-full h-64")
+                                    
+                                    def save_config():
+                                        try:
+                                            new_config = json.loads(editor.value)
+                                            self._agent_store.configure_agent(user_id, aid, new_config)
+                                            ui.notify(f"Updated config: {new_config}", color="green")
+                                        except Exception as e:
+                                            ui.notify(f"Invalid JSON: {e}", color="red")
+
+                                    ui.button("Save", on_click=save_config)
+                                    
+                                    def close_dialog():
+                                        dialog.close()
+                                        self._refresh()  # Refresh the dashboard after reconfiguring an agent
+                                                                                
+                                    ui.button('Close', on_click=close_dialog)
+                                    
+                            dialog.open()
                         
                         def terminate_agent(aid: str = agent.id):
                             self._agent_store.terminate_agent(user_id, aid)
