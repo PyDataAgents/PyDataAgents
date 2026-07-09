@@ -1,9 +1,11 @@
 from dataclasses import fields
 import json
 import os
+from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 
+from .YAMLConfig import YAMLConfig
 from .AgentElement import AgentElement
 from .AgentException import AgentException
 from ..utils.ClassUtils import ClassUtils
@@ -167,6 +169,20 @@ class AgentConfig:
         Convert the configuration to a JSON string.
         """                
         return json.dumps(self.to_dict(), indent=4)
+    
+    @staticmethod
+    def from_file(file_path : str) -> 'AgentConfig':
+        p = Path(file_path)
+        match p.suffix:
+            case ".yaml" | ".yml":
+                yc = YAMLConfig(file_path)
+                ac : AgentConfig = yc.load()            
+                return ac
+            
+            case _:
+                raise AgentException(f"Unknown configuration file {file_path}.")
+
+            
                
     def __str__(self) -> str:
         return self.to_json()
