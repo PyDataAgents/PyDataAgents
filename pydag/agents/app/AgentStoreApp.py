@@ -1,2 +1,2 @@
 class AgentStoreApp:
-    
+    pass
