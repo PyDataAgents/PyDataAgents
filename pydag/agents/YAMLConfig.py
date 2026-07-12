@@ -1,8 +1,10 @@
+from __future__ import annotations
+
 import yaml
 
 from ..utils.FileUtils import FileUtils
-from .FileConfig import FileConfig
 from .AgentConfig import AgentConfig
+from .FileConfig import FileConfig    
 
 
 class YAMLConfig(FileConfig):
