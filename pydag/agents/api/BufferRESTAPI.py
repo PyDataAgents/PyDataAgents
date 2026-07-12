@@ -14,8 +14,6 @@ from ...utils.ClassUtils import ClassUtils
 
 if TYPE_CHECKING:
     from ..Agent import Agent
-
-ROOT_URL : str = "/api/v1/buffers"
  
 class BufferDefinition(BaseModel):
     type : str = Field(default=DictBuffer.__module__, title="type of the buffer to create")
@@ -43,9 +41,9 @@ class BufferRESTAPI:
     """
    
     @staticmethod
-    def get_api_router(agent : Agent) -> APIRouter:
+    def get_api_router(agent : Agent, path : str = "/api/v1/buffers") -> APIRouter:
         
-        router = APIRouter(prefix=ROOT_URL, tags=[Buffer.cname()],)
+        router = APIRouter(prefix=path, tags=[Buffer.__class__.__name__],)
         
         @router.get("/")
         def buffers() -> list[str]:

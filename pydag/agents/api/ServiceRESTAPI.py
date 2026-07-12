@@ -12,8 +12,6 @@ from ...utils.ClassUtils import ClassUtils
 if TYPE_CHECKING:
     from ..Agent import Agent
 
-ROOT_URL : str = "/api/v1/services"
-
 class ServiceDefinition(BaseModel):
     definition : Dict[str, Any] = Field(default=None, title="service config")
       
@@ -24,9 +22,9 @@ class ServiceRESTAPI:
     """
 
     @staticmethod
-    def get_api_router(agent : Agent) -> APIRouter:
+    def get_api_router(agent : Agent, path : str = "/api/v1/services") -> APIRouter:
 
-        router = APIRouter(prefix=ROOT_URL, tags=[Service.cname()],)
+        router = APIRouter(prefix=path, tags=[Service.cname()],)
 
         @router.get("/")
         def services() -> list[str]:

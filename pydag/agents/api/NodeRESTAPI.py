@@ -15,8 +15,6 @@ from .RESTAPIManager import APIRole, RESTAPIManager
 if TYPE_CHECKING:
     from ..Agent import Agent
 
-ROOT_URL : str = "/api/v1/nodes"
-
 class NodeDefinition(BaseModel):
     definition : Dict[str, Any] = Field(default=None, title="node config")
         
@@ -27,11 +25,10 @@ class NodeRESTAPI:
     """
    
     @staticmethod
-    def get_api_router(agent : Agent) -> APIRouter:
+    def get_api_router(agent : Agent, path : str = "/api/v1/nodes") -> APIRouter:
         
-        router = APIRouter(prefix=ROOT_URL, tags=[Node.cname()],)
-          
-        
+        router = APIRouter(prefix=path, tags=[Node.cname()],)
+               
         @router.get("/")
         def nodes() -> list[str]:
             """

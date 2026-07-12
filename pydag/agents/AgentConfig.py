@@ -132,7 +132,7 @@ class AgentConfig:
         return result
     
     def __init__(self, agent : 'Agent' = None):
-        self._agent_config : dict = None
+        self._agent_config : dict = {}
         if agent:
             self._agent_config = AgentConfig.config_options(agent)    
             

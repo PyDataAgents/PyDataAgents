@@ -10,9 +10,6 @@ from ..AgentElement import AgentElement
 if TYPE_CHECKING:
     from ..Agent import Agent
 
-
-ROOT_URL : str = "/api/v1/agent"
-
 class ElementDefinition(BaseModel):
     prop : str = Field(default=None, title="the property to change")
     value : Union[float | int | bool | str | list | dict]  = Field(default = None, title="new value for the property")
@@ -25,10 +22,10 @@ class AgentRESTAPI:
     """
 
     @staticmethod
-    def get_api_router(agent : Agent) -> APIRouter:
+    def get_api_router(agent : Agent, path : str = "/api/v1/agent") -> APIRouter:
         
         from ..Agent import Agent 
-        router = APIRouter(prefix=ROOT_URL, tags=[Agent.__name__])
+        router = APIRouter(prefix=path, tags=[Agent.__name__])
         
         @router.get("/")
         def online():

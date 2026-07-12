@@ -7,7 +7,6 @@ from ..llm.LLMSQLService import LLMSQLService
 from ..llm.LLMService import LLMService
 from ..llm.RAGService import RAGService
 
-ROOT_URL : str = "/api/v1/llm"
 
 class LLMRestAPI:
     """
@@ -16,9 +15,9 @@ class LLMRestAPI:
     """
    
     @staticmethod
-    def get_api_router(agent : Agent) -> APIRouter:
+    def get_api_router(agent : Agent, path : str = "/api/v1/llm") -> APIRouter:
         
-        router = APIRouter(prefix=ROOT_URL, tags=["LLM"],)
+        router = APIRouter(prefix=path, tags=["LLM"],)
         
         @router.get("/")
         def llm_services():

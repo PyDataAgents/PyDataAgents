@@ -1,36 +1,37 @@
 from __future__ import annotations
 
-import copy
 import multiprocessing
 
 from pydag.agents.Agent import Agent
+from pydag.agents.AgentConfig import AgentConfig
 
 
-def _run_agent(agent: Agent) -> None:
+def _run_agent(agent_config: AgentConfig) -> None:
+    agent : Agent = agent_config.create()
     agent.release(blocking=True)
 
 class AgentProcessStore:
     def __init__(self) -> None:
-        self._agents: dict[str, Agent] = {}
+        self._agent_configs: dict[str, AgentConfig] = {}
         self._processes: dict[str, multiprocessing.Process] = {}
 
-    def add_agent(self, agent: Agent) -> Agent:
-        cloned_agent = copy.deepcopy(agent)
-        self._agents[cloned_agent.id] = cloned_agent
-        return cloned_agent
+    def add_agent(self, agent_config: AgentConfig) -> AgentConfig:
+        #cloned_agent = copy.deepcopy(agent)
+        self._agent_configs[agent_config.to_dict()[AgentConfig.ID]] = agent_config
+        return agent_config
 
-    def get_agent(self, agent_id: str) -> Agent | None:
-        return self._agents.get(agent_id)
+    def get_agent_config(self, agent_id: str) -> AgentConfig | None:
+        return self._agent_configs.get(agent_id)
 
     def start_agent(self, agent_id: str) -> multiprocessing.Process:
-        if agent_id not in self._agents:
+        if agent_id not in self._agent_configs:
             raise KeyError(f"No agent with id={agent_id} was registered")
 
         existing_process = self._processes.get(agent_id)
         if existing_process is not None and existing_process.is_alive():
             return existing_process
 
-        agent_copy = copy.deepcopy(self._agents[agent_id])
+        agent_copy = self._agent_configs[agent_id]
         context = multiprocessing.get_context("spawn")
         process = context.Process(target=_run_agent, args=(agent_copy,), daemon=True)
         process.start()
@@ -50,15 +51,15 @@ class AgentProcessStore:
 
 
 def test_agent_process_store_can_start_and_stop_agents():
-    agent = Agent(id="test-store-agent", with_ui=False, with_api=False)
+    agent : Agent = Agent(id="A1")
+    agent_config = AgentConfig(agent)
     store = AgentProcessStore()
 
-    stored_agent = store.add_agent(agent)
-    process = store.start_agent(stored_agent.id)
+    stored_agent = store.add_agent(agent_config)
+    process = store.start_agent(stored_agent.to_dict()[AgentConfig.ID])
 
     assert process.is_alive()
 
-    store.stop_agent(stored_agent.id)
+    store.stop_agent(stored_agent.to_dict()[AgentConfig.ID])
 
-    process.join(timeout=5)
     assert not process.is_alive()

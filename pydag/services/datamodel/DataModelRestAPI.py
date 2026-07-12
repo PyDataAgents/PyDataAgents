@@ -6,8 +6,6 @@ from ..Service import Service
 from ...agents.Agent import Agent
 from .DataModelService import DataModelService
 
-ROOT_URL : str = "/api/v1/datamodelservices"
-
 class DataModelRestAPI:
     """
     REST API for DataModelService access via HTTP Requests using FastAPI.
@@ -15,9 +13,9 @@ class DataModelRestAPI:
     """
    
     @staticmethod
-    def get_api_router(agent : Agent) -> APIRouter:
+    def get_api_router(agent : Agent, path = "/api/v1/datamodelservices") -> APIRouter:
         
-        router = APIRouter(prefix=ROOT_URL, tags=[DataModelService.__name__])
+        router = APIRouter(prefix=path, tags=[DataModelService.__name__])
         
         @router.get("/")
         def datamodel_services():

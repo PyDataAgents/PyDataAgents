@@ -8,9 +8,6 @@ from ...agents.Agent import Agent
 from ..tasks.TaskRunnerService import TaskRunnerService
 
 
-ROOT_URL : str = "/api/v1/taskrunners"
-
-
 class TaskRestAPI():
     """
     REST API for executing tasks using FastAPI.
@@ -18,9 +15,9 @@ class TaskRestAPI():
     """
 
     @staticmethod
-    def get_api_router(agent : Agent) -> APIRouter:
+    def get_api_router(agent : Agent, path : str = "/api/v1/taskrunners") -> APIRouter:
         
-        router = APIRouter(prefix=ROOT_URL, tags=[TaskRunnerService.__name__])
+        router = APIRouter(prefix=path, tags=[TaskRunnerService.__name__])
         
         @router.get("/")
         def task_runners() -> list[Service]:
