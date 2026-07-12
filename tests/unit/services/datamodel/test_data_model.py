@@ -22,9 +22,9 @@ async def test_000():
     await dms.update(session_id, "M1", "a", 1.5)
     
     d1 = dms.get_data_model(session_id, "M1").to_dict()
-    assert len(d1) == 3
+    assert len(d1) == 6
     d2 = dms.get_data_model(session_id, "M1").to_dict(True)
-    assert len(d2) == 5
+    assert len(d2) == 7
     
     
 @pytest.mark.asyncio
@@ -40,9 +40,9 @@ async def test_001():
     await dms.updates(session_id, "M1", {"a": 1.5}) 
     
     d1 = dms.get_data_model(session_id, "M1").to_dict()
-    assert len(d1) == 3
+    assert len(d1) == 6
     d2 = dms.get_data_model(session_id, "M1").to_dict(True)
-    assert len(d2) == 5
+    assert len(d2) == 7
    
     
 def test_010():

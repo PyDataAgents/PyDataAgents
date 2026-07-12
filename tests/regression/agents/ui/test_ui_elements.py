@@ -3,9 +3,12 @@ import os
 from nicegui import ui
 
 from pydag.agents.Agent import Agent
+from pydag.agents.ui.UIDataModelPage import UIDataModelPage
 from pydag.buffers.DictBuffer import DictBuffer
 from pydag.agents.ui.UIBufferPage import UIBufferPage
-from pydag.agents.ui.UIElements import BufferTable, EditableDictTable, PlotCard
+from pydag.agents.ui.UIElements import BufferTable, EditableTable, PlotCard
+from pydag.services.datamodel.DataModelService import DataModelService
+from tests.regression.agents.ui.TableDataModel import TableDataModel
 
 
 def test_000():
@@ -40,7 +43,7 @@ def _build_editable_table_ui():
     columns = {"A": "Column A", "B": "Column B"}
     data = [{"A": 1, "B": "a"},
             {"A": 2, "B": "b"}]
-    t = EditableDictTable(columns=columns, data=data)
+    t = EditableTable(columns=columns, data=data)
     
     def print_handler(d):
         print(d)
@@ -51,3 +54,16 @@ def _build_editable_table_ui():
 def test_editable_table():
     os.environ.setdefault("NICEGUI_SCREEN_TEST_PORT", "10001")
     ui.run(reload=True, port=10001, root=_build_editable_table_ui)
+    
+
+def test_editable_table_in_datamodel():
+    ag = Agent(with_ui=True, port=10001, dark_mode=False)
+    
+    dms = DataModelService()
+    dms.set_model(TableDataModel)
+    
+    ag.add_service(dms)
+    
+    ag.add_ui_page(UIDataModelPage(ag, dms))
+    
+    ag.release()

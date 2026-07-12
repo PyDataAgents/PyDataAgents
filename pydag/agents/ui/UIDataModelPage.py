@@ -8,7 +8,7 @@ from nicegui.elements.image import Image
 
 from .UIException import UIException
 from ..Agent import Agent
-from .UIElements import EditableDictTable, UIPage
+from .UIElements import EditableTable, UIPage
 from ...services.datamodel.DataModel import DataModel
 from ...services.datamodel.DataModelService import DataModelService
 
@@ -148,7 +148,7 @@ class UIDataModelPage(UIPage):
                                     if o:
                                         if "columns" in o:
                                             columns : dict[str, str] = o.get("columns", None)
-                                            elem = EditableDictTable(columns=columns, data = v)
+                                            elem = EditableTable(columns=columns, data = v)
                                         else:
                                             raise UIException("type table requires 'columns' option in ui_options")
                                     else:
@@ -163,17 +163,20 @@ class UIDataModelPage(UIPage):
                                     raise UIException(f"unknown ui_type specified in {self.__class__.__name__}")
                         else:
                             if t is int:
-                                elem = ui.number(label=l, value=v).props("step=1")
+                                elem = ui.number(label=l, value=v).props("step=1").classes("border border-gray-300")
                             elif t is float:
-                                elem = ui.number(label=l, value=v)
+                                elem = ui.number(label=l, value=v).classes("border border-gray-300")
                             elif t is bool:
                                 elem = ui.switch(l, value=v)
                             elif get_origin(t) is list:
-                                elem = ui.input_chips(label=l, value=v, new_value_mode="add", clearable=True)
+                                elem = ui.input_chips(label=l, value=v, new_value_mode="add", clearable=True).classes("border border-gray-300")
                             else:
-                                elem = ui.input(label=l, value=v)
+                                elem = ui.input(label=l, value=v).classes("border border-gray-300")
                         if n in input_vars:
-                            elem.on("change", self._on_change)
+                            if isinstance(elem, EditableTable):
+                                elem.on_change(lambda data, name=n: self._on_change(data, name=name))
+                            else:
+                                elem.on("change", self._on_change)
                         elem.tooltip(d).props(f"name={n}")
                         if n in output_vars:
                             elem.props("readonly input-class=bg-grey-2")
@@ -185,14 +188,20 @@ class UIDataModelPage(UIPage):
                 if h:
                     f -= 1
 
-    async def _on_change(self, e):
+    async def _on_change(self, e, name : str = None):
         if self._suspend_on_change:
             return
         self._suspend_on_change = True
         try:
             session_id = self._ui_session_id_elem.value
             model_id = self._ui_model_id_elem.value
-            await self._dms.update(session_id, model_id, e.sender.props.get("name"), e.sender.value)
+            if isinstance(e, list):
+                property_name = name
+                value = e
+            else:
+                property_name = e.sender.props.get("name")
+                value = e.sender.value
+            await self._dms.update(session_id, model_id, property_name, value)
             # update ui elements
             self._update_fields()
             with self._ui_session_id_elem:

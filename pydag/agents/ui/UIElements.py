@@ -1,6 +1,8 @@
 from __future__ import annotations
 from abc import abstractmethod
+import asyncio
 from collections import deque
+import copy
 import enum
 from typing import TYPE_CHECKING, Any
 from nicegui import ui
@@ -8,6 +10,7 @@ from nicegui.element import Element
 import plotly.graph_objs as go
 
 
+from ...utils.DataUtils import DataUtils
 from ..AgentConfig import AgentConfig
 from ..AgentElement import AgentElement
 from ..AgentStates import AgentElementState, ServiceState, BufferState, NodeState
@@ -415,82 +418,115 @@ class TrafficLight(BufferComponent):
                     self._icon.classes(replace='text-4xl text-green-500')
                 else:
                     self._icon.classes(replace='text-4xl text-red-500')
+                
+class EditableTable(ui.element):
+    """
+    Editable dictionary table component.
 
-                    
-class EditableDictTable(ui.element):
+    Example:
 
-    def __init__(self, columns : dict[str, str], data : list[dict[str, Any]] = None):
-        super().__init__("div")        
-        self._columns = columns
+        table = EditableTable(
+            columns={
+                "name": "Name",
+                "age": "Age",
+                "city": "City",
+            },
+            data=[
+                {"name": "Alice", "age": 30, "city": "Berlin"},
+                {"name": "Bob", "age": 25, "city": "Munich"},
+            ]
+        )
+
+        table.on_change(lambda data: print(data))
+
+    """
+
+    def __init__(self, columns: dict[str, str], data: list[dict[str, Any]] | None = None):
+        super().__init__("div")
+        self.columns = columns
+        self.value: list[dict[str, Any]] = []
         self._change_handler = None
         if data:
-            if len(data) > 0:
-                first_row : dict = data[0]
-                if first_row.keys() != columns.keys():
-                    raise ValueError("Data keys do not match columns keys")
-                self._data : dict[int, dict[str, Any]] = dict()
-                k : int = 0
-                for row in data:                
-                    self._data[k] = row
-                    k += 1                    
+            self.set_value(data)
         self._render()
 
+    def set_value(self, data: list[dict[str, Any]]):
+        """
+        Replace table contents.
+        """
+        for row in data:
+            if set(row.keys()) != set(self.columns.keys()):
+                raise ValueError("Data keys do not match columns")
+
+        self.value = copy.deepcopy(data)
+        self._render()
+
+    def get_value(self) -> list[dict[str, Any]]:
+        """
+        Return a copy of current data.
+        """
+        return copy.deepcopy(self.value)
+
     def on_change(self, handler):
-        """ Register callback: handler(sender, data_dict) """
+        """
+        Register callback:
+
+            handler(data)
+
+        where data is the complete table.
+        """
         self._change_handler = handler
         return self
+    
+    def _emit_change(self):
+        if self._change_handler:
+            result = self._change_handler(self.get_value())
+            if asyncio.iscoroutine(result):
+                asyncio.create_task(result)
 
     def _render(self):
         self.clear()
+        grid = (" ".join(["1fr"] * len(self.columns)) + " 50px")
         with self:
             # header
-            with ui.row().classes('w-full bg-grey-3 p-2 items-center font-bold'):
-                for key, label in self._columns.items():
-                    ui.label(label).classes("flex items-center").props(f"name={key}")
-                # create space place holder for row with delete buttons
-                ui.label("#").classes("flex items-center")
+            with ui.element("div").classes("w-full grid gap-0 bg-grey-3 p-0 font-bold").style(f"grid-template-columns:{grid}"):
+                for label in self.columns.values():
+                    ui.label(label).classes("px-3 py-2 border border-gray-300")
+                ui.label("#").classes("px-3 py-2 border border-gray-300")
+
             # rows
-            row : dict
-            for index, row in self._data.items():
-                with ui.row().classes('w-full items-center'):
-                    for key, value in row.items():                        
-                        value_input = ui.input(value=value).classes("flex items-center").props(f"name={key}")
+            for row_index, row in enumerate(self.value):
 
-                        def commit_change(i : int = index, k = key, inp = value_input):
-                            new_value = inp.value
-                            self._data[i][k] = new_value
+                with ui.element("div").classes("w-full grid gap-0 items-stretch").style(f"grid-template-columns:{grid}"):
+                    for column in self.columns:
+                        inp = ui.input(value=row.get(column, "")).classes("w-full border border-gray-300 px-3 py-2").props("outlined=False")
+
+                        def update(e=None, r=row_index, c=column, widget=inp):
+                            self.value[r][c] = DataUtils.force_numeric(widget.value)
                             self._emit_change()
-                        
-                        value_input.on("blur", lambda _, f=commit_change: f())
-                        
-                    ui.button(icon="delete", color="negative", on_click=lambda k=index: self._remove_row(k)).props("flat")
 
-            ui.button("Add row", icon="add", on_click=self._add_row)
+                        inp.on("change", update)
+
+                    ui.button(icon="delete", color="negative", on_click=lambda r=row_index: self._delete_row(r)).props("flat").classes("w-full h-full border border-gray-300 rounded-none flex items-center justify-center")
+
+            ui.button("Add row", icon="add", on_click=self._add_row).classes("mt-2")
+
 
     def _add_row(self):
-        key = max(self._data.keys(), default=-1) + 1
-        row = {c: "" for c in self._columns}
-        self._data[key] = row
-        self._render()
+        self.value.append(
+            {
+                column: ""
+                for column in self.columns
+            }
+        )
 
-    def _remove_row(self, key: str):
-        self._data.pop(key, None)
-        # recreate all data with new indices
-        new_data = {}
-        i : int = 0
-        for k, row in self._data.items():
-            new_data[i] = row
-            i += 1
-        self._data = new_data
+        self._render()
         self._emit_change()
-        self._render()
 
-    def _emit_change(self):
-        # IMPORTANT: emit full dict snapshot
-        # rearrange data before emit
-        emit_data : list = []
-        for k, row in self._data.items():
-            emit_data.append(row)
-        if self._change_handler:
-            self._change_handler(emit_data)
-       
+
+    def _delete_row(self, index: int):
+        if 0 <= index < len(self.value):
+            self.value.pop(index)
+
+        self._render()
+        self._emit_change()

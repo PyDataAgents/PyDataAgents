@@ -10,12 +10,13 @@ from ...utils.ClassUtils import ClassUtils
 
 @dataclass
 class ConfigureElementAction(AgentNode, BufferNode, Action):
-    """this `Action` configures a `GrabberElement` property by the provided `element_id` and name of the `option`, which is the class' property
+    """ This `Action` configures a `AgentElement` property by the provided `element_id` and name of the `option`, which is the class' property
     <br>the new property value is derived from the `Node`'s `buffer`
 
     Args:
-        GrabberNode (_type_): inherits from class GrabberNode
-        BufferNode (_type_): inherits from class BufferNode
+        AgentNode (_type_): inherits from class `AgentNode`
+        BufferNode (_type_): inherits from class `BufferNode`
+        Action (_type_): inherits the `Action` interface
 
     Raises:
         StatemachineException: if an error occurs during execute
@@ -54,5 +55,7 @@ class ConfigureElementAction(AgentNode, BufferNode, Action):
                     ClassUtils.set_property(element, self.option, val.values()[0])
                 else:
                     raise NodeException("Value  dictionary contains more than one return value for ConfigureElementAction, but should only contain one!")
+            if isinstance(val, list):
+                ClassUtils.set_property(element, self.option, val[0])        
         else:
             raise NodeException("No " + AgentElement.cname() + " with id=" + self.element_id + " was found")

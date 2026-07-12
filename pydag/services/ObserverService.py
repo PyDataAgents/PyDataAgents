@@ -181,8 +181,9 @@ class ObserverService(Service):
             else:
                 # do nothing and sleep a little
                 diff = self.observing_time - SAFETY_DIFF_TIME_UNITS - (current_time - self._last_time)
-                time.sleep(diff / 1000.0 * SLEEP_WITH_HOLD_FACTOR)        
-        logger.info(f"{self.__class__.__name__} [{self._thread.name}] has stopped")         
+                time.sleep(diff / 1000.0 * SLEEP_WITH_HOLD_FACTOR)
+        thread_name = threading.current_thread().name        
+        logger.info(f"{self.__class__.__name__} [{thread_name}] has stopped")         
     
     def _run_microsecond_thread(self):
         self._last_time = 0
@@ -208,7 +209,8 @@ class ObserverService(Service):
                 # do nothing and sleep a little
                 diff = self.observing_time - SAFETY_DIFF_TIME_UNITS - (current_timer - last_timer)
                 time.sleep(diff / 1000000.0 * SLEEP_WITH_HOLD_FACTOR)       
-        logger.info(f"{self.__class__.__name__} [{self._thread.name}] has stopped") 
+        thread_name = threading.current_thread().name                
+        logger.info(f"{self.__class__.__name__} [{thread_name}] has stopped") 
     
     def _run_nanosecond_thread(self):
         self._last_time = 0
@@ -235,7 +237,8 @@ class ObserverService(Service):
                 # do nothing and sleep a little
                 diff = self.observing_time - SAFETY_DIFF_TIME_UNITS - (current_timer - last_timer)
                 time.sleep(diff / 1000000000.0 * SLEEP_WITH_HOLD_FACTOR)        
-        logger.info(f"{self.__class__.__name__} [{self._thread.name}] has stopped") 
+        thread_name = threading.current_thread().name                
+        logger.info(f"{self.__class__.__name__} [{thread_name}] has stopped") 
         
     def _run_second_thread(self):
         self._last_time = 0
@@ -259,7 +262,8 @@ class ObserverService(Service):
                 # do nothing and sleep a little
                 diff = self.observing_time - SAFETY_DIFF_TIME_UNITS / 10.0 - (current_time - self._last_time)
                 time.sleep(diff * SLEEP_WITH_HOLD_FACTOR)        
-        logger.info(f"{self.__class__.__name__} [{self._thread.name}] has stopped") 
+        thread_name = threading.current_thread().name                
+        logger.info(f"{self.__class__.__name__} [{thread_name}] has stopped") 
     
     def _run_instant_thread(self):
         self._last_time = time.time_ns()
@@ -274,7 +278,8 @@ class ObserverService(Service):
                 with self._lock:
                     self._is_running = False
                 self._state = AgentElementState.ERROR   
-        logger.info(f"{self.__class__.__name__} [{self._thread.name}] has stopped") 
+        thread_name = threading.current_thread().name                
+        logger.info(f"{self.__class__.__name__} [{thread_name}] has stopped")
     
     def _run_only_once_thread(self):
         try:
@@ -354,7 +359,8 @@ class ObserverService(Service):
                 # do nothing and sleep a little
                 diff = self.observing_time - SAFETY_DIFF_TIME_UNITS / 10.0 - (current_time - self._last_time)
                 time.sleep(diff * SLEEP_WITH_HOLD_FACTOR)        
-        logger.info(f"{self.__class__.__name__} [{self._thread.name}] has stopped")
+        thread_name = threading.current_thread().name                
+        logger.info(f"{self.__class__.__name__} [{thread_name}] has stopped")
             
     def is_running(self) -> bool:
         with self._lock:
