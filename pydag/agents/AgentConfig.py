@@ -1,3 +1,4 @@
+from __future__ import annotations
 from dataclasses import fields
 import json
 import os
