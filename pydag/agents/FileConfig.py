@@ -1,6 +1,10 @@
-from abc import ABC, abstractmethod
+from __future__ import annotations
 
-from .AgentConfig import AgentConfig
+from abc import ABC, abstractmethod
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from .AgentConfig import AgentConfig
 
 
 class FileConfig(ABC):
