@@ -19,6 +19,7 @@ class ModelProvider(str, enum.Enum):
     OPENAI = "OPENAI"
     OLLAMA = "OLLAMA"
     AZURE = "AZURE"
+    LANGDOCK = "LANGDOCK"
     # Add other providers as needed
 
 
@@ -89,6 +90,7 @@ class LLMService(Service):
         match self.model_provider:
             case ModelProvider.OPENAI.value:
                 self._llm = ChatOpenAI(model_name=self.model, openai_api_key=self.api_key, temperature=1)
+            
             case ModelProvider.AZURE.value:
                 self._llm = AzureChatOpenAI(
                     azure_deployment=self.model,
@@ -97,6 +99,7 @@ class LLMService(Service):
                     api_key=self.api_key,
                     temperature=0
                 )
+            
             case ModelProvider.OLLAMA.value:
                 try:
                     ModelUtils.ensure_ollama_model_available(self.model, self.endpoint)
@@ -113,6 +116,18 @@ class LLMService(Service):
                         + str(exc)
                     ) from exc
                 self._llm = OllamaLLM(model = self.model, base_url = self.endpoint)
+            
+            case ModelProvider.LANGDOCK.value:
+                if self.endpoint is None or str(self.endpoint).strip() == "":
+                    raise ServiceException("Langdock endpoint must be configured for " + self.__class__.__name__)
+
+                self._llm = ChatOpenAI(
+                    model_name=self.model,
+                    openai_api_key=self.api_key,
+                    base_url=self.endpoint,
+                    temperature=1,
+                )
+            
             case _:
                 raise ServiceException("Unknown Model " + self.model + " for " + self.cname())
         logger.debug("created LLM with model " + self.model + " from provider " + self.model_provider)
