@@ -349,7 +349,7 @@ def test_timestamps_mixed_provided_then_missing():
     buf.install()
     import time as _time
     now = _time.time_ns()
-    provided = [now, now -1 , now -2]
+    provided = [now - 2, now - 1 , now]
     buf.push({"a": [9, 10, 11], buf.timestamps_key: provided})
     buf.push({"a": [12]})
     buf.push({"a": [12, 14, 15]})    

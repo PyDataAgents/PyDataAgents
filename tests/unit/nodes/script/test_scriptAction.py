@@ -97,7 +97,7 @@ def test_execute_raises_when_ignore_empty_parents_is_false():
     action.add_parent(parent)
     action.install()
 
-    with pytest.raises(NodeException, match="None of the specified input_keys were found in the parent buffer data"):
+    with pytest.raises(NodeException, match="None of the specified input_keys were found in the parent buffers data"):
         action.execute()
 
 
