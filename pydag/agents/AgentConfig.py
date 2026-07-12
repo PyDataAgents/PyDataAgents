@@ -5,8 +5,6 @@ import os
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
-
-from .YAMLConfig import YAMLConfig
 from .AgentElement import AgentElement
 from .AgentException import AgentException
 from ..utils.ClassUtils import ClassUtils
@@ -175,7 +173,8 @@ class AgentConfig:
     def from_file(file_path : str) -> 'AgentConfig':
         p = Path(file_path)
         match p.suffix:
-            case ".yaml" | ".yml":
+            case ".yaml" | ".yml":                
+                from .YAMLConfig import YAMLConfig
                 yc = YAMLConfig(file_path)
                 ac : AgentConfig = yc.load()            
                 return ac
@@ -183,7 +182,6 @@ class AgentConfig:
             case _:
                 raise AgentException(f"Unknown configuration file {file_path}.")
 
-            
                
     def __str__(self) -> str:
         return self.to_json()
