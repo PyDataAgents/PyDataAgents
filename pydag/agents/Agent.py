@@ -3,26 +3,26 @@ import multiprocessing
 import os
 from pathlib import Path
 import threading
-from typing import TYPE_CHECKING, Any, Type, cast
+from typing import TYPE_CHECKING, Any, Type
 from dataclasses import dataclass, field
 import uuid
 from fastapi import APIRouter, Depends, FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from loguru import logger
 from nicegui import app, ui
 import uvicorn
 
-from pydag.agents.AgentStates import AgentElementState, ServiceState
-from fastapi.middleware.cors import CORSMiddleware
-from pydag.agents.api.AgentRESTAPI import AgentRESTAPI
-from pydag.agents.api.BufferRESTAPI import BufferRESTAPI
-from pydag.agents.api.NodeRESTAPI import NodeRESTAPI
-from pydag.agents.api.RESTAPIManager import APIRole, RESTAPIManager
-from pydag.agents.api.ServiceRESTAPI import ServiceRESTAPI
-from pydag.agents.ui.UIAgentMgmtPage import UIAgentMgmtPage
-from pydag.agents.ui.UIBufferPage import UIBufferPage
-from pydag.agents.ui.UIElements import UIHomePage, UIPage
-from pydag.utils.ClassUtils import ClassUtils
 
+from .AgentStates import AgentElementState, ServiceState
+from .api.AgentRESTAPI import AgentRESTAPI
+from .api.BufferRESTAPI import BufferRESTAPI
+from .api.NodeRESTAPI import NodeRESTAPI
+from .api.RESTAPIManager import APIRole, RESTAPIManager
+from .api.ServiceRESTAPI import ServiceRESTAPI
+from .ui.UIAgentMgmtPage import UIAgentMgmtPage
+from .ui.UIBufferPage import UIBufferPage
+from .ui.UIElements import UIHomePage, UIPage
+from ..utils.ClassUtils import ClassUtils
 from .AgentElementException import AgentElementException
 from .AgentException import AgentException
 from ..utils.FileUtils import FileUtils
@@ -31,9 +31,6 @@ from ..nodes.Node import Node
 from .AgentElement import AgentElement
 from .AgentConfig import AgentConfig
 from ..services.statemachine.StatemachineService import StatemachineService
-from ..services.MappingService import MappingService
-from ..services.ObserverService import ObserverService
-from ..nodes.BufferNode import BufferNode
 
 if TYPE_CHECKING:
     from ..buffers.Buffer import Buffer

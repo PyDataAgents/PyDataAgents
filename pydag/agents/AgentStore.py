@@ -1,17 +1,11 @@
 from __future__ import annotations
 from dataclasses import dataclass, field
-import os
-import secrets
 from threading import Lock
 from typing import Any
 import uuid
-
 from loguru import logger
-from nicegui import app, ui
 
 
-from .auth.Auth import AuthenticationMiddleware
-from .ui.UIAgentStorePages import UIAgentStoreLoginPage, UIAgentStorePage
 from .ui.UIElements import UIPage
 from .AgentException import AgentException
 from .YAMLConfig import YAMLConfig
@@ -24,8 +18,6 @@ class AgentStore:
     """A store for managing template based agents, that users can create in a multi-client setup."""
     
     template_paths : list[str] = field(default_factory=list, metadata={"description": "List of paths to agent templates"})
-    host : str = field(default="localhost", metadata={"description": "Host for the agent store server"})
-    port : int = field(default=10001, metadata={"description": "Port for the agent store server"})
     
     def __post_init__(self):
         self._user_agents : dict[str, set[str]] = dict()
@@ -37,18 +29,7 @@ class AgentStore:
     def open(self):
         """ Start the agent store UI Server. This will block the current thread until the server is stopped. """        
         self.load_templates()
-        self.create_ui()
-        pages_paths = [f"http://{self.host}:{self.port}{page.path}" for page in self._ui_pages]
-        pages_str = "\n".join(pages_paths)
-        logger.info("Available NiceGui Pages:\n" + pages_str)                
-        os.environ.setdefault("NICEGUI_SCREEN_TEST_PORT", f"{self.port}")
-        #app.add_middleware(AuthenticationMiddleware)
-        ui.run(host=self.host, port = self.port, reload=True, title=self.__class__.__name__ + " UI", storage_secret=secrets.token_hex(32))        
-    
-    def close(self):
-        """ Close the agent store UI Server. """
-        app.shutdown() 
-                
+                        
     def load_templates(self):
         with self._lock:
             for path in self.template_paths:
@@ -146,23 +127,5 @@ class AgentStore:
                     self._agents.pop(agent_id)
                     self._user_agents[user_id].remove(agent_id)
     
-    def create_ui(self):
-        """ create the UI for the agent store """
-        # define default color schema
-        
-        app.colors(
-            primary='#005B95',
-            secondary='#A8A8A9',
-            accent='#C43726',
-            positive='#00B050', 
-            negative='#C43726',
-        )
-        
-        p = UIAgentStoreLoginPage(None)
-        self._ui_pages.append(p)
-        p = UIAgentStorePage(self)
-        self._ui_pages.append(p)
-        for page in self._ui_pages:
-            page.register()
-        
+    
     
