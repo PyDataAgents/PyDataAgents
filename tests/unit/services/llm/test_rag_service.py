@@ -1,4 +1,7 @@
 import pytest
+from langchain_core.documents import Document
+from langchain_core.retrievers import BaseRetriever
+from pydantic import Field
 
 
 class DummyChain:
@@ -14,6 +17,17 @@ class DummyChain:
 class DummyAIMessage:
     def __init__(self, content):
         self.content = content
+
+
+class RecordingLangChainRetriever(BaseRetriever):
+    calls: list[str] = Field(default_factory=list)
+
+    def _get_relevant_documents(self, query: str, *, run_manager=None):
+        self.calls.append(query)
+        return [
+            Document(page_content="first retrieved chunk"),
+            Document(page_content="second retrieved chunk"),
+        ]
 
 
 def test_chat_uses_default_payload_values_when_optional_args_are_missing():
@@ -114,3 +128,31 @@ def test_chat_only_mode_works_without_retriever_or_embedding_folder_link():
     assert payload["input_context"] == ""
     assert payload["retrieval_query"] == "Answer from instruction only"
     assert payload["use_rag_context"] is False
+
+
+def test_get_retrieved_context_text_invokes_langchain_retriever_with_stringified_retrieval_query(monkeypatch):
+    """Ensure retrieval calls LangChain's retriever API with str(retrieval_query)."""
+    from pydag.services.llm.RAGService import RAGService
+
+    langchain_calls = []
+    original_invoke = BaseRetriever.invoke
+
+    def recording_invoke(self, query, *args, **kwargs):
+        langchain_calls.append(query)
+        return original_invoke(self, query, *args, **kwargs)
+
+    monkeypatch.setattr(
+        BaseRetriever,
+        "invoke",
+        recording_invoke,
+    )
+
+    rs = RAGService()
+    retriever = RecordingLangChainRetriever()
+    rs._retriever = retriever
+
+    context = rs._get_retrieved_context_text(retrieval_query=12345)
+
+    assert langchain_calls == ["12345"]
+    assert retriever.calls == ["12345"]
+    assert context == "first retrieved chunk\n\nsecond retrieved chunk"

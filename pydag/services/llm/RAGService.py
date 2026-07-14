@@ -187,7 +187,11 @@ class RAGService(LLMService):
             return ""
         if retrieval_query is None or str(retrieval_query).strip() == "":
             return ""
-        docs = self._retriever.get_relevant_documents(str(retrieval_query))
+        retrieval_query = str(retrieval_query)
+        if hasattr(self._retriever, "invoke"):
+            docs = self._retriever.invoke(retrieval_query)
+        else:
+            docs = self._retriever.get_relevant_documents(retrieval_query)
         return "\n\n".join([getattr(doc, "page_content", str(doc)) for doc in docs])
 
     def _resolve_vector_store_directory(self):
