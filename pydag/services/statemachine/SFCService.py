@@ -99,7 +99,7 @@ class SFCService(StatemachineService):
         if isinstance(node, Transition):
             # deactivate transition at the beginning
             node.set_active(False)
-            if not node.id in self._transitions.values():
+            if node.id not in self._transitions:
                 self._transitions[node.id] = node
                 for node2 in node.get_children():
                     self._assemble(node2)
