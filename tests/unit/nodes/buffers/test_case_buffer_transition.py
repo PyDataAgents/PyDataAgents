@@ -5,6 +5,7 @@ from pydag.buffers.Comparator import Comparator
 from pydag.buffers.DictBuffer import DictBuffer
 from pydag.nodes.NodeException import NodeException
 from pydag.nodes.buffers.CaseBufferTransition import CaseBufferTransition
+from pydag.nodes.buffers.CopyDataAction import CopyDataAction
 from pydag.nodes.buffers.LinkBufferAction import LinkBufferAction
 
 
@@ -36,6 +37,36 @@ def _case_transition(parent: LinkBufferAction, **kwargs) -> CaseBufferTransition
     transition.set_buffer(buffer)
     transition.add_parent(parent)
     transition.install()
+    return transition
+
+
+def _child_reader(parent: CaseBufferTransition, persistent: bool = True) -> CopyDataAction:
+    child = CopyDataAction(persistent=persistent)
+    buffer = DictBuffer(index_enabled=False, timestamps_enabled=False)
+    buffer.install()
+    child.set_buffer(buffer)
+    child.add_parent(parent)
+    child.install()
+    return child
+
+
+def _matching_transition_with_payload() -> CaseBufferTransition:
+    parent = _parent_with_data(
+        {
+            "case": ["route", "route"],
+            "value": [1, 2],
+        }
+    )
+    transition = _case_transition(
+        parent,
+        case_key="case",
+        comparator=Comparator.EQUAL.value,
+        value="route",
+        check_n=1,
+        payload_n=2,
+    )
+
+    assert transition.check() is True
     return transition
 
 
@@ -196,6 +227,90 @@ def test_default_case_moves_payload_without_case_key():
 
     assert parent.get_buffer().size() == 1
     assert transition.get_buffer().data(persistent=True) == {"value": [1, 2]}
+
+
+def test_one_to_many_children_all_persistent_read_same_transition_payload():
+    transition = _matching_transition_with_payload()
+    expected_payload = {"case": ["route", "route"], "value": [1, 2]}
+    children = [
+        _child_reader(transition, persistent=True),
+        _child_reader(transition, persistent=True),
+        _child_reader(transition, persistent=True),
+    ]
+
+    for child in children:
+        child.execute()
+
+    assert transition.get_children() == children
+    assert [child.get_buffer().data(persistent=True) for child in children] == [
+        expected_payload,
+        expected_payload,
+        expected_payload,
+    ]
+    assert transition.get_buffer().data(persistent=True) == expected_payload
+
+
+def test_one_to_many_children_first_non_persistent_reader_consumes_transition_payload():
+    transition = _matching_transition_with_payload()
+    expected_payload = {"case": ["route", "route"], "value": [1, 2]}
+    children = [
+        _child_reader(transition, persistent=False),
+        _child_reader(transition, persistent=True),
+        _child_reader(transition, persistent=True),
+    ]
+
+    for child in children:
+        child.execute()
+
+    assert transition.get_children() == children
+    assert [child.get_buffer().data(persistent=True) for child in children] == [
+        expected_payload,
+        {},
+        {},
+    ]
+    assert transition.get_buffer().size() == 0
+
+
+def test_one_to_many_children_last_non_persistent_reader_consumes_transition_payload_after_others_read():
+    transition = _matching_transition_with_payload()
+    expected_payload = {"case": ["route", "route"], "value": [1, 2]}
+    children = [
+        _child_reader(transition, persistent=True),
+        _child_reader(transition, persistent=True),
+        _child_reader(transition, persistent=False),
+    ]
+
+    for child in children:
+        child.execute()
+
+    assert transition.get_children() == children
+    assert [child.get_buffer().data(persistent=True) for child in children] == [
+        expected_payload,
+        expected_payload,
+        expected_payload,
+    ]
+    assert transition.get_buffer().size() == 0
+
+
+def test_one_to_many_children_middle_non_persistent_reader_consumes_transition_payload_for_later_child():
+    transition = _matching_transition_with_payload()
+    expected_payload = {"case": ["route", "route"], "value": [1, 2]}
+    children = [
+        _child_reader(transition, persistent=True),
+        _child_reader(transition, persistent=False),
+        _child_reader(transition, persistent=True),
+    ]
+
+    for child in children:
+        child.execute()
+
+    assert transition.get_children() == children
+    assert [child.get_buffer().data(persistent=True) for child in children] == [
+        expected_payload,
+        expected_payload,
+        {},
+    ]
+    assert transition.get_buffer().size() == 0
 
 
 def test_empty_parent_buffer_returns_false_without_error():
