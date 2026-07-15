@@ -1,8 +1,35 @@
 import configparser
 
 import pytest
+from langchain_core.messages import AIMessage
 
 from pydag.services.llm.LLMService import LLMService, ModelProvider
+
+
+def test_retained_messages_use_langgraph_thread_history(monkeypatch):
+    prompts = []
+
+    def fake_create_llm(self):
+        def echo_model(prompt_value):
+            prompts.append(prompt_value)
+            return AIMessage(content="echo-" + str(len(prompts)))
+
+        self._llm = echo_model
+
+    monkeypatch.setattr(LLMService, "_create_llm", fake_create_llm)
+
+    service = LLMService(retain_messages=True)
+    service._on_start()
+
+    assert service.chat("Q1") == "echo-1"
+    assert service.chat("Q2") == "echo-2"
+
+    second_prompt_messages = prompts[1].to_messages()
+    assert [message.content for message in second_prompt_messages] == [
+        "Q1",
+        "echo-1",
+        "Q2",
+    ]
 
 
 def test_openapi_llm():

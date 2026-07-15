@@ -4,12 +4,11 @@ import enum
 from langchain_openai import AzureChatOpenAI, ChatOpenAI
 from langchain_ollama import OllamaLLM
 from langchain_core.prompts import PromptTemplate, ChatPromptTemplate, MessagesPlaceholder
-from langchain_core.runnables import RunnableWithMessageHistory
-from langchain_core.chat_history import InMemoryChatMessageHistory
 from loguru import logger
 
 from ...services.ServiceException import ServiceException
 from ...services.Service import Service
+from ...utils.LLMUtils import build_message_history_input, compile_message_history_graph, get_message_content
 from ...utils.ModelUtils import ModelUtils
 
 SYS_GENERAL_ASSISTANT : str = "You are a helpful assistant. Answer the following question:\n\n{question}"
@@ -38,14 +37,7 @@ class LLMService(Service):
     def __post_init__(self):
         super().__post_init__()
         self._llm = None
-        self._langchain : RunnableWithMessageHistory = None
-        self._session_histories = dict()  # to store chat history
-       
-    def __get_session_history(self, session_id: str):
-        """Returns a persistent chat history for a given session."""
-        if session_id not in self._session_histories:
-            self._session_histories[session_id] = InMemoryChatMessageHistory()
-        return self._session_histories[session_id]
+        self._langchain = None
         
     def _on_start(self):
         self._create_llm()                
@@ -56,13 +48,14 @@ class LLMService(Service):
             ])
             
             chain  = prompt | self._llm # using pip operator to chain prompt and llm
-            
-            self._langchain = RunnableWithMessageHistory(
-                chain,
-                get_session_history=self.__get_session_history,
-                input_messages_key="question",     # where to pull current user input
-                history_messages_key="history"  # matches MessagesPlaceholder
-            )          
+
+            def call_model(state, history_messages):
+                return chain.invoke({
+                    "history": history_messages,
+                    "question": state["question"],
+                })
+
+            self._langchain = compile_message_history_graph(call_model)
         else:
             prompt = PromptTemplate.from_template(
                 self.system_message
@@ -77,14 +70,13 @@ class LLMService(Service):
     
     def chat(self, question : str) -> str:
         if self.retain_messages:        
-            ai_message = self._langchain.invoke({"question" : question}, config={"configurable" : {"session_id": "DEFAULT_SESSION"}})
+            ai_message = self._langchain.invoke(
+                build_message_history_input({"question": question}),
+                config={"configurable" : {"thread_id": "DEFAULT_SESSION"}},
+            )
         else:
             ai_message = self._langchain.invoke({"question" : question})
-        #print(type(result))
-        if isinstance(ai_message, str):
-            return ai_message
-        else:
-            return ai_message.content
+        return get_message_content(ai_message)
         
     def _create_llm(self):
         match self.model_provider:
