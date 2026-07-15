@@ -21,6 +21,15 @@ class DummyAIMessage:
         self.content = content
 
 
+class EchoChatModel:
+    def __init__(self):
+        self.prompts = []
+
+    def __call__(self, prompt_value):
+        self.prompts.append(prompt_value)
+        return DummyAIMessage("echo")
+
+
 class RecordingVectorStore(VectorStore):
     def __init__(self):
         self.queries = []
@@ -157,7 +166,8 @@ def test_chat_passes_explicit_runtime_arguments_and_session_id():
     assert payload["input_context"] == '{"fields": [{"field_id": "kasse"}]}'
     assert payload["retrieval_query"] == "insurance form policy"
     assert payload["use_rag_context"] is False
-    assert config == {"configurable": {"session_id": "S1"}}
+    assert payload["messages"][0].content == "Fill fields"
+    assert config == {"configurable": {"thread_id": "S1"}}
 
 
 def test_chat_raises_on_empty_question():
@@ -184,6 +194,51 @@ def test_chat_returns_message_content_for_non_string_llm_response():
     answer = rs.chat("Q")
 
     assert answer == "message-content"
+
+
+def test_create_llm_and_chain_uses_langgraph_message_history_for_retained_rag(monkeypatch):
+    """Ensure retained RAG chat uses LangGraph thread persistence."""
+    from pydag.services.llm.LLMService import LLMService
+    from pydag.services.llm.RAGService import RAGService
+
+    chat_model = EchoChatModel()
+
+    def fake_create_llm(self):
+        self._llm = chat_model
+
+    monkeypatch.setattr(LLMService, "_create_llm", fake_create_llm)
+
+    rs = RAGService()
+    rs.retain_messages = True
+    rs.system_message = "You are concise."
+    rs._retriever = None
+    rs._create_llm_and_chain()
+
+    answer = rs.chat(
+        question="Q1",
+        instruction="I1",
+        input_context={"k": "v"},
+        use_rag_context=False,
+        session_id="T1",
+    )
+    second_answer = rs.chat(
+        question="Q2",
+        instruction="I2",
+        input_context={"k": "v2"},
+        use_rag_context=False,
+        session_id="T1",
+    )
+
+    assert answer == "echo"
+    assert second_answer == "echo"
+    assert len(chat_model.prompts) == 2
+    second_prompt_contents = [
+        message.content for message in chat_model.prompts[1].to_messages()
+    ]
+    assert second_prompt_contents[0] == "You are concise."
+    assert second_prompt_contents[1] == "Q1"
+    assert second_prompt_contents[2] == "echo"
+    assert second_prompt_contents[3].startswith("Question:\nQ2")
 
 
 def test_chat_only_mode_works_without_retriever_or_embedding_folder_link():

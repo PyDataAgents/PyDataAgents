@@ -9,8 +9,6 @@ from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_unstructured import UnstructuredLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
-from langchain_core.runnables import RunnableWithMessageHistory
-from langchain_core.chat_history import InMemoryChatMessageHistory
 from langchain_core.documents import Document
 from sentence_transformers import SentenceTransformer
 from langchain_community.vectorstores.utils import filter_complex_metadata
@@ -18,6 +16,7 @@ from langchain_core.runnables import RunnableMap
 from pydag.agents.AgentConfig import AgentConfig
 
 from ..llm.LLMService import LLMService
+from ...utils.LLMUtils import build_message_history_input, compile_message_history_graph, get_message_content
 from ...services.ServiceException import ServiceException
 
 
@@ -101,35 +100,21 @@ class RAGService(LLMService):
                 ("human", "Question:\n{question}\n\nInstruction:\n{instruction}\n\nLocal Input Context:\n{input_context}\n\nRetrieved Context:\n{context}"),
             ])
 
-            retrieval_chain = (
-                {
-                    "question": lambda x: x["question"],
-                    "instruction": lambda x: x.get("instruction", ""),
-                    "input_context": lambda x: x.get("input_context", ""),
-                    "retrieval_query": lambda x: x.get("retrieval_query", x["question"]),
-                    "use_rag_context": lambda x: x.get("use_rag_context", True),
-                    "history": lambda x: x["history"],
-                }
-                | RunnableMap({
-                    "context": lambda x: self._get_retrieved_context_text(
-                        retrieval_query=x["retrieval_query"],
-                        use_rag_context=x["use_rag_context"],
-                    ),
-                    "history": lambda x: x["history"],
-                    "question": lambda x: x["question"],
-                    "instruction": lambda x: x["instruction"],
-                    "input_context": lambda x: x["input_context"],
-                })
-                | prompt
-                | self._llm
-            )
+            chain = prompt | self._llm
 
-            self._langchain = RunnableWithMessageHistory(
-                retrieval_chain,
-                get_session_history=self._get_session_history,
-                input_messages_key="question",     # where to pull current user input
-                history_messages_key="history"  # matches MessagesPlaceholder
-            )
+            def call_model(state, history_messages):
+                return chain.invoke({
+                    "context": self._get_retrieved_context_text(
+                        retrieval_query=state["retrieval_query"],
+                        use_rag_context=state["use_rag_context"],
+                    ),
+                    "history": history_messages,
+                    "question": state["question"],
+                    "instruction": state["instruction"],
+                    "input_context": state["input_context"],
+                })
+
+            self._langchain = compile_message_history_graph(call_model)
 
         else:
             prompt = ChatPromptTemplate.from_messages([
@@ -165,13 +150,6 @@ class RAGService(LLMService):
         self._embedding_store = None
         self._embedding_model = None
         self._retriever = None
-        self._session_histories = {}
-
-    def _get_session_history(self, session_id: str):
-        """Returns a persistent chat history for a given session."""
-        if session_id not in self._session_histories:
-            self._session_histories[session_id] = InMemoryChatMessageHistory()
-        return self._session_histories[session_id]
 
     def _serialize_input_context(self, input_context: str | dict | list | None) -> str:
         if input_context is None:
@@ -337,12 +315,9 @@ class RAGService(LLMService):
 
         if self.retain_messages:
             ai_message = self._langchain.invoke(
-                payload,
-                config={"configurable": {"session_id": session_id}},
+                build_message_history_input(payload),
+                config={"configurable": {"thread_id": session_id}},
             )
         else:
             ai_message = self._langchain.invoke(payload)
-        if isinstance(ai_message, str):
-            return ai_message
-        else:
-            return ai_message.content
+        return get_message_content(ai_message)
