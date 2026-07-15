@@ -75,17 +75,17 @@ def test_sentiment_analysis_1key():
     
     assert hfn.get_buffer().size() == buf.size(), "buffer size of hugging face node does not conform with size of listbuffer"
     
-def test_translation():
+def test_text_generation():
     
     buf = ListBuffer(id="LB1", capacity=3)
     buf.install()    
-    buf.push("I'm a rock'n-roll teddy bear riding a harley davidson")
+    buf.push("Once upon a time")
     
     lba = LinkBufferAction()
     lba.set_buffer(buf)
     lba.install()
     
-    hfn = HuggingFaceAction(task="translation_en_to_de", output_keys=["translation"])
+    hfn = HuggingFaceAction(task="text-generation", output_keys=["generated_text"])
     hfn.add_parent(lba)
     hfn.install()
     
@@ -95,17 +95,17 @@ def test_translation():
     
     assert hfn.get_buffer().size() == buf.size(), "buffer size of hugging face node does not conform with size of listbuffer"
     
-def test_translation_with_model():
+def test_text_generation_with_model():
     
     buf = ListBuffer(id="LB1", capacity=3)
     buf.install()    
-    buf.push("I'm a rock'n-roll teddy bear riding a harley davidson")
+    buf.push("Once upon a time")
     
     lba = LinkBufferAction()
     lba.set_buffer(buf)
     lba.install()
     
-    hfn = HuggingFaceAction(task="translation_en_to_de", model="google-t5/t5-base", output_keys=["translation"])
+    hfn = HuggingFaceAction(task="text-generation", model="sshleifer/tiny-gpt2", output_keys=["generated_text"])
     hfn.add_parent(lba)
     hfn.install()
     
