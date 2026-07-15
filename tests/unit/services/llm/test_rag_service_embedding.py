@@ -145,6 +145,33 @@ def test_add_documents_scans_folders_recursively_and_embeds_only_text(tmp_path, 
     assert not any(id_value.startswith(str(file_c) + "_") for id_value in all_ids)
 
 
+def test_resolve_vector_store_directory_returns_none_when_vector_store_path_is_missing():
+    """Ensure missing vector_store_path keeps Chroma in-memory."""
+    service = RAGService()
+
+    assert service._resolve_vector_store_directory() is None
+
+
+def test_resolve_vector_store_directory_uses_directory_path(tmp_path):
+    """Ensure directory vector_store_path is passed to Chroma unchanged."""
+    store_folder = tmp_path / "store"
+    store_folder.mkdir()
+    service = RAGService(vector_store_path=str(store_folder))
+
+    assert os.path.normpath(service._resolve_vector_store_directory()) == os.path.normpath(str(store_folder))
+
+
+def test_resolve_vector_store_directory_uses_parent_for_chroma_db_file(tmp_path):
+    """Ensure direct chroma DB file paths resolve to their parent directory."""
+    store_folder = tmp_path / "store"
+    store_folder.mkdir()
+    store_db_file = store_folder / "chroma.sqlite3"
+    store_db_file.write_text("", encoding="utf-8")
+    service = RAGService(vector_store_path=str(store_db_file))
+
+    assert os.path.normpath(service._resolve_vector_store_directory()) == os.path.normpath(str(store_folder))
+
+
 def test_on_start_uses_existing_vector_store_and_appends_document_links(tmp_path, monkeypatch):
     """Ensure startup opens an existing vector store path and appends configured documents."""
     class DummySentenceTransformer:
