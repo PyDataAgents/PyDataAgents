@@ -31,8 +31,7 @@ class RAGService(LLMService):
     document_links : list[str] = field(default_factory=list, metadata={"description": "list of document links to load into embedded store on startup"})
     ignore_invalid_documents: bool = field(default=False, metadata={"description": "deprecated compatibility field (no-op)"})
     embedding_model_name: str = field(default="all-MiniLM-L6-v2", metadata={"description": "name of the embedding model to use for embedding store"})
-    persist_directory: str = field(default=None, metadata={"description": "directory for persisting the embedded store"})
-    vector_store_path: str = field(default=None, metadata={"description": "path to existing chroma.db/chroma.sqlite3 file or its directory. Use this, if a pre-existing vector store should be used. If both vector_store_path and persist_directory are provided, vector_store_path takes precedence."})
+    vector_store_path: str = field(default=None, metadata={"description": "path to a Chroma vector store directory or chroma.db/chroma.sqlite3 file. If omitted, an in-memory vector store is used."})
 
     def __post_init__(self):
         super().__post_init__()
@@ -175,10 +174,6 @@ class RAGService(LLMService):
 
     def _resolve_vector_store_directory(self):
         configured_path = self.vector_store_path
-        if configured_path and self.persist_directory:
-            logger.warning("Both vector_store_path and persist_directory are configured. vector_store_path takes precedence.")
-        if configured_path is None:
-            configured_path = self.persist_directory
         if configured_path is None:
             return None
 
