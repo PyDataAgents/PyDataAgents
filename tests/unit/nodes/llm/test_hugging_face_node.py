@@ -85,7 +85,7 @@ def test_text_generation():
     lba.set_buffer(buf)
     lba.install()
     
-    hfn = HuggingFaceAction(task="text-generation", output_keys=["generated_text"])
+    hfn = HuggingFaceAction(task="text-generation", model="sshleifer/tiny-gpt2", output_keys=["generated_text"])
     hfn.add_parent(lba)
     hfn.install()
     
