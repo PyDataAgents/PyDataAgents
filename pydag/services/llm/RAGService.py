@@ -11,6 +11,7 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.runnables import RunnableWithMessageHistory
 from langchain_core.chat_history import InMemoryChatMessageHistory
+from langchain_core.documents import Document
 from sentence_transformers import SentenceTransformer
 from langchain_community.vectorstores.utils import filter_complex_metadata
 from langchain_core.runnables import RunnableMap
@@ -230,6 +231,32 @@ class RAGService(LLMService):
             extension = os.path.splitext(document_link)[1].lower()
         return extension in self._non_text_extensions
 
+    def _document_extension(self, document_link: str) -> str:
+        if self._is_document_link_url(document_link):
+            path = urlparse(document_link).path
+        else:
+            path = document_link
+        return os.path.splitext(path)[1].lower()
+
+    def _load_pdf_documents(self, document_link: str):
+        from pypdf import PdfReader
+
+        reader = PdfReader(document_link)
+        return [
+            Document(
+                page_content=page.extract_text() or "",
+                metadata={"source": document_link, "page": page_index},
+            )
+            for page_index, page in enumerate(reader.pages)
+        ]
+
+    def _load_documents(self, document_link: str):
+        if not self._is_document_link_url(document_link) and self._document_extension(document_link) == ".pdf":
+            return self._load_pdf_documents(document_link)
+
+        loader = UnstructuredLoader(document_link, strategy="auto")
+        return loader.load()
+
     def add_documents(self, document_links: list[str] | str):
         if isinstance(document_links, str):
             document_links = [document_links]
@@ -262,8 +289,7 @@ class RAGService(LLMService):
         if self._is_non_text_document(document_link):
             logger.warning("skipping non-text file " + document_link + " for embedding")
             return
-        loader = UnstructuredLoader(document_link, strategy="auto")
-        documents = loader.load()
+        documents = self._load_documents(document_link)
         # filter for complex data
         filtered_docs = filter_complex_metadata(documents)  # Filter out documents with complex metadata that cannot be processed by the embedding model
         # Split into chunks
