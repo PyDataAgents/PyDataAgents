@@ -388,6 +388,20 @@ def test_use_rag_context_defaults_to_false_when_not_configured():
     assert service.calls[0]["use_rag_context"] is False
 
 
+def test_use_internet_access_defaults_to_false_when_not_configured():
+    """Ensure internet context is opt-in for chat actions."""
+    service = _new_service()
+    service.next_answer = "answer"
+
+    action = LLMChatAction(question_value="Q")
+    action.set_service(service)
+    action.install()
+    action.execute()
+
+    assert len(service.calls) == 1
+    assert service.calls[0]["use_internet_context"] is False
+
+
 def test_mode_full_template_fill_success():
     """Mode 5: Full-mode-template_fill validates and accepts matching answer structure."""
     service = _new_service()
