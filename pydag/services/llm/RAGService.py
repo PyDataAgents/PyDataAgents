@@ -96,7 +96,7 @@ class RAGService(LLMService):
             prompt = ChatPromptTemplate.from_messages([
                 ("system", self.system_message),
                 MessagesPlaceholder(variable_name="history"),
-                ("human", "Question:\n{question}\n\nInstruction:\n{instruction}\n\nLocal Input Context:\n{input_context}\n\nRetrieved Context:\n{context}"),
+                ("human", "Question:\n{question}\n\nInstruction:\n{instruction}\n\nLocal Input Context:\n{input_context}\n\nRetrieved Context:\n{context}\n\nInternet Context:\n{internet_context}"),
             ])
 
             chain = prompt | self._llm
@@ -111,6 +111,7 @@ class RAGService(LLMService):
                     "question": state["question"],
                     "instruction": state["instruction"],
                     "input_context": state["input_context"],
+                    "internet_context": state.get("internet_context", ""),
                 })
 
             self._langchain = compile_message_history_graph(call_model)
@@ -118,7 +119,7 @@ class RAGService(LLMService):
         else:
             prompt = ChatPromptTemplate.from_messages([
                 ("system", self.system_message),
-                ("human", "Question:\n{question}\n\nInstruction:\n{instruction}\n\nLocal Input Context:\n{input_context}\n\nRetrieved Context:\n{context}"),
+                ("human", "Question:\n{question}\n\nInstruction:\n{instruction}\n\nLocal Input Context:\n{input_context}\n\nRetrieved Context:\n{context}\n\nInternet Context:\n{internet_context}"),
             ])
 
             self._langchain = (
@@ -137,6 +138,7 @@ class RAGService(LLMService):
                     "question": lambda x: x["question"],
                     "instruction": lambda x: x["instruction"],
                     "input_context": lambda x: x["input_context"],
+                    "internet_context": lambda x: x.get("internet_context", ""),
                 })
                 | prompt
                 | self._llm
@@ -285,6 +287,7 @@ class RAGService(LLMService):
         input_context: str | dict | list | None = None,
         retrieval_query: str | None = None,
         use_rag_context: bool = True,
+        use_internet_context: bool | None = None,
         session_id: str = "DEFAULT_SESSION",
     ) -> str:
         """Chat with RAG-backed context.
@@ -295,6 +298,7 @@ class RAGService(LLMService):
             input_context: Additional runtime context passed directly from parent buffers (not retrieved from vector DB).
             retrieval_query: The query used only for document retrieval from the vector store.
             use_rag_context: Set to False to disable retrieval and answer only from the prompt payload.
+            use_internet_context: Optional per-call internet context override. False disables internet context for this call.
             session_id: Session id used for retained message history.
         """
         if question is None or str(question).strip() == "":
@@ -306,6 +310,10 @@ class RAGService(LLMService):
             "input_context": self._serialize_input_context(input_context),
             "retrieval_query": str(question) if retrieval_query is None else str(retrieval_query),
             "use_rag_context": bool(use_rag_context),
+            "internet_context": self._get_internet_context_text(
+                str(question) if retrieval_query is None else str(retrieval_query),
+                use_internet_context=use_internet_context,
+            ),
         }
 
         if self.retain_messages:

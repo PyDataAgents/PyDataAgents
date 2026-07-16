@@ -138,6 +138,7 @@ def test_chat_uses_default_payload_values_when_optional_args_are_missing():
     assert payload["input_context"] == ""
     assert payload["retrieval_query"] == "What is RAG?"
     assert payload["use_rag_context"] is True
+    assert payload["internet_context"] == ""
 
 
 def test_chat_passes_explicit_runtime_arguments_and_session_id():
@@ -166,6 +167,7 @@ def test_chat_passes_explicit_runtime_arguments_and_session_id():
     assert payload["input_context"] == '{"fields": [{"field_id": "kasse"}]}'
     assert payload["retrieval_query"] == "insurance form policy"
     assert payload["use_rag_context"] is False
+    assert payload["internet_context"] == ""
     assert payload["messages"][0].content == "Fill fields"
     assert config == {"configurable": {"thread_id": "S1"}}
 
@@ -264,6 +266,29 @@ def test_chat_only_mode_works_without_retriever_or_embedding_folder_link():
     assert payload["input_context"] == ""
     assert payload["retrieval_query"] == "Answer from instruction only"
     assert payload["use_rag_context"] is False
+    assert payload["internet_context"] == ""
+
+
+def test_rag_chat_adds_internet_context_to_payload(monkeypatch):
+    """Ensure RAGService uses inherited internet context lookup in chat payloads."""
+    from pydag.services.llm.RAGService import RAGService
+
+    def fake_internet_context(self, query, use_internet_context=None):
+        assert query == "specific web query"
+        return "1. Title: Live result | URL: https://example.test | Content: fresh"
+
+    monkeypatch.setattr(RAGService, "_get_internet_context_text", fake_internet_context)
+
+    rs = RAGService()
+    rs.retain_messages = False
+    rs._langchain = DummyChain("ok")
+
+    assert rs.chat(
+        question="Answer from web",
+        retrieval_query="specific web query",
+        use_rag_context=False,
+    ) == "ok"
+    assert rs._langchain.calls[0]["payload"]["internet_context"] == "1. Title: Live result | URL: https://example.test | Content: fresh"
 
 
 def test_get_retrieved_context_text_invokes_langchain_retriever_with_stringified_retrieval_query(monkeypatch):

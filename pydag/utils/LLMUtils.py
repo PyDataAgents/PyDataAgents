@@ -17,6 +17,7 @@ class MessageHistoryState(TypedDict, total=False):
     input_context: str
     retrieval_query: str
     use_rag_context: bool
+    internet_context: str
 
 
 def compile_message_history_graph(
