@@ -22,7 +22,7 @@ class AdsService(ReadService, WriteService):
         self._ads_client : pyads.Connection = None
     
     def _on_install(self, agent : Agent = None):
-        super()._on_install()
+        super()._on_install(agent)
         match self.twincat:
             case 2:
                 self._ads_client = pyads.Connection(self.ams_net_id, pyads.PORT_TC2PLC1)
@@ -34,7 +34,7 @@ class AdsService(ReadService, WriteService):
             logger.error(f"Failed to open ADS connection: {e}")
 
     def _on_uninstall(self, agent : Agent = None):
-        super()._on_uninstall()
+        super()._on_uninstall(agent)
         self._ads_client.close()
         self._ads_client = None
         

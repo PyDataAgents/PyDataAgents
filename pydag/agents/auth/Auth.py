@@ -80,7 +80,7 @@ class AuthManager:
         if self._users_file is not None:
             data : dict
             if self._users_file.exists():
-                data = yaml.safe_load(self._users_file.read_text()) 
+                data = yaml.safe_load(self._users_file.read_text(encoding="utf-8")) 
             else:
                 data = {}.setdefault("users", {})          
             self._users : dict = data.get("users", {})
