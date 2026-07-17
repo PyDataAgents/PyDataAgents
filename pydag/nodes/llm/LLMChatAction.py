@@ -93,6 +93,7 @@ class LLMChatAction(BufferNode, ServiceNode, Action):
         default=False,
         metadata={"description": "Set to False to disable vector retrieval for this action."},
     )
+    use_internet_access: bool = field(default=False, metadata={"description": "Whether to access the internet to answer a question."})
     pass_through_keys: list[str] = field(
         default_factory=list,
         metadata={"description": "Row keys that should be copied unchanged to the output row."},
@@ -144,6 +145,7 @@ class LLMChatAction(BufferNode, ServiceNode, Action):
                 input_context=input_context,
                 retrieval_query=retrieval_query,
                 use_rag_context=self.use_rag_context,
+                use_internet_context=self.use_internet_access,
             )
             normalized_answer = self._normalize_answer_for_mode(answer, input_context)
 

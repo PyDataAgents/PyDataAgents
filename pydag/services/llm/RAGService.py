@@ -9,14 +9,14 @@ from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_unstructured import UnstructuredLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
-from langchain_core.runnables import RunnableWithMessageHistory
-from langchain_core.chat_history import InMemoryChatMessageHistory
+from langchain_core.documents import Document
 from sentence_transformers import SentenceTransformer
 from langchain_community.vectorstores.utils import filter_complex_metadata
 from langchain_core.runnables import RunnableMap
 from pydag.agents.AgentConfig import AgentConfig
 
 from ..llm.LLMService import LLMService
+from ...utils.LLMUtils import build_message_history_input, compile_message_history_graph, get_message_content
 from ...services.ServiceException import ServiceException
 
 
@@ -31,8 +31,7 @@ class RAGService(LLMService):
     document_links : list[str] = field(default_factory=list, metadata={"description": "list of document links to load into embedded store on startup"})
     ignore_invalid_documents: bool = field(default=False, metadata={"description": "deprecated compatibility field (no-op)"})
     embedding_model_name: str = field(default="all-MiniLM-L6-v2", metadata={"description": "name of the embedding model to use for embedding store"})
-    persist_directory: str = field(default=None, metadata={"description": "directory for persisting the embedded store"})
-    vector_store_path: str = field(default=None, metadata={"description": "path to existing chroma.db/chroma.sqlite3 file or its directory. Use this, if a pre-existing vector store should be used. If both vector_store_path and persist_directory are provided, vector_store_path takes precedence."})
+    vector_store_path: str = field(default=None, metadata={"description": "path to a Chroma vector store directory or chroma.db/chroma.sqlite3 file. If omitted, an in-memory vector store is used."})
 
     def __post_init__(self):
         super().__post_init__()
@@ -97,43 +96,30 @@ class RAGService(LLMService):
             prompt = ChatPromptTemplate.from_messages([
                 ("system", self.system_message),
                 MessagesPlaceholder(variable_name="history"),
-                ("human", "Question:\n{question}\n\nInstruction:\n{instruction}\n\nLocal Input Context:\n{input_context}\n\nRetrieved Context:\n{context}"),
+                ("human", "Question:\n{question}\n\nInstruction:\n{instruction}\n\nLocal Input Context:\n{input_context}\n\nRetrieved Context:\n{context}\n\nInternet Context:\n{internet_context}"),
             ])
 
-            retrieval_chain = (
-                {
-                    "question": lambda x: x["question"],
-                    "instruction": lambda x: x.get("instruction", ""),
-                    "input_context": lambda x: x.get("input_context", ""),
-                    "retrieval_query": lambda x: x.get("retrieval_query", x["question"]),
-                    "use_rag_context": lambda x: x.get("use_rag_context", True),
-                    "history": lambda x: x["history"],
-                }
-                | RunnableMap({
-                    "context": lambda x: self._get_retrieved_context_text(
-                        retrieval_query=x["retrieval_query"],
-                        use_rag_context=x["use_rag_context"],
-                    ),
-                    "history": lambda x: x["history"],
-                    "question": lambda x: x["question"],
-                    "instruction": lambda x: x["instruction"],
-                    "input_context": lambda x: x["input_context"],
-                })
-                | prompt
-                | self._llm
-            )
+            chain = prompt | self._llm
 
-            self._langchain = RunnableWithMessageHistory(
-                retrieval_chain,
-                get_session_history=self._get_session_history,
-                input_messages_key="question",     # where to pull current user input
-                history_messages_key="history"  # matches MessagesPlaceholder
-            )
+            def call_model(state, history_messages):
+                return chain.invoke({
+                    "context": self._get_retrieved_context_text(
+                        retrieval_query=state["retrieval_query"],
+                        use_rag_context=state["use_rag_context"],
+                    ),
+                    "history": history_messages,
+                    "question": state["question"],
+                    "instruction": state["instruction"],
+                    "input_context": state["input_context"],
+                    "internet_context": state.get("internet_context", ""),
+                })
+
+            self._langchain = compile_message_history_graph(call_model)
 
         else:
             prompt = ChatPromptTemplate.from_messages([
                 ("system", self.system_message),
-                ("human", "Question:\n{question}\n\nInstruction:\n{instruction}\n\nLocal Input Context:\n{input_context}\n\nRetrieved Context:\n{context}"),
+                ("human", "Question:\n{question}\n\nInstruction:\n{instruction}\n\nLocal Input Context:\n{input_context}\n\nRetrieved Context:\n{context}\n\nInternet Context:\n{internet_context}"),
             ])
 
             self._langchain = (
@@ -152,6 +138,7 @@ class RAGService(LLMService):
                     "question": lambda x: x["question"],
                     "instruction": lambda x: x["instruction"],
                     "input_context": lambda x: x["input_context"],
+                    "internet_context": lambda x: x.get("internet_context", ""),
                 })
                 | prompt
                 | self._llm
@@ -164,13 +151,6 @@ class RAGService(LLMService):
         self._embedding_store = None
         self._embedding_model = None
         self._retriever = None
-        self._session_histories = {}
-
-    def _get_session_history(self, session_id: str):
-        """Returns a persistent chat history for a given session."""
-        if session_id not in self._session_histories:
-            self._session_histories[session_id] = InMemoryChatMessageHistory()
-        return self._session_histories[session_id]
 
     def _serialize_input_context(self, input_context: str | dict | list | None) -> str:
         if input_context is None:
@@ -187,15 +167,15 @@ class RAGService(LLMService):
             return ""
         if retrieval_query is None or str(retrieval_query).strip() == "":
             return ""
-        docs = self._retriever.get_relevant_documents(str(retrieval_query))
+        retrieval_query = str(retrieval_query)
+        if hasattr(self._retriever, "invoke"):
+            docs = self._retriever.invoke(retrieval_query)
+        else:
+            docs = self._retriever.get_relevant_documents(retrieval_query)
         return "\n\n".join([getattr(doc, "page_content", str(doc)) for doc in docs])
 
     def _resolve_vector_store_directory(self):
         configured_path = self.vector_store_path
-        if configured_path and self.persist_directory:
-            logger.warning("Both vector_store_path and persist_directory are configured. vector_store_path takes precedence.")
-        if configured_path is None:
-            configured_path = self.persist_directory
         if configured_path is None:
             return None
 
@@ -225,6 +205,32 @@ class RAGService(LLMService):
         else:
             extension = os.path.splitext(document_link)[1].lower()
         return extension in self._non_text_extensions
+
+    def _document_extension(self, document_link: str) -> str:
+        if self._is_document_link_url(document_link):
+            path = urlparse(document_link).path
+        else:
+            path = document_link
+        return os.path.splitext(path)[1].lower()
+
+    def _load_pdf_documents(self, document_link: str):
+        from pypdf import PdfReader
+
+        reader = PdfReader(document_link)
+        return [
+            Document(
+                page_content=page.extract_text() or "",
+                metadata={"source": document_link, "page": page_index},
+            )
+            for page_index, page in enumerate(reader.pages)
+        ]
+
+    def _load_documents(self, document_link: str):
+        if not self._is_document_link_url(document_link) and self._document_extension(document_link) == ".pdf":
+            return self._load_pdf_documents(document_link)
+
+        loader = UnstructuredLoader(document_link, strategy="auto")
+        return loader.load()
 
     def add_documents(self, document_links: list[str] | str):
         if isinstance(document_links, str):
@@ -258,8 +264,7 @@ class RAGService(LLMService):
         if self._is_non_text_document(document_link):
             logger.warning("skipping non-text file " + document_link + " for embedding")
             return
-        loader = UnstructuredLoader(document_link, strategy="auto")
-        documents = loader.load()
+        documents = self._load_documents(document_link)
         # filter for complex data
         filtered_docs = filter_complex_metadata(documents)  # Filter out documents with complex metadata that cannot be processed by the embedding model
         # Split into chunks
@@ -282,6 +287,7 @@ class RAGService(LLMService):
         input_context: str | dict | list | None = None,
         retrieval_query: str | None = None,
         use_rag_context: bool = True,
+        use_internet_context: bool | None = None,
         session_id: str = "DEFAULT_SESSION",
     ) -> str:
         """Chat with RAG-backed context.
@@ -292,6 +298,7 @@ class RAGService(LLMService):
             input_context: Additional runtime context passed directly from parent buffers (not retrieved from vector DB).
             retrieval_query: The query used only for document retrieval from the vector store.
             use_rag_context: Set to False to disable retrieval and answer only from the prompt payload.
+            use_internet_context: Optional per-call internet context override. False disables internet context for this call.
             session_id: Session id used for retained message history.
         """
         if question is None or str(question).strip() == "":
@@ -303,16 +310,17 @@ class RAGService(LLMService):
             "input_context": self._serialize_input_context(input_context),
             "retrieval_query": str(question) if retrieval_query is None else str(retrieval_query),
             "use_rag_context": bool(use_rag_context),
+            "internet_context": self._get_internet_context_text(
+                str(question) if retrieval_query is None else str(retrieval_query),
+                use_internet_context=use_internet_context,
+            ),
         }
 
         if self.retain_messages:
             ai_message = self._langchain.invoke(
-                payload,
-                config={"configurable": {"session_id": session_id}},
+                build_message_history_input(payload),
+                config={"configurable": {"thread_id": session_id}},
             )
         else:
             ai_message = self._langchain.invoke(payload)
-        if isinstance(ai_message, str):
-            return ai_message
-        else:
-            return ai_message.content
+        return get_message_content(ai_message)

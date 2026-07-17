@@ -45,5 +45,3 @@ def test_040():
     
     buf.push({"C1": 7, "C2": 8})
     print(d)
-
-    

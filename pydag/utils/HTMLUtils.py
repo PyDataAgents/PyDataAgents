@@ -17,7 +17,7 @@ class HTMLUtils:
         """Save a BeautifulSoup object to an HTML file."""
         with open(output_file, 'w', encoding='utf-8') as f:
             f.write(str(soup))
-    
+
     @staticmethod
     def replace_value_by_id(soup : BeautifulSoup, element_id : str, new_value : str):
         """Find an element by ID and replace its value."""

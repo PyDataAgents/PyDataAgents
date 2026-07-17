@@ -1,23 +1,18 @@
-from dataclasses import dataclass, field
-from langchain_tavily import TavilySearch
+from dataclasses import dataclass
 from langchain.agents import tool, initialize_agent, AgentType
 
 
 from ..llm.LLMService import LLMService
 
 
-tavily_tool : TavilySearch = None
+tavily_tool = None
 
 @tool
 def web_search(query : str) -> str:
-    news = tavily_tool.invoke(query)
-    return news
+    return tavily_tool.invoke(query)
 
 @dataclass
 class LLMToolService(LLMService):
-    
-    tavily_websearch_apikey : str = field(default=None, metadata={})
-    
     def __post_init__(self):
         super().__post_init__()
         self._tools = list()
@@ -45,8 +40,6 @@ class LLMToolService(LLMService):
         pass
     
     def _create_tools(self):
-        # set up search tool with tavily
-        if not self.tavily_websearch_apikey is None:
-            tavily_tool = TavilySearch(category="news", tavily_api_key=self.tavily_websearch_apikey)
-            self._tools.append(tavily_tool)
-            
+        global tavily_tool
+        tavily_tool = self._create_internet_search_tool()
+        self._tools.append(web_search)
