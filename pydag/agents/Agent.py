@@ -1,27 +1,13 @@
 from __future__ import annotations
-import multiprocessing
-import os
 from pathlib import Path
 import threading
 from typing import TYPE_CHECKING, Any, Type
 from dataclasses import dataclass, field
 import uuid
-from fastapi import APIRouter, Depends, FastAPI
-from fastapi.middleware.cors import CORSMiddleware
 from loguru import logger
-from nicegui import app, ui
-import uvicorn
 
 
 from .AgentStates import AgentElementState, ServiceState
-from .api.AgentRESTAPI import AgentRESTAPI
-from .api.BufferRESTAPI import BufferRESTAPI
-from .api.NodeRESTAPI import NodeRESTAPI
-from .api.RESTAPIManager import APIRole, RESTAPIManager
-from .api.ServiceRESTAPI import ServiceRESTAPI
-from .ui.UIAgentMgmtPage import UIAgentMgmtPage
-from .ui.UIBufferPage import UIBufferPage
-from .ui.UIElements import UIHomePage, UIPage
 from ..utils.ClassUtils import ClassUtils
 from .AgentElementException import AgentElementException
 from .AgentException import AgentException
@@ -70,14 +56,7 @@ class Agent():
     create_config : bool = field(default=False, metadata={"description": "creates a configuration yaml on start, when True"})
     load_on_install : bool = field(default=False, metadata={"description": "if True, all AgentElements are set to load_on_install = True"})
     with_persistence : bool = field(default=False, metadata={"description": "if True, an AgentPersistService is created by default to contuinously save the AgentElements in a local files"})
-    
-    port : int = field(default=8081, metadata={"description": "port for the REST API Service"})
-    with_api : bool = field(default=False, metadata={"description": "if True, a REST API Service is created by default for REST interactions on port specified in port"})
-    api_key_file : str = field(default=None, metadata={"description": "file path for API key storage and loading"})
-    with_ui : bool = field(default=False, metadata={"description": "if True, a NiceGUI UI is created by default for the Agent"})
-    dark_mode : bool = field(default=True, metadata={"description": "enables dark mode"})
-    color_schema : dict = field(default_factory=dict, metadata={"description": "color schema for the ui, see https://nicegui.io/docs/colors for more details"})
-    
+        
     buffer_store : dict[str, Buffer] = field(default_factory=dict, metadata={"description": "dictionary of Buffers in the Agent"})
     service_store : dict[str, Service] = field(default_factory=dict, metadata={"description": "dictionary of Services in the Agent"})
 
@@ -86,8 +65,6 @@ class Agent():
         """
         self._is_running = False
         self._stop_event = threading.Event()
-        self._app : FastAPI = None
-        self._ui_pages : list[UIPage] = []
     
     def _install_elements(self):
         """ install all `Node`s, `Buffer`s, and `Service`s in the `Agent`.
@@ -229,34 +206,12 @@ class Agent():
             yc = YAMLConfig(f"Agent {self.id}.yaml")
             yc.save(gc)
         self._start_services()
-        # create web api and ui if specified
-        if self.with_api:
-            self.create_api()
-        if self.with_ui:
-            self.create_ui()
-        # check how to run the application, with blocking or non-blocking release or the blocking web api server (uvicorn/fastapi/nicegui)
-        host="0.0.0.0"
-        if self._app:
-            if len(self._ui_pages) > 0:
-                pages_paths = [f"http://{host}:{self.port}{page.path}" for page in self._ui_pages]
-                pages_str = "\n".join(pages_paths)
-                logger.info("Available NiceGui Pages:\n" + pages_str)
-                os.environ.setdefault("NICEGUI_SCREEN_TEST_PORT", f"{self.port}")
-                ui.run_with(self._app, dark=self.dark_mode, title=self.__class__.__name__ + " UI")                
-            multiprocessing.freeze_support()  # For Windows support
-            uvicorn.run(self._app, host=host, port=self.port, reload=True, workers=1)
-        elif len(self._ui_pages) > 0:
-            pages_paths = [f"http://{host}:{self.port}{page.path}" for page in self._ui_pages]
-            pages_str = "\n".join(pages_paths)
-            logger.info("Available NiceGui Pages:\n" + pages_str)                
-            os.environ.setdefault("NICEGUI_SCREEN_TEST_PORT", f"{self.port}")
-            ui.run(host=host, port = self.port, reload=True, dark=self.dark_mode, title=self.__class__.__name__ + " UI")
-        else:
-            self._stop_event.clear()
-            self._is_running = True
-            logger.info(f"Started {self.__class__.__name__} application (id='{self.id}')")
-            if blocking:
-                self._stop_event.wait()  # blocks efficiently until the event is set (for example by terminate)
+        
+        self._stop_event.clear()
+        self._is_running = True
+        logger.info(f"Started {self.__class__.__name__} application (id='{self.id}')")
+        if blocking:
+            self._stop_event.wait()  # blocks efficiently until the event is set (for example by terminate)
                 
     def terminate(self):
         """ Terminate the `Agent`.
@@ -472,63 +427,3 @@ class Agent():
             bool: True if the Agent is running, False otherwise.
         """
         return self._is_running
-        
-    def add_api(self, router : APIRouter):
-        self._app.include_router(router)
-    
-    def create_api(self, no_default_apis : bool = False):
-        if self.api_key_file:
-            RESTAPIManager.generate_api_keys(api_key_file=self.api_key_file, agent=self) # Generate API keys and save to file if api_key_file is provided
-            self._app = FastAPI(title=self.__class__.__name__ + " - REST API", docs_url="/docs", dependencies=[Depends(RESTAPIManager.require_min_role(APIRole.READ))])  # Protect all endpoints with API key dependency
-        else:
-            self._app = FastAPI(title=self.__class__.__name__ + " - REST API", docs_url="/docs")
-        self._app.add_middleware(
-            CORSMiddleware,
-            allow_origins=["*"],  # Allows all origins
-            allow_credentials=False,
-            allow_methods=["*"],  # Allows all methods (GET, POST, etc.)
-            allow_headers=["*"],  # Allows all headers
-        )
-        if not no_default_apis:
-            self.add_api(AgentRESTAPI.get_api_router(self))
-            self.add_api(BufferRESTAPI.get_api_router(self))
-            self.add_api(ServiceRESTAPI.get_api_router(self))
-            self.add_api(NodeRESTAPI.get_api_router(self))
-         
-    def create_ui(self, no_default_pages : bool = False):
-        """Create a NiceGUI UI for the Agent.
-        This method initializes the NiceGUI app and sets up the UI pages.
-        """
-        if not no_default_pages:
-            self.add_ui_page(UIHomePage(self))
-            self.add_ui_page(UIBufferPage(self, 1.0 / 30.0))
-            self.add_ui_page(UIAgentMgmtPage(self, 1.0))
-        
-        # define default color schema        
-        if len(self.color_schema) > 0:
-            app.colors(**self.color_schema)
-        else:
-            app.colors(
-                primary='#005B95',
-                secondary='#A8A8A9',
-                accent='#C43726',
-                positive='#00B050', 
-                negative='#C43726',
-            )
-            
-        page : UIPage
-        for page in self._ui_pages:
-            page.register()
-        
-    def add_ui_page(self, page : UIPage):
-        self._ui_pages.append(page)
-        
-    def remove_ui_page(self, i : int):
-        self._ui_pages.pop(i)
-        
-    def clear_ui_pages(self):
-        self._ui_pages.clear()
-
-    def get_ui_pages(self) -> list[UIPage]:
-        return self._ui_pages
-       
