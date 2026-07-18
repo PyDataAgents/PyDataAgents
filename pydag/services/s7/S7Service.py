@@ -36,7 +36,7 @@ class S7Service(ReadService, WriteService):
             except Exception as e:
                 raise ServiceException(f"Could not disconnect from {self.__class__.__name__}") from e
 
-    def _read_from_source(self):
+    def read_from_source(self):
         if len(self.get_buffers()) == len(self.addresses):
             a = 0
             for buffer in self.get_buffers().values():
@@ -66,7 +66,7 @@ class S7Service(ReadService, WriteService):
         else:
             raise ServiceException("Number of buffers and addresses do not match.")
 
-    def _write_to_sink(self):
+    def write_to_sink(self):
         if len(self.get_buffers()) == len(self.addresses):
             a = 0
             for buffer in self.get_buffers().values():

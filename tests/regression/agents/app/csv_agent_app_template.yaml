@@ -16,11 +16,12 @@ agent:
     S1:
       id: S1
       type: pydag.services.csv.CsvWriteService
-      thread_type: MILLI_SECONDS
+      thread_type: MILLI_SECOND
       observing_time: 100
       n: 10
       mapping_type: WRITE
-      folder: pydag/tests/regression/agents/app/data
+      folder: tests\regression\agents\app\data
+      file_post_fix: test
       buffer_ids:
       - B1
 

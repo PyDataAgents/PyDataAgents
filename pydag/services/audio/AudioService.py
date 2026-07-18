@@ -33,7 +33,7 @@ class AudioService(SubscribeService):
         if self._stream is not None:
             self._stream.close()
 
-    def _subscribe(self):
+    def subscribe(self):
         buf = next(iter(self._buffers.values()))
 
         def audio_callback(indata : np.ndarray, frames, time, status):
@@ -47,6 +47,6 @@ class AudioService(SubscribeService):
                             blocksize=self.n)
         self._stream.start()
 
-    def _unsubscribe(self):
+    def unsubscribe(self):
         if self._stream is not None:
             self._stream.stop()

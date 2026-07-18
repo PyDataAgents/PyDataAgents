@@ -32,7 +32,7 @@ class DocxService(WriteService):
     def _on_uninstall(self, agent : Agent = None):
         super()._on_uninstall(agent)
 
-    def _write_to_sink(self):
+    def write_to_sink(self):
         """ Write data from buffers to the document.
         Args:
             buffers (dict[str, Buffer]): Dictionary mapping addresses to buffers

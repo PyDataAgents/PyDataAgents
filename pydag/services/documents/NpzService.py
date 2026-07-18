@@ -28,7 +28,7 @@ class NpzService(ReadService):
     def _on_uninstall(self, agent : Agent = None):
         super()._on_uninstall(agent)
                 
-    def _read_from_source(self):
+    def read_from_source(self):
         if len(self.get_buffers()) == 1 and len(self.addresses) == 0:
             buffer : Buffer = next(iter(self.get_buffers().values()))
             if isinstance(buffer, DictBuffer):

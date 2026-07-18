@@ -33,7 +33,7 @@ class HttpService(ReadService, WriteService):
         super()._on_uninstall(agent)
         self._http = None
         
-    def _read_from_source(self):
+    def read_from_source(self):
         if len(self.addresses) == 0 and len(self.get_buffers()) == 1:
             buffer : Buffer = next(iter(self.get_buffers().values()))
             if self.headers is None:
@@ -98,7 +98,7 @@ class HttpService(ReadService, WriteService):
         else:
             raise ServiceException("size of buffers and addresses must match")
             
-    def _write_to_sink(self):
+    def write_to_sink(self):
         if len(self.get_buffers()) != len(self.addresses):
             raise ServiceException("size of buffers and addresses must match")
         b = 0

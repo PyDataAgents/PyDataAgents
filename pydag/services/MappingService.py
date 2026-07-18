@@ -42,7 +42,7 @@ class MappingService(ObserverService):
         super().__post_init__()
         self._buffers : dict[str, Buffer] = dict()
         
-    def _on_install(self, agent : Agent = None):        
+    def _on_install(self, agent : Agent = None):
         from .PublishService import PublishService
         from .SubscribeService import SubscribeService
         from .WriteService import WriteService
@@ -109,6 +109,7 @@ class MappingService(ObserverService):
             raise ServiceException("could not detect thread_type, please set it explicitly")
         
         super()._on_install(agent)
+        self._check_mapping_enums()
          
         # create observer based on mapping
         observer : MappingObserver = None
@@ -170,4 +171,15 @@ class MappingService(ObserverService):
     def address_to_dict(address : str) -> dict[str, str]:
         d = StringUtils.string_to_dict(address)
         return d
+    
+    def _check_mapping_enums(self):
+        """ checks the enums for `mapping_type`
+            if unknown it raises a `ServiceException`
+        """
+        try:
+            MappingType(self.mapping_type)
+            return
+        except ValueError as e:
+            raise ServiceException(f"mapping_type {self.mapping_type} is not valid") from e
+    
         

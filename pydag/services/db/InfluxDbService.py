@@ -47,7 +47,7 @@ class InfluxDbService(ReadService, WriteService):
                 pass
         self._client = None        
     
-    def _read_from_source(self):
+    def read_from_source(self):
         if len(self.get_buffers()) == len(self.addresses):
             a = 0
             query_api = self._client.query_api()
@@ -83,7 +83,7 @@ class InfluxDbService(ReadService, WriteService):
         else:
             raise ServiceException("The number of buffers and addresses must match.")
     
-    def _write_to_sink(self):
+    def write_to_sink(self):
         if len(self.get_buffers()) == len(self.addresses):
             a = 0
             write_api = self._client.write_api(write_options=SYNCHRONOUS)

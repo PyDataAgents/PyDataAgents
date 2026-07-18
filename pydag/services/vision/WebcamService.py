@@ -44,7 +44,7 @@ class WebcamService(ReadService):
         self._vc = None
         self._codec = None
             
-    def _read_from_source(self):
+    def read_from_source(self):
         if len(self.get_buffers()) > 1:
             raise ServiceException(f"only 1 {Buffer.cname()} can be used for data storage")
         else:

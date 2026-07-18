@@ -10,7 +10,7 @@ from .MappingService import MappingService
 class PublishService(MappingService):
     
     @abstractmethod
-    def _publish(self):
+    def publish(self):
         """publish samples from buffers to addresses with specified sampling_period and n samples at once
             <br>if persistent is specified False, then the samples will be removed from buffers
 
@@ -21,7 +21,7 @@ class PublishService(MappingService):
         """        
     
     @abstractmethod
-    def _unpublish(self):
+    def unpublish(self):
         """ unpublish logic to stop publishing
         
         Raises:

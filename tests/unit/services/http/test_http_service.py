@@ -18,7 +18,7 @@ def test_single_listbuffer():
     ha.add_buffer(buf)
     ha.install()
             
-    ha._read_from_source()
+    ha.read_from_source()
     
     data = buf.data()
     print(data)
@@ -34,7 +34,7 @@ def test_single_dictbuffer():
     ha.add_buffer(buf)
     ha.install()
     
-    ha._read_from_source()
+    ha.read_from_source()
     
     data = buf.data()
     print(data)
@@ -49,7 +49,7 @@ def test_single_listbuffer_with_jsonpath():
     ha.add_buffer(buf)
     ha.install()
     
-    ha._read_from_source()
+    ha.read_from_source()
     
     data = buf.data()
     print(data)
@@ -64,7 +64,7 @@ def test_single_dictbuffer_with_jsonpath():
     ha.add_buffer(buf)
     ha.install()
        
-    ha._read_from_source()
+    ha.read_from_source()
     data = buf.data()
     print(data)
         

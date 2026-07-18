@@ -57,7 +57,7 @@ def test_020():
     
     a1.install()
     while i < i_max:    
-        a1._read_from_source()
+        a1.read_from_source()
         print(buf1.data())
         time.sleep(0.05)
         i = i + 1       
@@ -80,7 +80,7 @@ def test_021():
     
     a1.install()
     while i < i_max:    
-        a1._read_from_source()
+        a1.read_from_source()
         print(buf1.data())
         time.sleep(0.5)
         i = i + 1

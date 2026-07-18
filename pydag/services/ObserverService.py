@@ -51,6 +51,7 @@ class ObserverService(Service):
     
     def _on_install(self, agent : Agent = None):
         super()._on_install(agent)
+        self._check_thread_enums()
     
     def _create_thread(self):
         name = f"Thread-{self.__class__.__name__} {self.id}"
@@ -411,4 +412,14 @@ class ObserverService(Service):
             int: number of iterations
         """
         return self._counts
+    
+    def _check_thread_enums(self):
+        """ checks the enum `thread_type`'s
+            it raises a `ServiceException` for unknown `thread_type`s
+        """
+        try:
+            ThreadType(self.thread_type)
+            return
+        except ValueError as e:
+            raise ServiceException(f"thread_type {self.thread_type} is not valid") from e
     

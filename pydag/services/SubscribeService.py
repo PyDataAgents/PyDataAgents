@@ -10,7 +10,7 @@ from .MappingService import MappingService
 class SubscribeService(MappingService):
     
     @abstractmethod
-    def _subscribe(self):
+    def subscribe(self):
         """subscribe logic from source into specified buffers and addresses, with specified sampling_period and n samples at once
         
         Args:
@@ -18,6 +18,6 @@ class SubscribeService(MappingService):
         """
     
     @abstractmethod
-    def _unsubscribe(self):
+    def unsubscribe(self):
         """ unsubscribe logic to stop subscribing
         """

@@ -65,7 +65,7 @@ class CsvReadService(ReadService):
         self._csv_reader = None
         self._csv_file = None
             
-    def _read_from_source(self):
+    def read_from_source(self):
         if len(self.get_buffers()) > 1 and len(self.get_buffers()) != len(self.addresses):
             raise ServiceException(Buffer.__name__+ "s and addresses must be of same size")
         elif len(self.get_buffers()) == 1 and len(self.addresses) == 0:

@@ -15,7 +15,7 @@ class DiscoveryService(ObserverService):
     """
     
     @abstractmethod
-    def _discover(self) -> list[dict]:
+    def discover(self) -> list[dict]:
         """ discovery logic to find available data sources and their config options
         
         Raises:

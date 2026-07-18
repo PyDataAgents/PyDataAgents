@@ -39,7 +39,7 @@ class OpcUaService(ReadService, WriteService, BrowsingService):
             except Exception as e:
                 raise ServiceException(f"Disconnecting from OPC UA server failed in {self.__class__.__name__}") from e
     
-    def _read_from_source(self):
+    def read_from_source(self):
         if len(self.get_buffers()) != len(self.addresses):
             raise ServiceException("size of buffers and addresses must match")
         b = 0
@@ -49,9 +49,9 @@ class OpcUaService(ReadService, WriteService, BrowsingService):
                 val = node.get_value()
                 v.push(val)
         else:
-            raise ServiceException("_read_from_source is not implemented for n > 1")
+            raise ServiceException("read_from_source is not implemented for n > 1")
         
-    def _write_to_sink(self):
+    def write_to_sink(self):
         if len(self.get_buffers()) != len(self.addresses):
             raise ServiceException("size of buffers and addresses must match")
         b = 0
@@ -60,7 +60,7 @@ class OpcUaService(ReadService, WriteService, BrowsingService):
             val = v.data(n = self.n, persistent=self.persistent)
             self._client.set_values(node, val)
             
-    def _browse(self, browse_filter : BrowseFilter = None) -> list[Address]:
+    def browse(self, browse_filter : BrowseFilter = None) -> list[Address]:
         root : Node = self._client.get_root_node()
         addresses : list[Address] = []
         self._recursive_browse(root, browse_filter, addresses)

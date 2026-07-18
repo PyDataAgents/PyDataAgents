@@ -62,7 +62,7 @@ class ByteStreamService(ReadService, WriteService):
     write_byte_schema : str = field(default=None, metadata={"description": "schema of bytes to convert the buffers data to and send it, e.g. ddfs10 (double, double, float, string of length 10)"})
     
         
-    def _read_from_source(self):
+    def read_from_source(self):
         b, f = ByteStreamService.decode_schema(self.read_byte_schema)
         read_bytes = self._receive(b * (self.n if self.n > 0 else 1))
         data_tuples = self._decode(self.read_byte_schema, read_bytes)
@@ -108,7 +108,7 @@ class ByteStreamService(ReadService, WriteService):
                 if not success:
                     raise ServiceException("No matching addresses found in buffers")                
 
-    def _write_to_sink(self):
+    def write_to_sink(self):
         if len(self.addresses) == 0:
             if len(self.get_buffers()) == 1:
                 buffer = next(iter(self.get_buffers().values()))    

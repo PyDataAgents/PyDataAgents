@@ -118,7 +118,7 @@ class VSEService(SubscribeService):
             except Exception as e:
                 raise ServiceException(f"could not disconnect from socket in {self.__class__.__name__}") from e
              
-    def _subscribe(self):        
+    def subscribe(self):        
         buffer : Buffer = next(iter(self.get_buffers().values()))
         # start the message processing task
         if not self._is_measuring:
@@ -132,7 +132,7 @@ class VSEService(SubscribeService):
                 raise ServiceException("Connection to VSE device was interrupted") from e
 
         
-    def _unsubscribe(self):
+    def unsubscribe(self):
         self._is_measuring = False
         if self._thread:
             self._thread.join()

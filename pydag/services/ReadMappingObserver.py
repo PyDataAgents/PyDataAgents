@@ -1,5 +1,5 @@
 from .ServiceException import ServiceException
-#from .ReadService import ReadService
+from .ReadService import ReadService
 from .ObserverException import ObserverException
 from .MappingObserver import MappingObserver
 
@@ -16,9 +16,10 @@ class ReadMappingObserver(MappingObserver):
 
     def observe(self):
         try:
-            self._mapping._read_from_source()
+            if isinstance(self._mapping, ReadService):
+                self._mapping.read_from_source()
         except ServiceException as e:
-            raise ObserverException(f"Could not execute read_from_source on {self._mapping.__class__.__name__}: {self._mapping.config_options()}") from e
+            raise ObserverException(f"Could not execute read_from_source on {self._mapping.__class__.__name__}:\n\t{e.message}") from e
     
     def unobserve(self):
         pass

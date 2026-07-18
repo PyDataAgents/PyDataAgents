@@ -19,11 +19,11 @@ def test_vse_adapter():
     vse.install()
     
     
-    vse._subscribe()
+    vse.subscribe()
     
     time.sleep(10)
     
-    vse._unsubscribe()
+    vse.unsubscribe()
         
     vse.uninstall()
     

@@ -27,7 +27,7 @@ def test_000():
     n = 5
     i = 0
     while i < n:
-        opcua._read_from_source()    
+        opcua.read_from_source()    
         print(buf1.data())
         time.sleep(1)
         i = i + 1
@@ -53,7 +53,7 @@ def test_010():
     n = 5
     i = 0
     while i < n:
-        opcua._read_from_source()    
+        opcua.read_from_source()    
         print(buf1.data())
         time.sleep(1)
         i = i + 1
@@ -62,7 +62,7 @@ def test_010():
 def test_opcua_browsing():
     opcua = OpcUaService(endpoint = "opc.tcp://jh:48010", id = "OPC1", mapping_type=MappingType.READ.value, thread_type=ThreadType.MILLI_SECOND.value)
     opcua.install()
-    addresses = opcua._browse()
+    addresses = opcua.browse()
     for addr in addresses:
         print(addr)
         

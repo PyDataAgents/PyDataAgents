@@ -60,7 +60,7 @@ class WebSocketService(WriteService, SubscribeService):
         # thread is daemon; it will exit when socket.run_forever stops
         self._thread = None
                     
-    def _write_to_sink(self):
+    def write_to_sink(self):
         for buffer in self.get_buffers().values():
             id = buffer.id
             data = buffer.data(n=self.n, persistent=self.persistent)
@@ -74,7 +74,7 @@ class WebSocketService(WriteService, SubscribeService):
             except Exception as e:
                 raise ServiceException("Failed to send websocket message") from e
             
-    def _subscribe(self):
+    def subscribe(self):
         
         def on_message(ws, message):
             #print("📨 Message received:", message)

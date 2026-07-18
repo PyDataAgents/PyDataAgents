@@ -38,7 +38,7 @@ class MQTTService(SubscribeService, WriteService):
         if self._client:
             self._client.disconnect()
         
-    def _subscribe(self):
+    def subscribe(self):
         """subscribe to mqtt topics by specifying addresses in the schema of address = "topic=this/is/a/topic;id=buf1"
             <br>where id is the buffer id, where this topic's messages shall be stored to
         """
@@ -68,11 +68,11 @@ class MQTTService(SubscribeService, WriteService):
             self._client.on_message = on_message
             self._client.loop_start()
         
-    def _unsubscribe(self):
+    def unsubscribe(self):
         if self._client:
             self._client.unsubscribe(ROOT_TOPIC)
     
-    def _write_to_sink(self):
+    def write_to_sink(self):
         """publish buffer values to mqtt topcis by writing single publish messages
 
         Raises:

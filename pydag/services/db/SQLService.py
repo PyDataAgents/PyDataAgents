@@ -39,7 +39,7 @@ class SQLService(ReadService, WriteService):
         """
         return pyodbc.drivers()
     
-    def _read_from_source(self):
+    def read_from_source(self):
         """_summary_
 
         Args:
@@ -65,7 +65,7 @@ class SQLService(ReadService, WriteService):
                 #print(row_dict)
                 buffer.push(row_dict)
 
-    def _write_to_sink(self):
+    def write_to_sink(self):
         """writes data from buffer to SQL database
 
         Args:

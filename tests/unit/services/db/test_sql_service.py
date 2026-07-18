@@ -161,7 +161,7 @@ def test_030():
                  """]
     sql = SQLService(connection_str=connection_str, addresses=addresses, thread_type=ThreadType.MILLI_SECOND.value, mapping_type=MappingType.WRITE.value)    
     sql.install()    
-    sql._write_to_sink()    
+    sql.write_to_sink()    
     sql.uninstall()    
 
 def test_031():
@@ -179,7 +179,7 @@ def test_031():
     sql = SQLService(connection_str=connection_str, addresses=addresses, thread_type=ThreadType.MILLI_SECOND.value, mapping_type=MappingType.WRITE.value)
     
     sql.install()        
-    sql._write_to_sink()
+    sql.write_to_sink()
     sql.uninstall()
     
 def test_032():
@@ -195,7 +195,7 @@ def test_032():
     sql = SQLService(connection_str=connection_str, addresses=addresses, thread_type=ThreadType.MILLI_SECOND.value, mapping_type=MappingType.WRITE.value)
     sql.add_buffer(buf)   
     sql.install()    
-    sql._write_to_sink()
+    sql.write_to_sink()
     sql.uninstall()
     
 def test_033():
@@ -213,7 +213,7 @@ def test_033():
     sql.add_buffer(buf)
     
     sql.install()
-    sql._write_to_sink()
+    sql.write_to_sink()
     sql.uninstall()
     
 def test_034():
@@ -229,7 +229,7 @@ def test_034():
     sql.add_buffer(buf)
     
     sql.install()    
-    sql._read_from_source()
+    sql.read_from_source()
     sql.uninstall()
     
     print(buf.data())
@@ -248,7 +248,7 @@ def test_035():
     sql.add_buffer(buf)
     
     sql.install()    
-    sql._write_to_sink()
+    sql.write_to_sink()
     
     addresses = ["SELECT id, name FROM benutzer"]
     
@@ -258,7 +258,7 @@ def test_035():
     sql.add_buffer(buf2)
     
     buf2.install()       
-    sql._read_from_source()
+    sql.read_from_source()
     
     sql.uninstall()
     
@@ -273,7 +273,7 @@ def test_036():
     sql = SQLService(connection_str=connection_str, addresses=addresses, thread_type=ThreadType.MILLI_SECOND.value, mapping_type=MappingType.WRITE.value)
     
     sql.install()        
-    sql._write_to_sink()
+    sql.write_to_sink()
     
     sql.uninstall()
     

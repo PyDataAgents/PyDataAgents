@@ -27,7 +27,7 @@ def test_010():
     npz = NpzService(file_path=file_path, thread_type=ThreadType.MILLI_SECOND.value)
     npz.add_buffer(buf)
     npz.install()
-    npz._read_from_source()
+    npz.read_from_source()
     print(buf.data(n=100))
     
 def test_011():    
@@ -43,7 +43,7 @@ def test_011():
     npz.add_buffer(buf1)
     npz.add_buffer(buf2)
     npz.install()
-    npz._read_from_source()    
+    npz.read_from_source()    
     print(buf1.data())
     print(buf2.data())
     

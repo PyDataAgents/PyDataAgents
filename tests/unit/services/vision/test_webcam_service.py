@@ -17,7 +17,7 @@ def test_webcam_adapter():
     
     for i in range(1, 2):
 
-        wcs._read_from_source()
+        wcs.read_from_source()
         #print(buf.data(persistent=True))    
     
     d = buf.data()

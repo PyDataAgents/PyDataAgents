@@ -26,7 +26,7 @@ def test_000():
     mqtt.add_buffer(buf)
     mqtt.install()
     
-    mqtt._subscribe()
+    mqtt.subscribe()
     
     i = 0
     while i < 25:

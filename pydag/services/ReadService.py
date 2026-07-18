@@ -11,7 +11,7 @@ class ReadService(MappingService):
         
     
     @abstractmethod
-    def _read_from_source(self):
+    def read_from_source(self):
         """ read logic from source into buffers for specified addresses and n samples at once
 
         Args:

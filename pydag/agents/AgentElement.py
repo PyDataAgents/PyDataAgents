@@ -86,7 +86,7 @@ class AgentElement(ABC):
             self._state = AgentElementState.INSTALLED
         except AgentElementException as e:
             self._state = AgentElementState.ERROR
-            raise AgentElementException(f"Could not install {self.__class__.__name__}") from e
+            raise AgentElementException(f"Could not install {self.__class__.__name__}:\n\t{e.message}") from e
         
     def uninstall(self, agent : Agent = None):
         """resets the element, this method can be used to stop internal element logic or reset objects that were initialized on creation

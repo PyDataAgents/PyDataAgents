@@ -47,7 +47,7 @@ class CsvWriteService(WriteService):
         self._csv_writer = None
         self._rows = 0
     
-    def _write_to_sink(self):
+    def write_to_sink(self):
         if len(self.get_buffers()) == 1:
             buffer : Buffer = next(iter(self.get_buffers().values()))
             if self._rows == 0:

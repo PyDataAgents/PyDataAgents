@@ -30,7 +30,7 @@ def test_000():
     
     da.install()
     
-    da._write_to_sink()
+    da.write_to_sink()
         
     da.uninstall()
     

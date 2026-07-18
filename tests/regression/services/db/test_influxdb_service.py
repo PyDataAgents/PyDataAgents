@@ -38,7 +38,7 @@ def test_010():
     
     j = 0
     while j < 10:
-        i._write_to_sink()
+        i.write_to_sink()
         time.sleep(0.1)
         j = j + 1
         

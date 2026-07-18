@@ -38,7 +38,7 @@ class AdsService(ReadService, WriteService):
         self._ads_client.close()
         self._ads_client = None
         
-    def _read_from_source(self):
+    def read_from_source(self):
         if len(self.get_buffers()) == 1 and len(self.addresses) > 1:
             # if only one buffer is provided, we assume that all addresses should be read into this buffer
             buffer = next(iter(self.get_buffers().values()))
@@ -61,7 +61,7 @@ class AdsService(ReadService, WriteService):
                 b = b + 1
         
         
-    def _write_to_sink(self):
+    def write_to_sink(self):
         if len(self.get_buffers()) != len(self.addresses):
             raise ServiceException("size of buffers and addresses must match")
         b = 0

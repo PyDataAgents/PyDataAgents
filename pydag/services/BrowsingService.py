@@ -41,7 +41,7 @@ class BrowsingService(ObserverService):
     """
     
     @abstractmethod    
-    def _browse(self, browse_filter : BrowseFilter = None) -> list[Address]:
+    def browse(self, browse_filter : BrowseFilter = None) -> list[Address]:
         """ browses the connected data sources for all available addresses
         
         Raises:

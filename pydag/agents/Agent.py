@@ -95,7 +95,7 @@ class Agent():
                 if self.load_on_install:
                     service.load_on_install = True
             except AgentElementException as e:
-                logger.error(f"Could not install{service.__class__.__name__} with {service.config_options()}: {e}")
+                logger.error(e)
                     
     def _uninstall_elements(self):
         """ uninstall all `Node`s, `Buffer`s, and `Service`s from the `Agent`.
@@ -159,7 +159,7 @@ class Agent():
                 try:
                     service.start()
                 except AgentElementException as e:
-                    logger.error(f"Could not start {service.__class__.__name__}: {e}")
+                    logger.error(e)
     
     @staticmethod
     def load_from(config_file : str) -> Agent:

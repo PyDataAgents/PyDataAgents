@@ -1,4 +1,4 @@
-#from .SubscribeService import SubscribeService
+from .SubscribeService import SubscribeService
 from .ServiceException import ServiceException
 from .ObserverException import ObserverException
 from .MappingObserver import MappingObserver
@@ -11,9 +11,11 @@ class SubscribeMappingObserver(MappingObserver):
 
     def observe(self):
         try:
-            self._mapping._subscribe()
+            if isinstance(self._mapping, SubscribeService):
+                self._mapping.subscribe()
         except ServiceException as e:
-            raise ObserverException(f"Could not execute subscribe on {self._mapping.__class__.__name__}: {self._mapping.config_options()}") from e
+            raise ObserverException(f"Could not execute subscribe on {self._mapping.__class__.__name__}:\n\t{e.message}") from e
 
     def unobserve(self):
-        self._mapping._unsubscribe()    
+        if isinstance(self._mapping, SubscribeService):
+            self._mapping.unsubscribe()    

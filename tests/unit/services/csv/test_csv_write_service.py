@@ -1,7 +1,11 @@
 import csv
 import os
 
+import pytest
+
+from pydag.agents.AgentElementException import AgentElementException
 from pydag.buffers.DictBuffer import DictBuffer
+from pydag.services.ServiceException import ServiceException
 from pydag.services.ThreadType import ThreadType
 from pydag.services.csv.CsvWriteService import CsvWriteService
 
@@ -37,6 +41,18 @@ def test_010():
     csv.install()
     
     for _ in range(1, 4):
-        csv._write_to_sink()
+        csv.write_to_sink()
         
     csv.uninstall()
+    
+def test_wrong_thread_type():
+    folder = os.path.dirname(__file__)
+    csv = CsvWriteService(folder=folder,
+                          file_post_fix="test",
+                          file_extension="csv",
+                          delimiter=";",
+                          thread_type="FEMTOSECOND",
+                          mapping_type="WRITE",
+                          n=1)
+    with pytest.raises(AgentElementException):
+        csv.install()
