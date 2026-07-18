@@ -1,0 +1,27 @@
+port: 8081
+with_api: true
+with_ui: true
+agent:
+  id: A1
+  description: null
+  buffer_store:
+    B1:
+      id: B1
+      type: pydag.buffers.SignalBuffer
+      sampling_period: 10
+      capacity: 100
+      signal:
+        type: pydag.buffers.signals.Sine
+  service_store:
+    S1:
+      id: S1
+      type: pydag.services.csv.CsvWriteService
+      thread_type: MILLI_SECONDS
+      observing_time: 100
+      n: 10
+      mapping_type: WRITE
+      folder: pydag/tests/regression/agents/app/data
+      buffer_ids:
+      - B1
+
+      

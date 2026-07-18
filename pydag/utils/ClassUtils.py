@@ -111,6 +111,15 @@ class ClassUtils:
                             raise AgentException(f"Expected a dictionary with '{AgentConfig.TYPE}' for property '{property_name}' of {obj}, but got {value}.")
                     else:
                         raise AgentException(f"Expected a dictionary for property '{property_name}' of {obj}, but got {type(value).__name__}.")
+                else:
+                    # check if property is an int
+                    current_value = getattr(obj, property_name)
+                    if isinstance(current_value, int) and not isinstance(current_value, bool):
+                        setattr(obj, property_name, int(value))
+                    elif isinstance(current_value, bool):
+                        setattr(obj, property_name, bool(value))
+                    else:
+                        setattr(obj, property_name, value)
             else:
                 # check if property is an int
                 current_value = getattr(obj, property_name)

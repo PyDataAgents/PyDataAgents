@@ -187,7 +187,7 @@ class Agent():
         else:
             raise AgentException(f"Configuration File {config_file} was not found!")
     
-    def release(self, blocking : bool = True):
+    def release(self, blocking : bool = False):
         """Release the `Agent` for operation.
         
         Installs all elements and starts services. If blocking is True,
@@ -205,6 +205,7 @@ class Agent():
             gc = AgentConfig(self)
             yc = YAMLConfig(f"Agent {self.id}.yaml")
             yc.save(gc)
+            
         self._start_services()
         
         self._stop_event.clear()
