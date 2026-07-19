@@ -58,11 +58,11 @@ class AgentApp():
             case _:
                 raise AgentException(f"loading from {file_path} is not defined")
     
-    def create(self):
+    def create(self, no_default_apis : bool = False, no_default_pages : bool = False):
         if self.with_api:
-            self._create_api()
+            self._create_api(no_default_apis=no_default_apis)
         if self.with_ui:           
-            self._create_ui()
+            self._create_ui(no_default_pages=no_default_pages)
                
     def run(self):
         if self.with_ui:

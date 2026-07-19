@@ -3,6 +3,7 @@ import os
 from nicegui import ui
 
 from pydag.agents.Agent import Agent
+from pydag.agents.app.AgentApp import AgentApp
 from pydag.agents.ui.UIDataModelPage import UIDataModelPage
 from pydag.buffers.DictBuffer import DictBuffer
 from pydag.agents.ui.UIBufferPage import UIBufferPage
@@ -11,11 +12,8 @@ from pydag.services.datamodel.DataModelService import DataModelService
 from tests.regression.agents.ui.TableDataModel import TableDataModel
 
 
-def test_000():
-    ag = Agent()
-    
-    p = UIBufferPage(ag)    
-    ag.add_ui_page(p)
+def test_000():    
+    p = UIBufferPage(None)  
     
     buf1 = DictBuffer()
     buf2 = DictBuffer()
@@ -57,13 +55,15 @@ def test_editable_table():
     
 
 def test_editable_table_in_datamodel():
-    ag = Agent(with_ui=True, port=10001, dark_mode=False)
+    ag = Agent()
     
     dms = DataModelService()
     dms.set_model(TableDataModel)
     
     ag.add_service(dms)
-    
-    ag.add_ui_page(UIDataModelPage(ag, dms))
-    
-    ag.release()
+        
+    app = AgentApp(port=10001, with_ui=True, with_api=True, dark_mode=False)
+    app.set_agent(ag)
+    app.add_ui_page(UIDataModelPage(ag, dms))
+    app.create()
+    app.run()

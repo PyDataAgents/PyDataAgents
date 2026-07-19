@@ -41,10 +41,13 @@ def test_020():
     app.run()
     
 def test_030():
-    ag = Agent(with_ui=True, with_api=True)
+    ag = Agent()
     
     s1 = Sine(f=10)
     buf = SignalBuffer(signal=s1, capacity=1000, sampling_period=10)    
     ag.add_buffer(buf)
     
-    ag.release()
+    app = AgentApp(port=8081, with_ui=True, with_api=True, dark_mode=False)
+    app.set_agent(ag)
+    app.create()
+    app.run()
