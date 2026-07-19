@@ -21,6 +21,16 @@ class DummyAIMessage:
         self.content = content
 
 
+class RecordingChatModel:
+    def __init__(self, response="ok"):
+        self.response = response
+        self.calls = []
+
+    def invoke(self, messages):
+        self.calls.append(messages)
+        return DummyAIMessage(self.response)
+
+
 class EchoChatModel:
     def __init__(self):
         self.prompts = []
@@ -289,6 +299,59 @@ def test_rag_chat_adds_internet_context_to_payload(monkeypatch):
         use_rag_context=False,
     ) == "ok"
     assert rs._langchain.calls[0]["payload"]["internet_context"] == "1. Title: Live result | URL: https://example.test | Content: fresh"
+
+
+def test_rag_chat_with_file_context_builds_multimodal_prompt():
+    """Ensure RAG chat sends files as message blocks and keeps text context in the prompt."""
+    from pydag.services.llm.RAGService import RAGService
+
+    rs = RAGService(model_provider="OPENAI")
+    rs._llm = RecordingChatModel()
+
+    assert rs.chat(
+        question="Summarize the file",
+        instruction="Return one sentence",
+        input_context={"source": "runtime"},
+        use_rag_context=False,
+        context_files="https://example.test/file.pdf",
+    ) == "ok"
+
+    messages = rs._llm.calls[0]
+    assert messages[0].content == rs.system_message
+    content = messages[-1].content
+    assert content[0]["type"] == "text"
+    assert "Question:\nSummarize the file" in content[0]["text"]
+    assert "Instruction:\nReturn one sentence" in content[0]["text"]
+    assert "Local Input Context:\n{\"source\": \"runtime\"}" in content[0]["text"]
+    assert content[1] == {
+        "type": "file",
+        "url": "https://example.test/file.pdf",
+        "filename": "file.pdf",
+        "mime_type": "application/pdf",
+    }
+
+
+def test_rag_chat_ollama_file_context_warns_and_uses_text_chain(monkeypatch):
+    """Ensure Ollama file inputs are warning-only and do not process files."""
+    from pydag.services.llm.RAGService import RAGService
+
+    rs = RAGService(model_provider="OLLAMA")
+    rs._langchain = DummyChain("ok")
+
+    def fail_if_called(_context_files):
+        raise AssertionError("Ollama placeholder must not normalize or process files")
+
+    monkeypatch.setattr(rs, "_normalize_context_files", fail_if_called)
+
+    with pytest.warns(RuntimeWarning, match="supported only for OPENAI and AZURE"):
+        assert rs.chat(
+            question="Q",
+            use_rag_context=False,
+            context_files="C:/missing/file.pdf",
+        ) == "ok"
+
+    assert len(rs._langchain.calls) == 1
+    assert rs._langchain.calls[0]["payload"]["context_files"] is None
 
 
 def test_get_retrieved_context_text_invokes_langchain_retriever_with_stringified_retrieval_query(monkeypatch):
