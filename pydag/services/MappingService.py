@@ -11,10 +11,6 @@ from .ServiceException import ServiceException
 from ..buffers.Buffer import Buffer
 from .MappingObserver import MappingObserver
 from .MappingType import MappingType
-from .PublishMappingObserver import PublishMappingObserver
-from .ReadMappingObserver import ReadMappingObserver
-from .SubscribeMappingObserver import SubscribeMappingObserver
-from .WriteMappingObserver import WriteMappingObserver
 from .ObserverService import ObserverService
 
 if TYPE_CHECKING:
@@ -46,7 +42,11 @@ class MappingService(ObserverService):
         from .PublishService import PublishService
         from .SubscribeService import SubscribeService
         from .WriteService import WriteService
-        from .ReadService import ReadService
+        from .ReadService import ReadService        
+        from .PublishMappingObserver import PublishMappingObserver
+        from .ReadMappingObserver import ReadMappingObserver
+        from .SubscribeMappingObserver import SubscribeMappingObserver
+        from .WriteMappingObserver import WriteMappingObserver
         # assemble buffers from agent
         if len(self._buffers) == 0:
             if agent is not None:

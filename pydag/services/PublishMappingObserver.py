@@ -1,4 +1,5 @@
-#from .PublishService import PublishService
+from __future__ import annotations
+
 from .PublishService import PublishService
 from .ServiceException import ServiceException
 from .ObserverException import ObserverException

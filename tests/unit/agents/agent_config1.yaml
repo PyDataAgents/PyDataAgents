@@ -3,12 +3,6 @@ description: null
 create_config: false
 load_on_install: false
 with_persistence: false
-port: 8081
-with_api: false
-api_key_file: null
-with_ui: false
-dark_mode: true
-color_schema: {}
 buffer_store:
   B1:
     type: pydag.buffers.ListBuffer
