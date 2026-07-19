@@ -1,8 +1,10 @@
+import base64
 import configparser
 
 import pytest
 from langchain_core.messages import AIMessage
 
+from pydag.services.ServiceException import ServiceException
 from pydag.services.llm.LLMService import LLMService, ModelProvider
 
 
@@ -24,6 +26,16 @@ class DummySearchTool:
     def invoke(self, query):
         self.calls.append(query)
         return self.response
+
+
+class RecordingChatModel:
+    def __init__(self, response="ok"):
+        self.response = response
+        self.calls = []
+
+    def invoke(self, messages):
+        self.calls.append(messages)
+        return AIMessage(content=self.response)
 
 
 def test_retained_messages_use_langgraph_thread_history(monkeypatch):
@@ -88,6 +100,160 @@ def test_llmservice_chat_skips_internet_context_when_disabled_or_call_disabled()
         assert service.chat("What changed today?", **kwargs) == "ok"
         assert service._internet_search_tool.calls == []
         assert service._langchain.calls[0]["payload"]["question"] == "What changed today?"
+
+
+@pytest.mark.parametrize("provider", [ModelProvider.OPENAI.value, ModelProvider.AZURE.value])
+def test_llmservice_file_context_dispatches_openai_compatible_providers(provider):
+    service = LLMService(model_provider=provider)
+    service._llm = RecordingChatModel()
+
+    assert service.chat("Describe the file", context_files="https://example.test/file.pdf") == "ok"
+
+    messages = service._llm.calls[0]
+    content = messages[-1].content
+    assert content[0]["type"] == "text"
+    assert "Describe the file" in content[0]["text"]
+    assert content[1] == {
+        "type": "file",
+        "url": "https://example.test/file.pdf",
+        "filename": "file.pdf",
+        "mime_type": "application/pdf",
+    }
+
+
+def test_llmservice_file_context_builds_multiple_remote_blocks():
+    service = LLMService(model_provider=ModelProvider.OPENAI.value)
+    service._llm = RecordingChatModel()
+
+    service.chat(
+        "Describe these files",
+        context_files=[
+            "https://example.test/image.png",
+            "https://example.test/file.pdf",
+        ],
+    )
+
+    content = service._llm.calls[0][-1].content
+    assert content[1] == {"type": "image_url", "image_url": {"url": "https://example.test/image.png"}}
+    assert content[2]["type"] == "file"
+    assert content[2]["url"] == "https://example.test/file.pdf"
+    assert content[2]["filename"] == "file.pdf"
+
+
+def test_llmservice_file_context_builds_local_path_and_file_url_blocks(tmp_path):
+    local_pdf = tmp_path / "local.pdf"
+    local_pdf.write_bytes(b"%PDF-test")
+    local_image = tmp_path / "local.jpg"
+    local_image.write_bytes(b"jpg-test")
+    service = LLMService(model_provider=ModelProvider.OPENAI.value)
+    service._llm = RecordingChatModel()
+
+    service.chat("Describe local files", context_files=[str(local_pdf), local_pdf.as_uri(), str(local_image)])
+
+    content = service._llm.calls[0][-1].content
+    expected_base64 = base64.b64encode(b"%PDF-test").decode("utf-8")
+    expected_image_base64 = base64.b64encode(b"jpg-test").decode("utf-8")
+    assert content[1]["type"] == "file"
+    assert content[1]["base64"] == expected_base64
+    assert content[1]["filename"] == "local.pdf"
+    assert content[1]["mime_type"] == "application/pdf"
+    assert content[2]["base64"] == expected_base64
+    assert content[3] == {
+        "type": "image_url",
+        "image_url": {"url": "data:image/jpeg;base64," + expected_image_base64},
+    }
+
+
+def test_llmservice_file_context_builds_data_uri_base64_and_raw_bytes_blocks():
+    service = LLMService(model_provider=ModelProvider.OPENAI.value)
+    service._llm = RecordingChatModel()
+    image_payload = base64.b64encode(b"image-bytes").decode("utf-8")
+    file_payload = base64.b64encode(b"file-bytes").decode("utf-8")
+
+    service.chat(
+        "Describe inline files",
+        context_files=[
+            "data:image/png;base64," + image_payload,
+            file_payload,
+            b"raw-bytes",
+        ],
+    )
+
+    content = service._llm.calls[0][-1].content
+    assert content[1] == {"type": "image_url", "image_url": {"url": "data:image/png;base64," + image_payload}}
+    assert content[2] == {
+        "type": "file",
+        "base64": file_payload,
+        "filename": "context_file_2",
+        "mime_type": "application/octet-stream",
+    }
+    assert content[3] == {
+        "type": "file",
+        "base64": base64.b64encode(b"raw-bytes").decode("utf-8"),
+        "filename": "context_file_3",
+        "mime_type": "application/octet-stream",
+    }
+
+
+def test_llmservice_empty_context_files_uses_existing_text_chain():
+    service = LLMService()
+    service._langchain = DummyChain("ok")
+
+    assert service.chat("Q", context_files=[]) == "ok"
+
+    assert len(service._langchain.calls) == 1
+    assert service._langchain.calls[0]["payload"]["question"] == "Q"
+
+
+def test_llmservice_ollama_file_context_warns_and_does_not_normalize(monkeypatch):
+    service = LLMService(model_provider=ModelProvider.OLLAMA.value)
+    service._langchain = DummyChain("ok")
+
+    def fail_if_called(_context_files):
+        raise AssertionError("Ollama placeholder must not normalize or process files")
+
+    monkeypatch.setattr(service, "_normalize_context_files", fail_if_called)
+
+    with pytest.warns(RuntimeWarning, match="supported only for OPENAI and AZURE"):
+        assert service.chat("Q", context_files="C:/missing/file.pdf") == "ok"
+
+    assert len(service._langchain.calls) == 1
+    assert service._langchain.calls[0]["payload"]["question"] == "Q"
+
+
+@pytest.mark.parametrize(
+    "context_files",
+    [
+        {"url": "https://example.test/file.pdf"},
+        "relative/file.pdf",
+        "ftp://example.test/file.pdf",
+        "",
+        "https://",
+        "not-base64@@",
+    ],
+)
+def test_llmservice_rejects_invalid_context_file_inputs(context_files):
+    service = LLMService(model_provider=ModelProvider.OPENAI.value)
+    service._llm = RecordingChatModel()
+
+    with pytest.raises(ServiceException):
+        service.chat("Q", context_files=context_files)
+
+
+def test_llmservice_rejects_missing_local_context_file(tmp_path):
+    service = LLMService(model_provider=ModelProvider.OPENAI.value)
+    service._llm = RecordingChatModel()
+
+    with pytest.raises(ServiceException):
+        service.chat("Q", context_files=str(tmp_path / "missing.pdf"))
+
+
+def test_llmservice_rejects_files_for_unsupported_provider():
+    service = LLMService(model_provider=ModelProvider.LANGDOCK.value)
+    service._llm = RecordingChatModel()
+
+    with pytest.raises(ServiceException):
+        service.chat("Q", context_files="https://example.test/file.pdf")
 
 
 # This test performs real internet access through Tavily. It requires a Tavily API key.

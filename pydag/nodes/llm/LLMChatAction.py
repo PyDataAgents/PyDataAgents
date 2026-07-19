@@ -23,6 +23,13 @@ class LLMChatAction(BufferNode, ServiceNode, Action):
     3. Chat-with-local-context: `RAGService` with `question` + `input_context`, `use_rag_context=False`.
     4. Full-mode-augment: `question` + `input_context` + retrieval enabled, no strict structure enforcement.
     5. Full-mode-template_fill: same as full augment plus strict structure validation.
+
+    Optional file context can be supplied via `context_files_key` or
+    `context_files_value`. V1 accepts external URLs, local file URLs, absolute
+    local paths, data URIs, plain base64 strings, raw bytes, or lists of those
+    values. File inputs are supported only for OPENAI and AZURE model
+    providers. OLLAMA file processing is not implemented yet; supplying files
+    with OLLAMA emits a warning and continues text-only.
     """
 
     template: str = field(
@@ -84,6 +91,18 @@ class LLMChatAction(BufferNode, ServiceNode, Action):
             "description": "Fixed value for the Additional runtime context passed directly from parent buffers (not retrieved from vector DB). if input_context_keys is not configured, this value is used as the input context for all rows.",
         },
     )
+    context_files_key: str = field(
+        default=None,
+        metadata={
+            "description": "Key from which to receive optional file context. V1 accepts str, bytes, or list[str | bytes].",
+        },
+    )
+    context_files_value: str | bytes | list[str | bytes] | None = field(
+        default=None,
+        metadata={
+            "description": "Fixed optional file context for all rows. V1 accepts external URLs, file URLs, absolute local paths, data URIs, plain base64 strings, raw bytes, or lists of those values.",
+        },
+    )
 
     input_context_mode: str = field(
         default="augment",
@@ -138,6 +157,7 @@ class LLMChatAction(BufferNode, ServiceNode, Action):
             instruction = self._resolve_instruction(row)
             input_context = self._resolve_input_context(row)
             retrieval_query = self._resolve_retrieval_query(row, question)
+            context_files = self._resolve_context_files(row)
 
             answer = self._service.chat(
                 question=question,
@@ -146,6 +166,7 @@ class LLMChatAction(BufferNode, ServiceNode, Action):
                 retrieval_query=retrieval_query,
                 use_rag_context=self.use_rag_context,
                 use_internet_context=self.use_internet_access,
+                context_files=context_files,
             )
             normalized_answer = self._normalize_answer_for_mode(answer, input_context)
 
@@ -166,6 +187,7 @@ class LLMChatAction(BufferNode, ServiceNode, Action):
             ("instruction", self.instruction_key, self.instruction_value),
             ("retrieval_query", self.retrieval_query_key, self.retrieval_query_value),
             ("input_context", None if len(self.input_context_keys) == 0 else "<keys>", self.input_context_value),
+            ("context_files", self.context_files_key, self.context_files_value),
         ]
         for name, key, value in pairs:
             if key is not None and value is not None:
@@ -179,6 +201,7 @@ class LLMChatAction(BufferNode, ServiceNode, Action):
                 self.instruction_value,
                 self.retrieval_query_value,
                 self.input_context_value,
+                self.context_files_value,
             ]
         )
 
@@ -188,6 +211,7 @@ class LLMChatAction(BufferNode, ServiceNode, Action):
                 self.question_key is not None,
                 self.instruction_key is not None,
                 self.retrieval_query_key is not None,
+                self.context_files_key is not None,
                 len(self.input_context_keys) > 0,
                 len(self.pass_through_keys) > 0,
                 self._uses_legacy_template_question(),
@@ -268,6 +292,9 @@ class LLMChatAction(BufferNode, ServiceNode, Action):
                 raise NodeException("missing configured key(s) for input_context: " + ", ".join(missing_keys))
             return {key: row[key] for key in self.input_context_keys}
         return self.input_context_value
+
+    def _resolve_context_files(self, row: dict) -> str | bytes | list[str | bytes] | None:
+        return self._resolve_key_or_value(row, self.context_files_key, self.context_files_value, "context_files")
 
     def _to_prompt_text(self, value: Any) -> str:
         if value is None:

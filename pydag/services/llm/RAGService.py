@@ -22,7 +22,14 @@ from ...services.ServiceException import ServiceException
 
 @dataclass
 class RAGService(LLMService):
-    """Retrieval Augmented Generation (RAG) Service for document based LLM knowledge retrieval in chat form."""
+    """Retrieval Augmented Generation (RAG) Service for document based LLM knowledge retrieval in chat form.
+
+    Optional per-call file context is accepted through `chat(..., context_files=...)`.
+    External URLs, local file URLs, absolute local paths, data URIs,
+    plain base64 strings, raw bytes, or lists of those values are accepted. File inputs are
+    supported only for OPENAI and AZURE. OLLAMA file handling is not implemented
+    yet; supplying files with OLLAMA emits a warning and continues text-only.
+    """
 
     # Constants
     MODEL_RESOURCE_FOLDER = Path(AgentConfig.MODEL_RESOURCE_FOLDER)
@@ -102,11 +109,25 @@ class RAGService(LLMService):
             chain = prompt | self._llm
 
             def call_model(state, history_messages):
+                retrieved_context = self._get_retrieved_context_text(
+                    retrieval_query=state["retrieval_query"],
+                    use_rag_context=state["use_rag_context"],
+                )
+                if self._context_files_supplied(state.get("context_files")):
+                    return self._invoke_model_with_context_files(
+                        prompt_text=self._format_rag_prompt_text(
+                            question=state["question"],
+                            instruction=state["instruction"],
+                            input_context=state["input_context"],
+                            retrieved_context=retrieved_context,
+                            internet_context=state.get("internet_context", ""),
+                        ),
+                        context_files=state["context_files"],
+                        history_messages=history_messages,
+                        system_message=self.system_message,
+                    )
                 return chain.invoke({
-                    "context": self._get_retrieved_context_text(
-                        retrieval_query=state["retrieval_query"],
-                        use_rag_context=state["use_rag_context"],
-                    ),
+                    "context": retrieved_context,
                     "history": history_messages,
                     "question": state["question"],
                     "instruction": state["instruction"],
@@ -161,6 +182,27 @@ class RAGService(LLMService):
             return json.dumps(input_context, ensure_ascii=True)
         except Exception:
             return str(input_context)
+
+    def _format_rag_prompt_text(
+        self,
+        question: str,
+        instruction: str,
+        input_context: str,
+        retrieved_context: str,
+        internet_context: str,
+    ) -> str:
+        return (
+            "Question:\n"
+            + str(question)
+            + "\n\nInstruction:\n"
+            + str(instruction)
+            + "\n\nLocal Input Context:\n"
+            + str(input_context)
+            + "\n\nRetrieved Context:\n"
+            + str(retrieved_context)
+            + "\n\nInternet Context:\n"
+            + str(internet_context)
+        )
 
     def _get_retrieved_context_text(self, retrieval_query: str, use_rag_context: bool = True) -> str:
         if not use_rag_context:
@@ -288,6 +330,7 @@ class RAGService(LLMService):
         retrieval_query: str | None = None,
         use_rag_context: bool = True,
         use_internet_context: bool | None = None,
+        context_files: str | bytes | list[str | bytes] | None = None,
         session_id: str = "DEFAULT_SESSION",
     ) -> str:
         """Chat with RAG-backed context.
@@ -299,11 +342,16 @@ class RAGService(LLMService):
             retrieval_query: The query used only for document retrieval from the vector store.
             use_rag_context: Set to False to disable retrieval and answer only from the prompt payload.
             use_internet_context: Optional per-call internet context override. False disables internet context for this call.
+            context_files: Optional file context. Accepts external URLs,
+            local file URLs, absolute local paths, data URIs, plain base64
+            strings, raw bytes, or lists of those values. File inputs are
+            supported only for OPENAI and AZURE.
             session_id: Session id used for retained message history.
         """
         if question is None or str(question).strip() == "":
             raise ServiceException("question must not be empty for " + self.cname())
 
+        context_files = self._prepare_context_files_for_provider(context_files)
         payload = {
             "question": str(question),
             "instruction": "" if instruction is None else str(instruction),
@@ -314,6 +362,7 @@ class RAGService(LLMService):
                 str(question) if retrieval_query is None else str(retrieval_query),
                 use_internet_context=use_internet_context,
             ),
+            "context_files": context_files,
         }
 
         if self.retain_messages:
@@ -322,5 +371,21 @@ class RAGService(LLMService):
                 config={"configurable": {"thread_id": session_id}},
             )
         else:
-            ai_message = self._langchain.invoke(payload)
+            if self._context_files_supplied(context_files):
+                ai_message = self._invoke_model_with_context_files(
+                    prompt_text=self._format_rag_prompt_text(
+                        question=payload["question"],
+                        instruction=payload["instruction"],
+                        input_context=payload["input_context"],
+                        retrieved_context=self._get_retrieved_context_text(
+                            retrieval_query=payload["retrieval_query"],
+                            use_rag_context=payload["use_rag_context"],
+                        ),
+                        internet_context=payload["internet_context"],
+                    ),
+                    context_files=context_files,
+                    system_message=self.system_message,
+                )
+            else:
+                ai_message = self._langchain.invoke(payload)
         return get_message_content(ai_message)

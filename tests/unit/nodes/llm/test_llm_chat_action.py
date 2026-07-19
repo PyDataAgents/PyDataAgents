@@ -51,6 +51,7 @@ class RecordingRAGService(RAGService):
         retrieval_query: str | None = None,
         use_rag_context: bool = True,
         use_internet_context: bool | None = None,
+        context_files: str | bytes | list[str | bytes] | None = None,
         session_id: str = "DEFAULT_SESSION",
     ) -> str:
         self.calls.append(
@@ -61,6 +62,7 @@ class RecordingRAGService(RAGService):
                 "retrieval_query": retrieval_query,
                 "use_rag_context": use_rag_context,
                 "use_internet_context": use_internet_context,
+                "context_files": context_files,
                 "session_id": session_id,
             }
         )
@@ -185,6 +187,21 @@ def test_execute_raises_on_input_context_key_and_value_conflict():
         action.execute()
 
 
+def test_execute_raises_on_context_files_key_and_value_conflict():
+    """Ensure context_files cannot be configured with both key and value."""
+    service = _new_service()
+    action = LLMChatAction(
+        question_value="q",
+        context_files_key="files",
+        context_files_value="https://example.test/file.pdf",
+    )
+    action.set_service(service)
+    action.install()
+
+    with pytest.raises(NodeException):
+        action.execute()
+
+
 def test_execute_raises_on_missing_configured_parent_key():
     """Ensure missing configured parent keys raise NodeException."""
     service = _new_service()
@@ -274,6 +291,54 @@ def test_mode_chat_with_local_context_only():
     assert service.calls[0]["question"] == "Summarize local context"
     assert service.calls[0]["input_context"] == {"context": {"a": 1, "b": 2}}
     assert service.calls[0]["use_rag_context"] is False
+
+
+def test_context_files_value_is_forwarded_to_rag_service():
+    """Ensure fixed context_files_value is passed through without node-side normalization."""
+    service = _new_service()
+    service.next_answer = "file-answer"
+    context_files = [
+        "https://example.test/file.pdf",
+        b"raw-bytes",
+    ]
+
+    action = LLMChatAction(
+        question_value="Read the attached files",
+        context_files_value=context_files,
+        use_rag_context=False,
+    )
+    action.set_service(service)
+    action.install()
+    action.execute()
+
+    assert service.calls[0]["question"] == "Read the attached files"
+    assert service.calls[0]["context_files"] == context_files
+
+
+def test_context_files_key_is_resolved_from_parent_row():
+    """Ensure context_files_key resolves row values as a single item or list."""
+    service = _new_service()
+    context_files = ["https://example.test/a.pdf", "https://example.test/b.png"]
+
+    action = LLMChatAction(
+        question_key="question",
+        context_files_key="files",
+        use_rag_context=False,
+    )
+    action.set_service(service)
+    action.add_parent(
+        _link_parent_with_row(
+            {
+                "question": "Use supplied files",
+                "files": [context_files],
+            }
+        )
+    )
+    action.install()
+    action.execute()
+
+    assert service.calls[0]["question"] == "Use supplied files"
+    assert service.calls[0]["context_files"] == context_files
 
 
 def test_mode_full_augment():
@@ -678,11 +743,17 @@ def test_llmservice_wraps_modelutils_failures_as_serviceexception(monkeypatch):
     def _failing_ensure(model, endpoint):
         raise RuntimeError("simulated ensure failure for " + model + "@" + str(endpoint))
 
+    class _FakeOllamaLLM:
+        def __init__(self, model, base_url=None):
+            self.model = model
+            self.base_url = base_url
+
     monkeypatch.setattr(
         llm_service_module.ModelUtils,
         "ensure_ollama_model_available",
         staticmethod(_failing_ensure),
     )
+    monkeypatch.setattr(llm_service_module, "OllamaLLM", _FakeOllamaLLM)
 
     service = LLMService(model_provider="OLLAMA", model="llama3.1", endpoint="http://localhost:11434")
 
