@@ -30,6 +30,8 @@ if "graphviz" not in sys.modules:
     graphviz_stub.Digraph = _DummyDigraph
     sys.modules["graphviz"] = graphviz_stub
 
+from pydag.agents.AgentElementException import AgentElementException
+from pydag.agents.AgentStates import AgentElementState
 from pydag.buffers.DictBuffer import DictBuffer
 from pydag.buffers.ListBuffer import ListBuffer
 from pydag.nodes.NodeException import NodeException
@@ -39,6 +41,16 @@ from pydag.nodes.documents.PDFWriteFormAction import PDFWriteFormAction
 from pydag.nodes.llm.LLMChatAction import LLMChatAction
 from pydag.services.llm.RAGService import RAGService
 from pydag.utils.PDFUtils import normalize_state_name
+
+
+def _assert_install_fails_with_node_exception(element, expected_cause_message: str):
+    with pytest.raises(AgentElementException, match=f"Could not install {element.__class__.__name__}") as exc_info:
+        element.install()
+
+    cause = exc_info.value.__cause__
+    assert isinstance(cause, NodeException)
+    assert expected_cause_message in str(cause)
+    assert element.get_state() == AgentElementState.ERROR
 
 
 def _test_pdf_file() -> str:
@@ -310,14 +322,12 @@ def test_write_pdf_form_rejects_non_pdf_input_when_extension_required(tmp_path):
 
 def test_write_pdf_form_install_rejects_duplicate_fill_input_keys():
     writer = PDFWriteFormAction(fill_input_keys=["answer", "answer"])
-    with pytest.raises(NodeException, match="fill_input_keys must contain unique entries"):
-        writer.install()
+    _assert_install_fails_with_node_exception(writer, "keys must contain unique entries")
 
 
 def test_write_pdf_form_install_rejects_duplicate_output_keys():
     writer = PDFWriteFormAction(output_keys=["filepath", "filepath", "written_fields", "written_field_count"])
-    with pytest.raises(NodeException, match="output_keys must contain unique entries"):
-        writer.install()
+    _assert_install_fails_with_node_exception(writer, "keys must contain unique entries")
 
 
 def test_write_pdf_form_rejects_output_path_that_matches_source_pdf():
