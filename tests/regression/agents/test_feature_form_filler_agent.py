@@ -44,7 +44,7 @@ from pydag.nodes.llm.LLMChatAction import LLMChatAction
 from pydag.services.ThreadType import ThreadType
 from pydag.services.documents.FileEmbeddingService import FileEmbeddingService
 from pydag.services.llm.RAGService import RAGService
-from pydag.services.statemachine.SimpleActionService import SimpleActionService
+from pydag.services.statemachine.SimpleStatemachine import SimpleStatemachine
 
 
 def _repo_root() -> Path:
@@ -439,7 +439,7 @@ def test_feature_form_filler_agent_end_to_end_local_example():
     )
     write_pdf_form_action.add_parent(llm_fill_action)
 
-    action_service = SimpleActionService(
+    action_service = SimpleStatemachine(
         id="FORM_FILLER_ACTION_SERVICE_LOCAL",
         thread_type=ThreadType.ONLY_ONCE.value,
     )
@@ -523,7 +523,7 @@ def test_feature_form_filler_agent_end_to_end_openai_example():
     llm_fill_action.add_parent(read_pdf_form_action)
     llm_fill_action.set_service(rag_service)
 
-    action_service = SimpleActionService(
+    action_service = SimpleStatemachine(
         id="FORM_FILLER_ACTION_SERVICE_OPENAI",
         thread_type=ThreadType.ONLY_ONCE.value,
     )
@@ -636,7 +636,7 @@ def test_feature_form_filler_agent_end_to_end_openai_nordlichter_context3():
     llm_fill_action.add_parent(read_pdf_form_action)
     llm_fill_action.set_service(rag_service)
 
-    action_service = SimpleActionService(
+    action_service = SimpleStatemachine(
         id="FORM_FILLER_ACTION_SERVICE_OPENAI_NORDLICHTER",
         thread_type=ThreadType.ONLY_ONCE.value,
     )

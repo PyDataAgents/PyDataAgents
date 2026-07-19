@@ -1,5 +1,6 @@
 import time
 from pydag.agents.Agent import Agent
+from pydag.agents.app.AgentApp import AgentApp
 from pydag.buffers.ListBuffer import ListBuffer
 from pydag.buffers.DataType import DataType
 from pydag.services.MappingType import MappingType
@@ -53,7 +54,7 @@ def test_opcua_get_missing_element():
 
 #Integration test requires Prosys OPC UA Simulation Server + REST port
 def test_opcua_rest_blocking_start():
-    agent = Agent(id="AG1", port=8002, with_api=True)
+    agent = Agent(id="AG1")
     buf = ListBuffer(id="T1", capacity=1, data_type=DataType.FLOAT.value, unit="°C")
     agent.add_buffer(buf)
     opcua = OpcUaService(
@@ -68,7 +69,9 @@ def test_opcua_rest_blocking_start():
     opcua.add_buffer(buf)
     agent.add_service(opcua)
     
-    # Do not actually block in tests; just verify start/stop
-    agent.release()
+    app = AgentApp(with_api=True, port=8002)
+    app.set_agent(agent)
+    app.create()
+    app.run()
 
     

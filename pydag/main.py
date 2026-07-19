@@ -15,6 +15,6 @@ if __name__ == "__main__":
         print(gc)
         agent = gc.create()
     else:
-        agent = Agent(id = "A1", with_api=True)
+        agent = Agent(id = "A1")
 
     agent.release()

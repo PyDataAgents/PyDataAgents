@@ -1,10 +1,10 @@
 from pydag.nodes.utils.SleepAction import SleepAction
 from pydag.services.Service import Service
-from pydag.services.statemachine.SimpleActionService import SimpleActionService
+from pydag.services.statemachine.SimpleStatemachine import SimpleStatemachine
 
 
 def test_install():
-    sas = SimpleActionService()
+    sas = SimpleStatemachine()
     
     sa = SleepAction()
     sas.add_node(sa)
@@ -13,7 +13,7 @@ def test_install():
     
 def test_install_from_dict():
     d : dict[str, Service] = {}
-    sas = SimpleActionService()
+    sas = SimpleStatemachine()
     d[sas.id] = sas
     
     sa = SleepAction()

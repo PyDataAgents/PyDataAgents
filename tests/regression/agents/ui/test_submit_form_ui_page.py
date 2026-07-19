@@ -3,6 +3,7 @@ from typing import Any
 from nicegui import ui
 
 from pydag.agents.Agent import Agent
+from pydag.agents.app.AgentApp import AgentApp
 from pydag.buffers.Buffer import Buffer
 from pydag.buffers.DictBuffer import DictBuffer
 from pydag.agents.ui.UIElements import BufferTable, UIPage
@@ -51,12 +52,15 @@ class SubmitFormPage(UIPage):
             
 
 def test_000():
-    ag = Agent(with_ui=True)
+    ag = Agent()
     
     buf = DictBuffer()   
     ag.add_buffer(buf)
     
     sp = SubmitFormPage(ag, buf)
-    ag.add_ui_page(sp)
     
-    ag.release()
+    app = AgentApp(port=8081, with_ui=True, with_api=False, dark_mode=False)
+    app.set_agent(ag)
+    app.add_ui_page(sp)
+    app.create()
+    app.run()

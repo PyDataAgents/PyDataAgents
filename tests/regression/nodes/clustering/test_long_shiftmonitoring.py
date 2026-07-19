@@ -9,7 +9,7 @@ from pydag.nodes.featureextraction.ChronosExtractor import ChronosExtractor
 from pydag.nodes.featureextraction.ROCKETExtractor import ROCKETExtractor
 from pydag.nodes.clustering.ShiftMonitoring import ShiftMonitoring
 from pydag.nodes.dimreduction.PCADimReduction import PCADimReduction
-from pydag.services.statemachine.SimpleActionService import SimpleActionService
+from pydag.services.statemachine.SimpleStatemachine import SimpleStatemachine
 from pydag.agents.Agent import Agent
 from pydag.nodes.featureextraction.PSDExtractor import PSDExtractor
 
@@ -346,7 +346,7 @@ def test_long_agent_mode_with_rest_api():
 
     # Test Distribution Shift Monitoring in Agent mode with REST-API
     
-    ag = Agent(with_api=True, port=8001)
+    ag = Agent()
     
     signal = DatasetBuffer(id="signal", dataset_name="ChlorineConcentration", sort_by_y=True, index_enabled=True, duplicate_ids=["ChlorineConcentration_2"])
     # 903 + x datapoints with length 166 belong to category 1. 
@@ -356,7 +356,7 @@ def test_long_agent_mode_with_rest_api():
     _index = signal.data(persistent=True)["index"][-1]
     index_buff.push({"count": _index})
 
-    sm = SimpleActionService() 
+    sm = SimpleStatemachine() 
      
     lba = LinkBufferAction()
     lba.set_buffer(signal)

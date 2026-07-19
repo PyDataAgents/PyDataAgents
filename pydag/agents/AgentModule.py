@@ -5,7 +5,6 @@ class AgentModule:
         # services
         import pydag.services.ObserverService
         import pydag.services.MappingService
-        import pydag.services.statemachine.SimpleActionService
         import pydag.services.statemachine.SimpleStatemachine
         import pydag.services.statemachine.SFCService
         import pydag.services.plot.PlotlifyService

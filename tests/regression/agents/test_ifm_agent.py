@@ -1,3 +1,4 @@
+from pydag.agents.app.AgentApp import AgentApp
 from pydag.services.socket.ifmvse.VSEService import VSEService
 from pydag.agents.Agent import Agent
 from pydag.buffers.ListBuffer import ListBuffer
@@ -5,7 +6,7 @@ from pydag.buffers.ListBuffer import ListBuffer
 
 def test_000():
     
-    ag = Agent(with_api=True, port=8089)
+    ag = Agent()
     
     buf = ListBuffer(id="S1", capacity=300000, duplicate_ids=["S11"])    
     ag.add_buffer(buf)
@@ -14,6 +15,9 @@ def test_000():
     vse.add_buffer(buf)
     ag.add_service(vse)
     
-    ag.release()
+    app = AgentApp(with_api=True, port=8089)
+    app.set_agent(ag)
+    app.create()
+    app.run()
     
     

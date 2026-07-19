@@ -1,4 +1,5 @@
 import os
+from pydag.agents.app.AgentApp import AgentApp
 from pydag.services.csv.CsvWriteService import CsvWriteService
 from pydag.agents.Agent import Agent
 from pydag.buffers.SignalBuffer import SignalBuffer
@@ -6,7 +7,7 @@ from pydag.buffers.signals.Sine import Sine
 from pydag.services.ThreadType import ThreadType
 
 def test_signal_csv_agent_rest():
-    ag = Agent(with_api=True, port=8001)
+    ag = Agent()
     
     s = Sine()
     buf = SignalBuffer(signal=s, capacity=1000, sampling_period=100)
@@ -25,5 +26,8 @@ def test_signal_csv_agent_rest():
     
     ag.add_service(a)
     
-    ag.release()
+    app = AgentApp(with_api=True, port=8001)
+    app.set_agent(ag)
+    app.create()
+    app.run()
     

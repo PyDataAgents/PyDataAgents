@@ -13,7 +13,7 @@ from pydag.nodes.utils.TrueTransition import TrueTransition
 from pydag.nodes.utils.CountAction import CountAction
 from pydag.nodes.utils.CountTransition import CountTransition
 from pydag.nodes.utils.PrintAction import PrintAction
-from pydag.services.statemachine.SimpleActionService import SimpleActionService
+from pydag.services.statemachine.SimpleStatemachine import SimpleStatemachine
 from pydag.services.ThreadType import ThreadType
 
 
@@ -278,7 +278,7 @@ def test_050():
     sm.start()
 
 def test_060():
-    """Test that SimpleActionService executes each Action exactly once with ONLY_ONCE thread type."""
+    """Test that SimpleStatemachine executes each Action exactly once with ONLY_ONCE thread type."""
     # Arrange
     a1 = StartAction()
     a2 = CountAction()
@@ -286,7 +286,7 @@ def test_060():
     a1.add_child(a2)
     a2.add_child(a3)
 
-    service = SimpleActionService()
+    service = SimpleStatemachine()
     service.add_node(a1)
     service.add_node(a2)
     service.add_node(a3)

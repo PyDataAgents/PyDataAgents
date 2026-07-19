@@ -1,4 +1,5 @@
 
+from pydag.agents.app.AgentApp import AgentApp
 from pydag.services.vision.WebcamService import WebcamService
 from pydag.agents.Agent import Agent
 from pydag.buffers.DataType import DataType
@@ -8,7 +9,7 @@ from pydag.services.ThreadType import ThreadType
 
 
 def test_webcam_agent():
-    ag = Agent(with_api=True, port=8108)
+    ag = Agent()
     
     buf = ListBuffer(id="B1", data_type=DataType.IMAGE, capacity=1)
     ag.add_buffer(buf)
@@ -21,5 +22,8 @@ def test_webcam_agent():
     wca.add_buffer(buf)
     ag.add_service(wca)
     
-    ag.release()
+    app = AgentApp(with_api=True, port=8108)
+    app.set_agent(ag)
+    app.create()
+    app.run()
     

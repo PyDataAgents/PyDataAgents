@@ -1,3 +1,4 @@
+from pydag.agents.app.AgentApp import AgentApp
 from pydag.services.csv.CsvReadService import CsvReadService
 from pydag.services.csv.CsvWriteService import CsvWriteService
 from pydag.services.db.SQLService import SQLService
@@ -10,7 +11,7 @@ from pydag.buffers.signals.Sine import Sine
 
 
 def test_000():
-    agent = Agent(with_api=True)
+    agent = Agent()
     agent.id = "G1"
     
     s = Sine()
@@ -28,7 +29,7 @@ def test_000():
 
 def test_020():
     
-    agent = Agent(with_api=True, port=8001)
+    agent = Agent()
     agent.id = "G1"
     
     b1 = ListBuffer()
@@ -46,4 +47,7 @@ def test_020():
     s3 = SQLService()
     agent.add_service(s3)
         
-    agent.release()
+    app = AgentApp(with_api=True, port=8001)
+    app.set_agent(agent)
+    app.create()
+    app.run()

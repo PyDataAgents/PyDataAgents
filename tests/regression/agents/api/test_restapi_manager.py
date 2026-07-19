@@ -3,6 +3,7 @@ import time
 
 from pydag.agents.Agent import Agent
 from pydag.agents.api.RESTAPIManager import RESTAPIManager
+from pydag.agents.app.AgentApp import AgentApp
 from pydag.utils.FileUtils import FileUtils
 
 
@@ -13,15 +14,19 @@ def test_api_key_generation():
     
 def test_rest_service_with_api_keys():
     
-    ag = Agent(with_api=True, api_key_file=os.path.dirname(__file__) + os.sep + "test_API_KEYS.html")
+    ag = Agent()
             
-    ag.release()
+    app = AgentApp(with_api=True, port=8108, api_key_file=os.path.dirname(__file__) + os.sep + "test_API_KEYS.html")
+    app.set_agent(ag)
+    app.create()
+    app.run()
     
     
-def test_rest_service_with_no_api_keys():
-    
-    ag = Agent(with_api=True)
-    
-    ag.release()
+def test_rest_service_with_no_api_keys():    
+    ag = Agent()    
+    app = AgentApp(with_api=True, port=8108)
+    app.set_agent(ag)
+    app.create()
+    app.run()
     
     

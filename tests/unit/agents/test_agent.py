@@ -5,7 +5,7 @@ from pydag.agents.Agent import Agent
 from pydag.buffers.DictBuffer import DictBuffer
 from pydag.nodes.utils.PrintAction import PrintAction
 from pydag.services.ThreadType import ThreadType
-from pydag.services.statemachine.SimpleActionService import SimpleActionService
+from pydag.services.statemachine.SimpleStatemachine import SimpleStatemachine
 
 
 def test_agent_get_buffer():
@@ -49,7 +49,7 @@ def test_edit_agent_element():
 def test_edit_agent_element2():
     ag = Agent()
     
-    sas = SimpleActionService(
+    sas = SimpleStatemachine(
         thread_type=ThreadType.SECOND.value,
         observing_time=1.0
     )
