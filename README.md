@@ -41,7 +41,7 @@ Extract relevant features from vibration/temperature/current signals, update a p
 - `Buffer` as data backbone:
   Buffers are the primary data exchange mechanism between services and nodes.
 - `Service` concept:
-  Services are long-running, usually background components (e.g., REST APIs, data streams, schedulers, observers, model/tool providers) that encapsulate reusable runtime capabilities.
+  Services are long-running, usually background components (e.g. data streams, schedulers, observers, model/tool providers) that encapsulate reusable runtime capabilities.
 - `Node` / `Action` concept:
   Nodes represent compact workflow steps. `Action` nodes execute tasks, `Transition` nodes evaluate flow conditions, and both are composed to build deterministic automation pipelines.
 - `MappingService` as orchestrator:
@@ -101,6 +101,37 @@ agent.release()
 
 ```
 
+### AgentApp
+An `Agent` can be wrapped in an `AgentApp` to provide it with UI or REST-API.
+This is done by using the libraries FastAPI and NiceGUI
+
+```python
+
+  from pydag.agents.Agent import Agent
+  from pydag.agents.app.AgentApp import AgentApp
+
+  agent = Agent()
+
+  ... # create `AgentElement`s here
+
+  app = AgentApp(port=8092, with_ui=True, with_api=True, dark_mode=False)
+  app.set_agent(agent)
+  app.create()
+  app.run()
+
+```
+
+or
+
+```python
+  from pydag.agents.app.AgentApp import AgentApp
+
+  file_path = "app_template.yaml"
+  aa = AgentApp.load(file_path)
+  aa.create()
+  aa.run()
+
+```
 
 ### AgentElement
 All elements within an `Agent` application are derived from `AgentElement`.
@@ -196,7 +227,7 @@ buffer.data_with_meta(n = 0, persistent = True) # returns buffer data and metada
 
 ### Service
 An overview of all available services and their usage is given [here](pydag/_docs/Services.md).
-<br>In general, `Service`s are standalone micro applications within the `Agent`. Their tasks include observing resources (filesystem, agent state, ...), background daemon services (copy files from one folder to another, ...), providing reusable resources for other `AgentElement`s (browser, vector store, LLM model, ...), or providing REST API endpoints to monitor or manipulate the `Agent` application. `Service`s usually have no direct interaction with other parts of the `Agent` and run in a closed loop.
+<br>In general, `Service`s are standalone micro applications within the `Agent`. Their tasks include observing resources (filesystem, agent state, ...), background daemon services (copy files from one folder to another, ...), providing reusable resources for other `AgentElement`s (browser, vector store, LLM model, ...). `Service`s usually have no direct interaction with other parts of the `Agent` and run in a closed loop.
 
 If one of the following criteria is met, a `Service` should be implemented (instead of a `Node`):
 - the process/task is running in the background continuously or on a defined interval
