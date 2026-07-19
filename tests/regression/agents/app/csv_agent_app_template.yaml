@@ -23,7 +23,7 @@ agent:
       folder: tests\regression\agents\app\data
       file_post_fix: test
       file_prefix_format: "%Y%m%d%H%M%S"
-      max_samples: 1000
+      max_samples: 10000
       buffer_ids:
       - B1
 

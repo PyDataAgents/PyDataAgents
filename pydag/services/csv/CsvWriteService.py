@@ -75,7 +75,7 @@ class CsvWriteService(WriteService):
                 if self._rows > self.max_samples:
                     self._rows = 0
                     self._csv_file.close()
-                    logger.debug("closed csv file in " + self.folder)
+                    logger.debug(f"closed csv file {self._csv_file.name}")
         else:
             raise ServiceException("this combination of buffers and addresses is not implemented")
                     

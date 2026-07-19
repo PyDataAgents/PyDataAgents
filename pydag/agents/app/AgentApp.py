@@ -39,12 +39,6 @@ class AgentApp():
         self._agent : Agent = field(default=None)    
         self._app : FastAPI = None
         self._ui_pages : list[UIPage] = []
-    
-    def set_agent(self, ag : Agent):
-        self._agent = ag
-        
-    def set_app(self, app : FastAPI):
-        self._app = app
         
     @staticmethod
     def load(file_path : str) -> AgentApp:
@@ -150,3 +144,12 @@ class AgentApp():
 
     def get_ui_pages(self) -> list[UIPage]:
         return self._ui_pages
+    
+    def set_agent(self, ag : Agent):
+        self._agent = ag
+        
+    def get_agent(self) -> Agent:
+        return self._agent
+        
+    def set_app(self, app : FastAPI):
+        self._app = app
