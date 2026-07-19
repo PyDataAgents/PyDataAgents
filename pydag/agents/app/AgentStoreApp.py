@@ -25,16 +25,7 @@ class AgentStoreApp:
         self._app : FastAPI = None
         self._ui_pages : list[UIPage] = list()
         
-    def run(self):
-        self._create_ui()
-        pages_paths = [f"http://{self.host}:{self.port}{page.path}" for page in self._ui_pages]
-        pages_str = "\n".join(pages_paths)
-        logger.info("Available NiceGui Pages:\n" + pages_str)                
-        os.environ.setdefault("NICEGUI_SCREEN_TEST_PORT", f"{self.port}")
-        #app.add_middleware(AuthenticationMiddleware)
-        ui.run(host=self.host, port = self.port, reload=True, title=self.__class__.__name__ + " UI", storage_secret=secrets.token_hex(32))        
-    
-    def _create_ui(self):
+    def create(self):
         """ create the UI for the agent store """
         # define default color schema
         
@@ -51,5 +42,15 @@ class AgentStoreApp:
         p = UIAgentStorePage(self)
         self._ui_pages.append(p)
         for page in self._ui_pages:
-            page.register()
+            page.register()            
+    
+    def run(self):
+        self.create()
+        pages_paths = [f"http://{self.host}:{self.port}{page.path}" for page in self._ui_pages]
+        pages_str = "\n".join(pages_paths)
+        logger.info("Available NiceGui Pages:\n" + pages_str)                
+        os.environ.setdefault("NICEGUI_SCREEN_TEST_PORT", f"{self.port}")
+        #app.add_middleware(AuthenticationMiddleware)
+        ui.run(host=self.host, port = self.port, reload=True, title=self.__class__.__name__ + " UI", storage_secret=secrets.token_hex(32))        
+    
         
