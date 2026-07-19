@@ -2,7 +2,7 @@ from pathlib import Path
 import time
 from pydag.buffers.DataType import DataType
 from pydag.buffers.ListBuffer import ListBuffer
-from pydag.services.statemachine.SimpleActionService import SimpleActionService
+from pydag.services.statemachine.SimpleStatemachine import SimpleStatemachine
 from pydag.nodes.documents.ListFilesAction import ListFilesAction
 from pydag.nodes.documents.MoveFilesAction import MoveFilesAction
 from pydag.nodes.utils.SleepAction import SleepAction
@@ -36,7 +36,7 @@ def test000():
     la.add_child(ma)
     ma.add_child(sa)    
     
-    sm = SimpleActionService()
+    sm = SimpleStatemachine()
     sm.install()
     sm.add_node(la)
     sm.add_node(ma)

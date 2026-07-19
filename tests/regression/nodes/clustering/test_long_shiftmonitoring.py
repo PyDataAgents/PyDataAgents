@@ -9,7 +9,7 @@ from pydag.nodes.featureextraction.ChronosExtractor import ChronosExtractor
 from pydag.nodes.featureextraction.ROCKETExtractor import ROCKETExtractor
 from pydag.nodes.clustering.ShiftMonitoring import ShiftMonitoring
 from pydag.nodes.dimreduction.PCADimReduction import PCADimReduction
-from pydag.services.statemachine.SimpleActionService import SimpleActionService
+from pydag.services.statemachine.SimpleStatemachine import SimpleStatemachine
 from pydag.agents.Agent import Agent
 from pydag.nodes.featureextraction.PSDExtractor import PSDExtractor
 
@@ -356,7 +356,7 @@ def test_long_agent_mode_with_rest_api():
     _index = signal.data(persistent=True)["index"][-1]
     index_buff.push({"count": _index})
 
-    sm = SimpleActionService() 
+    sm = SimpleStatemachine() 
      
     lba = LinkBufferAction()
     lba.set_buffer(signal)

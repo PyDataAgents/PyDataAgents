@@ -4,7 +4,7 @@ from pydag.agents.Agent import Agent
 from pydag.nodes.triggers.FileTriggerAction import FileTriggerAction
 from pydag.nodes.utils.PrintBufferAction import PrintBufferAction
 from pydag.services.ThreadType import ThreadType
-from pydag.services.statemachine.SimpleActionService import SimpleActionService
+from pydag.services.statemachine.SimpleStatemachine import SimpleStatemachine
 from pydag.utils.FileUtils import FileUtils
 
 
@@ -13,7 +13,7 @@ def test_000():
     
     ag = Agent()
         
-    sas = SimpleActionService(thread_type=ThreadType.TRIGGERED.value)
+    sas = SimpleStatemachine(thread_type=ThreadType.TRIGGERED.value)
     
     fta = FileTriggerAction(folder=folder, create_events=False, modified_events=True)
     fta.set_service(sas)
@@ -44,7 +44,7 @@ def test_001():
     
     ag = Agent()
         
-    sas = SimpleActionService(thread_type=ThreadType.TRIGGERED.value)
+    sas = SimpleStatemachine(thread_type=ThreadType.TRIGGERED.value)
     
     fta = FileTriggerAction(folder=folder, create_events=True, recursive=True)
     fta.set_service(sas)
@@ -80,7 +80,7 @@ def test_002():
     
     ag = Agent()
         
-    sas = SimpleActionService(thread_type=ThreadType.TRIGGERED.value)
+    sas = SimpleStatemachine(thread_type=ThreadType.TRIGGERED.value)
     
     fta = FileTriggerAction(folder=folder, create_events=False, modified_events=True)
     fta.set_service(sas)
@@ -111,7 +111,7 @@ def test_003():
     
     ag = Agent()
         
-    sas = SimpleActionService(thread_type=ThreadType.TRIGGERED.value)
+    sas = SimpleStatemachine(thread_type=ThreadType.TRIGGERED.value)
     
     fta = FileTriggerAction(folder=folder, create_events=False, delete_events=True, recursive=True)
     fta.set_service(sas)

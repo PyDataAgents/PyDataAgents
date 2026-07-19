@@ -6,7 +6,7 @@ from pydag.buffers.ListBuffer import ListBuffer
 from pydag.nodes.buffers.LinkBufferAction import LinkBufferAction
 from pydag.nodes.documents.PlotlifyAction import PlotlifyAction
 from pydag.services.ThreadType import ThreadType
-from pydag.services.statemachine.SimpleActionService import SimpleActionService
+from pydag.services.statemachine.SimpleStatemachine import SimpleStatemachine
 from pydag.services.utils.MappingRestartService import MappingRestartService
 
 
@@ -20,7 +20,7 @@ def test_000():
     va.add_buffer(buf)    
     ag.add_service(va)
     
-    sas = SimpleActionService(id="S1", thread_type=ThreadType.SECOND.value, observing_time=1)
+    sas = SimpleStatemachine(id="S1", thread_type=ThreadType.SECOND.value, observing_time=1)
     
     lba = LinkBufferAction(id="L1")
     lba.set_buffer(buf)

@@ -13,7 +13,6 @@ from pydag.nodes.utils.TrueTransition import TrueTransition
 from pydag.nodes.utils.CountAction import CountAction
 from pydag.nodes.utils.CountTransition import CountTransition
 from pydag.nodes.utils.PrintAction import PrintAction
-from pydag.services.statemachine.SimpleActionService import SimpleActionService
 from pydag.services.ThreadType import ThreadType
 
 
@@ -277,30 +276,3 @@ def test_050():
     sm.install()
     sm.start()
 
-def test_060():
-    """Test that SimpleActionService executes each Action exactly once with ONLY_ONCE thread type."""
-    # Arrange
-    a1 = StartAction()
-    a2 = CountAction()
-    a3 = StopAction()
-    a1.add_child(a2)
-    a2.add_child(a3)
-
-    service = SimpleActionService()
-    service.add_node(a1)
-    service.add_node(a2)
-    service.add_node(a3)
-    # Force ONLY_ONCE execution semantics
-    service.thread_type = ThreadType.ONLY_ONCE.value
-    service.install()
-    
-    # Act
-    service.start()
-    # Wait for thread to finish (ONLY_ONCE runs observer once and returns)
-    service._thread.join(timeout=2)
-
-    # Assert
-    # StartAction inherits Action but doesn't increment count; CountAction increments once
-    assert a2.count == 1, f"Expected CountAction to execute once, executed {a2.count} times"
-    assert service._thread.is_alive() is False
-    

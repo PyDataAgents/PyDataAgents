@@ -16,7 +16,7 @@ from pydag.services.ThreadType import ThreadType
 from pydag.services.llm.RAGService import RAGService
 from pydag.nodes.llm.LLMOCRAction import LLMOCRAction
 from pydag.agents.Agent import Agent
-from pydag.services.statemachine.SimpleActionService import SimpleActionService
+from pydag.services.statemachine.SimpleStatemachine import SimpleStatemachine
 from pydag.buffers.DictBuffer import DictBuffer
 from pydag.nodes.documents.ListFilesAction import ListFilesAction
 from pydag.nodes.script.ScriptAction import ScriptAction
@@ -34,7 +34,7 @@ def test_multiple_files():
 
     # Define agent and services
     ag = Agent(id="A1")
-    sas = SimpleActionService(id="SAS1", thread_type=ThreadType.INSTANT.value)
+    sas = SimpleStatemachine(id="SAS1", thread_type=ThreadType.INSTANT.value)
     llms = RAGService(api_key=config["OPENAI"]["OPENAI_API_KEY"], model="gpt-4o", model_provider="OPENAI")
     #llms.start()
 
@@ -118,7 +118,7 @@ def test_multiple_files_with_copyaction():
 
     # Define agent and services
     ag = Agent(id="A1")
-    sas = SimpleActionService(thread_type=ThreadType.INSTANT.value)
+    sas = SimpleStatemachine(thread_type=ThreadType.INSTANT.value)
     llms = RAGService(api_key=config["OPENAI"]["OPENAI_API_KEY"], model="gpt-4o", model_provider="OPENAI")
     #llms.start()
     
@@ -197,7 +197,7 @@ def test_ocr_agent_restapi():
     
     ag.add_service(llms)
     
-    sas1 = SimpleActionService(id="SAS1", thread_type=ThreadType.TRIGGERED.value) 
+    sas1 = SimpleStatemachine(id="SAS1", thread_type=ThreadType.TRIGGERED.value) 
     
     otn1 = ObserverTriggerAction(id="TA1")
     otn1.set_service(sas1)
@@ -220,7 +220,7 @@ def test_ocr_agent_restapi():
     ag.add_service(sas1)
     
      
-    sas2 = SimpleActionService(id="SAS2", thread_type=ThreadType.TRIGGERED.value)
+    sas2 = SimpleStatemachine(id="SAS2", thread_type=ThreadType.TRIGGERED.value)
       
     otn2 = ObserverTriggerAction(id="TA2")
     otn2.set_service(sas2)
