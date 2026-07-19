@@ -13,7 +13,7 @@ from tests.regression.agents.ui.TableDataModel import TableDataModel
 
 
 def test_000():    
-    p = UIBufferPage(None)  
+    p = UIBufferPage(None)
     
     buf1 = DictBuffer()
     buf2 = DictBuffer()
