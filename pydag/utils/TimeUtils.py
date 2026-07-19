@@ -5,6 +5,10 @@ import time
 class TimeUtils:
     
     @staticmethod
+    def dt_now() -> datetime:
+        return datetime.now()
+    
+    @staticmethod
     def utc_ms():
         t = time.time()
         ts = round(t * 1000, 0)

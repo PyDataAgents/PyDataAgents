@@ -24,6 +24,7 @@ class CsvWriteService(WriteService):
     max_samples : int = field(default=1_000_000, metadata={"description": "maximum number of samples in one file, if limit is reached a new file is being created"})
     delimiter : str = field(default=";", metadata={"description": "delimiter to use for column separation"})
     decimal_precision : int = field(default=3, metadata={"description": "maximum decimal precision of numeric values"})
+    file_prefix_format : str = field(default=None, metadata={"description": "format of the timestamp prefix, if None then a unixtimestamp is used, otherwise formats like '%Y%m%d' can be specified"})
     
     def __post_init__(self):
         super().__post_init__()
@@ -66,23 +67,25 @@ class CsvWriteService(WriteService):
                 self._csv_writer.writerows(data)
                 self._rows = self._rows + len(data)
             else:
-                if self.n == 1:
-                    data = buffer.data(n = self.n, persistent = self.persistent)                    
-                    # convert to row style
-                    data = DataUtils.dict_to_list(data)
-                    self._csv_writer.writerows(data)
-                    self._rows = self._rows + len(data)
-                    if self._rows > self.max_samples:
-                        self._rows = 0
-                        self._csv_file.close()
-                        logger.debug("closed csv file in " + self.folder)
-                else:
-                    raise ServiceException("write_to_sink is not defined for n > 1")
+                data = buffer.data(n = self.n, persistent = self.persistent)                    
+                # convert to row style
+                data = DataUtils.dict_to_list(data)
+                self._csv_writer.writerows(data)
+                self._rows = self._rows + len(data)
+                if self._rows > self.max_samples:
+                    self._rows = 0
+                    self._csv_file.close()
+                    logger.debug("closed csv file in " + self.folder)
         else:
             raise ServiceException("this combination of buffers and addresses is not implemented")
                     
     def _new_file_name(self) -> str:
-        ts = str(int(TimeUtils.utc_ms()))
+        ts : str = None
+        if not self.file_prefix_format is None:
+            ts = TimeUtils.datetime_to_str(TimeUtils.dt_now(), self.file_prefix_format)
+        else:    
+            ts = str(int(TimeUtils.utc_ms()))
+        
         if self.file_post_fix is None:
             file_path = self.folder.rstrip(os.path.sep) + os.path.sep + ts + "." + self.file_extension.lstrip(".")
         else:
