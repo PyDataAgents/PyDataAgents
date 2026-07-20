@@ -201,10 +201,6 @@ class Agent():
             AgentElementException: if a `AgentElement` could not be installed
         """
         self._install_elements()
-        if self.create_config:
-            gc = AgentConfig(self)
-            yc = YAMLConfig(f"Agent {self.id}.yaml")
-            yc.save(gc)
             
         self._start_services()
         
