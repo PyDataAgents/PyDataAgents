@@ -25,10 +25,11 @@ class RAGService(LLMService):
     """Retrieval Augmented Generation (RAG) Service for document based LLM knowledge retrieval in chat form.
 
     Optional per-call file context is accepted through `chat(..., context_files=...)`.
-    External URLs, local file URLs, absolute local paths, data URIs,
-    plain base64 strings, raw bytes, or lists of those values are accepted. File inputs are
-    supported only for OPENAI and AZURE. OLLAMA file handling is not implemented
-    yet; supplying files with OLLAMA emits a warning and continues text-only.
+    External URLs, local file URLs, local paths absolute or relative to the
+    current working directory, data URIs, plain base64 strings, raw bytes, or
+    lists of those values are accepted. File inputs are supported only for
+    OPENAI and AZURE. OLLAMA file handling is not implemented yet; supplying
+    files with OLLAMA emits a warning and continues text-only.
     """
 
     # Constants
@@ -191,6 +192,7 @@ class RAGService(LLMService):
         retrieved_context: str,
         internet_context: str,
     ) -> str:
+        """Render the final prompt payload with instructions kept separate from runtime context."""
         return (
             "Question:\n"
             + str(question)
@@ -337,15 +339,16 @@ class RAGService(LLMService):
 
         Args:
             question: The final task/question the model must answer. This is what the generated answer should respond to.
-            instruction: Rules on how to answer (format, style, constraints, priorities).
+            instruction: Prompt instructions rendered under the `Instruction:` section; use for answer rules, format, style, constraints, and priorities.
             input_context: Additional runtime context passed directly from parent buffers (not retrieved from vector DB).
             retrieval_query: The query used only for document retrieval from the vector store.
             use_rag_context: Set to False to disable retrieval and answer only from the prompt payload.
             use_internet_context: Optional per-call internet context override. False disables internet context for this call.
             context_files: Optional file context. Accepts external URLs,
-            local file URLs, absolute local paths, data URIs, plain base64
-            strings, raw bytes, or lists of those values. File inputs are
-            supported only for OPENAI and AZURE.
+            local file URLs, local paths absolute or relative to the current
+            working directory, data URIs, plain base64 strings, raw bytes, or
+            lists of those values. File inputs are supported only for OPENAI
+            and AZURE.
             session_id: Session id used for retained message history.
         """
         if question is None or str(question).strip() == "":
