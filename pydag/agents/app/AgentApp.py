@@ -9,6 +9,9 @@ from nicegui import app, ui
 from fastapi import APIRouter, Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from pydag.agents.YAMLConfig import YAMLConfig
+from pydag.utils.ClassUtils import ClassUtils
+
 
 from ..AgentConfig import AgentConfig
 from ..api.AgentRESTAPI import AgentRESTAPI
@@ -34,9 +37,10 @@ class AgentApp():
     with_ui : bool = field(default=False, metadata={"description": "if True, a NiceGUI UI is created by default for the Agent"})
     dark_mode : bool = field(default=True, metadata={"description": "enables dark mode"})
     color_schema : dict = field(default_factory=dict, metadata={"description": "color schema for the ui, see https://nicegui.io/docs/colors for more details"})
+    with_config : bool = field(default=False)
             
     def __post_init__(self):
-        self._agent : Agent = field(default=None)    
+        self._agent : Agent = None    
         self._app : FastAPI = None
         self._ui_pages : list[UIPage] = []
         
@@ -63,6 +67,8 @@ class AgentApp():
             self._create_api(no_default_apis=no_default_apis)
         if self.with_ui:           
             self._create_ui(no_default_pages=no_default_pages)
+        if self.with_config:
+            self._create_config()
                
     def run(self):
         if self.with_ui:
@@ -129,6 +135,14 @@ class AgentApp():
         page : UIPage
         for page in self._ui_pages:
             page.register()
+    
+    def _create_config(self):
+        apc = AgentConfig.config_options(self)
+        ac = AgentConfig.config_options(self.get_agent())
+        apc["agent"] = ac
+        yaml_file = open(f"{self.get_agent().id}.yaml", "w", encoding='utf-8')
+        yaml.dump(apc, yaml_file, sort_keys=False)
+        yaml_file.close()
     
     def add_api(self, router : APIRouter):
         self._app.include_router(router)
