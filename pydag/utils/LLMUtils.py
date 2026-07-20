@@ -18,6 +18,7 @@ class MessageHistoryState(TypedDict, total=False):
     retrieval_query: str
     use_rag_context: bool
     internet_context: str
+    context_files: Any
 
 
 def compile_message_history_graph(

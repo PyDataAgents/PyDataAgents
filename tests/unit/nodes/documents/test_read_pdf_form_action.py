@@ -26,11 +26,22 @@ if "graphviz" not in sys.modules:
     graphviz_stub.Digraph = _DummyDigraph
     sys.modules["graphviz"] = graphviz_stub
 
+from pydag.agents.AgentElementException import AgentElementException
+from pydag.agents.AgentStates import AgentElementState
 from pydag.buffers.ListBuffer import ListBuffer
 from pydag.nodes.NodeException import NodeException
 from pydag.nodes.buffers.LinkBufferAction import LinkBufferAction
 from pydag.nodes.documents.PDFReadFormAction import PDFReadFormAction
 
+
+def _assert_install_fails_with_node_exception(element, expected_cause_message: str):
+    with pytest.raises(AgentElementException, match=f"Could not install {element.__class__.__name__}") as exc_info:
+        element.install()
+
+    cause = exc_info.value.__cause__
+    assert isinstance(cause, NodeException)
+    assert expected_cause_message in str(cause)
+    assert element.get_state() == AgentElementState.ERROR
 
 
 def _test_pdf_file() -> str:
@@ -179,20 +190,20 @@ def test_read_pdf_form_raises_for_missing_pdf():
 
 def test_read_pdf_form_install_raises_for_invalid_row_mode():
     reader = PDFReadFormAction(row_mode="invalid")
-    with pytest.raises(NodeException):
-        reader.install()
+    _assert_install_fails_with_node_exception(
+        reader,
+        "row_mode must be either 'per_pdf' or 'per_field'",
+    )
 
 
 def test_read_pdf_form_install_rejects_duplicate_input_keys():
     reader = PDFReadFormAction(input_keys=["values", "values"])
-    with pytest.raises(NodeException, match="must contain unique entries"):
-        reader.install()
+    _assert_install_fails_with_node_exception(reader, "keys must contain unique entries")
 
 
 def test_read_pdf_form_install_rejects_duplicate_output_keys():
     reader = PDFReadFormAction(output_keys=["filepath", "metadata", "fields", "fields", "llm_prompt"])
-    with pytest.raises(NodeException, match="must contain unique entries"):
-        reader.install()
+    _assert_install_fails_with_node_exception(reader, "keys must contain unique entries")
 
 
 

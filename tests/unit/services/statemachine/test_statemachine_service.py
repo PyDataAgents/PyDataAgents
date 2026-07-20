@@ -13,7 +13,10 @@ from pydag.nodes.utils.TrueTransition import TrueTransition
 from pydag.nodes.utils.CountAction import CountAction
 from pydag.nodes.utils.CountTransition import CountTransition
 from pydag.nodes.utils.PrintAction import PrintAction
+<<<<<<< HEAD
 from pydag.services.statemachine.SimpleStatemachine import SimpleStatemachine
+=======
+>>>>>>> develop
 from pydag.services.ThreadType import ThreadType
 
 
