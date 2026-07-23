@@ -18,8 +18,7 @@ class AgentStoreApp:
     
     host : str = field(default="localhost", metadata={"description": "Host for the agent store server"})
     port : int = field(default=10001, metadata={"description": "Port for the agent store server"})
-    
-    
+        
     def __init__(self):
         self._agent_store : AgentStore = None
         self._app : FastAPI = None

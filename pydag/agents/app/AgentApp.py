@@ -103,6 +103,17 @@ class AgentApp():
                 uvicorn.run(self._app, host=self.host, port=self.port, reload=False, workers=1)
             else:
                 self._agent.release(blocking=True)
+    
+    def shutdown(self):
+        self._agent.terminate()
+        if self.with_ui:
+            if self.with_api:
+                pass            
+            else:
+                pass
+        else:                
+            if self.with_api:
+                pass
                             
     def _create_api(self, no_default_apis : bool = False):
         if self.api_key_file:
