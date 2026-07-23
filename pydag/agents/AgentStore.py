@@ -5,8 +5,7 @@ from typing import Any
 import uuid
 from loguru import logger
 
-
-from .ui.UIElements import UIPage
+from .app.AgentApp import AgentApp
 from .AgentException import AgentException
 from .YAMLConfig import YAMLConfig
 from .AgentConfig import AgentConfig
@@ -21,10 +20,9 @@ class AgentStore:
     
     def __post_init__(self):
         self._user_agents : dict[str, set[str]] = dict()
-        self._agents : dict[str, Agent] = dict()
-        self._templates : dict[str, AgentConfig] = dict()
+        self._agents_apps : dict[str, AgentApp] = dict()
+        self._templates : dict[str, dict] = dict()
         self._lock : Lock = Lock()
-        self._ui_pages : list[UIPage] = list()
     
     def open(self):
         """ Start the agent store UI Server. This will block the current thread until the server is stopped. """        
@@ -53,13 +51,13 @@ class AgentStore:
             if user_id not in self._user_agents:
                 self._user_agents[user_id] = set()
     
-    def add_agent(self, user_id : str, agent : Agent):
+    def add_agent(self, user_id : str, agent_app : AgentApp):
         with self._lock:
             if user_id in self._user_agents:
-                self._user_agents[user_id].add(agent.id)
+                self._user_agents[user_id].add(agent_app.get_agent().id)
             else:
-                self._user_agents[user_id] = {agent.id}
-            self._agents[agent.id] = agent
+                self._user_agents[user_id] = {agent_app.get_agent().id}
+            self._agents_apps[agent_app.get_agent().id] = agent_app
             
     def add_agent_from_template(self, user_id : str, template_id : str):
         with self._lock:
@@ -67,7 +65,7 @@ class AgentStore:
                 agent_config = self._templates[template_id]
                 new_agent = agent_config.create()
                 new_agent.id = str(uuid.uuid4())
-                self._agents[new_agent.id] = new_agent
+                self._agents_apps[new_agent.id] = new_agent
                 if user_id in self._user_agents:
                     self._user_agents[user_id].add(new_agent.id)
                 else:
@@ -75,14 +73,14 @@ class AgentStore:
             else:
                 raise AgentException(f"Template with ID {template_id} not found.")
             
-    def get_agent(self, user_id : str, agent_id : str) -> Agent:
+    def get_agent(self, user_id : str, agent_id : str) -> AgentApp:
         with self._lock:
             if user_id in self._user_agents and agent_id in self._user_agents[user_id]:
-                return self._agents[agent_id]
+                return self._agents_apps[agent_id]
             else:
                 return None
         
-    def get_templates(self) -> dict[str, AgentConfig]:
+    def get_templates(self) -> dict[str, dict]:
         with self._lock:
             return self._templates
             
@@ -90,41 +88,40 @@ class AgentStore:
         with self._lock:
             return list(self._user_agents.keys())
         
-    def get_user_agents(self, user : str) -> list[Agent]:
+    def get_user_agents(self, user : str) -> list[AgentApp]:
         with self._lock:
             if user in self._user_agents:
-                return [self._agents[agent_id] for agent_id in self._user_agents[user]]
+                return [self._agents_apps[agent_id] for agent_id in self._user_agents[user]]
             else:
                 return []
     
     def release_agent(self, user_id : str, agent_id : str):
         with self._lock:
             if user_id in self._user_agents and agent_id in self._user_agents[user_id]:
-                self._agents[agent_id].release(blocking=False)
+                self._agents_apps[agent_id].release(blocking=False)
 
     def terminate_agent(self, user_id : str, agent_id : str):
         with self._lock:
             if user_id in self._user_agents and agent_id in self._user_agents[user_id]:
-                self._agents[agent_id].terminate()
+                self._agents_apps[agent_id].terminate()
                 
     def configure_agent(self, user_id : str, agent_id : str, config : dict[str, Any]):
         with self._lock:
             if user_id in self._user_agents and agent_id in self._user_agents[user_id]:
-                agent : Agent = self._agents[agent_id]
+                agent : Agent = self._agents_apps[agent_id]
                 if agent.is_running():
                     raise AgentException(f"{Agent.__name__} with id={agent_id} cannot be configured, while it's running.")
                 else:
-                    pass
-                    
+                    pass            
 
     def remove_agent(self, user_id : str, agent_id : str):
         with self._lock:
             if user_id in self._user_agents and agent_id in self._user_agents[user_id]:
-                agent : Agent = self._agents[agent_id]
+                agent : Agent = self._agents_apps[agent_id]
                 if agent.is_running():
                     raise AgentException(f"{Agent.__name__} with id={agent_id} cannot be removed, when it's running.")
                 else:
-                    self._agents.pop(agent_id)
+                    self._agents_apps.pop(agent_id)
                     self._user_agents[user_id].remove(agent_id)
     
     

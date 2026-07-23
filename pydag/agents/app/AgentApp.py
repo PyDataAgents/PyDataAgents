@@ -2,15 +2,13 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 import multiprocessing
 import os
+from pathlib import Path
 import uvicorn
 import yaml
 from loguru import logger
 from nicegui import app, ui
 from fastapi import APIRouter, Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-
-from pydag.agents.YAMLConfig import YAMLConfig
-from pydag.utils.ClassUtils import ClassUtils
 
 
 from ..AgentConfig import AgentConfig
@@ -29,7 +27,7 @@ from ..Agent import Agent
 @dataclass
 class AgentApp():
     """ Application that stores an `Agent` and provides REST API and UI based on configuration settings """
-        
+
     host : str = field(default="localhost", metadata={"description": ""})
     port : int = field(default=8081, metadata={"description": "port for the REST API Service"})
     with_api : bool = field(default=False, metadata={"description": "if True, a REST API Service is created by default for REST interactions on port specified in port"})
@@ -38,29 +36,43 @@ class AgentApp():
     dark_mode : bool = field(default=True, metadata={"description": "enables dark mode"})
     color_schema : dict = field(default_factory=dict, metadata={"description": "color schema for the ui, see https://nicegui.io/docs/colors for more details"})
     with_config : bool = field(default=False)
-            
+
     def __post_init__(self):
-        self._agent : Agent = None    
+        self._agent : Agent = None
         self._app : FastAPI = None
         self._ui_pages : list[UIPage] = []
         
     @staticmethod
-    def load(file_path : str) -> AgentApp:
-        ext : str = file_path.split(".")[-1].lower()
-        match ext:
-            case "yaml" | "yml":
-                with open(file_path, encoding="utf-8") as f:
-                    data : dict = yaml.safe_load(f)
-                # split the config into app and agent config
-                apcd : dict = data.copy()
-                del apcd["agent"]
-                acd : dict = data["agent"]
-                ac : AgentConfig = AgentConfig.from_dict(acd)
-                aa : AgentApp = AgentApp(**apcd)
-                aa.set_agent(ac.create())
-                return aa
-            case _:
-                raise AgentException(f"loading from {file_path} is not defined")
+    def load(config : str | dict) -> AgentApp:
+        """ loads the `AgentApp` from file or dictionary """
+        if isinstance(config, str):
+            p : Path = Path(config)
+            if p.exists():
+                ext : str = config.split(".")[-1].lower()
+                match ext:
+                    case "yaml" | "yml":
+                        with open(config, encoding="utf-8") as f:
+                            data : dict = yaml.safe_load(f)
+                            # split the config into app and agent config
+                            apcd : dict = data.copy()
+                            del apcd["agent"]
+                            acd : dict = data["agent"]
+                            ac : AgentConfig = AgentConfig.from_dict(acd)
+                            aa : AgentApp = AgentApp(**apcd)
+                            aa.set_agent(ac.create())
+                            return aa
+                    case _:
+                        raise AgentException(f"loading from {config} is not defined")
+            else:
+                raise AgentException(f"{config} is not a valid filepath")
+        elif isinstance(config, dict):
+            apcd : dict = config.copy()
+            ac : AgentConfig = AgentConfig.from_dict(acd)
+            aa : AgentApp = AgentApp(**apcd)
+            aa.set_agent(ac.create())
+            return aa
+        else:
+            raise AgentException("config was not of allowd datatypes (str | dict)")
     
     def create(self, no_default_apis : bool = False, no_default_pages : bool = False):
         if self.with_api:
