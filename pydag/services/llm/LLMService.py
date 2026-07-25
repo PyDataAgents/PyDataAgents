@@ -47,9 +47,10 @@ class LLMService(Service):
     Internet context uses Tavily and requires a Tavily API key configured as
     `tavily_api_key` or the `TAVILY_API_KEY` environment variable.
 
-    File inputs use `context_files` and may be URLs, file URLs, absolute paths,
-    data URIs, base64 strings, bytes, or lists. OPENAI and AZURE send them to
-    the model; OLLAMA warns and continues text-only.
+    File inputs use `context_files` and may be URLs, file URLs, local paths
+    (absolute or relative to the current working directory), data URIs, base64
+    strings, bytes, or lists. OPENAI and AZURE send them to the model; OLLAMA
+    warns and continues text-only.
     """
     
     api_key : str = field(default=None, metadata={"description": "api token for a web based model provider, e.g. OPENAI"})
@@ -227,8 +228,8 @@ class LLMService(Service):
             return self._normalize_local_context_file(self._path_from_file_url(text))
         if parsed.scheme != "":
             raise ServiceException("unsupported context file URL scheme: " + parsed.scheme)
-        if self._looks_like_relative_path(text):
-            raise ServiceException("relative context file paths are not supported: " + text)
+        if os.path.exists(os.path.normpath(text)) or self._looks_like_relative_path(text):
+            return self._normalize_local_context_file(text)
 
         return ContextFile("inline", self._decode_base64_context_file(text), default_filename, GENERIC_FILE_MIME_TYPE)
 

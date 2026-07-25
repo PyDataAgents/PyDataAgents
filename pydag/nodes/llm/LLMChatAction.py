@@ -24,12 +24,19 @@ class LLMChatAction(BufferNode, ServiceNode, Action):
     4. Full-mode-augment: `question` + `input_context` + retrieval enabled, no strict structure enforcement.
     5. Full-mode-template_fill: same as full augment plus strict structure validation.
 
+    `instruction_key` and `instruction_value` are used for prompt
+    instructions: the resolved value is passed to `RAGService.chat` as
+    `instruction` and rendered in the prompt's `Instruction:` section. Use
+    `input_context_keys` and `input_context_value` for runtime facts/data that
+    should be rendered in `Local Input Context:`.
+
     Optional file context can be supplied via `context_files_key` or
-    `context_files_value`. V1 accepts external URLs, local file URLs, absolute
-    local paths, data URIs, plain base64 strings, raw bytes, or lists of those
-    values. File inputs are supported only for OPENAI and AZURE model
-    providers. OLLAMA file processing is not implemented yet; supplying files
-    with OLLAMA emits a warning and continues text-only.
+    `context_files_value`. V1 accepts external URLs, local file URLs, local
+    paths (absolute or relative to the current working directory), data URIs,
+    plain base64 strings, raw bytes, or lists of those values. File inputs are
+    supported only for OPENAI and AZURE model providers. OLLAMA file processing
+    is not implemented yet; supplying files with OLLAMA emits a warning and
+    continues text-only.
     """
 
     template: str = field(
@@ -58,13 +65,13 @@ class LLMChatAction(BufferNode, ServiceNode, Action):
     instruction_key: str = field(
         default=None,
         metadata={
-            "description": "Key from which to receive the Rules on how to answer (format, style, constraints, priorities).",
+            "description": "Key from which to receive prompt instructions. The resolved value is passed to RAGService.chat as instruction and rendered under the prompt's Instruction section; use it for answer rules, format, style, constraints, and priorities.",
         },
     )
     instruction_value: str = field(
         default=None,
         metadata={
-            "description": "Fixed value for the Rules on how to answer (format, style, constraints, priorities).",
+            "description": "Fixed prompt instructions for all rows. The value is passed to RAGService.chat as instruction and rendered under the prompt's Instruction section; use it for answer rules, format, style, constraints, and priorities.",
         },
     )
     retrieval_query_key: str = field(
@@ -100,7 +107,7 @@ class LLMChatAction(BufferNode, ServiceNode, Action):
     context_files_value: str | bytes | list[str | bytes] | None = field(
         default=None,
         metadata={
-            "description": "Fixed optional file context for all rows. V1 accepts external URLs, file URLs, absolute local paths, data URIs, plain base64 strings, raw bytes, or lists of those values.",
+            "description": "Fixed optional file context for all rows. V1 accepts external URLs, file URLs, local paths absolute or relative to the current working directory, data URIs, plain base64 strings, raw bytes, or lists of those values.",
         },
     )
 
