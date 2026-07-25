@@ -15,6 +15,7 @@ class AdsService(ReadService, WriteService):
     """
     
     ams_net_id : str = field(default=None, metadata = {"description": "AMS Net Id to connect to for ADS Connection"})
+    ip_address : str = field(default=None, metadata={"description": "explicitly defined IP address, if it can't be extracted from AMS Net Id"})
     twincat : int = field(default=3, metadata = {"description": "Twincat version to use, e.g. 2 or 3 for TwinCAT 2/3"})
     
     def __post_init__(self):
@@ -25,13 +26,13 @@ class AdsService(ReadService, WriteService):
         super()._on_install(agent)
         match self.twincat:
             case 2:
-                self._ads_client = pyads.Connection(self.ams_net_id, pyads.PORT_TC2PLC1)
+                self._ads_client = pyads.Connection(self.ams_net_id, pyads.PORT_TC2PLC1, self.ip_address)
             case 3:
-                self._ads_client = pyads.Connection(self.ams_net_id, pyads.PORT_TC3PLC1)
+                self._ads_client = pyads.Connection(self.ams_net_id, pyads.PORT_TC3PLC1, self.ip_address)
         try:
             self._ads_client.open()
         except Exception as e:
-            logger.error(f"Failed to open ADS connection: {e}")
+            raise ServiceException(f"Failed to open ADS connection: {e}")
 
     def _on_uninstall(self, agent : Agent = None):
         super()._on_uninstall(agent)
