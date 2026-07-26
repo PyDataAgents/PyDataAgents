@@ -1,10 +1,15 @@
-from dataclasses import Field, fields
+from dataclasses import Field, dataclass, field, fields
+import os
 from pathlib import Path
 from typing import Any, Tuple, get_origin
+import uuid
 
 from nicegui import app, ui
 from nicegui.element import Element
 from nicegui.elements.image import Image
+from nicegui.elements.audio import Audio
+from nicegui.elements.video import Video
+from nicegui.elements.upload import Upload
 
 from .UIException import UIException
 from ..Agent import Agent
@@ -13,13 +18,15 @@ from ...services.datamodel.DataModel import DataModel
 from ...services.datamodel.DataModelService import DataModelService
 
 
+@dataclass
 class UIDataModelPage(UIPage):
     """ UI page for displaying `DataModelService`. """
     
+    path : str = "/data_model"
+    upload_folder : str = field(default=None, metadata={"description": "default folder for uploads, this folder must be specified before ui elements like Upload can work"})    
+    
     def __init__(self, agent : Agent, dms : DataModelService, columns : int = 1):
         super().__init__(agent)
-        self.task_runner_id = id
-        self.path = "/data_model"
         self._dms : DataModelService = dms
         self._nc : int = columns
         self._columns : list[Element] = []
@@ -153,6 +160,12 @@ class UIDataModelPage(UIPage):
                                             raise UIException("type table requires 'columns' option in ui_options")
                                     else:
                                         raise UIException("type table requires ui_options")
+                                case "file":
+                                    elem = ui.upload(lambda data, name=n: self._on_change(data, name=name))
+                                case "audio":
+                                    elem = ui.audio(src=v)
+                                case "video":
+                                    elem = ui.video(src=v)
                                 case "dropdown":
                                     pass
                                 case "slider":
@@ -175,6 +188,9 @@ class UIDataModelPage(UIPage):
                         if n in input_vars:
                             if isinstance(elem, EditableTable):
                                 elem.on_change(lambda data, name=n: self._on_change(data, name=name))
+                            elif isinstance(elem, Upload):
+                                # skip ui.upload elements
+                                pass
                             else:
                                 elem.on("change", self._on_change)
                         elem.tooltip(d).props(f"name={n}")
@@ -198,6 +214,13 @@ class UIDataModelPage(UIPage):
             if isinstance(e, list):
                 property_name = name
                 value = e
+            if isinstance(e, Upload):
+                property_name = name
+                file_ext = Path(e.name).suffix
+                file_id = uuid.uuid4()
+                content = e.content.read()
+                value = self.upload_folder + os.sep + file_id + file_ext
+                Path(value).write_bytes(content)
             else:
                 property_name = e.sender.props.get("name")
                 value = e.sender.value
@@ -219,9 +242,12 @@ class UIDataModelPage(UIPage):
             data : dict[str, Any] = dm.to_dict()
             for k, v in data.items():
                 if k in self._ui_field_elements:
-                    if isinstance(self._ui_field_elements[k], Image):
+                    if isinstance(self._ui_field_elements[k], Image) or isinstance(self._ui_field_elements[k], Audio) or isinstance(self._ui_field_elements[k], Video):
                         if self._ui_field_elements[k].source != v:
                             self._ui_field_elements[k].set_source(v)
+                    elif isinstance(self._ui_field_elements[k], Upload):
+                        # skip ui.upload elements
+                        pass
                     else:
                         if self._ui_field_elements[k].value != v:
                             self._ui_field_elements[k].set_value(v)
