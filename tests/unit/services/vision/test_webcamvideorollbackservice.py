@@ -20,7 +20,8 @@ def test_webcam_rollback_service():
         rollback_files=rb,
         video_length=vlen,
         codec="mp4v",
-        extension="mp4"
+        extension="mp4",
+        post_fix="test"
     )
     
     wvrs.install()
