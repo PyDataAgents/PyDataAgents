@@ -10,6 +10,7 @@ from nicegui.elements.image import Image
 from nicegui.elements.audio import Audio
 from nicegui.elements.video import Video
 from nicegui.elements.upload import Upload
+from nicegui.elements.select import Select
 
 from .UIException import UIException
 from ..Agent import Agent
@@ -95,7 +96,7 @@ class UIDataModelPage(UIPage):
             h : bool = False
             if n in input_vars or n in output_vars:                    
                 t = field.type
-                d : str = field.metadata.get("description", "")
+                d : str = field.metadata.get("description", None)
                 h = field.metadata.get("hidden", False)
                 v : Any = getattr(self._dms.get_model_class(), n, None)
                 u : str = field.metadata.get("unit", None)
@@ -164,10 +165,44 @@ class UIDataModelPage(UIPage):
                                     elem = ui.upload(lambda data, name=n: self._on_change(data, name=name))
                                 case "audio":
                                     elem = ui.audio(src=v)
+                                    if o:
+                                        if "controls" in o:
+                                            if o["controls"]:
+                                                elem.props("controls")
+                                        if "autoplay" in o:
+                                            if o["autoplay"]:
+                                                elem.props("autoplay")
+                                        if "loop" in o:
+                                            if o["loop"]:
+                                                elem.props("loop")
                                 case "video":
                                     elem = ui.video(src=v)
-                                case "dropdown":
-                                    pass
+                                    if o:
+                                        if "controls" in o:
+                                            if o["controls"]:
+                                                elem.props("controls")
+                                        if "autoplay" in o:
+                                            if o["autoplay"]:
+                                                elem.props("autoplay")
+                                        if "loop" in o:
+                                            if o["loop"]:
+                                                elem.props("loop")
+                                        if "style" in o:
+                                            elem.style(o["style"])
+                                case "select":
+                                    if o:
+                                        options : str | dict | list = o
+                                        if isinstance(options, str):
+                                            if "@" in options:
+                                                elem = ui.select(label=l, value=None, options=[""])                                                
+                                                elem.props(f"data-options='{options.replace("@", "")}'")
+                                            else:
+                                                raise UIException(f"ui_options should contain a string with '@' referencing a {DataModel.__name__} variable")
+                                        elif isinstance(options, dict) or isinstance(options, list):
+                                            elem = ui.select(label=l, value=v, options=options)
+                                    else:
+                                        raise UIException(f"ui_type='select' must specify 'ui_options'")
+                                                                        
                                 case "slider":
                                     pass
                                 case "plot":
@@ -188,12 +223,16 @@ class UIDataModelPage(UIPage):
                         if n in input_vars:
                             if isinstance(elem, EditableTable):
                                 elem.on_change(lambda data, name=n: self._on_change(data, name=name))
+                            elif isinstance(elem, Select):
+                                elem.on_value_change(self._on_change)
                             elif isinstance(elem, Upload):
                                 # skip ui.upload elements
                                 pass
                             else:
                                 elem.on("change", self._on_change)
-                        elem.tooltip(d).props(f"name={n}")
+                        elem.props(f"name={n}")
+                        if d:
+                            elem.tooltip(d)
                         if n in output_vars:
                             elem.props("readonly input-class=bg-grey-2")
                         if u:
@@ -251,7 +290,14 @@ class UIDataModelPage(UIPage):
                     else:
                         if self._ui_field_elements[k].value != v:
                             self._ui_field_elements[k].set_value(v)
-        
+                            
+                    # check if ui.select elements needs options update
+                    if isinstance(self._ui_field_elements[k], Select):
+                        if "data-options" in self._ui_field_elements[k]._props:
+                            option_name : str = self._ui_field_elements[k]._props["data-options"]
+                            options : list | dict = dm.get_value(option_name)
+                            self._ui_field_elements[k].set_options(options)
+                                                
     async def _init_model_session(self):
         await ui.run_javascript("""
             if (!localStorage.session_id) {

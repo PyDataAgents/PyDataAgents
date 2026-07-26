@@ -225,7 +225,7 @@ class DataModelService(Service):
         # Parse file into AST
         tree = ast.parse(source_code)
         
-        # collect all mthod inputs and outputs
+        # collect all method inputs and outputs
         visitor1 = DataModelReadAccessVisitor()
         visitor1.visit(tree)
         read_vars : dict = visitor1.read_accesses
@@ -256,7 +256,7 @@ class DataModelService(Service):
                 if iv not in self._model_output_vars:
                     self._model_input_vars.update({iv: iv})
                     
-        # collect special output variables: ui_type -> image
+        # collect special input/output variables:
         field : Field
         for field in fields(self._model_class):
             ut = field.metadata.get("ui_type", None)
@@ -264,6 +264,12 @@ class DataModelService(Service):
                 match ut:
                     case "image":
                         self._model_output_vars.update({field.name: field.name})
+                    case "video":
+                        self._model_output_vars.update({field.name: field.name})
+                    case "audio":
+                        self._model_output_vars.update({field.name: field.name})
+                    case "file":
+                        self._model_input_vars.update({field.name: field.name})
             
         # validate if method properties exist in model properties
         #data_model = ClassUtils.load_instance(self.model_path, self.model_name)

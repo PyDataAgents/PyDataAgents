@@ -28,7 +28,20 @@ class DataModel(ABC):
     - `width`: specifies the width of an image in css format
     - `height`: specifies the height of an image in css format
     
-    **dropdown**
+    **video**
+    - `style`: specifies a CSS based style option for the video element, e.g. "style": "width:100%; aspect-ratio:16/9;"
+    - `controls`: true/false for the display of video controls
+    - `autoplay`: true/false for automatically playing the video on page load
+    - `loop`: true/false for playing the video in a loop
+    
+    **audio**
+    - `controls`: true/false for the display of video controls
+    - `autoplay`: true/false for automatically playing the video on page load
+    - `loop`: true/false for playing the video in a loop
+        
+    
+    **select**
+    - `ui_options`: is used to specify the select options, e.g. "ui_options": ["A", "B", "C"] or "ui_options": {"a": "A", "b": "B"}
     
     **slider**
     
@@ -76,6 +89,22 @@ class DataModel(ABC):
             return True
         else:
             return False
+    
+    def get_value(self, property_name : str) -> Any:
+        """ returns the value of the specified `property_name`
+        
+        Args:
+            property_name (str): name of the property to return
+            
+        Returns:
+            Any: the value of the property
+        
+        """
+        if self.has_property(property_name):
+            return getattr(self, property_name)
+        else:
+            logger.error(f"no property '{property_name}' in {self.__class__.__name__}")
+            return None
             
     def to_dict(self, with_hidden : bool = False) -> dict:
         """
