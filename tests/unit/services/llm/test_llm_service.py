@@ -140,15 +140,16 @@ def test_llmservice_file_context_builds_multiple_remote_blocks():
     assert content[2]["filename"] == "file.pdf"
 
 
-def test_llmservice_file_context_builds_local_path_and_file_url_blocks(tmp_path):
+def test_llmservice_file_context_builds_local_path_and_file_url_blocks(tmp_path, monkeypatch):
     local_pdf = tmp_path / "local.pdf"
     local_pdf.write_bytes(b"%PDF-test")
     local_image = tmp_path / "local.jpg"
     local_image.write_bytes(b"jpg-test")
+    monkeypatch.chdir(tmp_path)
     service = LLMService(model_provider=ModelProvider.OPENAI.value)
     service._llm = RecordingChatModel()
 
-    service.chat("Describe local files", context_files=[str(local_pdf), local_pdf.as_uri(), str(local_image)])
+    service.chat("Describe local files", context_files=["local.pdf", local_pdf.as_uri(), "local.jpg"])
 
     content = service._llm.calls[0][-1].content
     expected_base64 = base64.b64encode(b"%PDF-test").decode("utf-8")
@@ -225,7 +226,6 @@ def test_llmservice_ollama_file_context_warns_and_does_not_normalize(monkeypatch
     "context_files",
     [
         {"url": "https://example.test/file.pdf"},
-        "relative/file.pdf",
         "ftp://example.test/file.pdf",
         "",
         "https://",

@@ -293,6 +293,63 @@ def test_mode_chat_with_local_context_only():
     assert service.calls[0]["use_rag_context"] is False
 
 
+def test_input_context_keys_forward_file_references_from_multiple_parent_keys():
+    """Ensure file-path-shaped parent values remain ordinary input context data."""
+    service = _new_service()
+    cat_image_path = "tests/unit/nodes/llm/cyber_cat_christmas.jpg"
+    cat_image_uri = Path(cat_image_path).resolve().as_uri()
+
+    action = LLMChatAction(
+        question_key="question",
+        input_context_keys=["file1", "file2", "file3"],
+        use_rag_context=False,
+    )
+    action.set_service(service)
+    action.add_parent(
+        _link_parent_with_row(
+            {
+                "question": "Use the referenced file metadata",
+                "file1": cat_image_path,
+                "file2": cat_image_uri,
+                "file3": [[cat_image_path, cat_image_uri]],
+            }
+        )
+    )
+    action.install()
+    action.execute()
+
+    assert service.calls[0]["input_context"] == {
+        "file1": cat_image_path,
+        "file2": cat_image_uri,
+        "file3": [cat_image_path, cat_image_uri],
+    }
+    assert service.calls[0]["context_files"] is None
+
+
+def test_input_context_value_forwards_file_reference_dictionary():
+    """Ensure a dict of file-path-shaped values can be supplied as fixed input context."""
+    service = _new_service()
+    cat_image_path = "tests/unit/nodes/llm/cyber_cat_christmas.jpg"
+    cat_image_uri = Path(cat_image_path).resolve().as_uri()
+    context = {
+        "file1": cat_image_path,
+        "file2": cat_image_uri,
+        "file3": [cat_image_path, cat_image_uri],
+    }
+
+    action = LLMChatAction(
+        question_value="Use the referenced file metadata",
+        input_context_value=context,
+        use_rag_context=False,
+    )
+    action.set_service(service)
+    action.install()
+    action.execute()
+
+    assert service.calls[0]["input_context"] == context
+    assert service.calls[0]["context_files"] is None
+
+
 def test_context_files_value_is_forwarded_to_rag_service():
     """Ensure fixed context_files_value is passed through without node-side normalization."""
     service = _new_service()
@@ -339,6 +396,38 @@ def test_context_files_key_is_resolved_from_parent_row():
 
     assert service.calls[0]["question"] == "Use supplied files"
     assert service.calls[0]["context_files"] == context_files
+
+
+def test_context_files_key_can_resolve_nested_file_list_from_parent_dictionary():
+    """Ensure actual file context can be selected from a nested parent dictionary."""
+    service = _new_service()
+    cat_image_path = "tests/unit/nodes/llm/cyber_cat_christmas.jpg"
+    cat_image_uri = Path(cat_image_path).resolve().as_uri()
+    context_files = [cat_image_path, cat_image_uri]
+
+    action = LLMChatAction(
+        question_key="question",
+        context_files_key="attachments.file3",
+        use_rag_context=False,
+    )
+    action.set_service(service)
+    action.add_parent(
+        _link_parent_with_row(
+            {
+                "question": "Use supplied files",
+                "attachments": {
+                    "file1": cat_image_path,
+                    "file2": cat_image_uri,
+                    "file3": context_files,
+                },
+            }
+        )
+    )
+    action.install()
+    action.execute()
+
+    assert service.calls[0]["context_files"] == context_files
+    assert service.calls[0]["input_context"] is None
 
 
 def test_mode_full_augment():
