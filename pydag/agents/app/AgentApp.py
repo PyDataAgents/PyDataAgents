@@ -107,6 +107,7 @@ class AgentApp():
     def shutdown(self):
         self._agent.terminate()
         if self.with_ui:
+            app.shutdown()
             if self.with_api:
                 pass            
             else:

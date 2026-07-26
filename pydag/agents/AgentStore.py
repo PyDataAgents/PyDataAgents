@@ -1,5 +1,6 @@
 from __future__ import annotations
 from dataclasses import dataclass, field
+from multiprocessing import Process
 from threading import Lock
 from typing import Any
 import uuid
@@ -22,6 +23,7 @@ class AgentStore:
         self._user_agents : dict[str, set[str]] = dict()
         self._agents_apps : dict[str, AgentApp] = dict()
         self._templates : dict[str, dict] = dict()
+        self._agent_processes : dict[str, Process] = dict()
         self._lock : Lock = Lock()
     
     def open(self):
