@@ -23,7 +23,7 @@ from ...services.datamodel.DataModelService import DataModelService
 class UIDataModelPage(UIPage):
     """ UI page for displaying `DataModelService`. """
     
-    path : str = "/data_model"
+    path : str = field(default="/data_model", metadata={"description": ""})
     upload_folder : str = field(default=None, metadata={"description": "default folder for uploads, this folder must be specified before ui elements like Upload can work"})    
     
     def __init__(self, agent : Agent, dms : DataModelService, columns : int = 1):
@@ -162,7 +162,7 @@ class UIDataModelPage(UIPage):
                                     else:
                                         raise UIException("type table requires ui_options")
                                 case "file":
-                                    elem = ui.upload(lambda data, name=n: self._on_change(data, name=name))
+                                    elem = ui.upload(on_upload=lambda data, name=n: self._on_change(data, name=name))
                                 case "audio":
                                     elem = ui.audio(src=v)
                                     if o:

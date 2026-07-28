@@ -3,6 +3,7 @@ from abc import abstractmethod
 import asyncio
 from collections import deque
 import copy
+from dataclasses import dataclass, field
 import enum
 from typing import TYPE_CHECKING, Any
 from nicegui import ui
@@ -10,6 +11,7 @@ from nicegui.element import Element
 import plotly.graph_objs as go
 
 
+from ..app.AgentApp import AgentApp
 from ...utils.DataUtils import DataUtils
 from ..AgentConfig import AgentConfig
 from ..AgentElement import AgentElement
@@ -37,19 +39,22 @@ def determine_samples(buffer : Buffer) -> int:
     """ defines the number of samples to retrieve for a `BufferComponent`"""
     # TODO
 
+@dataclass
 class UIPage():
     """ Base Page class to build nicegui pages """
     
-    path : str = "/"
-    with_nav_bar : bool = True
+    path : str = field(default="/", metadata={})
+    with_nav_bar : bool = field(default=True, metadata={})
+    refresh_interval : int = field(default=1.0, metadata={})
     
-    def __init__(self, agent : Agent, refresh_interval : int = 1.0):
-        self._agent : Agent = agent
+    def __post_init__(self):
+        self._agent_app : AgentApp = None
         self._ui_components : deque[UIComponent] = deque()
-        self._refresh_interval : int = refresh_interval
         self._timer : ui.timer = None
     
-    def register(self):
+    def register(self, agent_app : AgentApp):
+        
+        self._agent_app = agent_app
         
         @ui.page(self.path)
         def page():
@@ -62,7 +67,7 @@ class UIPage():
                     requires_update = True
                     break                    
             if requires_update:
-                self._timer = ui.timer(self._refresh_interval, lambda: [
+                self._timer = ui.timer(self.refresh_interval, lambda: [
                     component.update() for component in self._ui_components if component.requires_update 
                 ])
     
@@ -83,8 +88,8 @@ class UIPage():
         return self._ui_components
     
     def get_agent(self) -> Agent:
-        return self._agent
-    
+        return self._agent_app.get_agent()
+        
     def create_header(self, title : str, home_path : str = "/"):
         """ creates a standard header with title and home link """
         with ui.header().classes('bg-primary text-white'):
@@ -92,16 +97,15 @@ class UIPage():
             ui.space()
             with ui.link(target=home_path).classes("flex items-center gap-2 text-white"):
                 ui.icon("home").classes("text-xl")
-   
+
+@dataclass   
 class UIHomePage(UIPage):
     """ Main/Home Page with navigation cards for other UI Pages """
-    
-    path : str = "/"
-    
+        
     def _render(self):
         self.create_header("UI Home - Dashboard")
         with ui.grid(columns=4).classes("w-full gap-2"):
-            for page in self._agent.get_ui_pages():
+            for page in self._agent_app.get_ui_pages():
                 link = page.path
                 title = page.__class__.__name__
                 desc = page.__doc__

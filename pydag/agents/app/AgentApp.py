@@ -139,9 +139,9 @@ class AgentApp():
         This method initializes the NiceGUI app and sets up the UI pages.
         """
         if not no_default_pages:
-            self.add_ui_page(UIHomePage(self))
-            self.add_ui_page(UIBufferPage(self, 1.0 / 30.0))
-            self.add_ui_page(UIAgentMgmtPage(self, 1.0))
+            self.add_ui_page(UIHomePage())
+            self.add_ui_page(UIBufferPage(1.0 / 30.0))
+            self.add_ui_page(UIAgentMgmtPage(1.0))
         
         # define default color schema        
         if len(self.color_schema) > 0:
@@ -157,7 +157,7 @@ class AgentApp():
             
         page : UIPage
         for page in self._ui_pages:
-            page.register()
+            page.register(self)
     
     def _create_config(self):
         apc = AgentConfig.config_options(self)
@@ -188,5 +188,5 @@ class AgentApp():
     def get_agent(self) -> Agent:
         return self._agent
         
-    def set_app(self, app : FastAPI):
-        self._app = app
+    def set_app(self, fast_api_app : FastAPI):
+        self._app = fast_api_app
