@@ -390,12 +390,12 @@ class Line:
         self.shape = str(line_shape) if isinstance(line_shape, LineShape) else line_shape
         return self
 
-    def get_color(self):
+    def get_color(self) -> str:
         return self.color
 
     def set_color(self, color : str | Color):
         # expects color to be an object with __str__ defined or a string
-        self.color = str(color)
+        self.color = str(color) if isinstance(color, Color) else color
         return self
 
 @dataclass    
@@ -724,31 +724,31 @@ class Contour:
 @dataclass
 class Trace:   
 
-    x: Union[list[object], list[float], list[int], np.ndarray] = None
-    y: Union[list[object], list[float], list[int], np.ndarray] = None
-    z: Union[list[object], list[float], list[int], np.ndarray] = None
-    mode: Optional[str] = None
-    type: Optional[str] = None
-    fill: Optional[str] = None
-    fillcolor: Optional[str] = None
-    name: str = None
-    line: Optional[Line] = None
-    text: Optional[List[str]] = None
-    font: Optional[TextFont] = None
-    textposition: Optional[str] = None
+    x : Union[list[object], list[float], list[int], np.ndarray] = None
+    y : Union[list[object], list[float], list[int], np.ndarray] = None
+    z : Union[list[object], list[float], list[int], np.ndarray] = None
+    mode : Optional[str] = None
+    type : Optional[str] = None
+    fill : Optional[str] = None
+    fillcolor : Optional[str] = None
+    name : str = None
+    line : Optional[Line] = None
+    text : Optional[List[str]] = None
+    font : Optional[TextFont] = None
+    textposition : Optional[str] = None
     marker : Optional[Marker] = None
-    opacity: float = 1.0
+    opacity : float = 1.0
     # cone-specific
-    u: Union[list[object], list[float], list[int], np.ndarray] = None
-    v: Union[list[object], list[float], list[int], np.ndarray] = None
-    w: Union[list[object], list[float], list[int], np.ndarray] = None
-    showscale: bool = False
-    colorscale: Optional[List[object]] = None
+    u : Union[list[object], list[float], list[int], np.ndarray] = None
+    v : Union[list[object], list[float], list[int], np.ndarray] = None
+    w : Union[list[object], list[float], list[int], np.ndarray] = None
+    showscale : bool = None
+    colorscale : Optional[List[object]] = None
     surfacecolor : list[int] = None
     # subplot axes
-    xaxis: Optional[str] = None
-    yaxis: Optional[str] = None
-    zaxis: Optional[str] = None
+    xaxis : Optional[str] = None
+    yaxis : Optional[str] = None
+    zaxis : Optional[str] = None
     contours : Optional[dict[str, Contour]] = None
     
     _TRACE_NUM = 0
