@@ -319,7 +319,7 @@ class Legend:
     
     x : float = 1.0
     y : float = 1.0
-    xanchor : str = 'right'
+    xanchor : str = "right"
     font : TextFont = None
 
     def get_x(self):
@@ -364,7 +364,7 @@ class Line:
     
     dash : str = None
     width : int = 3
-    shape : LineShape = None
+    shape : str = None
     color : str = None
 
     def get_dash(self):
@@ -385,9 +385,9 @@ class Line:
     def get_shape(self):
         return self.shape
 
-    def set_shape(self, line_shape):
+    def set_shape(self, line_shape : LineShape | str):
         # expects line_shape to be an enum or object with __str__ defined
-        self.shape = str(line_shape)
+        self.shape = str(line_shape) if isinstance(line_shape, LineShape) else line_shape
         return self
 
     def get_color(self):
@@ -618,11 +618,11 @@ class Symbol(str, Enum):
 @dataclass
 class Marker:
     
-    size: int = 12
-    color: Union[str, List[float], None] = None
-    symbol: Optional[str] = None
-    angleref: str = None
-    line: Optional[Line] = None
+    size : int = 12
+    color : Union[str, List[float], None] = None
+    symbol : Optional[str] = None
+    angleref : str = None
+    line : Optional[Line] = None
     
     def get_size(self) -> int:
         return self.size
@@ -645,7 +645,7 @@ class Marker:
 
     # --- symbol ---
     def set_symbol(self, value: Union[str, Symbol]) -> "Marker":
-        self.symbol = str(value)
+        self.symbol = str(value) if isinstance(value, Symbol) else value
         return self
 
     def get_symbol(self) -> str:
@@ -736,7 +736,7 @@ class Trace:
     text: Optional[List[str]] = None
     font: Optional[TextFont] = None
     textposition: Optional[str] = None
-    marker: Optional[Marker] = None
+    marker : Optional[Marker] = None
     opacity: float = 1.0
     # cone-specific
     u: Union[list[object], list[float], list[int], np.ndarray] = None
@@ -802,20 +802,20 @@ class Trace:
             self.w = w
         return self
 
-    def set_mode(self, mode: Mode):
-        self.mode = str(mode)
+    def set_mode(self, mode: Mode | str):
+        self.mode = str(mode) if isinstance(mode, Mode) else mode
         return self
 
-    def set_type(self, t: PlotType):
-        self.type = str(t)
+    def set_type(self, t: PlotType | str):
+        self.type = str(t) if isinstance(t, PlotType) else t
         return self
     
-    def set_fill(self, fill : FillType):
-        self.fill = str(fill)
+    def set_fill(self, fill : FillType | str):
+        self.fill = str(fill) if isinstance(fill, FillType) else fill
         return self
     
-    def set_fillcolor(self, fillcolor : Color):
-        self.fillcolor = str(fillcolor)
+    def set_fillcolor(self, fillcolor : Color | str):
+        self.fillcolor = str(fillcolor) if isinstance(fillcolor, Color) else fillcolor
         return self
 
     def set_name(self, name: str):
@@ -834,8 +834,8 @@ class Trace:
             self.font = font
         return self.font
 
-    def set_text_position(self, pos: TextPosition):
-        self.textposition = str(pos)
+    def set_text_position(self, pos: TextPosition | str):
+        self.textposition = str(pos) if isinstance(pos, TextPosition) else pos
         return self
     
     def set_line(self, line: Line = None):
@@ -912,8 +912,8 @@ class Layout:
     grid : Grid = None
     margin : Margin = None
     autosize : bool = True
-    plot_bgcolor = None
-    paper_bgcolor = None
+    plot_bgcolor : str = None
+    paper_bgcolor : str = None
 
     def equal_axis(self):
         if self.yaxis is None:
@@ -1030,18 +1030,18 @@ class Layout:
         self.autosize = autosize
         return self
 
-    def set_background_color(self, color):
-        self.plot_bgcolor = color
+    def set_background_color(self, color : Color | str):
+        self.plot_bgcolor = str(color) if isinstance(color, Color) else color
         return self
 
-    def get_background_color(self):
+    def get_background_color(self) -> str:
         return self.plot_bgcolor
 
-    def set_paper_color(self, color):
-        self.paper_bgcolor = color
+    def set_paper_color(self, color : Color | str):
+        self.paper_bgcolor = str(color) if isinstance(color, Color) else color
         return self
 
-    def get_paper_color(self):
+    def get_paper_color(self) -> str:
         return self.paper_bgcolor
 
     def to_dict(self) -> dict:
