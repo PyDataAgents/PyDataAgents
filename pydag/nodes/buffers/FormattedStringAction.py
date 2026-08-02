@@ -7,7 +7,7 @@ from ...buffers.DataType import DataType
 from ...buffers.ListBuffer import ListBuffer
 from ...buffers.DictBuffer import DictBuffer
 from ...agents.Agent import Agent
-from ...agents.AgentConfig import AgentConfig
+from ...agents.AgentKeywords import AgentKeywords
 from ..Action import Action
 from ..BufferNode import BufferNode
 
@@ -32,9 +32,9 @@ class FormattedStringAction(BufferNode, Action):
                         self.buffer_id = buf.id
                 else:
                     if len(self.output_keys) == 1:
-                        self._buffer = DictBuffer(id=self.id + "-BUFFER", capacity=AgentConfig.INFINITE_CAPACITY, data_type=DataType.STRING)
+                        self._buffer = DictBuffer(id=self.id + "-BUFFER", capacity=AgentKeywords.INFINITE_CAPACITY, data_type=DataType.STRING)
                     else:
-                        self._buffer = ListBuffer(id=self.id + "-BUFFER", capacity=AgentConfig.INFINITE_CAPACITY, data_type=DataType.STRING)
+                        self._buffer = ListBuffer(id=self.id + "-BUFFER", capacity=AgentKeywords.INFINITE_CAPACITY, data_type=DataType.STRING)
                     self.buffer_id = self._buffer.id
                     self._buffer.install(agent)
                     agent.add_buffer(self._buffer)                
@@ -44,7 +44,7 @@ class FormattedStringAction(BufferNode, Action):
                 else:
                     self._buffer = ListBuffer()
                 self._buffer.install(agent)
-                self._buffer.capacity = AgentConfig.INFINITE_CAPACITY
+                self._buffer.capacity = AgentKeywords.INFINITE_CAPACITY
                 self._buffer.data_type = DataType.STRING
         
     def _on_execute(self):

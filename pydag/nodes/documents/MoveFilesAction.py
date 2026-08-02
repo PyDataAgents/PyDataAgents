@@ -1,7 +1,6 @@
 from dataclasses import dataclass, field
 from loguru import logger
 
-from ...agents.AgentConfig import AgentConfig
 from ...agents.Agent import Agent
 from ...buffers.ListBuffer import ListBuffer
 from ..Action import Action
@@ -15,7 +14,7 @@ class MoveFilesAction(BufferNode, Action):
     <br>this `Action` either needs a parent `Node` with a `ListBuffer` with filepaths or a reference to a `Buffer` via `buffer_id` or its `buffer`variable
 
     Raises:
-        StatemachineException: if folder does not exist or wrong `Buffer` is provided
+        NodeException: if folder does not exist or wrong `Buffer` is provided
     """
     
     target_folder : str = field(default=None, metadata={"description": "target folder to move all the files to in Buffer"})

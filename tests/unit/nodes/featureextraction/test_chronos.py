@@ -1,6 +1,6 @@
 import time
 from pydag.nodes.featureextraction.ChronosExtractor import ChronosExtractor
-from pydag.agents.AgentConfig import AgentConfig
+from pydag.agents.AgentKeywords import AgentKeywords
 from pydag.buffers.DatasetBuffer import DatasetBuffer, DatasetNames
 from pydag.nodes.buffers.LinkBufferAction import LinkBufferAction
 from pydag.buffers.signals.Sine import Sine
@@ -113,7 +113,7 @@ def test_chronos_feature_key_naming_pattern():
         time.sleep(0.1)
     assert isinstance(forecast, dict) and len(forecast) > 0
     for idx, k in enumerate(forecast.keys()):
-        expected_key = ChronosExtractor.__name__ + "-" + AgentConfig.FEATURE + "-" + f"{idx}"
+        expected_key = ChronosExtractor.__name__ + "-" + AgentKeywords.FEATURE + "-" + f"{idx}"
         assert k == expected_key
 
 
@@ -155,8 +155,8 @@ def test_chronos_output_keys_mismatch_uses_default():
         attempts += 1
         time.sleep(0.1)
     expected = {
-        ChronosExtractor.__name__ + "-" + AgentConfig.FEATURE + "-" + "0",
-        ChronosExtractor.__name__ + "-" + AgentConfig.FEATURE + "-" + "1",
+        ChronosExtractor.__name__ + "-" + AgentKeywords.FEATURE + "-" + "0",
+        ChronosExtractor.__name__ + "-" + AgentKeywords.FEATURE + "-" + "1",
     }
     assert set(forecast.keys()) == expected
 

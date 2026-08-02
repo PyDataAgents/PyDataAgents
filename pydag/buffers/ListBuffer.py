@@ -4,7 +4,7 @@ import time
 from loguru import logger
 import numpy as np
 
-from ..agents.AgentConfig import AgentConfig
+from ..agents.AgentKeywords import AgentKeywords
 from .Buffer import Buffer
 
 class ListBuffer(Buffer):
@@ -33,7 +33,7 @@ class ListBuffer(Buffer):
                         elements.append(value)   
                 logger.debug("converted dict to list for " + ListBuffer.cname() + " push, "  + ListBuffer.cname() + " only accepts list elements")          
             # check for infinity capacity
-            if self.capacity != AgentConfig.INFINITE_CAPACITY:
+            if self.capacity != AgentKeywords.INFINITE_CAPACITY:
                 too_many =  len(elements) + self.size() - self.capacity
             else:
                 too_many = 0
@@ -62,7 +62,7 @@ class ListBuffer(Buffer):
                     with self._lock:
                         del self._elements[0:n]
                 dic : dict = {}
-                dic[AgentConfig.VALUES] = d
+                dic[AgentKeywords.VALUES] = d
                 return dic
             else:
                 # always make a deep copy, otherwise a reference will be maintained
@@ -71,7 +71,7 @@ class ListBuffer(Buffer):
                     with self._lock:
                         self._elements.clear()
                 dic : dict = {}
-                dic[AgentConfig.VALUES] = d
+                dic[AgentKeywords.VALUES] = d
                 return dic
         else:
             #logger.warning("buffer is empty")
@@ -79,10 +79,10 @@ class ListBuffer(Buffer):
 
     def data_with_meta(self, n = 0, persistent = True) -> dict:        
         data = {}
-        data[AgentConfig.VALUES] = self.data(n, persistent)
+        data[AgentKeywords.VALUES] = self.data(n, persistent)
         d = {}
-        d[AgentConfig.DATA] = data
-        d[AgentConfig.META] = self.config_options()
+        d[AgentKeywords.DATA] = data
+        d[AgentKeywords.META] = self.config_options()
         return d
                     
     def size(self) -> int:
@@ -95,7 +95,7 @@ class ListBuffer(Buffer):
             object (any): a buffer object / sample
         """
         # check for infinity capacity
-        if self.capacity != AgentConfig.INFINITE_CAPACITY:
+        if self.capacity != AgentKeywords.INFINITE_CAPACITY:
             if self.size() == self.capacity and self.capacity != 0:
                 self._elements.pop(0)  
         self._elements.append(element)

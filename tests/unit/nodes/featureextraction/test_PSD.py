@@ -6,7 +6,7 @@ from pydag.nodes.buffers.LinkBufferAction import LinkBufferAction
 from pydag.buffers.signals.Sine import Sine
 from pydag.buffers.SignalBuffer import SignalBuffer
 from pydag.nodes.featureextraction.PSDExtractor import PSDExtractor
-from pydag.agents.AgentConfig import AgentConfig
+from pydag.agents.AgentKeywords import AgentKeywords
 
 
 # Test one inference sample as well as multiple inference samples on different datasets.
@@ -84,7 +84,7 @@ def test_psd_feature_key_naming_pattern():
         time.sleep(0.1)
     assert isinstance(forecast, dict) and len(forecast) > 0
     for idx, k in enumerate(forecast.keys()):
-        expected_key = PSDExtractor.cname() + "-" + AgentConfig.FEATURE + "-" + f"{idx}"
+        expected_key = PSDExtractor.cname() + "-" + AgentKeywords.FEATURE + "-" + f"{idx}"
         assert k == expected_key
 
 
@@ -129,8 +129,8 @@ def test_psd_output_keys_mismatch_uses_default():
         time.sleep(0.1)
     # Two inputs -> expect default naming for both
     expected = {
-        PSDExtractor.__name__ + "-" + AgentConfig.FEATURE + "-" + "0",
-        PSDExtractor.__name__ + "-" + AgentConfig.FEATURE + "-" + "1",
+        PSDExtractor.__name__ + "-" + AgentKeywords.FEATURE + "-" + "0",
+        PSDExtractor.__name__ + "-" + AgentKeywords.FEATURE + "-" + "1",
     }
     assert set(forecast.keys()) == expected
 
@@ -154,7 +154,7 @@ def test_psd_ucr_dataset_keys_and_length():
         if data and len(data.values()) > 0:
             assert any([len(data[list(data.keys())[0]]) == 257, len(data[list(data.keys())[0]]) == 0]), f"Data length must be 257 or 0, but got: {len(data[list(data.keys())[0]])}"
             assert len(list(data.keys())) == 2 + 2 # Because of timestamps and indices
-            assert all([key in data.keys() for key in [PSDExtractor.__name__ + "-" + AgentConfig.FEATURE + "-" + "0", PSDExtractor.__name__ + "-" + AgentConfig.FEATURE + "-" + "1",]]), f"Keys must be {PSDExtractor.__name__ + '-' + AgentConfig.FEATURE + '-0', PSDExtractor.__name__ + '-' + AgentConfig.FEATURE + '-1'}, but got: {list(data.keys())}"
+            assert all([key in data.keys() for key in [PSDExtractor.__name__ + "-" + AgentKeywords.FEATURE + "-" + "0", PSDExtractor.__name__ + "-" + AgentKeywords.FEATURE + "-" + "1",]]), f"Keys must be {PSDExtractor.__name__ + '-' + AgentKeywords.FEATURE + '-0', PSDExtractor.__name__ + '-' + AgentKeywords.FEATURE + '-1'}, but got: {list(data.keys())}"
             #plt.plot(data[list(data.keys())[0]])
             #plt.pause(0.1)
 
@@ -177,8 +177,8 @@ def test_psd_cwru_dataset_changes_and_default_keys():
         if data and len(data.values()) > 0:
             assert any([len(data[list(data.keys())[0]]) == 257, len(data[list(data.keys())[0]]) == 0]), f"Data length must be 257 or 0, but got: {len(data[list(data.keys())[0]])}"
             assert len(list(data.keys())) == 2 + 2 # Because of timestamps and indices
-            assert all([key in data.keys() for key in [PSDExtractor.__name__ + "-" + AgentConfig.FEATURE + "-" + "0", PSDExtractor.__name__ + "-" + AgentConfig.FEATURE + "-" + "1",]]), f"Keys must be {PSDExtractor.__name__ + '-' + AgentConfig.FEATURE + '-0', PSDExtractor.__name__ + '-' + AgentConfig.FEATURE + '-1'}, but got: {list(data.keys())}"
-            assert all([key in data.keys() for key in [AgentConfig.INDEX, AgentConfig.TIMESTAMPS]]), f"Keys must contain {AgentConfig.INDEX, AgentConfig.TIMESTAMPS}, but got: {list(data.keys())}" 
+            assert all([key in data.keys() for key in [PSDExtractor.__name__ + "-" + AgentKeywords.FEATURE + "-" + "0", PSDExtractor.__name__ + "-" + AgentKeywords.FEATURE + "-" + "1",]]), f"Keys must be {PSDExtractor.__name__ + '-' + AgentKeywords.FEATURE + '-0', PSDExtractor.__name__ + '-' + AgentKeywords.FEATURE + '-1'}, but got: {list(data.keys())}"
+            assert all([key in data.keys() for key in [AgentKeywords.INDEX, AgentKeywords.TIMESTAMPS]]), f"Keys must contain {AgentKeywords.INDEX, AgentKeywords.TIMESTAMPS}, but got: {list(data.keys())}" 
             if len(data[list(data.keys())[0]]) == 257:
                 if signal is None:
                     signal = data[list(data.keys())[0]]
@@ -208,7 +208,7 @@ def test_psd_cwru_multiple_inference_samples():
         if data and len(data.values()) > 0:
             assert any([len(data[list(data.keys())[0]]) == 257*5, len(data[list(data.keys())[0]]) == 0]), f"Data length must be 257 or 0, but got: {len(data[list(data.keys())[0]])}"
             assert len(list(data.keys())) == 2 + 2 # Because of timestamps and indices
-            assert all([key in data.keys() for key in [PSDExtractor.__name__ + "-" + AgentConfig.FEATURE + "-" + "0", PSDExtractor.__name__ + "-" + AgentConfig.FEATURE + "-" + "1",]]), f"Keys must be {PSDExtractor.__name__ + '-' + AgentConfig.FEATURE + '-0', PSDExtractor.__name__ + '-' + AgentConfig.FEATURE + '-1'}, but got: {list(data.keys())}"
+            assert all([key in data.keys() for key in [PSDExtractor.__name__ + "-" + AgentKeywords.FEATURE + "-" + "0", PSDExtractor.__name__ + "-" + AgentKeywords.FEATURE + "-" + "1",]]), f"Keys must be {PSDExtractor.__name__ + '-' + AgentKeywords.FEATURE + '-0', PSDExtractor.__name__ + '-' + AgentKeywords.FEATURE + '-1'}, but got: {list(data.keys())}"
             if len(data[list(data.keys())[0]]) == 257*5:
                 if signal is None:
                     signal = data[list(data.keys())[0]]

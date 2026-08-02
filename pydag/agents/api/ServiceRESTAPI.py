@@ -5,7 +5,7 @@ from pydantic import BaseModel, Field
 
 
 from .RESTAPIManager import APIRole, RESTAPIManager
-from ..AgentConfig import AgentConfig
+from ..AgentKeywords import AgentKeywords
 from ...services.Service import Service
 from ...utils.ClassUtils import ClassUtils
 
@@ -72,7 +72,7 @@ class ServiceRESTAPI:
                       
         @router.post("/", dependencies=[Depends(RESTAPIManager.require_min_role(APIRole.WRITE))])
         def add_service(service_def : ServiceDefinition) -> str:
-            type = service_def.definition[AgentConfig.TYPE]
+            type = service_def.definition[AgentKeywords.TYPE]
             if not type is None:
                 service : Service = ClassUtils.create_instance(type)
                 ClassUtils.set_properties(service, service_def.definition)            

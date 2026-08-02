@@ -1,8 +1,6 @@
 import sys
-from pydag.agents.Agent import Agent
-from pydag.agents.AgentConfig import AgentConfig
 from pydag.agents.AgentModule import AgentModule
-from pydag.agents.YAMLConfig import YAMLConfig
+from pydag.agents.app.AgentApp import AgentApp
 
 if __name__ == "__main__":
     #AgentModule.load_iiot_modules(skip_ads=True)      
@@ -10,11 +8,9 @@ if __name__ == "__main__":
         
     if len(sys.argv) > 1:
         config_file = sys.argv[1]
-        yc = YAMLConfig(config_file)
-        gc : AgentConfig = yc.load()
-        print(gc)
-        agent = gc.create()
+        aa : AgentApp = AgentApp.load(config_file)        
+        aa.create()   
+        aa.run()
     else:
-        agent = Agent(id = "A1")
-
-    agent.release()
+        print("Please provide a configuration file path as an argument.")
+        sys.exit(1)

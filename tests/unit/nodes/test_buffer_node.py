@@ -1,6 +1,6 @@
 import pytest
 
-from pydag.agents.AgentConfig import AgentConfig
+from pydag.agents.AgentKeywords import AgentKeywords
 from pydag.agents.AgentElementException import AgentElementException
 from pydag.buffers.DictBuffer import DictBuffer
 from pydag.nodes.BufferNode import BufferNode
@@ -17,7 +17,7 @@ DATA = {
 }
 
 def test_000():
-    s = "".join(filter(str.isupper, BufferNode.cname())) + f"-{AgentConfig.FEATURE}" + "-{i}"
+    s = "".join(filter(str.isupper, BufferNode.cname())) + f"-{AgentKeywords.FEATURE}" + "-{i}"
     print(s)
     ss = s.format(i=1)
     print(ss)    

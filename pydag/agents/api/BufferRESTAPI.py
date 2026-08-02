@@ -6,7 +6,7 @@ from pydantic import BaseModel, Field
 
 from .RESTAPIManager import APIRole, RESTAPIManager
 from ...buffers.DictBuffer import DictBuffer
-from ..AgentConfig import AgentConfig
+from ..AgentKeywords import AgentKeywords
 from ...utils.DataUtils import DataUtils
 from ...buffers.Buffer import Buffer
 from ...buffers.DataType import DataType
@@ -126,9 +126,9 @@ class BufferRESTAPI:
                 mdata = buffer.data_with_meta(n, persistent)
                 if mdata is None:
                     return {}
-                data = mdata[AgentConfig.DATA]
+                data = mdata[AgentKeywords.DATA]
                 if by_rows:
-                    mdata[AgentConfig.DATA] = DataUtils.dict_to_list(data)
+                    mdata[AgentKeywords.DATA] = DataUtils.dict_to_list(data)
                 DataUtils.serialize_dict(mdata)
                 return mdata
             else:

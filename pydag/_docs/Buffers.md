@@ -34,7 +34,7 @@ Abstract base class for buffers.
 |-------|------|---------|-------------|
 | `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001E5AD05D100>` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
-| `capacity` | `int` | `'AgentConfig.INFINITE_CAPACITY'` | Number of elements that can be stored in buffer before being discarded in FiFo fashion. If set to -1, then there is no capacity for this buffer. |
+| `capacity` | `int` | `'AgentKeywords.INFINITE_CAPACITY'` | Number of elements that can be stored in buffer before being discarded in FiFo fashion. If set to -1, then there is no capacity for this buffer. |
 | `data_type` | `str` | `'DataType.FLOAT.value'` | datatype to expect from buffer elements, can be DataType enum or list of enums |
 | `initial_values` | `any` | `` | initial values in buffer |
 | `unit` | `any` | `` | unit of element values in this buffer, can be string or list of strings |
@@ -49,7 +49,7 @@ from pydag.buffers.Buffer import Buffer  # Adjust import if needed
 obj = Buffer()
 obj.id=<dataclasses._MISSING_TYPE object at 0x000001E5AD05D100>
 obj.load_on_install=False
-obj.capacity='AgentConfig.INFINITE_CAPACITY'
+obj.capacity='AgentKeywords.INFINITE_CAPACITY'
 obj.data_type='DataType.FLOAT.value'
 obj.initial_values="<value>"
 obj.unit="<value>"
@@ -64,7 +64,7 @@ A `Buffer` that loads a dataset and stores it in its elements
     
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| `capacity` | `int` | `'AgentConfig.INFINITE_CAPACITY'` | Number of elements that can be stored in buffer before being discarded in FiFo fashion. If set to -1, then there is no capacity for this buffer. |
+| `capacity` | `int` | `'AgentKeywords.INFINITE_CAPACITY'` | Number of elements that can be stored in buffer before being discarded in FiFo fashion. If set to -1, then there is no capacity for this buffer. |
 | `data_type` | `str` | `'DataType.FLOAT.value'` | datatype to expect from buffer elements, can be DataType enum or list of enums |
 | `initial_values` | `any` | `` | initial values in buffer |
 | `unit` | `any` | `` | unit of element values in this buffer, can be string or list of strings |
@@ -104,7 +104,7 @@ A `Buffer` that loads a dataset and stores it in its elements
 from pydag.buffers.DatasetBuffer import DatasetBuffer  # Adjust import if needed
 
 obj = DatasetBuffer()
-obj.capacity='AgentConfig.INFINITE_CAPACITY'
+obj.capacity='AgentKeywords.INFINITE_CAPACITY'
 obj.data_type='DataType.FLOAT.value'
 obj.initial_values="<value>"
 obj.unit="<value>"
@@ -126,7 +126,7 @@ obj.sort_by_y=False
 Buffer that stores its values in a dictionary column-wise (each key -> list).
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| `capacity` | `int` | `'AgentConfig.INFINITE_CAPACITY'` | Number of elements that can be stored in buffer before being discarded in FiFo fashion. If set to -1, then there is no capacity for this buffer. |
+| `capacity` | `int` | `'AgentKeywords.INFINITE_CAPACITY'` | Number of elements that can be stored in buffer before being discarded in FiFo fashion. If set to -1, then there is no capacity for this buffer. |
 | `data_type` | `str` | `'DataType.FLOAT.value'` | datatype to expect from buffer elements, can be DataType enum or list of enums |
 | `initial_values` | `any` | `` | initial values in buffer |
 | `unit` | `any` | `` | unit of element values in this buffer, can be string or list of strings |
@@ -145,7 +145,7 @@ Buffer that stores its values in a dictionary column-wise (each key -> list).
 from pydag.buffers.DictBuffer import DictBuffer  # Adjust import if needed
 
 obj = DictBuffer()
-obj.capacity='AgentConfig.INFINITE_CAPACITY'
+obj.capacity='AgentKeywords.INFINITE_CAPACITY'
 obj.data_type='DataType.FLOAT.value'
 obj.initial_values="<value>"
 obj.unit="<value>"
@@ -166,7 +166,7 @@ obj.index_key='index'
     
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| `capacity` | `int` | `'AgentConfig.INFINITE_CAPACITY'` | Number of elements that can be stored in buffer before being discarded in FiFo fashion. If set to -1, then there is no capacity for this buffer. |
+| `capacity` | `int` | `'AgentKeywords.INFINITE_CAPACITY'` | Number of elements that can be stored in buffer before being discarded in FiFo fashion. If set to -1, then there is no capacity for this buffer. |
 | `data_type` | `str` | `'DataType.FLOAT.value'` | datatype to expect from buffer elements, can be DataType enum or list of enums |
 | `initial_values` | `any` | `` | initial values in buffer |
 | `unit` | `any` | `` | unit of element values in this buffer, can be string or list of strings |
@@ -181,7 +181,7 @@ obj.index_key='index'
 from pydag.buffers.ListBuffer import ListBuffer  # Adjust import if needed
 
 obj = ListBuffer()
-obj.capacity='AgentConfig.INFINITE_CAPACITY'
+obj.capacity='AgentKeywords.INFINITE_CAPACITY'
 obj.data_type='DataType.FLOAT.value'
 obj.initial_values="<value>"
 obj.unit="<value>"
@@ -217,7 +217,7 @@ obj.datatype='DataType.FLOAT.value'
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| `capacity` | `int` | `'AgentConfig.INFINITE_CAPACITY'` | Number of elements that can be stored in buffer before being discarded in FiFo fashion. If set to -1, then there is no capacity for this buffer. |
+| `capacity` | `int` | `'AgentKeywords.INFINITE_CAPACITY'` | Number of elements that can be stored in buffer before being discarded in FiFo fashion. If set to -1, then there is no capacity for this buffer. |
 | `data_type` | `str` | `'DataType.FLOAT.value'` | datatype to expect from buffer elements, can be DataType enum or list of enums |
 | `initial_values` | `any` | `` | initial values in buffer |
 | `unit` | `any` | `` | unit of element values in this buffer, can be string or list of strings |
@@ -234,7 +234,7 @@ obj.datatype='DataType.FLOAT.value'
 from pydag.buffers.ObservedListBuffer import ObservedListBuffer  # Adjust import if needed
 
 obj = ObservedListBuffer()
-obj.capacity='AgentConfig.INFINITE_CAPACITY'
+obj.capacity='AgentKeywords.INFINITE_CAPACITY'
 obj.data_type='DataType.FLOAT.value'
 obj.initial_values="<value>"
 obj.unit="<value>"
@@ -252,7 +252,7 @@ obj.output_observers='list()'
 `Buffer` that samples a `signal` at a specified interval for `n`samples at a time.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| `capacity` | `int` | `'AgentConfig.INFINITE_CAPACITY'` | Number of elements that can be stored in buffer before being discarded in FiFo fashion. If set to -1, then there is no capacity for this buffer. |
+| `capacity` | `int` | `'AgentKeywords.INFINITE_CAPACITY'` | Number of elements that can be stored in buffer before being discarded in FiFo fashion. If set to -1, then there is no capacity for this buffer. |
 | `data_type` | `str` | `'DataType.FLOAT.value'` | datatype to expect from buffer elements, can be DataType enum or list of enums |
 | `initial_values` | `any` | `` | initial values in buffer |
 | `unit` | `any` | `` | unit of element values in this buffer, can be string or list of strings |
@@ -270,7 +270,7 @@ obj.output_observers='list()'
 from pydag.buffers.SampledBuffer import SampledBuffer  # Adjust import if needed
 
 obj = SampledBuffer()
-obj.capacity='AgentConfig.INFINITE_CAPACITY'
+obj.capacity='AgentKeywords.INFINITE_CAPACITY'
 obj.data_type='DataType.FLOAT.value'
 obj.initial_values="<value>"
 obj.unit="<value>"
@@ -289,7 +289,7 @@ obj.n=1
 `Buffer` that holds signals with a specific start time and elapsed time and is defined by the referenced `signal`'s values.    
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| `capacity` | `int` | `'AgentConfig.INFINITE_CAPACITY'` | Number of elements that can be stored in buffer before being discarded in FiFo fashion. If set to -1, then there is no capacity for this buffer. |
+| `capacity` | `int` | `'AgentKeywords.INFINITE_CAPACITY'` | Number of elements that can be stored in buffer before being discarded in FiFo fashion. If set to -1, then there is no capacity for this buffer. |
 | `data_type` | `str` | `'DataType.FLOAT.value'` | datatype to expect from buffer elements, can be DataType enum or list of enums |
 | `initial_values` | `any` | `` | initial values in buffer |
 | `unit` | `any` | `` | unit of element values in this buffer, can be string or list of strings |
@@ -306,7 +306,7 @@ obj.n=1
 from pydag.buffers.SignalBuffer import SignalBuffer  # Adjust import if needed
 
 obj = SignalBuffer()
-obj.capacity='AgentConfig.INFINITE_CAPACITY'
+obj.capacity='AgentKeywords.INFINITE_CAPACITY'
 obj.data_type='DataType.FLOAT.value'
 obj.initial_values="<value>"
 obj.unit="<value>"
@@ -325,7 +325,7 @@ A buffer that stores data with timestamps.
 Inherits from `ListBuffer`.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| `capacity` | `int` | `'AgentConfig.INFINITE_CAPACITY'` | Number of elements that can be stored in buffer before being discarded in FiFo fashion. If set to -1, then there is no capacity for this buffer. |
+| `capacity` | `int` | `'AgentKeywords.INFINITE_CAPACITY'` | Number of elements that can be stored in buffer before being discarded in FiFo fashion. If set to -1, then there is no capacity for this buffer. |
 | `data_type` | `str` | `'DataType.FLOAT.value'` | datatype to expect from buffer elements, can be DataType enum or list of enums |
 | `initial_values` | `any` | `` | initial values in buffer |
 | `unit` | `any` | `` | unit of element values in this buffer, can be string or list of strings |
@@ -340,7 +340,7 @@ Inherits from `ListBuffer`.
 from pydag.buffers.TimedBuffer import TimedBuffer  # Adjust import if needed
 
 obj = TimedBuffer()
-obj.capacity='AgentConfig.INFINITE_CAPACITY'
+obj.capacity='AgentKeywords.INFINITE_CAPACITY'
 obj.data_type='DataType.FLOAT.value'
 obj.initial_values="<value>"
 obj.unit="<value>"
@@ -357,7 +357,7 @@ TransformsBuffer is a subclass of ListBuffer that allows for data transformation
 It is used to transform data from one format to another.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| `capacity` | `int` | `'AgentConfig.INFINITE_CAPACITY'` | Number of elements that can be stored in buffer before being discarded in FiFo fashion. If set to -1, then there is no capacity for this buffer. |
+| `capacity` | `int` | `'AgentKeywords.INFINITE_CAPACITY'` | Number of elements that can be stored in buffer before being discarded in FiFo fashion. If set to -1, then there is no capacity for this buffer. |
 | `data_type` | `str` | `'DataType.FLOAT.value'` | datatype to expect from buffer elements, can be DataType enum or list of enums |
 | `initial_values` | `any` | `` | initial values in buffer |
 | `unit` | `any` | `` | unit of element values in this buffer, can be string or list of strings |
@@ -373,7 +373,7 @@ It is used to transform data from one format to another.
 from pydag.buffers.TransformsBuffer import TransformsBuffer  # Adjust import if needed
 
 obj = TransformsBuffer()
-obj.capacity='AgentConfig.INFINITE_CAPACITY'
+obj.capacity='AgentKeywords.INFINITE_CAPACITY'
 obj.data_type='DataType.FLOAT.value'
 obj.initial_values="<value>"
 obj.unit="<value>"
@@ -389,7 +389,7 @@ obj.transformations=[]
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| `capacity` | `int` | `'AgentConfig.INFINITE_CAPACITY'` | Number of elements that can be stored in buffer before being discarded in FiFo fashion. If set to -1, then there is no capacity for this buffer. |
+| `capacity` | `int` | `'AgentKeywords.INFINITE_CAPACITY'` | Number of elements that can be stored in buffer before being discarded in FiFo fashion. If set to -1, then there is no capacity for this buffer. |
 | `data_type` | `str` | `'DataType.FLOAT.value'` | datatype to expect from buffer elements, can be DataType enum or list of enums |
 | `initial_values` | `any` | `` | initial values in buffer |
 | `unit` | `any` | `` | unit of element values in this buffer, can be string or list of strings |
@@ -409,7 +409,7 @@ obj.transformations=[]
 from pydag.buffers.geometry.GeometryBuffer import GeometryBuffer  # Adjust import if needed
 
 obj = GeometryBuffer()
-obj.capacity='AgentConfig.INFINITE_CAPACITY'
+obj.capacity='AgentKeywords.INFINITE_CAPACITY'
 obj.data_type='DataType.FLOAT.value'
 obj.initial_values="<value>"
 obj.unit="<value>"

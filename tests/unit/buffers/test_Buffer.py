@@ -3,7 +3,7 @@ import pytest
 from pydag.buffers.ListBuffer import ListBuffer
 from pydag.agents.Agent import Agent
 from pydag.buffers.DataType import DataType
-from pydag.agents.AgentConfig import AgentConfig
+from pydag.agents.AgentKeywords import AgentKeywords
 
 @pytest.fixture
 def agent():
@@ -22,7 +22,7 @@ def test_push_and_capacity_fifo():
     buf.push([1, 2])
     buf.push(3)
     buf.push(4)  # evicts 1
-    values = buf.data()[AgentConfig.VALUES]
+    values = buf.data()[AgentKeywords.VALUES]
     assert values == [2, 3, 4]
     assert buf.size() == 3
 
@@ -31,8 +31,8 @@ def test_data_persistent_false_removes_returned():
     buf.install()
     buf.push([10, 20, 30])
     out = buf.data(n=2, persistent=False)
-    assert out[AgentConfig.VALUES] == [10, 20]
-    remaining = buf.data()[AgentConfig.VALUES]
+    assert out[AgentKeywords.VALUES] == [10, 20]
+    remaining = buf.data()[AgentKeywords.VALUES]
     assert remaining == [30]
 
 def test_clear_and_to_dict_and_str_json():
@@ -42,7 +42,7 @@ def test_clear_and_to_dict_and_str_json():
     d = buf.to_dict()
     assert "b4" in d and d["b4"] is buf
     parsed = json.loads(str(buf))
-    assert AgentConfig.META in parsed and parsed[AgentConfig.META]["description"] == "desc"
+    assert AgentKeywords.META in parsed and parsed[AgentKeywords.META]["description"] == "desc"
     buf.clear()
     assert buf.size() == 0
 
@@ -52,14 +52,14 @@ def test_json_and_data_with_meta_contents():
     buf.push([1, 2, 3])
     meta = buf.data_with_meta()
     # meta structure: {data: {values: {...}}, meta: {...}}
-    assert meta[AgentConfig.META]["capacity"] == -1
-    assert meta[AgentConfig.META]["data_type"] == DataType.INT.value
-    assert meta[AgentConfig.META]["unit"] == "m"
-    assert meta[AgentConfig.META]["description"] == "test"
+    assert meta[AgentKeywords.META]["capacity"] == -1
+    assert meta[AgentKeywords.META]["data_type"] == DataType.INT.value
+    assert meta[AgentKeywords.META]["unit"] == "m"
+    assert meta[AgentKeywords.META]["description"] == "test"
     assert buf.size() == 3
     parsed = json.loads(buf.json())
     # json() with n=0 returns all values deep inside parsed[DATA][VALUES][VALUES]
-    values = parsed[AgentConfig.DATA][AgentConfig.VALUES][AgentConfig.VALUES]
+    values = parsed[AgentKeywords.DATA][AgentKeywords.VALUES][AgentKeywords.VALUES]
     assert values == [1, 2, 3]
 
 def test_duplicate_ids_without_agent():
@@ -67,9 +67,9 @@ def test_duplicate_ids_without_agent():
     buf.install()
     assert set(buf._duplicates.keys()) == {"dup1", "dup2"}
     buf.push([100, 200])
-    main_vals = buf.data()[AgentConfig.VALUES]
-    dup1_vals = buf._duplicates["dup1"].data()[AgentConfig.VALUES]
-    dup2_vals = buf._duplicates["dup2"].data()[AgentConfig.VALUES]
+    main_vals = buf.data()[AgentKeywords.VALUES]
+    dup1_vals = buf._duplicates["dup1"].data()[AgentKeywords.VALUES]
+    dup2_vals = buf._duplicates["dup2"].data()[AgentKeywords.VALUES]
     assert main_vals == dup1_vals == dup2_vals == [100, 200]
     buf.clear()
     assert buf.size() == 0 and buf._duplicates["dup1"].size() == 0 and buf._duplicates["dup2"].size() == 0
@@ -82,8 +82,8 @@ def test_duplicate_ids_with_agent_store(agent: Agent):
     assert buf._duplicates["dupA"] is dup_a
     assert buf._duplicates["dupB"] is dup_b
     buf.push([7, 8, 9])
-    assert dup_a.data()[AgentConfig.VALUES] == [7, 8, 9]
-    assert dup_b.data()[AgentConfig.VALUES] == [7, 8, 9]
+    assert dup_a.data()[AgentKeywords.VALUES] == [7, 8, 9]
+    assert dup_b.data()[AgentKeywords.VALUES] == [7, 8, 9]
 
 def test_data_persistent_false_all_clears():
     buf = ListBuffer(id="b6", capacity=-1)
@@ -91,7 +91,7 @@ def test_data_persistent_false_all_clears():
     buf.push([1, 2, 3])
     assert buf.size() == 3
     parsed_before = json.loads(buf.json())
-    vals_before = parsed_before[AgentConfig.DATA][AgentConfig.VALUES][AgentConfig.VALUES]
+    vals_before = parsed_before[AgentKeywords.DATA][AgentKeywords.VALUES][AgentKeywords.VALUES]
     assert vals_before == [1, 2, 3]
     _ = buf.data(n=0, persistent=False)
     assert buf.size() == 0

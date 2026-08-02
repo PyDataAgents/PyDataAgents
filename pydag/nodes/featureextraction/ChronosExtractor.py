@@ -5,7 +5,7 @@ import os
 
 from ...agents.Agent import Agent
 from ..LearningNode import LearningNode
-from ...agents.AgentConfig import AgentConfig
+from ...agents.AgentKeywords import AgentKeywords
 
 
 
@@ -55,7 +55,7 @@ class ChronosExtractor(LearningNode):
             if len(data.keys()) == len(self.output_keys):
                 forecast[self.output_keys[i]] = embeddings.tolist()  #convert to list
             else:
-                forecast[self.__class__.__name__ + "-" + AgentConfig.FEATURE + "-" + f"{i}"] = embeddings.tolist()  #convert to list
+                forecast[self.__class__.__name__ + "-" + AgentKeywords.FEATURE + "-" + f"{i}"] = embeddings.tolist()  #convert to list
         
         return forecast, None
     

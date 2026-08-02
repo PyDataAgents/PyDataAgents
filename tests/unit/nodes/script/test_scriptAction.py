@@ -2,7 +2,7 @@ import os
 
 import pytest
 
-from pydag.agents.AgentConfig import AgentConfig
+from pydag.agents.AgentKeywords import AgentKeywords
 from pydag.agents.AgentElementException import AgentElementException
 from pydag.buffers.signals.SampledSine import SampledSine
 from pydag.nodes.BufferNode import BufferNode
@@ -37,8 +37,8 @@ def _create_buffer_parent(data: dict) -> BufferNode:
 
 def _buffer_user_data(action: ScriptAction) -> dict:
     data = action.get_buffer().data()
-    data.pop(AgentConfig.TIMESTAMPS, None)
-    data.pop(AgentConfig.INDEX, None)
+    data.pop(AgentKeywords.TIMESTAMPS, None)
+    data.pop(AgentKeywords.INDEX, None)
     return data
 
 
@@ -111,11 +111,11 @@ def test_execute_with_no_output_keys_does_not_push_data():
 
 
 def test_execute_with_multiple_parents_uses_merged_parent_data():
-    parent_a = _create_buffer_parent({AgentConfig.VALUES: [1, 2]})
-    parent_b = _create_buffer_parent({AgentConfig.VALUES: [3, 4]})
+    parent_a = _create_buffer_parent({AgentKeywords.VALUES: [1, 2]})
+    parent_b = _create_buffer_parent({AgentKeywords.VALUES: [3, 4]})
     action = ScriptAction(
         script_path=MERGE_PARENT_DATA_SCRIPT_PATH,
-        input_keys=[AgentConfig.VALUES],
+        input_keys=[AgentKeywords.VALUES],
         output_keys=["merged_values"],
     )
     action.add_parent(parent_a)
@@ -150,7 +150,7 @@ def test_execute_with_parent_data_enabled_keeps_current_behavior():
 
     action = ScriptAction(
         script_path=SCRIPT2_PATH,
-        input_keys=[AgentConfig.VALUES],
+        input_keys=[AgentKeywords.VALUES],
         use_parent_data=True,
         output_keys=["mode"],
     )

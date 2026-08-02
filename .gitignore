@@ -74,5 +74,9 @@ __pycache__
 # ignore test log files
 *test*.log
 
+# ignore test yaml files
+/tests/**/*test*.yaml
+/tests/**/*test*.yml
+
 # .save folder for agent persistence
 .save/

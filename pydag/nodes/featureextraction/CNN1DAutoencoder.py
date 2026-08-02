@@ -5,7 +5,7 @@ from torch import nn
 
 from ...agents.Agent import Agent
 from ...utils.DataUtils import DataUtils
-from ...agents.AgentConfig import AgentConfig
+from ...agents.AgentKeywords import AgentKeywords
 from ..LearningNode import LearningNode
 
 @dataclass
@@ -23,7 +23,7 @@ class CNN1DAutoencoder(LearningNode, nn.Module):
     output_length : int = field(default=1, metadata={"description":""})
     apply_per_feature : bool = field(default=True, metadata={"description": ""})
     output_keys : list[str] = field(default_factory=list, metadata={"description": "optional explicit output keys; if empty, default naming is used"})
-    y_hat_key : str = field(default= AgentConfig.Y_HAT, metadata={"description": "key to use for reconstructed output data of this Node."})
+    y_hat_key : str = field(default= AgentKeywords.Y_HAT, metadata={"description": "key to use for reconstructed output data of this Node."})
 
     def __post_init__(self):
         super().__post_init__()
@@ -126,7 +126,7 @@ class CNN1DAutoencoder(LearningNode, nn.Module):
         elif decoded.shape[2] < x.shape[2]:
             pad_amt = x.shape[2] - decoded.shape[2]
             decoded = nn.functional.pad(decoded, (0, pad_amt))
-        prediction[self.__class__.__name__ + "-" + AgentConfig.FEATURE] = bottleneck.unsqueeze(1).swapaxes(1,2) # Shape before: (batch, 1, self.bottleneck_features), shape after: (self.bottleneck_features, 1, batch)
+        prediction[self.__class__.__name__ + "-" + AgentKeywords.FEATURE] = bottleneck.unsqueeze(1).swapaxes(1,2) # Shape before: (batch, 1, self.bottleneck_features), shape after: (self.bottleneck_features, 1, batch)
         prediction[self.y_hat_key] = decoded
         return prediction
     
@@ -155,7 +155,7 @@ class CNN1DAutoencoder(LearningNode, nn.Module):
             running_loss = 0.0
             for batch in train_loader:
                 optimizer.zero_grad()
-                outputs = self.forward(batch)[AgentConfig.Y_HAT]
+                outputs = self.forward(batch)[AgentKeywords.Y_HAT]
                 loss = criterion(outputs, batch)
                 loss.backward()
                 optimizer.step()

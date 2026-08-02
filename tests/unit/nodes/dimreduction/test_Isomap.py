@@ -2,7 +2,7 @@ import time
 
 
 from pydag.nodes.dimreduction.IsomapDimReduction import IsomapDimReduction
-from pydag.agents.AgentConfig import AgentConfig
+from pydag.agents.AgentKeywords import AgentKeywords
 from pydag.buffers.DatasetBuffer import DatasetBuffer, DatasetNames
 from pydag.nodes.buffers.LinkBufferAction import LinkBufferAction
 
@@ -101,6 +101,6 @@ def test_feature_key_naming_pattern():
         if data:
             assert type(data) == dict
             for idx, k in enumerate(data.keys()):
-                if k not in [AgentConfig.INDEX, AgentConfig.TIMESTAMPS]:
-                    expected_key = IsomapDimReduction.__name__ + "-" + AgentConfig.FEATURE + "-" + f"{idx}"
+                if k not in [AgentKeywords.INDEX, AgentKeywords.TIMESTAMPS]:
+                    expected_key = IsomapDimReduction.__name__ + "-" + AgentKeywords.FEATURE + "-" + f"{idx}"
                     assert k == expected_key

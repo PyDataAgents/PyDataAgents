@@ -5,7 +5,7 @@ from loguru import logger
 
 from ..utils.DataUtils import DataUtils
 from ..nodes.NodeException import NodeException
-from ..agents.AgentConfig import AgentConfig
+from ..agents.AgentKeywords import AgentKeywords
 from ..buffers.DictBuffer import DictBuffer
 from ..buffers.Buffer import Buffer
 from .Node import Node
@@ -51,7 +51,7 @@ class BufferNode(Node):
                     else:
                         self._buffer = DictBuffer(
                                                     id=self.buffer_id,
-                                                    capacity=AgentConfig.INFINITE_CAPACITY,
+                                                    capacity=AgentKeywords.INFINITE_CAPACITY,
                                                     timestamps_enabled=True,
                                                     index_enabled=True
                                                 )
@@ -59,7 +59,7 @@ class BufferNode(Node):
                 else:
                     self._buffer = DictBuffer(
                                                 id=self.id + "-BUFFER",
-                                                capacity=AgentConfig.INFINITE_CAPACITY,
+                                                capacity=AgentKeywords.INFINITE_CAPACITY,
                                                 timestamps_enabled=True,
                                                 index_enabled=True
                                             )
@@ -68,7 +68,7 @@ class BufferNode(Node):
             else:
                 self._buffer = DictBuffer(
                     id=self.id + "-BUFFER",
-                    capacity=AgentConfig.INFINITE_CAPACITY,
+                    capacity=AgentKeywords.INFINITE_CAPACITY,
                     timestamps_enabled=True,
                     index_enabled=True
                 )

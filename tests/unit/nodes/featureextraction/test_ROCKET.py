@@ -3,7 +3,7 @@ import numpy as np
 from pydag.buffers.DatasetBuffer import DatasetBuffer, DatasetNames
 from pydag.nodes.buffers.LinkBufferAction import LinkBufferAction
 from pydag.nodes.featureextraction.ROCKETExtractor import ROCKETExtractor
-from pydag.agents.AgentConfig import AgentConfig
+from pydag.agents.AgentKeywords import AgentKeywords
 
 
 def test_rocket_exec_produces_n_length():
@@ -60,7 +60,7 @@ def test_rocket_feature_key_naming_pattern():
         time.sleep(0.1)
     assert isinstance(forecast, dict) and len(forecast) > 0
     for idx, k in enumerate(forecast.keys()):
-        expected_key = ROCKETExtractor.__name__ + "-" + AgentConfig.FEATURE + "-" + f"{idx}"
+        expected_key = ROCKETExtractor.__name__ + "-" + AgentKeywords.FEATURE + "-" + f"{idx}"
         assert k == expected_key
 
 
@@ -112,7 +112,7 @@ def test_rocket_output_keys_mismatch_uses_default():
         attempts += 1
         time.sleep(0.1)
     expected = {
-        ROCKETExtractor.__name__ + "-" + AgentConfig.FEATURE + "-" + "0",
-        ROCKETExtractor.__name__ + "-" + AgentConfig.FEATURE + "-" + "1",
+        ROCKETExtractor.__name__ + "-" + AgentKeywords.FEATURE + "-" + "0",
+        ROCKETExtractor.__name__ + "-" + AgentKeywords.FEATURE + "-" + "1",
     }
     assert set(forecast.keys()) == expected

@@ -30,7 +30,8 @@ class AgentElement(ABC):
         """
         Initialize the agent element type and state
         """
-        self.type = self.__module__
+        #self.type = f"{self.__module__}.{self.__class__.__name__}"
+        self.type = f"{self.__module__}"
         self._state : AgentElementState = AgentElementState.UNINSTALLED
         
     def name(self) -> str:
@@ -43,8 +44,9 @@ class AgentElement(ABC):
         return s
 
     def config_options(self, with_descriptions = False) -> dict:
-        from .AgentConfig import AgentConfig
-        result = AgentConfig.config_options(self, with_descriptions)
+        """ returns a dictionary of the configuration options for the `AgentElement` instance, including descriptions if specified.
+        """        
+        result : dict = ClassUtils.config_options(self, with_descriptions)
         return result
 
     @classmethod
@@ -81,7 +83,7 @@ class AgentElement(ABC):
         try:
             self._check_state(AgentElementState.INSTALLED)
             if self.load_on_install:
-                self.load()
+                self.load(agent.save_folder)
             self._on_install(agent)
             self._state = AgentElementState.INSTALLED
         except AgentElementException as e:
@@ -95,11 +97,13 @@ class AgentElement(ABC):
         self._state = AgentElementState.UNINSTALLED
         return
     
-    def load(self):
+    def load(self, from_file : str):
         """ load `AgentElement` config from filesystem
+        
+        Args:
+            from_file (str): path to the file to load the config from
         """
-        from .AgentConfig import AgentConfig
-        file = AgentConfig.SAVE_FOLDER + self.id + ".json"
+        file = from_file + self.id + ".json"
         if FileUtils.exists_file(file):
             with open(file, "r", encoding="utf-8") as json_file:
                 d = json.load(json_file)
@@ -107,12 +111,14 @@ class AgentElement(ABC):
         else:
             logger.warning("no configuration file " + self.id + ".json to load from was found")
     
-    def save(self):
+    def save(self, to_file : str):
         """ saves the `AgentElement` config to filesystem
+        
+        Args:
+            to_file (str): path to the file to save the config to
         """
-        from .AgentConfig import AgentConfig
         d = self.config_options()
-        with open(AgentConfig.SAVE_FOLDER + self.id + ".json", "w", encoding="utf-8") as json_file:
+        with open(to_file + self.id + ".json", "w", encoding="utf-8") as json_file:
             json.dump(d, json_file, indent = 4)  # "indent" makes the output more readable
             
     def get_state(self) -> AgentElementState:

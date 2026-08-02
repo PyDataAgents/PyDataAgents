@@ -1,6 +1,6 @@
 import time
 import matplotlib.pyplot as plt
-from pydag.agents.AgentConfig import AgentConfig
+from pydag.agents.AgentKeywords import AgentKeywords
 from pydag.nodes.featureextraction.RIFEExtractor import RIFEExtractor
 from pydag.buffers.DatasetBuffer import DatasetBuffer
 from pydag.nodes.buffers.LinkBufferAction import LinkBufferAction
@@ -52,11 +52,11 @@ def test_rife_short_input_zero_padding_behavior():
             first_key = list(data.keys())[0]
             assert len(data[first_key]) == 320, f"Data length must be 320, but got: {len(data[first_key])}"
             for k, vec in data.items():
-                if k not in [AgentConfig.TIMESTAMPS, AgentConfig.INDEX]:
+                if k not in [AgentKeywords.TIMESTAMPS, AgentKeywords.INDEX]:
                     assert all(x == 0 for x in vec[-5:]), "The last 5 features are 0 because the method zero-pads to 320 if not enough valid intervals are found."
                 else:
                     assert all(x != 0 for x in vec[-5:]), "Timestamps and indices should not be zero-padded."
-                if k not in [AgentConfig.INDEX]:
+                if k not in [AgentKeywords.INDEX]:
                     assert all(x != 0 for x in vec[:50]), "The first 50 features must be != 0."
 
 

@@ -1,10 +1,9 @@
 import os
 import pytest
 
+from pydag.agents.app.AgentApp import AgentApp
 from pydag.services.csv.CsvWriteService import CsvWriteService
 from pydag.buffers.ListBuffer import ListBuffer
-from pydag.agents.AgentConfig import AgentConfig
-from pydag.agents.YAMLConfig import YAMLConfig
 from pydag.agents.Agent import Agent
 try:    
     from pydag.services.ads.AdsService import AdsService
@@ -14,7 +13,9 @@ except (ImportError, OSError, FileNotFoundError) as exc:
 
 
 def test_000():
-    g = Agent(id = "AG1")
+    aa : AgentApp = AgentApp()
+    
+    ag = Agent(id = "AG1")
     
     buf = ListBuffer(
         id = "B1",
@@ -22,7 +23,7 @@ def test_000():
         data_type = "NUMERIC"
     )
     
-    g.add_buffer(buf)
+    ag.add_buffer(buf)
     
     ads = AdsService(
         id = "A1",
@@ -34,7 +35,7 @@ def test_000():
         n = 1,
         observing_time = 10
     )
-    g.add_service(ads)
+    ag.add_service(ads)
     
     csv = CsvWriteService(
         id = "A2",
@@ -51,13 +52,13 @@ def test_000():
         thread_type = "MILLI_SECOND"
     )
     
-    g.add_service(csv)
+    ag.add_service(csv)
     
-    gc = AgentConfig(g)
-    yc = YAMLConfig(os.path.dirname(__file__) + "\\ads_csv.yaml")
-    yc.save(gc)
+    aa.set_agent(ag)
+    
+    aa.save(f"{os.path.dirname(__file__)}\\ads_csv.yaml")
+    
 
 def test_001():
-    yc = YAMLConfig(os.path.dirname(__file__) + "\\ads_csv.yaml")
-    gc = yc.load()
-    print(gc)
+    aa : AgentApp = AgentApp.load(f"{os.path.dirname(__file__)}\\ads_csv.yaml")
+    print(aa.get_agent())

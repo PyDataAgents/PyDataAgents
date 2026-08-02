@@ -3,7 +3,7 @@ from typing import Dict, Tuple
 
 from ...agents.Agent import Agent
 from ..LearningNode import LearningNode
-from ...agents.AgentConfig import AgentConfig
+from ...agents.AgentKeywords import AgentKeywords
 import numpy as np
 from scipy.signal import welch
 
@@ -46,7 +46,7 @@ class PSDExtractor(LearningNode):
             if len(data.keys()) == len(self.output_keys):
                 forecast[self.output_keys[i]] = Pxx.tolist()
             else:
-                forecast[f"{self.cname()}-{AgentConfig.FEATURE}-{i}"] = Pxx.reshape(-1).tolist()  #convert to list
+                forecast[f"{self.cname()}-{AgentKeywords.FEATURE}-{i}"] = Pxx.reshape(-1).tolist()  #convert to list
 
         return forecast, None
     

@@ -4,7 +4,7 @@ from loguru import logger
 
 from pydag.utils.DataUtils import DataUtils
 
-from ...agents.AgentConfig import AgentConfig
+from ...agents.AgentKeywords import AgentKeywords
 from ...agents.Agent import Agent
 from ...buffers.DataType import DataType
 from ...buffers.ListBuffer import ListBuffer
@@ -28,14 +28,14 @@ class ConvertFile2Base64Action(BufferNode, Action):
                 if buf:
                     self._buffer = buf
                 else:
-                    self._buffer = ListBuffer(id=self.id + "-BUFFER", capacity=AgentConfig.INFINITE_CAPACITY, data_type=DataType.STRING.value)
+                    self._buffer = ListBuffer(id=self.id + "-BUFFER", capacity=AgentKeywords.INFINITE_CAPACITY, data_type=DataType.STRING.value)
                     self.buffer_id = self._buffer.id
                     if self.file_paths:
                         self._buffer.capacity = len(self.file_paths)
                     self._buffer.install(agent)
                     agent.add_buffer(self._buffer)
             else:
-                self._buffer = ListBuffer(id=self.id + "-BUFFER", capacity=AgentConfig.INFINITE_CAPACITY, data_type=DataType.STRING.value)
+                self._buffer = ListBuffer(id=self.id + "-BUFFER", capacity=AgentKeywords.INFINITE_CAPACITY, data_type=DataType.STRING.value)
                 if self.file_paths:
                     self._buffer.capacity = len(self.file_paths)
                 self.buffer_id = self._buffer.id

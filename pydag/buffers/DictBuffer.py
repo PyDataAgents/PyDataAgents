@@ -5,7 +5,7 @@ import time
 
 
 from ..buffers.BufferException import BufferException
-from ..agents.AgentConfig import AgentConfig
+from ..agents.AgentKeywords import AgentKeywords
 from .Buffer import Buffer
 
 
@@ -189,7 +189,7 @@ class DictBuffer(Buffer):
                     self._elements[self.index_key].extend(index_list)
 
             # Capacity enforcement
-            if self.capacity != AgentConfig.INFINITE_CAPACITY:
+            if self.capacity != AgentKeywords.INFINITE_CAPACITY:
                 final_size = self.size()
                 if final_size > self.capacity:
                     drop = final_size - self.capacity
@@ -201,7 +201,7 @@ class DictBuffer(Buffer):
         else:
             # non dict elements case, force the insertion with a standard key or already present key (but only if only one user-specified key is present)
             if len(self._elements) == 0:
-                dic = {AgentConfig.VALUES: elements}
+                dic = {AgentKeywords.VALUES: elements}
                 self._on_push(dic)
             else:
                 keys = list(self._elements.keys())
@@ -243,8 +243,8 @@ class DictBuffer(Buffer):
             
     def data_with_meta(self, n = 0, persistent = True) -> dict:        
         d = {}
-        d[AgentConfig.DATA] = self.data(n, persistent)
-        d[AgentConfig.META] = self.config_options()
+        d[AgentKeywords.DATA] = self.data(n, persistent)
+        d[AgentKeywords.META] = self.config_options()
         return d
 
     def size(self) -> int:

@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING, Union
 
 
 from .BufferException import BufferException
-from ..agents.AgentConfig import AgentConfig
+from ..agents.AgentKeywords import AgentKeywords
 from ..agents.AgentStates import AgentElementState, BufferState
 from ..utils.ClassUtils import ClassUtils
 from .DataType import DataType
@@ -22,7 +22,7 @@ class Buffer(AgentElement):
     Abstract base class for buffers.
     """    
     
-    capacity : int = field(default=AgentConfig.INFINITE_CAPACITY, metadata={"description": "Number of elements that can be stored in buffer before being discarded in FiFo fashion. If set to -1, then there is no capacity for this buffer."})
+    capacity : int = field(default=AgentKeywords.INFINITE_CAPACITY, metadata={"description": "Number of elements that can be stored in buffer before being discarded in FiFo fashion. If set to -1, then there is no capacity for this buffer."})
     data_type : str = field(default=DataType.FLOAT.value, metadata={"description": "datatype to expect from buffer elements, can be DataType enum or list of enums"})
     initial_values : any = field(default=None, metadata={"description": "initial values in buffer"})
     unit : any = field(default=None, metadata={"description": "unit of element values in this buffer, can be string or list of strings"})
@@ -161,10 +161,10 @@ class Buffer(AgentElement):
     def data_with_meta(self, n : int = 0, persistent : bool = True) -> dict:
         pass
 
-    def save(self):
+    def save(self, to_file : str):
         # move element values to initial values for being saved
         self.initial_values = self._elements
-        super().save()
+        super().save(to_file)
         # clear after saving to save space
         self.initial_values = None
 

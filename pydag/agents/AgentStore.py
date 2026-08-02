@@ -5,10 +5,9 @@ from typing import Any
 import uuid
 from loguru import logger
 
-from .app.AgentApp import AgentApp
+from .app.AgentApp import AGENT, AgentApp
 from .AgentException import AgentException
-from .YAMLConfig import YAMLConfig
-from .AgentConfig import AgentConfig
+from .AgentKeywords import AgentKeywords
 from ..utils.FileUtils import FileUtils
 from .Agent import Agent
 
@@ -33,18 +32,20 @@ class AgentStore:
             for path in self.template_paths:
                 if FileUtils.exists_folder(path):
                     for file in FileUtils.list_files(path, extension=[".yaml", ".yml"]):
-                        config = YAMLConfig(file).load()
-                        d = config.to_dict()
-                        if "id" in d:
-                            id = d["id"]                        
+                        aa : AgentApp = AgentApp.load(file)
+                        config = aa.config_options()
+                        if AgentKeywords.ID in config[AgentKeywords.AGENT]:
+                            id = config[AgentKeywords.AGENT][AgentKeywords.ID]
                             self._templates[id] = config
                         else:
                             logger.warning(f"Template file {file} does not contain an 'id' field. Skipping.")                     
     
-    def add_template(self, agent : Agent):
+    def add_template_from(self, agent_app : AgentApp):
         with self._lock:
-            config = AgentConfig(agent)
-            self._templates[agent.id] = config
+            config = agent_app.config_options()
+            if AgentKeywords.ID in config[AgentKeywords.AGENT]:
+                id = config[AgentKeywords.AGENT][AgentKeywords.ID]
+                self._templates[id] = config
 
     def add_user(self, user_id : str):
         with self._lock:

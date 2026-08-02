@@ -7,7 +7,7 @@ from pydantic import BaseModel, Field
 from ...services.Service import Service
 from ...nodes.TriggerAction import TriggerAction
 from ...services.statemachine.StatemachineService import StatemachineService
-from ..AgentConfig import AgentConfig
+from ..AgentKeywords import AgentKeywords
 from ...utils.ClassUtils import ClassUtils
 from ...nodes.Node import Node
 from .RESTAPIManager import APIRole, RESTAPIManager
@@ -85,7 +85,7 @@ class NodeRESTAPI:
             service = agent.get_service(service_id)
             if service:
                 if isinstance(service, StatemachineService):
-                    type = node_def.definition[AgentConfig.TYPE]
+                    type = node_def.definition[AgentKeywords.TYPE]
                     available_nodes = ClassUtils.get_subclasses(Node)
                     if type in available_nodes:
                         if type:

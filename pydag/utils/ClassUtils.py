@@ -1,32 +1,144 @@
 from __future__ import annotations
 import ast
-from dataclasses import MISSING, fields
+from dataclasses import MISSING, fields, is_dataclass
 import importlib.util
 from pathlib import Path
 import sys
 import inspect
 from types import FunctionType
-from typing import get_type_hints
+from typing import Any, get_type_hints
 
-from ..agents.AgentException import AgentException
-
+TYPE_PROPERTY : str = "type" # used to specify the class type of an object in a dictionary/list or other object when setting properties of an object
     
 class ClassUtils:
+    """ Utility class for working with classes and their instances. """
     
     @staticmethod
-    def create_class(fully_qualified_class_name):
+    def config_options(obj : Any, with_descriptions = False) -> dict:
+        """ creates a dictionary with configuration options of the given object
+        `obj` must be a dataclass or an object with dataclass fields. The function will iterate over the fields of the object and extract their values,
+        descriptions (if available), and any nested configuration options for fields that are instances of `dataclass`.
+        The resulting dictionary will contain the configuration options for the object, including nested configurations for any other
+        `dataclass` fields.
+
+        Args:
+            obj (Any): _description_
+            with_descriptions (bool, optional): _description_. Defaults to False.
+
+        Returns:
+            dict: nested config options
+        """
+        result = {}
+        for f in fields(obj):
+            value = getattr(obj, f.name)
+            if is_dataclass(value):
+                if with_descriptions:
+                    if len(f.metadata) > 0:
+                        result[f.name] = {
+                            "value": ClassUtils.config_options(value, with_descriptions),
+                            "description": f.metadata.get("description", "")
+                        }
+                    else:
+                        result[f.name] = {
+                            "value": ClassUtils.config_options(value, with_descriptions),
+                            "description": ""
+                        }
+                else:
+                    result[f.name] = ClassUtils.config_options(value, with_descriptions)
+            elif isinstance(value, list):
+                li = list()
+                for item in value:
+                    if is_dataclass(item):
+                        li.append(ClassUtils.config_options(item, with_descriptions))
+                    else:
+                        li.append(item)
+                if with_descriptions:
+                    if len(f.metadata) > 0:
+                        result[f.name] = {
+                            "value": li,
+                            "description": f.metadata.get("description", "")
+                        }
+                    else:
+                        result[f.name] = {
+                            "value": li,
+                            "description": ""
+                        }
+                else:
+                    result[f.name] = li
+            elif isinstance(value, dict):
+                d = dict()
+                for k, v in value.items():
+                    if is_dataclass(v):
+                        d[k] = ClassUtils.config_options(v, with_descriptions)
+                    else:
+                        d[k] = v
+                if with_descriptions:
+                    if len(f.metadata) > 0:
+                        result[f.name] = {
+                            "value": d,
+                            "description": f.metadata.get("description", "")
+                        }
+                    else:
+                        result[f.name] = {
+                            "value": d,
+                            "description": ""
+                        }
+                else:
+                    result[f.name] = d
+            elif hasattr(value, "__dict__"):
+                if with_descriptions:
+                    if len(f.metadata) > 0:
+                        result[f.name] = {
+                            "value": ClassUtils.config_options(value, with_descriptions),
+                            "description": f.metadata.get("description", "")
+                        }
+                    else:
+                        result[f.name] = {
+                            "value": ClassUtils.config_options(value, with_descriptions),
+                            "description": ""
+                        }
+                else:
+                    result[f.name] = ClassUtils.config_options(value, with_descriptions)
+            else:
+                if with_descriptions:
+                    if len(f.metadata) > 0:
+                        result[f.name] = {
+                                "value": value,
+                                "description": f.metadata.get("description", "")
+                            }
+                    else:
+                        result[f.name] = {
+                            "value": value,
+                            "description": ""
+                        }
+                else:
+                    result[f.name] = value
+        return result
+    
+    @staticmethod
+    def create_class(fully_qualified_class_name : str):
         """
         Create a class from the class name.
         """
-        # Split the fully qualified class name into module and class name
-        module_name, class_name = fully_qualified_class_name.rsplit(".", 1)
-        module = importlib.import_module(fully_qualified_class_name)
-        # Check if the module has the specified class
-        if hasattr(module, class_name):
-            clazz = getattr(module, class_name)
-            return clazz
-        else:
-            return None
+        # check if module name is also a class name, if so load the module and get the class from it
+        try:
+            module = importlib.import_module(fully_qualified_class_name)
+            class_name = fully_qualified_class_name.rsplit(".", 1)[-1]
+            if hasattr(module, class_name):
+                clazz = getattr(module, fully_qualified_class_name.rsplit(".", 1))
+                return clazz
+        except ModuleNotFoundError:
+            # Split the fully qualified class name into module and class name
+            module_name, class_name = fully_qualified_class_name.rsplit(".", 1)
+            module = importlib.import_module(module_name)
+            # Check if the module has the specified class
+            if hasattr(module, class_name):
+                clazz = getattr(module, class_name)
+                return clazz
+            else:
+                return None
+        
+        
     
     @staticmethod
     def create_instance(fully_qualified_class_name):
@@ -41,76 +153,94 @@ class ClassUtils:
         """
         Set a property of an object.
         """
-        from pydag.agents.AgentConfig import AgentConfig
         if hasattr(obj, property_name):
             attr = getattr(obj, property_name)
             if attr is None:
                 if property_name in obj.__annotations__:
                     attr = obj.__annotations__[property_name]
             #print(type(attr))
-            from ..agents.AgentElement import AgentElement
-            if isinstance(attr, AgentElement):
+            if is_dataclass(attr):
                 if isinstance(value, dict):
-                    # If the value is a dictionary, set properties of the AgentElement or dataclass
-                    if AgentConfig.TYPE in value:
+                    # If the value is a dictionary, set properties of the dataclass
+                    if TYPE_PROPERTY in value:
                         # If the dictionary contains a type, create an instance of that type
-                        sub_obj = ClassUtils.create_instance(value[AgentConfig.TYPE])
+                        sub_obj = ClassUtils.create_instance(value[TYPE_PROPERTY])
+                        # remove the type property from the dictionary before setting properties
+                        if not hasattr(sub_obj, TYPE_PROPERTY):
+                            value.pop(TYPE_PROPERTY, None)  
                         ClassUtils.set_properties(sub_obj, value)
                         setattr(obj, property_name, sub_obj)
                     else:
-                        raise AgentException(f"Expected a dictionary with '{AgentConfig.TYPE}' for property '{property_name}' of {obj}, but got {value}.")
+                        if isinstance(attr.__class__, type):
+                            try:
+                                clazz = type(attr)                                                        
+                                sub_obj = clazz()
+                                ClassUtils.set_properties(sub_obj, value)
+                                setattr(obj, property_name, sub_obj)
+                            except TypeError as e:
+                                raise ValueError(f"Error occurred while creating instance of '{property_name}'") from e
+                        else:
+                            raise ValueError(f"Expected a class object for '{property_name}'.")
                 else:
-                    raise AgentException(f"Expected a dictionary for property '{property_name}' of {obj}, but got {type(value).__name__}.")
+                    raise ValueError(f"Expected a dictionary for property '{property_name}' of {obj}, but got {type(value).__name__}.")
             elif isinstance(attr, dict):
                 if isinstance(value, dict):
                     if len(value) > 0:
                         key = next(iter(value))
                         if isinstance(value[key], dict):
-                            if AgentConfig.TYPE in value[key]:
+                            if TYPE_PROPERTY in value[key]:
                                 element_dic = {}
                                 for k, v in value.items():
-                                    sub_obj = ClassUtils.create_instance(v[AgentConfig.TYPE])
+                                    sub_obj = ClassUtils.create_instance(v[TYPE_PROPERTY])
+                                    if not hasattr(sub_obj, TYPE_PROPERTY):
+                                        v.pop(TYPE_PROPERTY, None)
                                     ClassUtils.set_properties(sub_obj, v)
                                     element_dic[k] = sub_obj
                                 setattr(obj, property_name, element_dic)
                             else:
-                                raise AgentException(f"No '{AgentConfig.TYPE}' property was specified in dict of object properties {value} for property '{property_name}' of {obj}")
+                                raise ValueError(f"No '{TYPE_PROPERTY}' property was specified in dict of object properties {value} for property '{property_name}' of {obj}")
                         else:
                             # just set the content of the dictionary, this should only be content, that can be serialized
                             setattr(obj, property_name, value)
                 else:
-                    raise AgentException(f"Expected a dictionary for property '{property_name}' of {obj}")
+                    raise ValueError(f"Expected a dictionary for property '{property_name}' of {obj}")
             elif isinstance(attr, list):
                 if isinstance(value, list):
                     if len(value) > 0:
                         if isinstance(value[0], dict):
-                            if AgentConfig.TYPE in value[0]:
+                            if TYPE_PROPERTY in value[0]:
                                 element_list = []
                                 for item in value:
-                                    sub_obj = ClassUtils.create_instance(item[AgentConfig.TYPE])
+                                    sub_obj = ClassUtils.create_instance(item[TYPE_PROPERTY])
+                                    # remove the type property from the dictionary before setting properties
+                                    if not hasattr(sub_obj, TYPE_PROPERTY):
+                                        item.pop(TYPE_PROPERTY, None)
                                     ClassUtils.set_properties(sub_obj, item)
                                     element_list.append(sub_obj)
                                 setattr(obj, property_name, element_list)
                             else:
-                                raise AgentException(f"No '{AgentConfig.TYPE}' property was specified in list of object properties {value} for property '{property_name}' of {obj}")    
+                                raise ValueError(f"No '{TYPE_PROPERTY}' property was specified in list of object properties {value} for property '{property_name}' of {obj}")    
                         else:
                             # just set the content of the list, this should only be content, that can be serialized
                             setattr(obj, property_name, value)
                 else:
-                    raise AgentException(f"Expected a list for property '{property_name}' of {obj}")
+                    raise ValueError(f"Expected a list for property '{property_name}' of {obj}")
             elif isinstance(attr, type):
-                if issubclass(attr, AgentElement):
+                if is_dataclass(attr):
                     if isinstance(value, dict):
-                        # If the value is a dictionary, set properties of the AgentElement or dataclass
-                        if AgentConfig.TYPE in value:
+                        # If the value is a dictionary, set properties of the dataclass
+                        if TYPE_PROPERTY in value:
                             # If the dictionary contains a type, create an instance of that type
-                            sub_obj = ClassUtils.create_instance(value[AgentConfig.TYPE])
+                            sub_obj = ClassUtils.create_instance(value[TYPE_PROPERTY])
+                            # remove the type property from the dictionary before setting properties
+                            if not hasattr(sub_obj, TYPE_PROPERTY):
+                                value.pop(TYPE_PROPERTY, None)
                             ClassUtils.set_properties(sub_obj, value)
                             setattr(obj, property_name, sub_obj)
                         else:
-                            raise AgentException(f"Expected a dictionary with '{AgentConfig.TYPE}' for property '{property_name}' of {obj}, but got {value}.")
+                            raise ValueError(f"Expected a dictionary with '{TYPE_PROPERTY}' for property '{property_name}' of {obj}, but got {value}.")
                     else:
-                        raise AgentException(f"Expected a dictionary for property '{property_name}' of {obj}, but got {type(value).__name__}.")
+                        raise ValueError(f"Expected a dictionary for property '{property_name}' of {obj}, but got {type(value).__name__}.")
                 else:
                     # check if property is an int
                     current_value = getattr(obj, property_name)
@@ -130,7 +260,7 @@ class ClassUtils:
                 else:
                     setattr(obj, property_name, value)
         else:
-            raise AgentException(f"Object {obj} has no attribute {property_name}")
+            raise ValueError(f"Object {obj} has no attribute {property_name}")
         
     @staticmethod
     def set_properties(obj, properties : dict):

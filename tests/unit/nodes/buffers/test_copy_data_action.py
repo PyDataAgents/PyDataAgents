@@ -9,7 +9,7 @@ from pydag.nodes.buffers.LinkBufferAction import LinkBufferAction
 from pydag.nodes.documents.PlotlifyAction import PlotlifyAction
 from pydag.buffers.signals.Sine import Sine
 from pydag.buffers.SignalBuffer import SignalBuffer
-from pydag.agents.AgentConfig import AgentConfig
+from pydag.agents.AgentKeywords import AgentKeywords
 import time
 
 
@@ -123,7 +123,7 @@ def test_012():
     # 2. Test that two consumers of two CopyDataAction nodes receives the same data between executions from a common source buffer.
     
     singal = Sine(f=1, a=1, p=0, n=0.1)
-    sine_buff = SignalBuffer(signal=singal, capacity=AgentConfig.INFINITE_CAPACITY)
+    sine_buff = SignalBuffer(signal=singal, capacity=AgentKeywords.INFINITE_CAPACITY)
     sine_buff.install()
 
     lba = LinkBufferAction()

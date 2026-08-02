@@ -2095,7 +2095,7 @@ This `DataElement` represents a time series feature extraction model using a 1D 
 | `output_length` | `int` | `1` |  |
 | `apply_per_feature` | `bool` | `True` |  |
 | `output_keys` | `list[str]` | `'list()'` | optional explicit output keys; if empty, default naming is used |
-| `y_hat_key` | `str` | `'AgentConfig.Y_HAT'` | key to use for reconstructed output data of this Node. |
+| `y_hat_key` | `str` | `'AgentKeywords.Y_HAT'` | key to use for reconstructed output data of this Node. |
 
 
 ```python
@@ -2126,7 +2126,7 @@ obj.bottleneck_features=2
 obj.output_length=1
 obj.apply_per_feature=True
 obj.output_keys='list()'
-obj.y_hat_key='AgentConfig.Y_HAT'
+obj.y_hat_key='AgentKeywords.Y_HAT'
 ```
 
 [Go to Summary](#summary)
