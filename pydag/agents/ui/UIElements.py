@@ -51,11 +51,7 @@ class UIPage():
         self._agent_app : AgentApp = None
         self._ui_components : deque[UIComponent] = deque()
         self._timer : ui.timer = None
-<<<<<<< HEAD
-    
-=======
      
->>>>>>> develop
     def register(self, agent_app : AgentApp):
         
         self._agent_app = agent_app
