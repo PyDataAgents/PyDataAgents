@@ -904,8 +904,8 @@ class Layout:
     xaxis : Axis = None
     yaxis : Axis = None
     zaxis : Axis = None
-    height : int = 0
-    width : int = 0
+    height : int = None
+    width : int = None
     legend = None
     showlegend = False
     title : Title = None
