@@ -7,7 +7,7 @@ from pydag.nodes.NodeException import NodeException
 from ...agents.Agent import Agent
 from ...utils.DataUtils import DataUtils
 from ..LearningNode import LearningNode
-from ...agents.AgentConfig import AgentConfig
+from ...agents.AgentKeywords import AgentKeywords
 
 
 @dataclass
@@ -60,7 +60,7 @@ class ROCKETExtractor(LearningNode):
             if len(data.keys()) == len(self.output_keys):
                 forecast[self.output_keys[i]] = transformed_data.tolist()  #convert to list
             else:
-                forecast[self.__class__.__name__ + "-" + AgentConfig.FEATURE + "-" + f"{i}"] = transformed_data.tolist()  #convert to list
+                forecast[self.__class__.__name__ + "-" + AgentKeywords.FEATURE + "-" + f"{i}"] = transformed_data.tolist()  #convert to list
         
         return forecast, None
 

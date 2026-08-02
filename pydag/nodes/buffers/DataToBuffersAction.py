@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
 
 from ...nodes.Node import Node
-from ...agents.AgentConfig import AgentConfig
+from ...agents.AgentKeywords import AgentKeywords
 from ...nodes.NodeException import NodeException
 from ...buffers.DictBuffer import DictBuffer
 from ...buffers.Buffer import Buffer
@@ -41,13 +41,13 @@ class DataToBuffersAction(BufferNode, Action):
                     if agent.get_buffer(buffer_id):
                         self._buffers[buffer_id] = agent.get_buffer(buffer_id)
                     else:
-                        buffer = DictBuffer(id=buffer_id, capacity=AgentConfig.INFINITE_CAPACITY)
+                        buffer = DictBuffer(id=buffer_id, capacity=AgentKeywords.INFINITE_CAPACITY)
                         buffer.install(agent)
                         agent.add_buffer(buffer)
                         self._buffers[buffer_id] = buffer
             else:
                 for buffer_id in self.buffer_ids:
-                    buffer = DictBuffer(id=buffer_id, capacity=AgentConfig.INFINITE_CAPACITY)
+                    buffer = DictBuffer(id=buffer_id, capacity=AgentKeywords.INFINITE_CAPACITY)
                     buffer.install(agent)
                     self._buffers[buffer_id] = buffer
             

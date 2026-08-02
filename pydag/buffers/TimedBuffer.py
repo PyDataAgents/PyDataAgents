@@ -2,7 +2,7 @@ import copy
 import time
 from loguru import logger
 
-from ..agents.AgentConfig import AgentConfig
+from ..agents.AgentKeywords import AgentKeywords
 from .ListBuffer import ListBuffer
 
 
@@ -22,7 +22,7 @@ class TimedBuffer(ListBuffer):
             self._push_timestamp(elements, ts)
         elif hasattr(elements, "__len__"):
             # check for infinity capacity
-            if self.capacity != AgentConfig.INFINITE_CAPACITY:
+            if self.capacity != AgentKeywords.INFINITE_CAPACITY:
                 too_many =  len(elements) + self.size() - self.capacity
             else:
                 too_many = 0
@@ -49,7 +49,7 @@ class TimedBuffer(ListBuffer):
             self._push_timestamp(elements, timestamps)                
         elif hasattr(elements, "__len__"):
             # check for infinity capacity
-            if self.capacity != AgentConfig.INFINITE_CAPACITY:
+            if self.capacity != AgentKeywords.INFINITE_CAPACITY:
                 too_many =  len(elements) + self.size() - self.capacity
             else:
                 too_many = 0
@@ -84,13 +84,13 @@ class TimedBuffer(ListBuffer):
                     with self._lock:            
                         del self._elements[0:n]
                         del self._timestamps[0:n]
-                d = {AgentConfig.TIMESTAMPS: t, AgentConfig.VALUES: v}
+                d = {AgentKeywords.TIMESTAMPS: t, AgentKeywords.VALUES: v}
                 return d
             else:
                 # always make a deep copy, otherwise a reference will be maintained
                 v = copy.deepcopy(self._elements)
                 t = copy.deepcopy(self._timestamps)
-                d = {AgentConfig.TIMESTAMPS: t, AgentConfig.VALUES: v}
+                d = {AgentKeywords.TIMESTAMPS: t, AgentKeywords.VALUES: v}
                 if not persistent:
                     with self._lock:
                         self._elements.clear()
@@ -102,8 +102,8 @@ class TimedBuffer(ListBuffer):
             
     def data_with_meta(self, n = 0, persistent = True) -> dict:        
         d = {}
-        d[AgentConfig.DATA] = self.data(n, persistent)
-        d[AgentConfig.META] = self.config_options()
+        d[AgentKeywords.DATA] = self.data(n, persistent)
+        d[AgentKeywords.META] = self.config_options()
         return d
     
     def clear(self):
@@ -118,7 +118,7 @@ class TimedBuffer(ListBuffer):
             timestamp (int): the timestamp of the element
         """
         # check for infinity capacity
-        if self.capacity != AgentConfig.INFINITE_CAPACITY:
+        if self.capacity != AgentKeywords.INFINITE_CAPACITY:
             if self.size() == self.capacity:
                 self._timestamps.pop(0)
                 self._elements.pop(0)

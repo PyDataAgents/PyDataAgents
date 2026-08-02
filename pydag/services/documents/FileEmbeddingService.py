@@ -8,7 +8,7 @@ from langchain_unstructured import UnstructuredLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from sentence_transformers import SentenceTransformer
 from langchain_community.vectorstores.utils import filter_complex_metadata
-from ...agents.AgentConfig import AgentConfig
+from ...agents.AgentKeywords import AgentKeywords
 from ..Service import Service
 from ..ServiceException import ServiceException
 
@@ -18,8 +18,8 @@ class FileEmbeddingService(Service):
     """
     
     # Constants
-    MODEL_RESOURCE_FOLDER = Path(AgentConfig.MODEL_RESOURCE_FOLDER)
-    EMBEDDINGS_RESOURCE_FOLDER = Path(AgentConfig.EMBEDDINGS_RESOURCE_FOLDER)
+    MODEL_RESOURCE_FOLDER = Path(AgentKeywords.MODEL_RESOURCE_FOLDER)
+    EMBEDDINGS_RESOURCE_FOLDER = Path(AgentKeywords.EMBEDDINGS_RESOURCE_FOLDER)
     
     docs_folder : list[str] | str = field(default=None, metadata={"description": "Folder links to load documents from into embedded store on startup"})
     embedding_model_name : str = field(default="all-MiniLM-L6-v2", metadata={"description": "name of the embedding model to use for embedding store. Currently, only sentence transformer models are supported, e.g. all-MiniLM-L6-v2. See "})

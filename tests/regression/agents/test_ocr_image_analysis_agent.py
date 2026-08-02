@@ -5,7 +5,7 @@ import pytest
 
 pytest.importorskip("mistralai")
 
-from pydag.agents.AgentConfig import AgentConfig
+from pydag.agents.AgentKeywords import AgentKeywords
 from pydag.buffers.ListBuffer import ListBuffer
 from pydag.nodes.buffers.ClearBufferAction import ClearBufferAction
 from pydag.nodes.buffers.CopyDataAction import CopyDataAction
@@ -183,7 +183,7 @@ def test_ocr_agent_restapi():
     
     ag = Agent(description="OCR Image Analysis Agent with REST API")
     
-    b64_buf = ListBuffer(id="B64-BUF", capacity=AgentConfig.INFINITE_CAPACITY)
+    b64_buf = ListBuffer(id="B64-BUF", capacity=AgentKeywords.INFINITE_CAPACITY)
     b64_ocr_buf = ListBuffer(id="B64-OCR-BUF", capacity=1)
     q_buf = DictBuffer(id="Q-BUF", capacity=1)
     a_buf = DictBuffer(id="A-BUF", capacity=1)

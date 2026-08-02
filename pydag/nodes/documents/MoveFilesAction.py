@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
 from loguru import logger
 
-from ...agents.AgentConfig import AgentConfig
+from ...agents.AgentKeywords import AgentKeywords
 from ...agents.Agent import Agent
 from ...buffers.ListBuffer import ListBuffer
 from ..Action import Action

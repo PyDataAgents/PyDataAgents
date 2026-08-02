@@ -11,9 +11,8 @@ from nicegui.element import Element
 import plotly.graph_objs as go
 
 
-from ..app.AgentApp import AgentApp
 from ...utils.DataUtils import DataUtils
-from ..AgentConfig import AgentConfig
+from ..AgentKeywords import AgentKeywords
 from ..AgentElement import AgentElement
 from ..AgentStates import AgentElementState, ServiceState, BufferState, NodeState
 from ...buffers.TimedBuffer import TimedBuffer
@@ -21,6 +20,7 @@ from ...buffers.Buffer import Buffer
 
 if TYPE_CHECKING:
     from ..Agent import Agent
+    from ..app.AgentApp import AgentApp
 
 class UIType(str, enum.Enum):
     PLOT = "PLOT"
@@ -43,13 +43,15 @@ def determine_samples(buffer : Buffer) -> int:
 class UIPage():
     """ Base Page class to build nicegui pages """
     
+    type : str = field(default=None, metadata={"description": "fully qualified package and class name descriptor"})
     path : str = field(default="/", metadata={})
     with_nav_bar : bool = field(default=True, metadata={})
     refresh_interval : int = field(default=1.0, metadata={})
     
     def __post_init__(self):
+        self.type = self.__module__ + "." + self.__class__.__name__
         self._agent_app : AgentApp = None
-        self._ui_components : deque[UIComponent] = deque()
+        self._ui_components : deque[UIComponent] = deque() 
         self._timer : ui.timer = None
      
     def register(self, agent_app : AgentApp):
@@ -101,7 +103,7 @@ class UIPage():
 @dataclass   
 class UIHomePage(UIPage):
     """ Main/Home Page with navigation cards for other UI Pages """
-        
+           
     def _render(self):
         self.create_header("UI Home - Dashboard")
         with ui.grid(columns=4).classes("w-full gap-2"):
@@ -301,13 +303,13 @@ class AgentElementConfigForm(UIComponent):
     def _render_form(self, expanded : bool = False):
         config_options = self._agent_element.config_options(True)
         if len(config_options) > 0:
-            id = config_options[AgentConfig.ID]
-            id_tt = id[AgentConfig.DESCRIPTION]
-            t = config_options[AgentConfig.TYPE]
-            t_tt = t[AgentConfig.DESCRIPTION]
-            type_short = t[AgentConfig.VALUE].split(".")[-1]
-            del config_options[AgentConfig.ID]
-            del config_options[AgentConfig.TYPE]
+            id = config_options[AgentKeywords.ID]
+            id_tt = id[AgentKeywords.DESCRIPTION]
+            t = config_options[AgentKeywords.TYPE]
+            t_tt = t[AgentKeywords.DESCRIPTION]
+            type_short = t[AgentKeywords.VALUE].split(".")[-1]
+            del config_options[AgentKeywords.ID]
+            del config_options[AgentKeywords.TYPE]
             ui_inputs = {}
             self._card.clear()
             with self._card:
@@ -317,19 +319,19 @@ class AgentElementConfigForm(UIComponent):
                     with expansion.add_slot("header"):
                         with ui.row().classes("items-center justify-between w-full p-1"):                            
                             doc : str = self._agent_element.__doc__
-                            self._id_label = ui.label(f"{type_short} - {id[AgentConfig.VALUE]}").tooltip(doc)
+                            self._id_label = ui.label(f"{type_short} - {id[AgentKeywords.VALUE]}").tooltip(doc)
                             if isinstance(self._agent_element, Buffer):
                                 self._buffersize_label = ui.label(f"{self._agent_element.size()}/{self._agent_element.capacity}")
                             self._state_label = ui.label(self._agent_element.get_state())
                             self._style_state_label()                            
                     with ui.grid(columns=1).classes("w-full"):
-                        ui_inputs[AgentConfig.ID] = ui.input(label=AgentConfig.ID, value=id[AgentConfig.VALUE]).tooltip(id_tt)
-                        i : Element = ui.input(label=AgentConfig.TYPE, value=t[AgentConfig.VALUE]).tooltip(t_tt)
+                        ui_inputs[AgentKeywords.ID] = ui.input(label=AgentKeywords.ID, value=id[AgentKeywords.VALUE]).tooltip(id_tt)
+                        i : Element = ui.input(label=AgentKeywords.TYPE, value=t[AgentKeywords.VALUE]).tooltip(t_tt)
                         i.enabled = False
-                        ui_inputs[AgentConfig.TYPE] = i
+                        ui_inputs[AgentKeywords.TYPE] = i
                         for config_option, config_value in config_options.items():
-                            value = config_value[AgentConfig.VALUE]
-                            description = config_value[AgentConfig.DESCRIPTION]
+                            value = config_value[AgentKeywords.VALUE]
+                            description = config_value[AgentKeywords.DESCRIPTION]
                             if isinstance(value, bool):
                                 cb : Element = ui.checkbox(config_option).tooltip(description).classes("text-sm text-gray-500 font-normal")
                                 cb.value = value
@@ -341,7 +343,7 @@ class AgentElementConfigForm(UIComponent):
                             elif isinstance(value, list):
                                 ui_inputs[config_option] = ui.input_chips(label=config_option, value=value, new_value_mode="add", clearable=True).tooltip(description)
                             elif isinstance(value, dict):
-                                if AgentConfig.TYPE in value:
+                                if AgentKeywords.TYPE in value:
                                     nested_agent_element : AgentElement = getattr(self._agent_element, config_option)
                                     ui.label(config_option).classes("text-sm text-gray-500 font-normal").tooltip(description)                                        
                                     if isinstance(nested_agent_element, AgentElement):

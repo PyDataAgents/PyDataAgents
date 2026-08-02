@@ -1,9 +1,9 @@
-from pydag.agents.AgentConfig import AgentConfig
+from pydag.agents.AgentKeywords import AgentKeywords
 from pydag.buffers.DatasetBuffer import DatasetBuffer
 
 
 def test_000():
-    db = DatasetBuffer(dataset_name="ArrowHead", duplicate_ids=["DB1"], capacity=AgentConfig.INFINITE_CAPACITY)
+    db = DatasetBuffer(dataset_name="ArrowHead", duplicate_ids=["DB1"], capacity=AgentKeywords.INFINITE_CAPACITY)
     db.install()
     db1 = db._duplicates["DB1"]
     

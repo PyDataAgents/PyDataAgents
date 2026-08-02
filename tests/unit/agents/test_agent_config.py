@@ -7,7 +7,7 @@ import yaml
 
 from pydag.services.opcua.OpcUaService import OpcUaService
 from pydag.buffers.ListBuffer import ListBuffer
-from pydag.agents.AgentConfig import AgentConfig
+from pydag.agents.AgentKeywords import AgentKeywords
 from pydag.agents.YAMLConfig import YAMLConfig
 from pydag.agents.Agent import Agent
 from pydag.services.ThreadType import ThreadType
@@ -58,7 +58,7 @@ def test_040():
     g.add_buffer(b)
     g.add_service(a)
     
-    gc = AgentConfig(g)
+    gc = AgentKeywords(g)
     print(gc)
     
 def test_041():
@@ -80,7 +80,7 @@ def test_041():
         
     g.add_service(a)
     
-    gc = AgentConfig(g)
+    gc = AgentKeywords(g)
     
     yc = YAMLConfig(os.path.dirname(__file__) + "\\agent_config1.yaml")
     
@@ -88,10 +88,10 @@ def test_041():
     
 def test_042():
     yc = YAMLConfig(os.path.dirname(__file__) + "\\agent_config1.yaml")
-    gc : AgentConfig = yc.load()
+    gc : AgentKeywords = yc.load()
     print(gc)
     g = gc.create()
-    gc2 = AgentConfig(g)
+    gc2 = AgentKeywords(g)
     print(gc2)
 
 @pytest.mark.skip("test manually")
@@ -104,7 +104,7 @@ def test_043_yaml_save_bare_filename(monkeypatch):
 
     agent = Agent()
     agent.id = "G2"
-    gc = AgentConfig(agent)
+    gc = AgentKeywords(agent)
     yc = YAMLConfig("agent_config_bare.yaml")
 
     yc.save(gc)
@@ -129,9 +129,9 @@ def test_044_agent_release_writes_default_yaml_to_cwd(monkeypatch):
     
 def test_050():
     
-    print(AgentConfig.FEATURES)
+    print(AgentKeywords.FEATURES)
     
-    clazz = ClassUtils.create_class("pydag.agents.AgentConfig")
+    clazz = ClassUtils.create_class("pydag.agents.AgentKeywords")
     
     print(type(clazz))
     

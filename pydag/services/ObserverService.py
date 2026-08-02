@@ -10,7 +10,7 @@ from apscheduler.job import Job
 from loguru import logger
 
 
-from ..agents.AgentConfig import AgentConfig
+from ..agents.AgentKeywords import AgentKeywords
 from ..agents.AgentStates import AgentElementState, ServiceState
 from ..services.ServiceException import ServiceException
 from ..utils.TimeUtils import TimeUtils
@@ -348,8 +348,8 @@ class ObserverService(Service):
                     self._counts += 1
                     self._last_time = time.time()                    
                     self.observing_time = 2 * self.observing_time
-                    if self.observing_time > AgentConfig.MAX_EXPONENTIAL_SECONDS:
-                        self.observing_time = AgentConfig.MAX_EXPONENTIAL_SECONDS
+                    if self.observing_time > AgentKeywords.MAX_EXPONENTIAL_SECONDS:
+                        self.observing_time = AgentKeywords.MAX_EXPONENTIAL_SECONDS
                     self._next_time = self._last_time + self.observing_time
                 except ObserverException as e:
                     logger.error(e)

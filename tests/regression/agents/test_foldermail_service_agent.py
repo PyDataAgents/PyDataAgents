@@ -3,7 +3,7 @@ from pathlib import Path
 import pytest
 
 from pydag.agents.Agent import Agent
-from pydag.agents.AgentConfig import AgentConfig
+from pydag.agents.AgentKeywords import AgentKeywords
 from pydag.agents.YAMLConfig import YAMLConfig
 from pydag.nodes.utils.MailAction import MailAction
 from pydag.services.documents.FolderObserveMailService import FolderObserveMailService
@@ -41,7 +41,7 @@ def test_000():
     
     agent.add_service(folder_service)
         
-    gc = AgentConfig(agent)
+    gc = AgentKeywords(agent)
     yc = YAMLConfig(str(Path.home() / "Downloads" / "t" / "folder_observe_config.yaml"))
     yc.save(gc)    
     
@@ -79,7 +79,7 @@ def test_020():
     
     agent.add_service(folder_service)
         
-    gc = AgentConfig(agent)
+    gc = AgentKeywords(agent)
     yc = YAMLConfig("tests\\services\\documents\\folder_observe_config.yaml")
     yc.save(gc)    
     
@@ -121,6 +121,6 @@ def test_021():
 def test_030():
     yc : YAMLConfig = YAMLConfig("C:\\Users\\jhillenb\\Downloads\\t\\pdm_folder_mail_service.yaml") 
     #yc : YAMLConfig = YAMLConfig("tests\\services\\documents\\folder_observe_config.yaml") 
-    ac : AgentConfig = yc.load()    
+    ac : AgentKeywords = yc.load()    
     ag : Agent = ac.create()
     ag.release() 

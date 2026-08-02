@@ -5,7 +5,7 @@ from scipy.stats import iqr
 
 from ...agents.Agent import Agent
 from ..LearningNode import LearningNode
-from ...agents.AgentConfig import AgentConfig
+from ...agents.AgentKeywords import AgentKeywords
 
 
 @dataclass
@@ -114,7 +114,7 @@ class RIFEExtractor(LearningNode):
             if len(data.keys()) == len(self.output_keys):
                 forecast[self.output_keys[i]] = feats.tolist()
             else:
-                forecast[self.__class__.__name__ + "-" + AgentConfig.FEATURE + "-" + f"{i}"] = feats.tolist()
+                forecast[self.__class__.__name__ + "-" + AgentKeywords.FEATURE + "-" + f"{i}"] = feats.tolist()
         return forecast, None
 
 __all__ = ["RIFEExtractor"]

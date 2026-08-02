@@ -1,5 +1,5 @@
 from __future__ import annotations
-from pathlib import Path
+import os
 import threading
 from typing import TYPE_CHECKING, Any, Type
 from dataclasses import dataclass, field
@@ -11,12 +11,10 @@ from .AgentStates import AgentElementState, ServiceState
 from ..utils.ClassUtils import ClassUtils
 from .AgentElementException import AgentElementException
 from .AgentException import AgentException
-from ..utils.FileUtils import FileUtils
-from .YAMLConfig import YAMLConfig
 from ..nodes.Node import Node
 from .AgentElement import AgentElement
-from .AgentConfig import AgentConfig
 from ..services.statemachine.StatemachineService import StatemachineService
+from .AgentKeywords import AgentKeywords
 
 if TYPE_CHECKING:
     from ..buffers.Buffer import Buffer
@@ -56,6 +54,7 @@ class Agent():
     create_config : bool = field(default=False, metadata={"description": "creates a configuration yaml on start, when True"})
     load_on_install : bool = field(default=False, metadata={"description": "if True, all AgentElements are set to load_on_install = True"})
     with_persistence : bool = field(default=False, metadata={"description": "if True, an AgentPersistService is created by default to contuinously save the AgentElements in a local files"})
+    save_folder : str = field(default=AgentKeywords.SAVE_FOLDER, metadata={"description": "folder to save the AgentElements in local files, if None, a default folder is created in the current working directory"})
         
     buffer_store : dict[str, Buffer] = field(default_factory=dict, metadata={"description": "dictionary of Buffers in the Agent"})
     service_store : dict[str, Service] = field(default_factory=dict, metadata={"description": "dictionary of Services in the Agent"})
@@ -140,7 +139,7 @@ class Agent():
         Returns:
             dict: Configuration options dictionary.
         """
-        return AgentConfig.config_options(self, with_descriptions)
+        return ClassUtils.config_options(self, with_descriptions)
         
     def _stop_services(self):
         """ Stop all `Service`s in the `Agent`.
@@ -160,32 +159,6 @@ class Agent():
                     service.start()
                 except AgentElementException as e:
                     logger.error(e)
-    
-    @staticmethod
-    def load_from(config_file : str) -> Agent:
-        """ loads an `Agent` from configuration file `config_file`
-
-        Args:
-            config_file (str): path to a config file, only YAML is implemented so far
-
-        Raises:
-            AgentException: if the `Agent` cannot be configured from `config_file`
-
-        Returns:
-            Agent: an `Agent` instance
-        """
-        if FileUtils.exists_file(config_file):
-            ext = Path(config_file).suffix
-            match(ext):
-                case ".yaml" | ".yml":
-                    yc = YAMLConfig(config_file)
-                    ac : AgentConfig = yc.load()
-                    ag : Agent = AgentConfig.create(ac)
-                    return ag
-                case _:
-                    raise AgentException(f"Unknown File Type for {Agent.__name__} configuration (only YAML is supported)")
-        else:
-            raise AgentException(f"Configuration File {config_file} was not found!")
     
     def release(self, blocking : bool = False):
         """Release the `Agent` for operation.

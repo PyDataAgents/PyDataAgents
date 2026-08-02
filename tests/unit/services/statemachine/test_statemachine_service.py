@@ -1,7 +1,7 @@
 import os
 import time
 from pydag.agents.Agent import Agent
-from pydag.agents.AgentConfig import AgentConfig
+from pydag.agents.AgentKeywords import AgentKeywords
 from pydag.agents.YAMLConfig import YAMLConfig
 from pydag.nodes.utils.JoinTransition import JoinTransition
 from pydag.services.statemachine.SFCService import SFCService
@@ -34,7 +34,7 @@ def test_000():
     
     g.add_service(sms)
     
-    gc = AgentConfig(g)
+    gc = AgentKeywords(g)
     
     yc = YAMLConfig(os.path.dirname(__file__) + "\\agent_statemachine_config1.yaml")
     
@@ -44,7 +44,7 @@ def test_000():
 def test_001():
     
     yc = YAMLConfig(os.path.dirname(__file__) + "\\agent_statemachine_config1.yaml")
-    gc : AgentConfig = yc.load()
+    gc : AgentKeywords = yc.load()
     
     g = gc.create()
     

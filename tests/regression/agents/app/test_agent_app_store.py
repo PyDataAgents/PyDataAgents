@@ -3,24 +3,24 @@ from __future__ import annotations
 import multiprocessing
 
 from pydag.agents.Agent import Agent
-from pydag.agents.AgentConfig import AgentConfig
+from pydag.agents.AgentKeywords import AgentKeywords
 
 
-def _run_agent(agent_config: AgentConfig) -> None:
+def _run_agent(agent_config: AgentKeywords) -> None:
     agent : Agent = agent_config.create()
     agent.release(blocking=True)
 
 class AgentProcessStore:
     def __init__(self) -> None:
-        self._agent_configs: dict[str, AgentConfig] = {}
+        self._agent_configs: dict[str, AgentKeywords] = {}
         self._processes: dict[str, multiprocessing.Process] = {}
 
-    def add_agent(self, agent_config: AgentConfig) -> AgentConfig:
+    def add_agent(self, agent_config: AgentKeywords) -> AgentKeywords:
         #cloned_agent = copy.deepcopy(agent)
-        self._agent_configs[agent_config.to_dict()[AgentConfig.ID]] = agent_config
+        self._agent_configs[agent_config.to_dict()[AgentKeywords.ID]] = agent_config
         return agent_config
 
-    def get_agent_config(self, agent_id: str) -> AgentConfig | None:
+    def get_agent_config(self, agent_id: str) -> AgentKeywords | None:
         return self._agent_configs.get(agent_id)
 
     def start_agent(self, agent_id: str) -> multiprocessing.Process:
@@ -52,14 +52,14 @@ class AgentProcessStore:
 
 def test_agent_process_store_can_start_and_stop_agents():
     agent : Agent = Agent(id="A1")
-    agent_config = AgentConfig(agent)
+    agent_config = AgentKeywords(agent)
     store = AgentProcessStore()
 
     stored_agent = store.add_agent(agent_config)
-    process = store.start_agent(stored_agent.to_dict()[AgentConfig.ID])
+    process = store.start_agent(stored_agent.to_dict()[AgentKeywords.ID])
 
     assert process.is_alive()
 
-    store.stop_agent(stored_agent.to_dict()[AgentConfig.ID])
+    store.stop_agent(stored_agent.to_dict()[AgentKeywords.ID])
 
     assert not process.is_alive()

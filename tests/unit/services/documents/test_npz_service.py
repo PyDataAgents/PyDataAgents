@@ -2,7 +2,7 @@ import os
 import numpy as np
 
 
-from pydag.agents.AgentConfig import AgentConfig
+from pydag.agents.AgentKeywords import AgentKeywords
 from pydag.buffers.DictBuffer import DictBuffer
 from pydag.buffers.ListBuffer import ListBuffer
 from pydag.services.ThreadType import ThreadType
@@ -22,7 +22,7 @@ def test_000():
 
 def test_010():    
     file_path = os.path.dirname(__file__) + os.sep + "1730_Normal.npz"
-    buf = DictBuffer(capacity=AgentConfig.INFINITE_CAPACITY)
+    buf = DictBuffer(capacity=AgentKeywords.INFINITE_CAPACITY)
     buf.install()
     npz = NpzService(file_path=file_path, thread_type=ThreadType.MILLI_SECOND.value)
     npz.add_buffer(buf)
@@ -32,9 +32,9 @@ def test_010():
     
 def test_011():    
     file_path = os.path.dirname(__file__) + os.sep + "1730_Normal.npz"  
-    buf1 = ListBuffer(capacity=AgentConfig.INFINITE_CAPACITY)
+    buf1 = ListBuffer(capacity=AgentKeywords.INFINITE_CAPACITY)
     buf1.install()    
-    buf2 = ListBuffer(capacity=AgentConfig.INFINITE_CAPACITY)
+    buf2 = ListBuffer(capacity=AgentKeywords.INFINITE_CAPACITY)
     buf2.install()
     buffers = buf1.to_dict()
     buffers[buf2.id] = buf2    

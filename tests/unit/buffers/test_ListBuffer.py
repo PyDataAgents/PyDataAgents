@@ -1,5 +1,5 @@
 from pydag.buffers.ListBuffer import ListBuffer
-from pydag.agents.AgentConfig import AgentConfig
+from pydag.agents.AgentKeywords import AgentKeywords
 import numpy as np
 
 def test_000():
@@ -144,7 +144,7 @@ def test_capacity_with_string_pushes():
 
 def test_infinite_capacity():
     buf = ListBuffer()
-    buf.capacity = AgentConfig.INFINITE_CAPACITY
+    buf.capacity = AgentKeywords.INFINITE_CAPACITY
     buf.install()
     buf.push([1, 2, 3, 4, 5])
 

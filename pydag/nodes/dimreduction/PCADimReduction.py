@@ -5,7 +5,7 @@ import numpy as np
 
 
 from ..LearningNode import LearningNode
-from ...agents.AgentConfig import AgentConfig
+from ...agents.AgentKeywords import AgentKeywords
 
 @dataclass
 class PCADimReduction(LearningNode):
@@ -40,7 +40,7 @@ class PCADimReduction(LearningNode):
             if len(data.keys()) == len(self.output_keys):
                 forecast[self.output_keys[i]] = transformed_data.tolist()  #convert to list
             else:
-                forecast[self.cname() + "-" + AgentConfig.FEATURE + "-" + f"{i}"] = transformed_data.tolist()  #convert to list
+                forecast[self.cname() + "-" + AgentKeywords.FEATURE + "-" + f"{i}"] = transformed_data.tolist()  #convert to list
         
         return forecast, None
         

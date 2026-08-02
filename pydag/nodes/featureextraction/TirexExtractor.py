@@ -5,7 +5,7 @@ import torch
 
 
 from ...agents.Agent import Agent
-from ...agents.AgentConfig import AgentConfig
+from ...agents.AgentKeywords import AgentKeywords
 from ..LearningNode import LearningNode
 
 
@@ -51,6 +51,6 @@ class TirexExtractor(LearningNode):
                 if len(data.keys()) == len(self.output_keys):
                     forecast[self.output_keys[forecast_index]] = row.reshape(-1).cpu().tolist()
                 else:
-                    forecast[f"{self.cname()}-{AgentConfig.FEATURE}-{forecast_index}"] = row.reshape(-1).cpu().tolist()
+                    forecast[f"{self.cname()}-{AgentKeywords.FEATURE}-{forecast_index}"] = row.reshape(-1).cpu().tolist()
                 forecast_index += 1
         return forecast, None

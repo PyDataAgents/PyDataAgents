@@ -155,7 +155,9 @@ class ClassUtils:
                     if TYPE_PROPERTY in value:
                         # If the dictionary contains a type, create an instance of that type
                         sub_obj = ClassUtils.create_instance(value[TYPE_PROPERTY])
-                        value.pop(TYPE_PROPERTY, None)  # remove the type property from the dictionary before setting properties
+                        # remove the type property from the dictionary before setting properties
+                        if not hasattr(sub_obj, TYPE_PROPERTY):
+                            value.pop(TYPE_PROPERTY, None)  
                         ClassUtils.set_properties(sub_obj, value)
                         setattr(obj, property_name, sub_obj)
                     else:
@@ -180,7 +182,8 @@ class ClassUtils:
                                 element_dic = {}
                                 for k, v in value.items():
                                     sub_obj = ClassUtils.create_instance(v[TYPE_PROPERTY])
-                                    v.pop(TYPE_PROPERTY, None)
+                                    if not hasattr(sub_obj, TYPE_PROPERTY):
+                                        v.pop(TYPE_PROPERTY, None)
                                     ClassUtils.set_properties(sub_obj, v)
                                     element_dic[k] = sub_obj
                                 setattr(obj, property_name, element_dic)
@@ -200,7 +203,8 @@ class ClassUtils:
                                 for item in value:
                                     sub_obj = ClassUtils.create_instance(item[TYPE_PROPERTY])
                                     # remove the type property from the dictionary before setting properties
-                                    item.pop(TYPE_PROPERTY, None)
+                                    if not hasattr(sub_obj, TYPE_PROPERTY):
+                                        item.pop(TYPE_PROPERTY, None)
                                     ClassUtils.set_properties(sub_obj, item)
                                     element_list.append(sub_obj)
                                 setattr(obj, property_name, element_list)
@@ -219,7 +223,8 @@ class ClassUtils:
                             # If the dictionary contains a type, create an instance of that type
                             sub_obj = ClassUtils.create_instance(value[TYPE_PROPERTY])
                             # remove the type property from the dictionary before setting properties
-                            value.pop(TYPE_PROPERTY, None)
+                            if not hasattr(sub_obj, TYPE_PROPERTY):
+                                value.pop(TYPE_PROPERTY, None)
                             ClassUtils.set_properties(sub_obj, value)
                             setattr(obj, property_name, sub_obj)
                         else:

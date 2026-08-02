@@ -1,6 +1,6 @@
 import numpy as np
 
-from pydag.agents.AgentConfig import AgentConfig
+from pydag.agents.AgentKeywords import AgentKeywords
 from pydag.buffers.BufferException import BufferException
 from pydag.buffers.DictBuffer import DictBuffer
 
@@ -222,8 +222,8 @@ def test_push_non_dict_list2():
     buf.push([1.0, 2.0, 3.0, 4.0])
     
     d = buf.data()
-    assert AgentConfig.VALUES in d, "data key should be " + AgentConfig.VALUES
-    assert len(d[AgentConfig.VALUES]) == 4, "data should be of size 4"
+    assert AgentKeywords.VALUES in d, "data key should be " + AgentKeywords.VALUES
+    assert len(d[AgentKeywords.VALUES]) == 4, "data should be of size 4"
 
 def test_push_non_dict_exception():
     # test pushing a list of dictionaries (batch of individual rows)

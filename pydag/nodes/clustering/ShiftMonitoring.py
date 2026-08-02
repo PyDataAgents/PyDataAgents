@@ -7,7 +7,7 @@ from scipy.spatial import KDTree
 from scipy.spatial.distance import jensenshannon
 from scipy.stats import wasserstein_distance
 
-from ...agents.AgentConfig import AgentConfig
+from ...agents.AgentKeywords import AgentKeywords
 from ..LearningNode import LearningNode
 
 
@@ -69,8 +69,8 @@ class ShiftMonitoring(LearningNode):
             elif d.ndim == 3:
                 d = np.squeeze(d, axis=0) 
             transformed_data, decision = self._models[key].transform(d)
-            forecast[f"{key}-{AgentConfig.FEATURE}-{self.shift_name}"] = transformed_data[0].tolist()  #convert to list
-            forecast[f"{key}-{AgentConfig.FEATURE}-{self.decision_name}"] = decision.tolist()  #convert to list
+            forecast[f"{key}-{AgentKeywords.FEATURE}-{self.shift_name}"] = transformed_data[0].tolist()  #convert to list
+            forecast[f"{key}-{AgentKeywords.FEATURE}-{self.decision_name}"] = decision.tolist()  #convert to list
             if self.return_input:
                 for index in d:
                     for f,feat in enumerate(index):

@@ -141,9 +141,9 @@ def test_regression_output_keys_mismatch_uses_default():
     # Expect default naming pattern when input keys count != output_keys length
     # Default: ClassName-<FEATURE>-<i>
     if len(data.keys()) == 2:
-        from pydag.agents.AgentConfig import AgentConfig
+        from pydag.agents.AgentKeywords import AgentKeywords
         expected = {
-            RegressionTransform.cname() + "-" + AgentConfig.FEATURE + "-" + "0",
-            RegressionTransform.cname() + "-" + AgentConfig.FEATURE + "-" + "1",
+            RegressionTransform.cname() + "-" + AgentKeywords.FEATURE + "-" + "0",
+            RegressionTransform.cname() + "-" + AgentKeywords.FEATURE + "-" + "1",
         }
         assert set(data.keys()) == expected

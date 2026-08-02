@@ -11,7 +11,7 @@ from fastapi import APIRouter, Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 
-from ..AgentConfig import AgentConfig
+from ...utils.ClassUtils import ClassUtils
 from ..api.AgentRESTAPI import AgentRESTAPI
 from ..api.BufferRESTAPI import BufferRESTAPI
 from ..api.NodeRESTAPI import NodeRESTAPI
@@ -36,11 +36,11 @@ class AgentApp():
     dark_mode : bool = field(default=True, metadata={"description": "enables dark mode"})
     color_schema : dict = field(default_factory=dict, metadata={"description": "color schema for the ui, see https://nicegui.io/docs/colors for more details"})
     with_config : bool = field(default=False)
-
+    agent : Agent = field(default_factory=Agent, metadata={"description": "the `Agent` instance to be used by the `AgentApp`"})
+    ui_pages : list[UIPage] = field(default_factory=list, metadata={"description": "list of UIPage instances to be used by the `AgentApp`"})
+    
     def __post_init__(self):
-        self._agent : Agent = None
         self._app : FastAPI = None
-        self._ui_pages : list[UIPage] = []
         
     @staticmethod
     def load(config : str | dict) -> AgentApp:
@@ -52,29 +52,28 @@ class AgentApp():
                 match ext:
                     case "yaml" | "yml":
                         with open(config, encoding="utf-8") as f:
-                            data : dict = yaml.safe_load(f)
-                            # split the config into app and agent config
-                            apcd : dict = data.copy()
-                            del apcd["agent"]
-                            acd : dict = data["agent"]
-                            ac : AgentConfig = AgentConfig.from_dict(acd)
-                            aa : AgentApp = AgentApp(**apcd)
-                            aa.set_agent(ac.create())
+                            app_config : dict = yaml.safe_load(f)
+                            aa : AgentApp = AgentApp()
+                            ClassUtils.set_properties(aa, app_config)
                             return aa
                     case _:
                         raise AgentException(f"loading from {config} is not defined")
             else:
                 raise AgentException(f"{config} is not a valid filepath")
-        elif isinstance(config, dict):
-            apcd : dict = config.copy()
-            ac : AgentConfig = AgentConfig.from_dict(acd)
-            aa : AgentApp = AgentApp(**apcd)
-            aa.set_agent(ac.create())
+        elif isinstance(config, dict):            
+            aa : AgentApp = AgentApp()
+            ClassUtils.set_properties(aa, config)
             return aa
         else:
             raise AgentException("config was not of allowd datatypes (str | dict)")
     
     def create(self, no_default_apis : bool = False, no_default_pages : bool = False):
+        """ Creates the `AgentApp` with the specified configuration.
+                    
+        Args:
+            no_default_apis (bool, optional): If True, no default REST API endpoints will be created. Defaults to False.
+            no_default_pages (bool, optional): If True, no default NiceGUI pages will be created. Defaults to False.        
+        """
         if self.with_api:
             self._create_api(no_default_apis=no_default_apis)
         if self.with_ui:           
@@ -83,12 +82,15 @@ class AgentApp():
             self._create_config()
                
     def run(self):
+        """ Runs the `AgentApp` with the specified configuration.
+            This method is blocking.
+        """
         if self.with_ui:
             os.environ.setdefault("NICEGUI_SCREEN_TEST_PORT", f"{self.port}")
-            pages_paths = [f"http://{self.host}:{self.port}{page.path}" for page in self._ui_pages]
+            pages_paths = [f"http://{self.host}:{self.port}{page.path}" for page in self.ui_pages]
             pages_str = "\n".join(pages_paths)
             logger.info("Available NiceGui Pages:\n" + pages_str)
-            self._agent.release(blocking=False)        
+            self.agent.release(blocking=False)        
             if self.with_api:
                 multiprocessing.freeze_support()  # For Windows support
                 ui.run_with(self._app, dark=self.dark_mode, title=self.__class__.__name__ + " UI")
@@ -98,14 +100,15 @@ class AgentApp():
         else:                
             if self.with_api:
                 logger.info("Available FastAPI url:\n" + self._app.docs_url)
-                self._agent.release(blocking=False)
+                self.agent.release(blocking=False)
                 multiprocessing.freeze_support()  # For Windows support
                 uvicorn.run(self._app, host=self.host, port=self.port, reload=False, workers=1)
             else:
-                self._agent.release(blocking=True)
+                self.agent.release(blocking=True)
     
     def shutdown(self):
-        self._agent.terminate()
+        """ Shuts down the `AgentApp` and the `Agent` instance. """
+        self.agent.terminate()
         if self.with_ui:
             if self.with_api:
                 pass            
@@ -116,6 +119,11 @@ class AgentApp():
                 pass
                             
     def _create_api(self, no_default_apis : bool = False):
+        """ Create a FastAPI REST API for the Agent.
+        This method initializes the FastAPI app and sets up the REST API endpoints.
+        Args:
+            no_default_apis (bool, optional): If True, no default REST API endpoints will be created. Defaults to False.
+        """
         if self.api_key_file:
             RESTAPIManager.generate_api_keys(api_key_file=self.api_key_file, agent=self) # Generate API keys and save to file if api_key_file is provided
             self._app = FastAPI(title=self.__class__.__name__ + " - REST API", docs_url="/docs", dependencies=[Depends(RESTAPIManager.require_min_role(APIRole.READ))])  # Protect all endpoints with API key dependency
@@ -156,37 +164,79 @@ class AgentApp():
             )
             
         page : UIPage
-        for page in self._ui_pages:
+        for page in self.ui_pages:
             page.register(self)
     
+    def config_options(self) -> dict:
+        """ Returns a dictionary of configuration options for the `AgentApp` instance.
+        
+        Returns:
+            dict: A dictionary containing the configuration options and their values.
+        """
+        return ClassUtils.config_options(self)
+    
     def _create_config(self):
-        apc = AgentConfig.config_options(self)
-        ac = AgentConfig.config_options(self.get_agent())
-        apc["agent"] = ac
+        apc = self.config_options()
         yaml_file = open(f"{self.get_agent().id}.yaml", "w", encoding='utf-8')
         yaml.dump(apc, yaml_file, sort_keys=False)
         yaml_file.close()
     
     def add_api(self, router : APIRouter):
+        """ Add a REST API router to the FastAPI app.
+        
+        Args:
+            router (APIRouter): The FastAPI router to be added.
+        """
         self._app.include_router(router)
             
     def add_ui_page(self, page : UIPage):
-        self._ui_pages.append(page)
+        """ Add a NiceGUI UI page to the AgentApp. 
+        
+        Args:
+            page (UIPage): The NiceGUI UI page to be added.        
+        """
+        self.ui_pages.append(page)
         
     def remove_ui_page(self, i : int):
-        self._ui_pages.pop(i)
+        """ Remove a NiceGUI UI page from the AgentApp by index.
+        
+        Args:
+            i (int): The index of the page to be removed.
+        """
+        self.ui_pages.pop(i)
         
     def clear_ui_pages(self):
-        self._ui_pages.clear()
+        """ Clear all NiceGUI UI pages from the AgentApp. """
+        self.ui_pages.clear()
 
     def get_ui_pages(self) -> list[UIPage]:
-        return self._ui_pages
+        """ Get the list of NiceGUI UI pages in the AgentApp.
+        
+        Returns:
+            list[UIPage]: The list of NiceGUI UI pages.
+        """
+        return self.ui_pages
     
     def set_agent(self, ag : Agent):
-        self._agent = ag
+        """ Set the `Agent` instance for the `AgentApp`.
+        
+        Args:
+            ag (Agent): The `Agent` instance to be set.
+        """
+        self.agent = ag
         
     def get_agent(self) -> Agent:
-        return self._agent
+        """ Get the `Agent` instance associated with the `AgentApp`.
+        
+        Returns:
+            Agent: The `Agent` instance associated with the `AgentApp`.
+        """
+        return self.agent
         
     def set_app(self, fast_api_app : FastAPI):
+        """ Set the FastAPI app for the `AgentApp`.
+        
+        Args:
+            fast_api_app (FastAPI): The FastAPI app to be set.
+        """
         self._app = fast_api_app

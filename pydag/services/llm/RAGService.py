@@ -13,7 +13,7 @@ from langchain_core.documents import Document
 from sentence_transformers import SentenceTransformer
 from langchain_community.vectorstores.utils import filter_complex_metadata
 from langchain_core.runnables import RunnableMap
-from pydag.agents.AgentConfig import AgentConfig
+from pydag.agents.AgentKeywords import AgentKeywords
 
 from ..llm.LLMService import LLMService
 from ...utils.LLMUtils import build_message_history_input, compile_message_history_graph, get_message_content
@@ -33,7 +33,7 @@ class RAGService(LLMService):
     """
 
     # Constants
-    MODEL_RESOURCE_FOLDER = Path(AgentConfig.MODEL_RESOURCE_FOLDER)
+    MODEL_RESOURCE_FOLDER = Path(AgentKeywords.MODEL_RESOURCE_FOLDER)
     CHROMA_DB_FILENAMES = {"chroma.db", "chroma.sqlite3"}
 
     document_links : list[str] = field(default_factory=list, metadata={"description": "list of document links to load into embedded store on startup"})

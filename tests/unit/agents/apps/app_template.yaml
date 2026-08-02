@@ -13,4 +13,4 @@ agent:
   buffer_store:
     B1:
       id: B1
-      type: pydag.buffers.DictBuffer
+      type: pydag.buffers.DictBuffer.DictBuffer

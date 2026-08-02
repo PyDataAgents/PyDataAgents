@@ -3,7 +3,7 @@ import pytest
 
 from pydag.services.csv.CsvWriteService import CsvWriteService
 from pydag.buffers.ListBuffer import ListBuffer
-from pydag.agents.AgentConfig import AgentConfig
+from pydag.agents.AgentKeywords import AgentKeywords
 from pydag.agents.YAMLConfig import YAMLConfig
 from pydag.agents.Agent import Agent
 try:    
@@ -53,7 +53,7 @@ def test_000():
     
     g.add_service(csv)
     
-    gc = AgentConfig(g)
+    gc = AgentKeywords(g)
     yc = YAMLConfig(os.path.dirname(__file__) + "\\ads_csv.yaml")
     yc.save(gc)
 

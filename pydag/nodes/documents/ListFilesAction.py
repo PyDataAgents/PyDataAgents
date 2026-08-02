@@ -2,7 +2,7 @@ from dataclasses import dataclass, field
 from typing import Union
 from loguru import logger
 
-from ...agents.AgentConfig import AgentConfig
+from ...agents.AgentKeywords import AgentKeywords
 from ...agents.Agent import Agent
 from ..NodeException import NodeException
 from ...buffers.ListBuffer import ListBuffer
@@ -30,12 +30,12 @@ class ListFilesAction(BufferNode, Action):
             if buf:
                 self._buffer = buf
             else:
-                self._buffer = ListBuffer(id=self.id + "-BUFFER", capacity=AgentConfig.INFINITE_CAPACITY)
+                self._buffer = ListBuffer(id=self.id + "-BUFFER", capacity=AgentKeywords.INFINITE_CAPACITY)
                 self.buffer_id = self._buffer.id
                 self._buffer.install(agent)
                 agent.add_buffer(self._buffer)
         else:
-            self._buffer = ListBuffer(id=self.id + "-BUFFER", capacity=AgentConfig.INFINITE_CAPACITY)
+            self._buffer = ListBuffer(id=self.id + "-BUFFER", capacity=AgentKeywords.INFINITE_CAPACITY)
             self.buffer_id = self._buffer.id
             self._buffer.install(agent)
             

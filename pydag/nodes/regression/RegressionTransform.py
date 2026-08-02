@@ -7,7 +7,7 @@ import torch
 
 from ...agents.Agent import Agent
 from ..LearningNode import LearningNode
-from ...agents.AgentConfig import AgentConfig
+from ...agents.AgentKeywords import AgentKeywords
 
 
 @dataclass
@@ -55,7 +55,7 @@ class RegressionTransform(LearningNode):
             return self.output_keys[index]
         if default_key is not None:
             return default_key
-        return f"{self.cname()}-{AgentConfig.FEATURE}-{index}"
+        return f"{self.cname()}-{AgentKeywords.FEATURE}-{index}"
           
     def infer(self, data : dict, meta : dict = None) -> Tuple[Dict, Dict]:
         if self.model_name == "Tirex":
@@ -91,7 +91,7 @@ class RegressionTransform(LearningNode):
                     y_pred = y_pred.reshape(-1).cpu().tolist()
                 else:
                     y_pred = np.asarray(y_pred).reshape(-1).tolist()
-                forecast[self._forecast_key(i, len(data), f"{key}-{AgentConfig.FEATURE}-{self.model_name}-{i}")] = y_pred
+                forecast[self._forecast_key(i, len(data), f"{key}-{AgentKeywords.FEATURE}-{self.model_name}-{i}")] = y_pred
             return forecast, None
 
     
