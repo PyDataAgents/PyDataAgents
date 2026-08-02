@@ -67,6 +67,10 @@ __pycache__
 /tests/**/*test*.stp
 /tests/**/*test_*.step
 
+# ignore test yaml files
+/tests/**/*test*.yaml
+/tests/**/*test*.yml
+
 # ignore test log files
 *test*.log
 
