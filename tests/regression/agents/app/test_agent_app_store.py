@@ -4,6 +4,7 @@ import multiprocessing
 
 from pydag.agents.Agent import Agent
 from pydag.agents.AgentKeywords import AgentKeywords
+from pydag.agents.app import AgentApp
 
 
 def _run_agent(agent_config: AgentKeywords) -> None:
@@ -15,7 +16,7 @@ class AgentProcessStore:
         self._agent_configs: dict[str, AgentKeywords] = {}
         self._processes: dict[str, multiprocessing.Process] = {}
 
-    def add_agent(self, agent_config: AgentKeywords) -> AgentKeywords:
+    def add_app_template(self, agent_config: AgentKeywords) -> AgentKeywords:
         #cloned_agent = copy.deepcopy(agent)
         self._agent_configs[agent_config.to_dict()[AgentKeywords.ID]] = agent_config
         return agent_config
@@ -51,8 +52,7 @@ class AgentProcessStore:
 
 
 def test_agent_process_store_can_start_and_stop_agents():
-    agent : Agent = Agent(id="A1")
-    agent_config = AgentKeywords(agent)
+    aa : AgentApp = AgentApp(agent=Agent(id="A1"))
     store = AgentProcessStore()
 
     stored_agent = store.add_agent(agent_config)
