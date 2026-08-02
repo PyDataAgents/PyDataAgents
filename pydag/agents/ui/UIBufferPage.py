@@ -1,12 +1,15 @@
+from dataclasses import dataclass, field
+
 from nicegui import ui
 
 from pydag.agents.ui.UIElements import PlotCard, UIPage
 
 
+@dataclass
 class UIBufferPage(UIPage):
     """ `UIPage` for diplaying all `Buffer` data from connected `Agent` """
     
-    path = "/buffers"
+    path : str = field(default="/buffers")
     
     def _render(self):
         self.create_header('Buffer Store - Dashboard')

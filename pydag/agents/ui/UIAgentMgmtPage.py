@@ -1,3 +1,5 @@
+from dataclasses import dataclass, field
+
 from nicegui import ui
 
 from ...services.Service import Service
@@ -5,10 +7,11 @@ from ...buffers.Buffer import Buffer
 from .UIElements import AgentElementConfigForm, UIPage
 
 
+@dataclass
 class UIAgentMgmtPage(UIPage):
     """ `UIPage` for configuring all relevant `AgentElement`'s in the `Agent` """
     
-    path = "/mgmt"
+    path : str = field(default="/mgmt")
     
     def _render(self):
         self.create_header('Agent Management - Dashboard')                

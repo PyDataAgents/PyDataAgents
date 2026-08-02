@@ -1,0 +1,17 @@
+host: localhost
+port: 8081
+with_ui: true
+agent:
+  id: 1f76486e-0bbf-49f9-b1bc-251be65e6a57
+  description: null
+  create_config: false
+  load_on_install: false
+  with_persistence: false
+  save_folder: .save\
+  buffer_store: {}
+  service_store: {}
+ui_pages:
+- type: pydag.agents.ui.UIElements.UIHomePage
+  path: /
+  with_nav_bar: true
+  refresh_interval: 1.0
