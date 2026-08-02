@@ -116,19 +116,29 @@ class ClassUtils:
         return result
     
     @staticmethod
-    def create_class(fully_qualified_class_name):
+    def create_class(fully_qualified_class_name : str):
         """
         Create a class from the class name.
         """
-        # Split the fully qualified class name into module and class name
-        module_name, class_name = fully_qualified_class_name.rsplit(".", 1)
-        module = importlib.import_module(module_name)
-        # Check if the module has the specified class
-        if hasattr(module, class_name):
-            clazz = getattr(module, class_name)
-            return clazz
-        else:
-            return None
+        # check if module name is also a class name, if so load the module and get the class from it
+        try:
+            module = importlib.import_module(fully_qualified_class_name)
+            class_name = fully_qualified_class_name.rsplit(".", 1)[-1]
+            if hasattr(module, class_name):
+                clazz = getattr(module, fully_qualified_class_name.rsplit(".", 1))
+                return clazz
+        except ModuleNotFoundError:
+            # Split the fully qualified class name into module and class name
+            module_name, class_name = fully_qualified_class_name.rsplit(".", 1)
+            module = importlib.import_module(module_name)
+            # Check if the module has the specified class
+            if hasattr(module, class_name):
+                clazz = getattr(module, class_name)
+                return clazz
+            else:
+                return None
+        
+        
     
     @staticmethod
     def create_instance(fully_qualified_class_name):

@@ -49,7 +49,8 @@ class UIPage():
     refresh_interval : int = field(default=1.0, metadata={})
     
     def __post_init__(self):
-        self.type = self.__module__ + "." + self.__class__.__name__
+        self.type = f"{self.__module__}.{self.__class__.__name__}"
+        self.type = f"{self.__module__}"
         self._agent_app : AgentApp = None
         self._ui_components : deque[UIComponent] = deque() 
         self._timer : ui.timer = None

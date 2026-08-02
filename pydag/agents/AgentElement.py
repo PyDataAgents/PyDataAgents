@@ -30,7 +30,8 @@ class AgentElement(ABC):
         """
         Initialize the agent element type and state
         """
-        self.type = self.__module__ + "." + self.__class__.__name__
+        #self.type = f"{self.__module__}.{self.__class__.__name__}"
+        self.type = f"{self.__module__}"
         self._state : AgentElementState = AgentElementState.UNINSTALLED
         
     def name(self) -> str:
