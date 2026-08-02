@@ -1,7 +1,6 @@
 import os
 
 from pydag.agents.AgentStore import AgentStore
-from pydag.agents.auth.Auth import AuthManager
 
 
 def test_agent_template_loading():

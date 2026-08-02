@@ -1,7 +1,9 @@
-import matplotlib.pyplot as plt
+import os
 
 
 from pydag.buffers.geometry.BallscrewGothicHelix import BallscrewGothicHelix
+from pydag.services.plot.PlotlifyService import PlotlifyService
+from pydag.services.plot.PlotlyElements import ColorNames
 
 
 def test_gothicarchhelix():
@@ -17,7 +19,5 @@ def test_gothicarchhelix():
 
     X, Y, Z = helix.mesh()
     
-    fig = plt.figure()
-    ax = fig.add_subplot(111, projection='3d')
-    ax.plot_surface(X, Y, Z, rstride=4, cstride=4, linewidth=0, antialiased=True)
-    plt.show()
+    pdoc = PlotlifyService.surface(X, Y, Z, color = ColorNames.LIGHT_BLUE.value, name="gothicarchhelix")
+    pdoc.to_file(f"{os.path.dirname(__file__)}{os.sep}test_gothicarchhelix.html")

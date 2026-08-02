@@ -79,7 +79,7 @@ class AgentApp():
         if self.with_ui:           
             self._create_ui(no_default_pages=no_default_pages)
         if self.with_config:
-            self._create_config()
+            self.save(f"{self.get_agent().save_folder}{self.get_agent().id}.yaml")
                
     def run(self):
         """ Runs the `AgentApp` with the specified configuration.
@@ -175,9 +175,9 @@ class AgentApp():
         """
         return ClassUtils.config_options(self)
     
-    def _create_config(self):
+    def save(self, to_file : str):
         apc = self.config_options()
-        yaml_file = open(f"{self.get_agent().id}.yaml", "w", encoding='utf-8')
+        yaml_file = open(to_file, "w", encoding='utf-8')
         yaml.dump(apc, yaml_file, sort_keys=False)
         yaml_file.close()
     

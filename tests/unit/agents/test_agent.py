@@ -18,31 +18,17 @@ def test_agent_get_buffer():
         
     assert ag.get_buffer("BUF2") is None, "the buffer was not properly added to bufferstore"
     
-def test_agent_get_buffer2():
-    
-    ag = Agent()
-    
-    buf = DictBuffer(id="BUF1")
-    
-    ag.add_buffer(buf)
-    
+def test_agent_get_buffer2():    
+    ag = Agent()    
+    buf = DictBuffer(id="BUF1")    
+    ag.add_buffer(buf)    
     assert ag.get_buffer("BUF1") is not None, "the buffer was not properly added to bufferstore"
-    
-def test_load_agent():
-    ag = Agent.load_from(os.path.dirname(__file__) + os.sep + "config.yaml")
-    ag.release(blocking=False)
-    time.sleep(5)    
-    ag.terminate()
-    
+        
 def test_edit_agent_element():
-    ag = Agent()
-    
-    buf = DictBuffer(id="BUF1")
-    
-    ag.add_buffer(buf)
-    
-    ag.edit_element(buf.id, {"id": "BUF11"})
-    
+    ag = Agent()    
+    buf = DictBuffer(id="BUF1")    
+    ag.add_buffer(buf)    
+    ag.edit_element(buf.id, {"id": "BUF11"})    
     assert buf.id == "BUF11", "wrong buffer id"
     
     

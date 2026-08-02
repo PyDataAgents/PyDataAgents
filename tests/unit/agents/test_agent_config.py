@@ -5,20 +5,14 @@ from pathlib import Path
 import pytest
 import yaml
 
+from pydag.agents.app.AgentApp import AgentApp
 from pydag.services.opcua.OpcUaService import OpcUaService
 from pydag.buffers.ListBuffer import ListBuffer
 from pydag.agents.AgentKeywords import AgentKeywords
-from pydag.agents.YAMLConfig import YAMLConfig
 from pydag.agents.Agent import Agent
 from pydag.services.ThreadType import ThreadType
 from pydag.utils.ClassUtils import ClassUtils
 from tests.unit.agents.ConfigObject import ConfigObject
-
-
-def test_000():
-    yaml_file = open(os.path.dirname(__file__) + "\\config.yaml", "r", encoding="utf-8")
-    d = yaml.safe_load(yaml_file)
-    print(d)
     
 
 @pytest.mark.skip(reason="not working")    
@@ -58,9 +52,10 @@ def test_040():
     g.add_buffer(b)
     g.add_service(a)
     
-    gc = AgentKeywords(g)
-    print(gc)
-    
+    aa : AgentApp = AgentApp()
+    aa.set_agent(g)
+    aa.save(f"{os.path.dirname(__file__)}{os.sep}test_opcua_agent_config.yaml")
+
 def test_041():
     g = Agent()
     g.id = "G1"
@@ -80,19 +75,13 @@ def test_041():
         
     g.add_service(a)
     
-    gc = AgentKeywords(g)
-    
-    yc = YAMLConfig(os.path.dirname(__file__) + "\\agent_config1.yaml")
-    
-    yc.save(gc)
-    
+    aa = AgentApp()
+    aa.set_agent(g)
+    aa.save(f"{os.path.dirname(__file__)}{os.sep}test_opcua_agent_config.yaml")
+
 def test_042():
-    yc = YAMLConfig(os.path.dirname(__file__) + "\\agent_config1.yaml")
-    gc : AgentKeywords = yc.load()
-    print(gc)
-    g = gc.create()
-    gc2 = AgentKeywords(g)
-    print(gc2)
+    aa : AgentApp = AgentApp.load(f"{os.path.dirname(__file__)}{os.sep}test_opcua_agent_config.yaml")
+    print(aa.get_agent())
 
 @pytest.mark.skip("test manually")
 def test_043_yaml_save_bare_filename(monkeypatch):
@@ -104,12 +93,12 @@ def test_043_yaml_save_bare_filename(monkeypatch):
 
     agent = Agent()
     agent.id = "G2"
-    gc = AgentKeywords(agent)
-    yc = YAMLConfig("agent_config_bare.yaml")
+    
+    aa : AgentApp = AgentApp()
+    aa.set_agent(agent)
+    aa.save(f"{test_dir / 'test_agent_config_bare.yaml'}")
 
-    yc.save(gc)
-
-    assert (test_dir / "agent_config_bare.yaml").is_file()
+    assert (test_dir / "test_agent_config_bare.yaml").is_file()
 
 @pytest.mark.skip("test manually")
 def test_044_agent_release_writes_default_yaml_to_cwd(monkeypatch):

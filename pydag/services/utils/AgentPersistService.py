@@ -2,7 +2,6 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 
-from ...agents.AgentKeywords import AgentKeywords
 from ...utils.FileUtils import FileUtils
 from ...agents.AgentElement import AgentElement
 from ..Observer import Observer
