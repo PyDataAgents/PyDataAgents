@@ -166,7 +166,7 @@ def test_052():
 def test_set_color():
     
     tr = Trace()
-    tr.set_line().set_color(Color.RED)
+    tr.set_mode(Mode.LINES_MARKERS).set_line().set_color(Color.RED)
     
     print(tr.to_dict())
     
