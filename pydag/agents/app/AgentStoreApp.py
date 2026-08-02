@@ -2,50 +2,36 @@ from dataclasses import dataclass, field
 import os
 import secrets
 
-from fastapi import FastAPI
 from loguru import logger
-from nicegui import app, ui
+from nicegui import ui
 
 
+from ..app.AgentApp import AgentApp
 from ..ui.UIAgentStorePages import UIAgentStoreLoginPage, UIAgentStorePage
-from ..ui.UIElements import UIPage
 from ..AgentStore import AgentStore
 
 
 @dataclass
-class AgentStoreApp:
+class AgentStoreApp(AgentApp):
     """ Application that stores an `AgentStore` and provides a REST API and UI based on configuration settings """
     
-    host : str = field(default="localhost", metadata={"description": "Host for the agent store server"})
-    port : int = field(default=10001, metadata={"description": "Port for the agent store server"})
-        
-    def __init__(self):
+    with_ui : bool = field(default=True, metadata={"description": "Whether to create a UI for the agent store"})
+     
+    def __post_init__(self):
         self._agent_store : AgentStore = None
-        self._app : FastAPI = None
-        self._ui_pages : list[UIPage] = list()
         
-    def create(self):
+    def set_agent_store(self, agent_store : AgentStore):
+        self._agent_store = agent_store
+        
+    def create(self, no_default_apis : bool = True, no_default_pages : bool = True):
         """ create the UI for the agent store """
-        # define default color schema
-        
-        app.colors(
-            primary='#005B95',
-            secondary='#A8A8A9',
-            accent='#C43726',
-            positive='#00B050', 
-            negative='#C43726',
-        )
-        
-        p = UIAgentStoreLoginPage(None)
-        self._ui_pages.append(p)
-        p = UIAgentStorePage(self)
-        self._ui_pages.append(p)
-        for page in self._ui_pages:
-            page.register()            
+        self.add_ui_page(UIAgentStoreLoginPage())
+        self.add_ui_page(UIAgentStorePage(self._agent_store))
+        super().create(no_default_apis=no_default_apis, no_default_pages=no_default_pages)
     
     def run(self):
-        self.create()
-        pages_paths = [f"http://{self.host}:{self.port}{page.path}" for page in self._ui_pages]
+        """ Run the the agent store application. This will block the current thread until the application is stopped. """
+        pages_paths = [f"http://{self.host}:{self.port}{page.path}" for page in self.ui_pages]
         pages_str = "\n".join(pages_paths)
         logger.info("Available NiceGui Pages:\n" + pages_str)                
         os.environ.setdefault("NICEGUI_SCREEN_TEST_PORT", f"{self.port}")

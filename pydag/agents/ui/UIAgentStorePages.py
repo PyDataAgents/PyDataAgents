@@ -1,9 +1,14 @@
 from __future__ import annotations
+from dataclasses import dataclass, field
 from functools import wraps
 import json
 from nicegui import app, ui
 from typing import TYPE_CHECKING
 
+
+from ..Agent import Agent
+from ..AgentKeywords import AgentKeywords
+from ..app.AgentApp import AgentApp
 from ..auth.Auth import AuthManager, TokenManager
 from .UIElements import UIPage
 
@@ -33,9 +38,10 @@ def requires_role(*roles, login_url="/login"):
 
     return decorator
 
+@dataclass
 class UIAgentStoreLoginPage(UIPage):
     
-    path = "/agentstore/login"
+    path : str = field(default="/store/login")
     
     def _render(self):
         self.create_header("AgentStore - Login", self.path)
@@ -47,12 +53,7 @@ class UIAgentStoreLoginPage(UIPage):
                 password = ui.input("Password", password=True).classes("w-full")
 
                 def do_login():
-
-                    user = AuthManager(None).authenticate(
-                        username.value,
-                        password.value,
-                    )
-
+                    user = AuthManager(None).authenticate(username.value, password.value)
                     if not user:
                         ui.notify("Invalid credentials")
                         return
@@ -63,26 +64,28 @@ class UIAgentStoreLoginPage(UIPage):
                     app.storage.user["access_token"] = token
                     app.storage.user["user"] = user
 
-                    ui.navigate.to("/agentstore")
+                    ui.navigate.to("/store")
 
                 ui.button("Login", on_click=do_login).classes("w-full mt-4")
             
-
+@dataclass
 class UIAgentStorePage(UIPage):
     """ `UIPage` for interacting with `AgentStore` """
     
-    path = "/agentstore"
+    path : str = field(default="/store")
     
-    def __init__(self, agent_store : AgentStore):
-        super().__init__(None)
-        self._agent_store = agent_store
+    def __post_init__(self):
+        super().__post_init__()
+        self._agent_store : AgentStore = None
         self._agent_column : ui.column = None
         self._template_column : ui.column = None
     
-    def register(self):
+    def register(self, agent_app : AgentApp):
+        
+        self._agent_app = agent_app
         
         @ui.page(self.path)
-        @requires_role("member", "admin", login_url="/agentstore/login")
+        @requires_role("member", "admin", login_url="/store/login")
         async def page():
             self._ui_components.clear()
             self._render()
@@ -93,7 +96,7 @@ class UIAgentStorePage(UIPage):
                     requires_update = True
                     break                    
             if requires_update:
-                self._timer = ui.timer(self._refresh_interval, lambda: [
+                self._timer = ui.timer(self.refresh_interval, lambda: [
                     component.update() for component in self._ui_components if component.requires_update 
                 ])
     
@@ -117,27 +120,27 @@ class UIAgentStorePage(UIPage):
         with self._agent_column:
             user_agents = self._agent_store.get_user_agents(user_id)
             if len(user_agents) > 0:
-                ui.label("My Agents").classes("text-h4")
-                for agent in user_agents:
+                ui.label(f"My {Agent.__name__}s").classes("text-h4")
+                for agent_app in user_agents:
                     with ui.card().classes("w-full mb-2"):                                                        
                         with ui.row().classes("items-center justify-between w-full p-1"):
-                            ui.markdown(f"**{agent.__class__.__name__} - {agent.id}**")                                
-                            if agent.is_running():
+                            ui.markdown(f"**{agent_app.get_agent().__class__.__name__} - {agent_app.get_agent().id}**")                                
+                            if agent_app.get_agent().is_running():
                                 ui.label("RUNNING").classes("bg-green-500 text-white p-2 rounded")                                                    
                             else:
                                 ui.label("STOPPED").classes("bg-gray-500 text-white p-2 rounded")
                             
-                            def remove_agent(aid : str = agent.id):
+                            def remove_agent(aid : str = agent_app.get_agent().id):
                                 self._agent_store.remove_agent(user_id, aid)
                                 self._refresh()  # Refresh the dashboard after releasing an agent
                                                         
                             ui.button("X", on_click=remove_agent).tooltip("Remove Agent")  
                         
-                        def release_agent(aid : str = agent.id):
+                        def release_agent(aid : str = agent_app.get_agent().id):
                             self._agent_store.release_agent(user_id, aid)
                             self._refresh()  # Refresh the dashboard after releasing an agent
                         
-                        def reconfigure_agent(aid: str = agent.id):
+                        def reconfigure_agent(aid: str = agent_app.get_agent().id):
                             with ui.dialog() as dialog:
                                 with ui.card():
                                     ui.label("Configure Agent")
@@ -163,12 +166,12 @@ class UIAgentStorePage(UIPage):
                                     
                             dialog.open()
                         
-                        def terminate_agent(aid: str = agent.id):
+                        def terminate_agent(aid: str = agent_app.get_agent().id):
                             self._agent_store.terminate_agent(user_id, aid)
                             self._refresh()  # Refresh the dashboard after terminating an agent                                                                      
                         
-                        ui.label(agent.description or "")
-                        if agent.is_running():
+                        ui.label(agent_app.get_agent().description or "")
+                        if agent_app.get_agent().is_running():
                             with ui.row():
                                 ui.button("Terminate", on_click=terminate_agent).tooltip("Terminate Agent")                    
                                 ui.button("Reconfigure", on_click=reconfigure_agent).tooltip("Reconfigure Agent")
@@ -178,23 +181,23 @@ class UIAgentStorePage(UIPage):
                                 ui.button("Reconfigure", on_click=reconfigure_agent).tooltip("Reconfigure Agent")
                                 
         with self._template_column:
-            agent_configs = self._agent_store.get_templates()
-            if len(agent_configs) > 0:                    
+            app_configs = self._agent_store.get_templates()
+            if len(app_configs) > 0:                    
                 ui.label("Agent Templates").classes("text-h4")
-                for agent_id, agent_config in agent_configs.items():
+                for agent_id, app_config in app_configs.items():
                     with ui.card().classes("w-full mb-2 bg-secondary"):
                         # 🔹 Dialog (centered by default)
                         with ui.dialog() as dialog:
                             with ui.card().classes("w-[600px] max-w-[90vw]"):
                                 ui.label("Agent Template Configuration").classes("text-h6 mb-2")
-                                ui.code(agent_config.to_json(), language="json").classes("w-full h-64")
+                                ui.code(json.dumps(app_config, indent=2), language="json").classes("w-full h-64")
                                 ui.button("Close", on_click=dialog.close).classes("mt-2")
 
                         # 🔹 Top-right help button
                         ui.button("?", on_click=dialog.open).props("flat round dense").classes("absolute top-2 right-2").tooltip("show configuration")
                         
                         ui.markdown(f"**{agent_id}**")
-                        ui.label(agent_config.to_dict().get("description", ""))
+                        ui.label(app_config.get(AgentKeywords.AGENT, {}).get(AgentKeywords.DESCRIPTION, ""))
                         
                         def create_agent_from_template(aid : str = agent_id):
                             self._agent_store.add_agent_from_template(user_id, aid)
