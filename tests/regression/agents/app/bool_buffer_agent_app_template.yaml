@@ -1,0 +1,13 @@
+port: 8082
+with_api: true
+with_ui: false
+agent:
+  id: A2
+  buffer_store:
+    B2:
+      id: B2
+      type: pydag.buffers.SignalBuffer
+      sampling_period: 500
+      capacity: 1
+      signal:
+        type: pydag.buffers.signals.RandBoolean

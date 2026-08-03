@@ -1,0 +1,13 @@
+port: 8081
+with_api: true
+with_ui: false
+agent:
+  id: A1
+  buffer_store:
+    B1:
+      id: B1
+      type: pydag.buffers.SignalBuffer
+      sampling_period: 10
+      capacity: 100
+      signal:
+        type: pydag.buffers.signals.Sine

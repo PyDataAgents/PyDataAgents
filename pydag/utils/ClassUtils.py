@@ -125,7 +125,7 @@ class ClassUtils:
             module = importlib.import_module(fully_qualified_class_name)
             class_name = fully_qualified_class_name.rsplit(".", 1)[-1]
             if hasattr(module, class_name):
-                clazz = getattr(module, fully_qualified_class_name.rsplit(".", 1))
+                clazz = getattr(module, class_name)
                 return clazz
         except ModuleNotFoundError:
             # Split the fully qualified class name into module and class name

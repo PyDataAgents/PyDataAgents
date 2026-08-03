@@ -1,24 +1,26 @@
 from __future__ import annotations
 
+import time
 import multiprocessing
+import os
 
-from pydag.agents.Agent import Agent
+
 from pydag.agents.AgentKeywords import AgentKeywords
-from pydag.agents.app import AgentApp
+from pydag.agents.app.AgentApp import AgentApp
 
 
-def _run_agent(agent_config: AgentKeywords) -> None:
-    agent : Agent = agent_config.create()
-    agent.release(blocking=True)
+def _run_agent(app_config: dict) -> None:
+    agent_app : AgentApp = AgentApp.load(app_config)
+    agent_app.run()
 
 class AgentProcessStore:
     def __init__(self) -> None:
         self._agent_configs: dict[str, AgentKeywords] = {}
         self._processes: dict[str, multiprocessing.Process] = {}
 
-    def add_app_template(self, agent_config: AgentKeywords) -> AgentKeywords:
+    def add_app_template(self, id : str, agent_config: dict):
         #cloned_agent = copy.deepcopy(agent)
-        self._agent_configs[agent_config.to_dict()[AgentKeywords.ID]] = agent_config
+        self._agent_configs[id] = agent_config
         return agent_config
 
     def get_agent_config(self, agent_id: str) -> AgentKeywords | None:
@@ -52,14 +54,29 @@ class AgentProcessStore:
 
 
 def test_agent_process_store_can_start_and_stop_agents():
-    aa : AgentApp = AgentApp(agent=Agent(id="A1"))
+    aa1 : AgentApp = AgentApp.load(os.path.dirname(__file__) + os.sep + "sine_buffer_agent_app_template.yaml")
+    aa2 : AgentApp = AgentApp.load(os.path.dirname(__file__) + os.sep + "bool_buffer_agent_app_template.yaml")
+
     store = AgentProcessStore()
+    
+    agent_config1 = aa1.config_options()
+    agent_id1 = agent_config1[AgentKeywords.AGENT][AgentKeywords.ID]
+    store.add_app_template(agent_id1, agent_config1)
+    
+    agent_config2 = aa2.config_options()
+    agent_id2 = agent_config2[AgentKeywords.AGENT][AgentKeywords.ID]
+    store.add_app_template(agent_id2, agent_config2)
+    
+    process1 = store.start_agent(agent_id1)
+    process2 = store.start_agent(agent_id2)
 
-    stored_agent = store.add_agent(agent_config)
-    process = store.start_agent(stored_agent.to_dict()[AgentKeywords.ID])
+    assert process1.is_alive()
+    assert process2.is_alive()
 
-    assert process.is_alive()
+    time.sleep(240)
+    
+    store.stop_agent(agent_id1)
+    store.stop_agent(agent_id2)
 
-    store.stop_agent(stored_agent.to_dict()[AgentKeywords.ID])
-
-    assert not process.is_alive()
+    assert not process1.is_alive()
+    assert not process2.is_alive()
