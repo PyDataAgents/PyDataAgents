@@ -137,10 +137,10 @@ class AgentApp():
             allow_headers=["*"],  # Allows all headers
         )
         if not no_default_apis:
-            self.add_api(AgentRESTAPI.get_api_router(self))
-            self.add_api(BufferRESTAPI.get_api_router(self))
-            self.add_api(ServiceRESTAPI.get_api_router(self))
-            self.add_api(NodeRESTAPI.get_api_router(self))
+            self.add_api(AgentRESTAPI.get_api_router(self.get_agent()))
+            self.add_api(BufferRESTAPI.get_api_router(self.get_agent()))
+            self.add_api(ServiceRESTAPI.get_api_router(self.get_agent()))
+            self.add_api(NodeRESTAPI.get_api_router(self.get_agent()))
          
     def _create_ui(self, no_default_pages : bool = False):
         """Create a NiceGUI UI for the Agent.

@@ -11,11 +11,12 @@ from pydag.agents.app.AgentApp import AgentApp
 
 def _run_agent(app_config: dict) -> None:
     agent_app : AgentApp = AgentApp.load(app_config)
+    agent_app.create()
     agent_app.run()
 
 class AgentProcessStore:
     def __init__(self) -> None:
-        self._agent_configs: dict[str, AgentKeywords] = {}
+        self._agent_configs: dict[str, dict] = {}
         self._processes: dict[str, multiprocessing.Process] = {}
 
     def add_app_template(self, id : str, agent_config: dict):
@@ -23,7 +24,7 @@ class AgentProcessStore:
         self._agent_configs[id] = agent_config
         return agent_config
 
-    def get_agent_config(self, agent_id: str) -> AgentKeywords | None:
+    def get_agent_config(self, agent_id: str) -> dict | None:
         return self._agent_configs.get(agent_id)
 
     def start_agent(self, agent_id: str) -> multiprocessing.Process:

@@ -7,7 +7,7 @@ import uuid
 from loguru import logger
 
 from .app.AgentApp import AgentApp
-from .AgentException import AgentException
+from .app.AppException import AppException
 from .AgentKeywords import AgentKeywords
 from ..utils.FileUtils import FileUtils
 from .Agent import Agent
@@ -24,10 +24,10 @@ class AgentStore:
     template_paths : list[str] = field(default_factory=list, metadata={"description": "List of paths to agent templates"})
     
     def __post_init__(self):
-        self._user_apps : dict[str, set[str]] = dict()
-        self._agents_apps : dict[str, AgentApp] = dict()
-        self._templates : dict[str, dict] = dict()
-        self._processes: dict[str, multiprocessing.Process] = {}
+        self._users : dict[str, set[str]] = dict() # user_id -> set of unique config_id's for each app config created for that user
+        self._configs : dict[str, dict] = dict() # config_id -> corresponding app config for that id
+        self._templates : dict[str, dict] = dict() # template_id -> dict of corresponding app config for that template
+        self._processes: dict[str, multiprocessing.Process] = {} # config_id -> process for that app
         self._lock : Lock = Lock()
     
     def open(self):
@@ -60,101 +60,87 @@ class AgentStore:
                 id = app_config[AgentKeywords.AGENT][AgentKeywords.ID]
                 self._templates[id] = app_config
             else:
-                raise AgentException(f"Template config does not contain an 'id' field. Cannot add template.")
+                raise AppException(f"Template config does not contain an 'id' field. Cannot add template.")
     
     def add_user(self, user_id : str):
         with self._lock:
-            if user_id not in self._user_apps:
-                self._user_apps[user_id] = set()
+            if user_id not in self._users:
+                self._users[user_id] = set()
     
-    def add_app(self, user_id : str, agent_app : AgentApp):
-        with self._lock:
-            if user_id in self._user_apps:
-                self._user_apps[user_id].add(agent_app.get_agent().id)
-            else:
-                self._user_apps[user_id] = {agent_app.get_agent().id}
-            self._agents_apps[agent_app.get_agent().id] = agent_app
+    def add_user_config(self, user_id : str, config_id : str, config : dict):
+        with self._lock:            
+            if not user_id in self._users:
+                self.add_user(user_id)
+            self._users[user_id].add(config_id)
+            self._configs[config_id] = config
             
-    def add_agent_from_template(self, user_id : str, template_id : str):
+    def add_app_from_template(self, user_id : str, template_id : str):
         with self._lock:
             if template_id in self._templates:
                 app_config = self._templates[template_id]
-                new_agent_app = AgentApp.load(app_config)
-                new_agent_app.get_agent().id = str(uuid.uuid4())
-                self._agents_apps[new_agent_app.get_agent().id] = new_agent_app
-                if user_id in self._user_apps:
-                    self._user_apps[user_id].add(new_agent_app.get_agent().id)
-                else:
-                    self._user_apps[user_id] = {new_agent_app.get_agent().id}
+                config_id = str(uuid.uuid4())
+                app_config[AgentKeywords.AGENT][AgentKeywords.ID] = config_id
+                self.add_user_config(user_id, config_id, app_config)
             else:
-                raise AgentException(f"Template with ID {template_id} not found.")
-            
-    def get_agent(self, user_id : str, agent_id : str) -> AgentApp:
-        with self._lock:
-            if user_id in self._user_apps and agent_id in self._user_apps[user_id]:
-                return self._agents_apps[agent_id]
-            else:
-                return None
-        
+                raise AppException(f"Template with ID {template_id} not found.")
+    
     def get_templates(self) -> dict[str, dict]:
         with self._lock:
             return self._templates
             
     def get_users(self) -> list[str]:
         with self._lock:
-            return list(self._user_apps.keys())
+            return list(self._users.keys())
         
-    def get_user_apps(self, user : str) -> list[AgentApp]:
+    def get_user_configs(self, user_id : str) -> list[dict]:
         with self._lock:
-            if user in self._user_apps:
-                return [self._agents_apps[agent_id] for agent_id in self._user_apps[user]]
+            if user_id in self._users:
+                return [self._configs[config_id] for config_id in self._users[user_id] if config_id in self._configs]
             else:
                 return []
     
-    def run_app(self, agent_id: str) -> multiprocessing.Process:
-        if agent_id not in self._agents_apps:
-            raise KeyError(f"No {AgentApp.__name__} with id={agent_id} was registered")
+    def run_app(self, config_id: str) -> multiprocessing.Process:
+        with self._lock:
+            if config_id not in self._configs:
+                raise AppException(f"No app config with id={config_id} was found in the store.")
 
-        existing_process = self._processes.get(agent_id)
-        if existing_process is not None and existing_process.is_alive():
-            return existing_process
+            existing_process = self._processes.get(config_id)
+            if existing_process is not None and existing_process.is_alive():
+                return existing_process
 
-        app_config = self._agents_apps[agent_id].config_options()
-        context = multiprocessing.get_context("spawn")
-        process = context.Process(target=_run_app_process, args=(app_config,), daemon=True)
-        process.start()
-        self._processes[agent_id] = process
-        return process
+            app_config = self._configs[config_id]
+            context = multiprocessing.get_context("spawn")
+            process = context.Process(target=_run_app_process, args=(app_config,), daemon=True)
+            process.start()
+            self._processes[config_id] = process
+            return process
     
-    def shutdown_app(self, agent_id: str) -> None:
-        process = self._processes.get(agent_id)
-        if process is None:
-            return
+    def shutdown_app(self, config_id: str) -> None:
+        with self._lock:
+            process = self._processes.get(config_id)
+            if process is None:
+                return
 
-        if process.is_alive():
-            process.terminate()
-            process.join(timeout=5)
+            if process.is_alive():
+                process.terminate()
+                process.join(timeout=5)
 
-        self._processes.pop(agent_id, None)
+            self._processes.pop(config_id, None)
                 
-    def configure_app(self, user_id : str, agent_id : str, config : dict[str, Any]):
+    def configure_app(self, user_id : str, config_id : str, config : dict[str, Any]):
         with self._lock:
-            if user_id in self._user_apps and agent_id in self._user_apps[user_id]:
-                agent : Agent = self._agents_apps[agent_id]
-                if agent.is_running():
-                    raise AgentException(f"{Agent.__name__} with id={agent_id} cannot be configured, while it's running.")
+            if user_id in self._users and config_id in self._configs:
+                if config_id in self._processes:
+                    process = self._processes[config_id]
+                    logger.warning("The app is already running config found for user_id='{user_id}' and config_id='{config_id}'")
                 else:
-                    pass            
+                    pass
+            else:
+                raise AppException(f"No app config found for user_id='{user_id}' and config_id='{config_id}'")            
 
-    def remove_app(self, user_id : str, agent_id : str):
+    def remove_app(self, user_id : str, config_id : str):
         with self._lock:
-            if user_id in self._user_apps and agent_id in self._user_apps[user_id]:
-                agent : Agent = self._agents_apps[agent_id]
-                if agent.is_running():
-                    raise AgentException(f"{Agent.__name__} with id={agent_id} cannot be removed, when it's running.")
-                else:
-                    self._agents_apps.pop(agent_id)
-                    self._user_apps[user_id].remove(agent_id)
-    
-    
-    
+            if user_id in self._users and config_id in self._configs:
+                pass
+            else:
+                logger.warning("No app config found for user_id='{user_id}' and config_id='{config_id}'")
