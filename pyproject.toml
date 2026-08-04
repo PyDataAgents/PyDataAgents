@@ -28,7 +28,7 @@ dependencies = [
     "fastapi[standard]",
     "APScheduler",
     "pwdlib", 
-    "pwdlib[argon2]",   
+    "pwdlib[argon2]",
 ]
 
 [project.optional-dependencies]
@@ -96,6 +96,8 @@ ocr = [
   "pytesseract",
   "pillow",
 ]
+
+sap = []
 
 llm = [
   "langchain-ollama",
