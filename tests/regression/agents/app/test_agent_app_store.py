@@ -6,6 +6,7 @@ import os
 
 
 from pydag.agents.AgentKeywords import AgentKeywords
+from pydag.agents.AgentStore import AgentStore
 from pydag.agents.app.AgentApp import AgentApp
 
 
@@ -74,10 +75,18 @@ def test_agent_process_store_can_start_and_stop_agents():
     assert process1.is_alive()
     assert process2.is_alive()
 
-    time.sleep(240)
+    time.sleep(5)
     
     store.stop_agent(agent_id1)
     store.stop_agent(agent_id2)
 
     assert not process1.is_alive()
     assert not process2.is_alive()
+    
+    
+def test_agent_store_run_and_shutdown():
+    aa1 : AgentApp = AgentApp.load(os.path.dirname(__file__) + os.sep + "sine_buffer_agent_app_template.yaml")
+    aa2 : AgentApp = AgentApp.load(os.path.dirname(__file__) + os.sep + "bool_buffer_agent_app_template.yaml")
+    store : AgentStore = AgentStore()
+    store.add_template_from(aa1)
+    store.add_template_from(aa2)

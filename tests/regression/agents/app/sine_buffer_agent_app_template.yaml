@@ -7,7 +7,7 @@ agent:
     B1:
       id: B1
       type: pydag.buffers.SignalBuffer
-      sampling_period: 10
+      sampling_period: 100
       capacity: 100
       signal:
         type: pydag.buffers.signals.Sine

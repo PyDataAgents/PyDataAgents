@@ -10,7 +10,6 @@ from .app.AgentApp import AgentApp
 from .app.AppException import AppException
 from .AgentKeywords import AgentKeywords
 from ..utils.FileUtils import FileUtils
-from .Agent import Agent
 
 def _run_app_process(app_config: dict) -> None:
     aa : AgentApp = AgentApp.load(app_config)
@@ -62,17 +61,23 @@ class AgentStore:
             else:
                 raise AppException(f"Template config does not contain an 'id' field. Cannot add template.")
     
+    def _add_user_unlocked(self, user_id : str):
+        if user_id not in self._users:
+            self._users[user_id] = set()
+    
     def add_user(self, user_id : str):
         with self._lock:
-            if user_id not in self._users:
-                self._users[user_id] = set()
+            self._add_user_unlocked(user_id)
+    
+    def _add_user_config_unlocked(self, user_id : str, config_id : str, config : dict):
+        if not user_id in self._users:
+            self._add_user_unlocked(user_id)
+            self._users[user_id].add(config_id)
+            self._configs[config_id] = config
     
     def add_user_config(self, user_id : str, config_id : str, config : dict):
         with self._lock:            
-            if not user_id in self._users:
-                self.add_user(user_id)
-            self._users[user_id].add(config_id)
-            self._configs[config_id] = config
+            self._add_user_config_unlocked(user_id, config_id, config)
             
     def add_app_from_template(self, user_id : str, template_id : str):
         with self._lock:
@@ -80,7 +85,7 @@ class AgentStore:
                 app_config = self._templates[template_id]
                 config_id = str(uuid.uuid4())
                 app_config[AgentKeywords.AGENT][AgentKeywords.ID] = config_id
-                self.add_user_config(user_id, config_id, app_config)
+                self._add_user_config_unlocked(user_id, config_id, app_config)
             else:
                 raise AppException(f"Template with ID {template_id} not found.")
     
@@ -99,48 +104,55 @@ class AgentStore:
             else:
                 return []
     
+    def _run_app_unlocked(self, config_id) -> multiprocessing.Process:
+        if config_id not in self._configs:
+            raise AppException(f"No app config with id={config_id} was found in the store.")
+        existing_process = self._processes.get(config_id)
+        if existing_process is not None and existing_process.is_alive():
+            return existing_process
+        app_config = self._configs[config_id]
+        context = multiprocessing.get_context("spawn")
+        process = context.Process(target=_run_app_process, args=(app_config,), daemon=True)
+        process.start()
+        self._processes[config_id] = process
+        return process
+    
     def run_app(self, config_id: str) -> multiprocessing.Process:
         with self._lock:
-            if config_id not in self._configs:
-                raise AppException(f"No app config with id={config_id} was found in the store.")
-
-            existing_process = self._processes.get(config_id)
-            if existing_process is not None and existing_process.is_alive():
-                return existing_process
-
-            app_config = self._configs[config_id]
-            context = multiprocessing.get_context("spawn")
-            process = context.Process(target=_run_app_process, args=(app_config,), daemon=True)
-            process.start()
-            self._processes[config_id] = process
-            return process
+            return self._run_app_unlocked(config_id)
     
-    def shutdown_app(self, config_id: str) -> None:
+    def _shutdown_app_unlocked(self, config_id : str):
+        process = self._processes.get(config_id)
+        if process is None:
+            return
+        if process.is_alive():
+            process.terminate()
+            process.join(timeout=5)
+        self._processes.pop(config_id, None)
+    
+    def shutdown_app(self, config_id: str):
         with self._lock:
-            process = self._processes.get(config_id)
-            if process is None:
-                return
-
-            if process.is_alive():
-                process.terminate()
-                process.join(timeout=5)
-
-            self._processes.pop(config_id, None)
+            self._shutdown_app_unlocked(config_id)
                 
     def configure_app(self, user_id : str, config_id : str, config : dict[str, Any]):
         with self._lock:
             if user_id in self._users and config_id in self._configs:
                 if config_id in self._processes:
                     process = self._processes[config_id]
-                    logger.warning("The app is already running config found for user_id='{user_id}' and config_id='{config_id}'")
+                    if process.is_alive():
+                        logger.warning("The app is already running config found for user_id='{user_id}' and config_id='{config_id}', the app will be shutdown and run anew.")                    
+                    self._add_user_config_unlocked(user_id, config_id, config)
+                    self._shutdown_app_unlocked(config_id)
+                    self._run_app_unlocked(config_id)
                 else:
-                    pass
+                    raise AppException(f"No process was found for config_id='{config_id}'")
             else:
                 raise AppException(f"No app config found for user_id='{user_id}' and config_id='{config_id}'")            
 
     def remove_app(self, user_id : str, config_id : str):
         with self._lock:
-            if user_id in self._users and config_id in self._configs:
-                pass
+            if user_id in self._users and config_id in self._configs and config_id in self._processes:
+                self._configs.pop(config_id)
+                self._shutdown_app_unlocked(config_id)
             else:
                 logger.warning("No app config found for user_id='{user_id}' and config_id='{config_id}'")
