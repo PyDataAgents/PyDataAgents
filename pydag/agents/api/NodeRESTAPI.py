@@ -27,7 +27,7 @@ class NodeRESTAPI:
     @staticmethod
     def get_api_router(agent : Agent, path : str = "/api/v1/nodes") -> APIRouter:
         
-        router = APIRouter(prefix=path, tags=[Node.cname()],)
+        router = APIRouter(prefix=path, tags=[Node.__name__],)
                
         @router.get("/")
         def nodes() -> list[str]:

@@ -24,7 +24,7 @@ class ServiceRESTAPI:
     @staticmethod
     def get_api_router(agent : Agent, path : str = "/api/v1/services") -> APIRouter:
 
-        router = APIRouter(prefix=path, tags=[Service.cname()],)
+        router = APIRouter(prefix=path, tags=[Service.__name__],)
 
         @router.get("/")
         def services() -> list[str]:

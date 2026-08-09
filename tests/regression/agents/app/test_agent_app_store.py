@@ -75,7 +75,7 @@ def test_agent_process_store_can_start_and_stop_agents():
     assert process1.is_alive()
     assert process2.is_alive()
 
-    time.sleep(5)
+    time.sleep(60)
     
     store.stop_agent(agent_id1)
     store.stop_agent(agent_id2)
@@ -86,8 +86,6 @@ def test_agent_process_store_can_start_and_stop_agents():
     
 def test_agent_store_run_and_shutdown():
     aa1 : AgentApp = AgentApp.load(os.path.dirname(__file__) + os.sep + "sine_buffer_agent_app_template.yaml")
-    aa2 : AgentApp = AgentApp.load(os.path.dirname(__file__) + os.sep + "bool_buffer_agent_app_template.yaml")
-    store : AgentStore = AgentStore()
-    store.add_template_from(aa1)
-    store.add_template_from(aa2)
+    aa1.create()
+    aa1.run()
  

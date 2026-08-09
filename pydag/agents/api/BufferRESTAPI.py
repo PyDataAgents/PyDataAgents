@@ -43,7 +43,7 @@ class BufferRESTAPI:
     @staticmethod
     def get_api_router(agent : Agent, path : str = "/api/v1/buffers") -> APIRouter:
         
-        router = APIRouter(prefix=path, tags=[Buffer.__class__.__name__],)
+        router = APIRouter(prefix=path, tags=[Buffer.__name__],)
         
         @router.get("/")
         def buffers() -> list[str]:
