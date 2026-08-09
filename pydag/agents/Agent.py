@@ -301,31 +301,31 @@ class Agent():
             elements_for_reinstall : list[AgentElement] = []
             elements_for_reinstall.append(agent_element)                
             if isinstance(agent_element, Buffer):
-                for k, service in self.service_store.items():                    
+                for _, service in self.service_store.items():                    
                     if service.contains_element(id):
                         services_for_restart.append(service)
                     if isinstance(service, StatemachineService):
-                        for kk, node in service.nodes.items():
+                        for _, node in service.nodes.items():
                             if node.contains_element(id):
                                 elements_for_reinstall.append(node)
                                 services_for_restart.append(service)
             elif isinstance(agent_element, Service):
                 services_for_restart.append(agent_element)                
             elif isinstance(agent_element, Node):
-                for k, service in self.service_store.items():
+                for _, service in self.service_store.items():
                     if isinstance(service, StatemachineService):
                         if service.contains_element(id):
                             services_for_restart.append(service)
             elif isinstance(agent_element, AgentElement):
-                for k, service in self.service_store.items():
+                for _, service in self.service_store.items():
                     if service.contains_element(id):
                         services_for_restart.append(service)
                     if isinstance(service, StatemachineService):
-                        for kk, node in service.nodes.items():
+                        for _, node in service.nodes.items():
                             if node.contains_element(id):
                                 elements_for_reinstall.append(node)
                                 services_for_restart.append(service)
-                for k, buffer in self.buffer_store.items():
+                for _, buffer in self.buffer_store.items():
                     if buffer.contains_element(id):
                         elements_for_reinstall.append(buffer)
             
