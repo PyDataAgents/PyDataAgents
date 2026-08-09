@@ -96,6 +96,13 @@ class AgentStore:
     def get_users(self) -> list[str]:
         with self._lock:
             return list(self._users.keys())
+    
+    def get_user_config_ids(self, user_id : str) -> list[str]:
+            with self._lock:
+                if user_id in self._users:
+                    return [config_id for config_id in self._users[user_id] if config_id in self._configs]
+                else:
+                    return []
         
     def get_user_configs(self, user_id : str) -> list[dict]:
         with self._lock:
@@ -116,7 +123,7 @@ class AgentStore:
         process.start()
         self._processes[config_id] = process
         return process
-    
+        
     def run_app(self, config_id: str) -> multiprocessing.Process:
         with self._lock:
             return self._run_app_unlocked(config_id)
@@ -137,15 +144,13 @@ class AgentStore:
     def configure_app(self, user_id : str, config_id : str, config : dict[str, Any]):
         with self._lock:
             if user_id in self._users and config_id in self._configs:
+                self._add_user_config_unlocked(user_id, config_id, config)
                 if config_id in self._processes:
                     process = self._processes[config_id]
                     if process.is_alive():
                         logger.warning("The app is already running config found for user_id='{user_id}' and config_id='{config_id}', the app will be shutdown and run anew.")                    
-                    self._add_user_config_unlocked(user_id, config_id, config)
                     self._shutdown_app_unlocked(config_id)
-                    self._run_app_unlocked(config_id)
-                else:
-                    raise AppException(f"No process was found for config_id='{config_id}'")
+                    self.run_app(config_id)
             else:
                 raise AppException(f"No app config found for user_id='{user_id}' and config_id='{config_id}'")            
 
@@ -155,4 +160,18 @@ class AgentStore:
                 self._configs.pop(config_id)
                 self._shutdown_app_unlocked(config_id)
             else:
-                logger.warning("No app config found for user_id='{user_id}' and config_id='{config_id}'")
+                logger.warning(f"No app config found for user_id='{user_id}' and config_id='{config_id}'")
+                
+    def is_running(self, user_id : str, config_id : str):
+        """ checks whether a `AgentApp` process is running for `user_id` and `config_id`"""
+        with self._lock:
+            if user_id in self._users and config_id in self._configs:
+                if config_id in self._processes:
+                    process = self._processes[config_id]
+                    if process.is_alive():
+                        return True
+            return False
+            
+    def get_config(self, config_id) -> dict:
+        with self._lock:
+            return self._configs[config_id]

@@ -90,3 +90,4 @@ def test_agent_store_run_and_shutdown():
     store : AgentStore = AgentStore()
     store.add_template_from(aa1)
     store.add_template_from(aa2)
+ 

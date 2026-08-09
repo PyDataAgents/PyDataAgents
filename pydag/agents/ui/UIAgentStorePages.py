@@ -5,6 +5,9 @@ import json
 from nicegui import app, ui
 from typing import TYPE_CHECKING
 
+if TYPE_CHECKING:
+    from pydag.agents.app.AgentStoreApp import AgentStoreApp
+
 
 from ..Agent import Agent
 from ..AgentKeywords import AgentKeywords
@@ -76,11 +79,11 @@ class UIAgentStorePage(UIPage):
     
     def __post_init__(self):
         super().__post_init__()
-        self._agent_store : AgentStore = None
+        self._agent_app : AgentStoreApp = None
         self._agent_column : ui.column = None
         self._template_column : ui.column = None
     
-    def register(self, agent_app : AgentApp):
+    def register(self, agent_app : AgentStoreApp):
         
         self._agent_app = agent_app
         
@@ -118,40 +121,41 @@ class UIAgentStorePage(UIPage):
         self._agent_column.clear()
         self._template_column.clear()
         with self._agent_column:
-            user_agents = self._agent_store.get_user_agents(user_id)
-            if len(user_agents) > 0:
+            user_config_ids = self._agent_app.get_agent_store().get_user_config_ids(user_id)
+            if len(user_config_ids) > 0:
                 ui.label(f"My {Agent.__name__}s").classes("text-h4")
-                for agent_app in user_agents:
+                for app_config_id in user_config_ids:
+                    app_config : dict = self._agent_app.get_agent_store().get_config(app_config_id)                                                        
                     with ui.card().classes("w-full mb-2"):                                                        
                         with ui.row().classes("items-center justify-between w-full p-1"):
-                            ui.markdown(f"**{agent_app.get_agent().__class__.__name__} - {agent_app.get_agent().id}**")                                
-                            if agent_app.get_agent().is_running():
+                            ui.markdown(f"**{AgentApp.__name__} - {app_config_id}**")
+                            if self._agent_app.get_agent_store().is_running(user_id, app_config_id):
                                 ui.label("RUNNING").classes("bg-green-500 text-white p-2 rounded")                                                    
                             else:
                                 ui.label("STOPPED").classes("bg-gray-500 text-white p-2 rounded")
                             
-                            def remove_agent(aid : str = agent_app.get_agent().id):
-                                self._agent_store.remove_agent(user_id, aid)
+                            def remove_app(aid : str = app_config_id):
+                                self._agent_app.get_agent_store().remove_app(user_id, aid)
                                 self._refresh()  # Refresh the dashboard after releasing an agent
                                                         
-                            ui.button("X", on_click=remove_agent).tooltip("Remove Agent")  
+                            ui.button("X", on_click=remove_app).tooltip("Remove App")
                         
-                        def release_agent(aid : str = agent_app.get_agent().id):
-                            self._agent_store.release_agent(user_id, aid)
+                        def run_app(aid : str = app_config_id):
+                            self._agent_app.get_agent_store().run_app(aid)
                             self._refresh()  # Refresh the dashboard after releasing an agent
                         
-                        def reconfigure_agent(aid: str = agent_app.get_agent().id):
+                        def reconfigure_app(aid: str = app_config_id):
                             with ui.dialog() as dialog:
                                 with ui.card():
                                     ui.label("Configure Agent")
-                                    # get agent config
-                                    agent_config : dict = self._agent_store.get_agent(user_id, aid).config_options()
-                                    editor = ui.codemirror(value=json.dumps(agent_config, indent=2), language="json").classes("w-full h-64")
+                                    # get app config
+                                    _app_config : dict = self._agent_app.get_agent_store().get_config(aid)                                                                        
+                                    editor = ui.codemirror(value=json.dumps(_app_config, indent=2), language="json").classes("w-full h-64")
                                     
                                     def save_config():
                                         try:
                                             new_config = json.loads(editor.value)
-                                            self._agent_store.configure_agent(user_id, aid, new_config)
+                                            self._agent_app.get_agent_store().configure_app(user_id, aid, new_config)
                                             ui.notify(f"Updated config: {new_config}", color="green")
                                         except Exception as e:
                                             ui.notify(f"Invalid JSON: {e}", color="red")
@@ -166,41 +170,41 @@ class UIAgentStorePage(UIPage):
                                     
                             dialog.open()
                         
-                        def terminate_agent(aid: str = agent_app.get_agent().id):
-                            self._agent_store.terminate_agent(user_id, aid)
+                        def shutdown_app(aid: str = app_config_id):
+                            self._agent_app.get_agent_store().shutdown_app(aid)
                             self._refresh()  # Refresh the dashboard after terminating an agent                                                                      
                         
-                        ui.label(agent_app.get_agent().description or "")
-                        if agent_app.get_agent().is_running():
+                        ui.label(app_config.get(AgentKeywords.AGENT, {}).get(AgentKeywords.DESCRIPTION, ""))
+                        if self._agent_app.get_agent_store().is_running(user_id, app_config_id):
                             with ui.row():
-                                ui.button("Terminate", on_click=terminate_agent).tooltip("Terminate Agent")                    
-                                ui.button("Reconfigure", on_click=reconfigure_agent).tooltip("Reconfigure Agent")
+                                ui.button("Terminate", on_click=shutdown_app).tooltip("Terminate Agent")                    
+                                ui.button("Reconfigure", on_click=reconfigure_app).tooltip("Reconfigure Agent")
                         else:                                                                    
                             with ui.row():
-                                ui.button("Release", on_click=release_agent).tooltip("Terminate Agent") 
-                                ui.button("Reconfigure", on_click=reconfigure_agent).tooltip("Reconfigure Agent")
+                                ui.button("Release", on_click=run_app).tooltip("Terminate Agent") 
+                                ui.button("Reconfigure", on_click=reconfigure_app).tooltip("Reconfigure Agent")
                                 
         with self._template_column:
-            app_configs = self._agent_store.get_templates()
-            if len(app_configs) > 0:                    
+            template_configs = self._agent_app.get_agent_store().get_templates()
+            if len(template_configs) > 0:                    
                 ui.label("Agent Templates").classes("text-h4")
-                for agent_id, app_config in app_configs.items():
+                for template_config_id, template_config in template_configs.items():
                     with ui.card().classes("w-full mb-2 bg-secondary"):
                         # 🔹 Dialog (centered by default)
                         with ui.dialog() as dialog:
                             with ui.card().classes("w-[600px] max-w-[90vw]"):
                                 ui.label("Agent Template Configuration").classes("text-h6 mb-2")
-                                ui.code(json.dumps(app_config, indent=2), language="json").classes("w-full h-64")
+                                ui.code(json.dumps(template_config, indent=2), language="json").classes("w-full h-64")
                                 ui.button("Close", on_click=dialog.close).classes("mt-2")
 
                         # 🔹 Top-right help button
                         ui.button("?", on_click=dialog.open).props("flat round dense").classes("absolute top-2 right-2").tooltip("show configuration")
                         
-                        ui.markdown(f"**{agent_id}**")
-                        ui.label(app_config.get(AgentKeywords.AGENT, {}).get(AgentKeywords.DESCRIPTION, ""))
+                        ui.markdown(f"**{template_config_id}**")
+                        ui.label(template_config.get(AgentKeywords.AGENT, {}).get(AgentKeywords.DESCRIPTION, ""))
                         
-                        def create_agent_from_template(aid : str = agent_id):
-                            self._agent_store.add_agent_from_template(user_id, aid)
+                        def create_app_from_template(tid : str = template_config_id):
+                            self._agent_app.get_agent_store().add_app_from_template(user_id, tid)
                             self._refresh()  # Refresh the dashboard after creating a new agent
         
-                        ui.button("Create Agent", on_click=create_agent_from_template).tooltip("create agent from template")
+                        ui.button("Create Agent", on_click=create_app_from_template).tooltip("create agent from template")

@@ -3,7 +3,7 @@ with_api: true
 with_ui: false
 agent:
   id: A1
-  description: Test Agent App that hosts a Signal Buffer with Sinus Data
+  description: Test AgentApp Template that hosts a SignalBuffer with Sine Data
   buffer_store:
     B1:
       id: B1

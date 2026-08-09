@@ -1,3 +1,4 @@
+from __future__ import annotations
 from dataclasses import dataclass, field
 import os
 import secrets
@@ -26,7 +27,7 @@ class AgentStoreApp(AgentApp):
     def create(self, no_default_apis : bool = True, no_default_pages : bool = True):
         """ create the UI for the agent store """
         self.add_ui_page(UIAgentStoreLoginPage())
-        self.add_ui_page(UIAgentStorePage(self._agent_store))
+        self.add_ui_page(UIAgentStorePage())
         super().create(no_default_apis=no_default_apis, no_default_pages=no_default_pages)
     
     def run(self):
@@ -38,4 +39,6 @@ class AgentStoreApp(AgentApp):
         #app.add_middleware(AuthenticationMiddleware)
         ui.run(host=self.host, port = self.port, reload=True, title=self.__class__.__name__ + " UI", storage_secret=secrets.token_hex(32))        
     
+    def get_agent_store(self) -> AgentStore:
+        return self._agent_store
         

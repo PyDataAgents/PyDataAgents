@@ -3,7 +3,7 @@ with_api: true
 with_ui: false
 agent:
   id: A2
-  description: Test AgentApp that hosts a SignalBuffer with a Random Boolean
+  description: Test AgentApp that hosts a SignalBuffer with Boolean Data
   buffer_store:
     B2:
       id: B2
