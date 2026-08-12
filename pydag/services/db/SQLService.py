@@ -83,9 +83,9 @@ class SQLService(ReadService, WriteService):
                 address = next(it)
                 data = buffer.data(n=self.n, persistent=self.persistent)
                 data_keys = data.keys()
-                if "insert into" in address.lower():
+                if "insert" in address.lower():
                     # extract columns from INSERT statement
-                    match = re.search(r"INSERT\s+INTO\s+\w+\s*\(([^)]+)\)", address, re.IGNORECASE)
+                    match = re.search(r"INSERT\s+(?:(?:OR\s+)?(?:REPLACE|IGNORE)\s+)?INTO\s+[^\s(]+\s*\(\s*([^)]*?)\s*\)", address, re.IGNORECASE)
                     if match:
                         insert_keys = [c.strip() for c in match.group(1).split(",")]
                         #print(insert_keys)                 
