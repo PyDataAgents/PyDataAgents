@@ -2,10 +2,8 @@ import configparser
 import pytest
 from pydag.buffers.ListBuffer import ListBuffer
 from pydag.nodes.buffers.LinkBufferAction import LinkBufferAction
-from pydag.services.llm.LLMService import LLMService
 from pydag.nodes.llm.LLMOCRAction import LLMOCRAction
 import os
-import re
 
 
 def test_correctly_extract_value_from_pdf():
@@ -39,6 +37,7 @@ def test_correctly_extract_value_from_pdf():
     lca.execute()
     
     output = lca.get_buffer().data(persistent=True)
+    print(output)
 
     assert lca.get_buffer().size() == 1
     assert "example of footnotes referenced" in output["documents"][0]
@@ -243,7 +242,39 @@ def test_empty_file():
     
     output = lca.get_buffer().data(persistent=True)
 
-    assert output == {}     
+    assert output == {}
+    
+def test_scanned_samples():
+    # Test if the number 302689 of the Fertigungsauftrag is correctly extracted.
+    config = configparser.ConfigParser()
+    config.read("config.ini")
+    if not config.has_section("MISTRAL") or not config.has_option("MISTRAL", "MISTRAL_API_KEY"):
+        pytest.skip("Skipping LLM OCR test: missing MISTRAL_API_KEY in [MISTRAL] of config.ini")
+        
+    buf = ListBuffer(id="BUF1")
+    buf.install()
+    pdf_file = os.path.dirname(__file__) + os.sep + "scanned_sample.pdf"
+    buf.push(pdf_file)
+    pdf_file = os.path.dirname(__file__) + os.sep + "scanned_sample2.pdf"
+    buf.push(pdf_file)
+    
+    lba = LinkBufferAction()
+    lba.set_buffer(buf)
+    lba.install()
+    
+    lca = LLMOCRAction(api_key=config["MISTRAL"]["MISTRAL_API_KEY"], n=0, persistent=False)
+    #lca.set_service(ls)
+    lca.add_parent(lba)
+    lca.install()    
+    
+    print(buf.data(persistent=True))
+    
+    lca.execute()
+    
+    output = lca.get_buffer().data(persistent=True)
+    print(output)
+
+    assert lca.get_buffer().size() == 2        
     
 
     

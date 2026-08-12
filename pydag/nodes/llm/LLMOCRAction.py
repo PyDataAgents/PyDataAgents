@@ -1,10 +1,10 @@
 from dataclasses import dataclass, field
-from ...utils.DataUtils import DataUtils
 import os
 from loguru import logger
 from mistralai import Mistral
 
 
+from ...utils.DataUtils import DataUtils
 from ...nodes.BufferNode import BufferNode
 from ...nodes.Action import Action
 from ...agents.Agent import Agent
