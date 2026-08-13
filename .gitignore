@@ -78,5 +78,8 @@ __pycache__
 /tests/**/*test*.yaml
 /tests/**/*test*.yml
 
+# ignore extra tests folders
+/tests/**/test_*/
+
 # .save folder for agent persistence
 .save/
