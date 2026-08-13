@@ -43,7 +43,7 @@ def test_011():
     
     s.start()
     
-    time.sleep(60)
+    time.sleep(12)
     
     s.stop()
     
