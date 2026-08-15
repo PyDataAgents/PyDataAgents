@@ -5,7 +5,6 @@ from ...agents import Agent
 from ...utils.TimeUtils import TimeUtils
 from ...utils.FileUtils import FileUtils
 from ..Observer import Observer
-from ..ObserverThread import ObserverThread
 from ...services.ThreadType import ThreadType
 from ...services.ObserverService import ObserverService
 
@@ -24,9 +23,8 @@ class DeleteFileService(ObserverService):
     def _on_install(self, agent : Agent = None):
         super()._on_install(agent)
         # Create a thread to periodically check for new files
-        self._observer_thread = ObserverThread(service=self, observing_time=self.observing_time, thread_type=self.thread_type)
         observer = DeleteFileObserver(self)
-        self._observer_thread.add_observer(observer)
+        self.add_observer(observer)
     
 class DeleteFileObserver(Observer):
     

@@ -1,5 +1,4 @@
 from __future__ import annotations
-import os
 import threading
 from typing import TYPE_CHECKING, Any, Type
 from dataclasses import dataclass, field
@@ -31,12 +30,9 @@ class Agent():
     
     Args:
         id (str): Unique identifier for the `Agent` application. Auto-generated if not provided.
-        create_config (bool): If True, creates a configuration YAML file on startup. Defaults to False.
         load_on_install (bool): If True, all `AgentElements` are set to load_on_install=True. Defaults to False.
         with_persistence (bool): If True, an `AgentPersistService` is created by default to continuously
             save `AgentElements` to local files. Defaults to False.
-        with_rest_api (bool): If True, a REST API `Service` is created by default for REST interactions
-            on port 4700. Defaults to False.
         description (str): Application/agent description. Defaults to None.
         buffer_store (dict[str, Buffer]): Dictionary storing all `Buffer` instances in the `Agent`.
         service_store (dict[str, Service]): Dictionary storing all `Service` instances in the `Agent`.
@@ -51,7 +47,6 @@ class Agent():
     
     id : str = field(default_factory=lambda: str(uuid.uuid4()), metadata = {"description": "unique identifier of Agent"})
     description : str = field(default=None, metadata={"description": "application/agent description"})    
-    create_config : bool = field(default=False, metadata={"description": "creates a configuration yaml on start, when True"})
     load_on_install : bool = field(default=False, metadata={"description": "if True, all AgentElements are set to load_on_install = True"})
     with_persistence : bool = field(default=False, metadata={"description": "if True, an AgentPersistService is created by default to contuinously save the AgentElements in a local files"})
     save_folder : str = field(default=AgentKeywords.SAVE_FOLDER, metadata={"description": "folder to save the AgentElements in local files, if None, a default folder is created in the current working directory"})

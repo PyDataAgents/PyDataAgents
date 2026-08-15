@@ -1,7 +1,11 @@
 import ast
+import inspect
 import os
 from pathlib import Path
+import re
 from typing import List, Dict, Set
+
+from loguru import logger
 
 from ..agents.AgentElement import AgentElement
 from .ClassUtils import ClassUtils
@@ -200,11 +204,12 @@ def generate_readme(class_data: List[Dict], output_file: Path, name : str, with_
         lines.append("|-------|-------------|------|")
 
         for cls in sorted(class_data, key=lambda x: str(x["file"])):
-            anchor = cls['name'] + " in " + cls['package'].replace(".", "") + ".py"
-            anchor = anchor.lower().replace(" ", "-").replace(".", "").replace("/", "")
-            #anchor = f"{cls['name'].lower()}-from-{str(cls['file']).replace('/', '').replace('.py', '')}"
-            docstring = cls["docstring"].replace("\n", "") if cls["docstring"] else ""
-            lines.append(f"| [`{cls['name']}`](#{anchor}) | {docstring} | ![{cls['name']}]({ICON_FOLDER}/{cls['name']}.png)")
+            if not _is_abstract(cls['name']):
+                anchor : str = cls['name'] + " in " + cls['package'].replace(".", "") + ".py"
+                anchor = anchor.lower().replace(" ", "-").replace(".", "").replace("/", "")
+                #anchor = f"{cls['name'].lower()}-from-{str(cls['file']).replace('/', '').replace('.py', '')}"
+                docstring = cls["docstring"].replace("\n", "") if cls["docstring"] else ""
+                lines.append(f"| [`{cls['name']}`](#{anchor}) | {docstring} | ![{cls['name']}]({ICON_FOLDER}/{cls['name']}.png)")
         lines.append("\n\n")
     else:
         # class summary
@@ -213,62 +218,72 @@ def generate_readme(class_data: List[Dict], output_file: Path, name : str, with_
         lines.append("|-------|-------------|")
 
         for cls in sorted(class_data, key=lambda x: str(x["file"])):
-            anchor = cls['name'] + " in " + cls['package'].replace(".", "") + ".py"
-            anchor = anchor.lower().replace(" ", "-").replace(".", "").replace("/", "")
-            #anchor = f"{cls['name'].lower()}-from-{str(cls['file']).replace('/', '').replace('.py', '')}"
-            docstring = cls["docstring"].replace("\n", "") if cls["docstring"] else ""
-            lines.append(f"| [`{cls['name']}`](#{anchor}) | {docstring} |")
+            if not _is_abstract(cls['name']):
+                anchor = cls['name'] + " in " + cls['package'].replace(".", "") + ".py"
+                anchor = anchor.lower().replace(" ", "-").replace(".", "").replace("/", "")
+                #anchor = f"{cls['name'].lower()}-from-{str(cls['file']).replace('/', '').replace('.py', '')}"
+                docstring = cls["docstring"].replace("\n", "") if cls["docstring"] else ""
+                lines.append(f"| [`{cls['name']}`](#{anchor}) | {docstring} |")
         lines.append("\n\n")
     
     # class details    
     for cls in sorted(class_data, key=lambda x: str(x["file"])):
-        package_file = cls['package'].replace(".", os.sep) + ".py"
-        lines.append(f"## `{cls['name']}` (in `{package_file}`)\n")
-        if cls["docstring"]:
-            lines.append(cls["docstring"])
-        if not cls["fields"]:
-            lines.append("_No fields defined._\n")
-            continue
-        # Table headers
-        lines.append("| Field | Type | Default | Description |")
-        lines.append("|-------|------|---------|-------------|")
+        if not _is_abstract(cls['name']):
+            package_file = cls['package'].replace(".", os.sep) + ".py"
+            lines.append(f"## `{cls['name']}` (in `{package_file}`)\n")
+            if cls["docstring"]:
+                lines.append(cls["docstring"])
+            if not cls["fields"]:
+                lines.append("_No fields defined._\n")
+                continue
+            # Table headers
+            lines.append("| Field | Type | Default | Description |")
+            lines.append("|-------|------|---------|-------------|")
 
-        # Table rows
-        for field in cls["fields"]:
-            lines.append(f"| `{field['name']}` | `{field['type']}` | `{field['default']}` | {field['description']} |")
-        
-        lines.append("")  # newline between classes
-        
-        # code section
-        lines.append("")  # Newline after table
-        # Code Example
-        lines.append("```python")
-        lines.append(f"# Example usage of `{cls['name']}`")
-        lines.append(f"from {cls['package']} import {cls['name']}  # Adjust import if needed\n")
-        # Instantiate the class with placeholder values
-        init_args = []
-        for field in cls["fields"]:
-            if field["default"]:
-                # If a default value is provided, use it
-                value = field["default"]
+            # Table rows
+            for field in cls["fields"]:
+                value : str = field['default']
+                if value:
+                    if "dataclasses._MISSING_TYPE" in value:
+                        value = guess_placeholder_value(field["type"], field["name"])
+                else:
+                    value = guess_placeholder_value(field["type"], field["name"])
+                lines.append(f"| `{field['name']}` | `{field['type']}` | `{value}` | {field['description']} |")
+            
+            lines.append("")  # newline between classes
+            
+            # code section
+            lines.append("")  # Newline after table
+            # Code Example
+            lines.append("```python")
+            lines.append(f"# Example usage of `{cls['name']}`")
+            lines.append(f"from {cls['package']} import {cls['name']}  # Adjust import if needed\n")
+            # Instantiate the class with placeholder values
+            init_args = []
+            for field in cls["fields"]:
+                if field["default"]:
+                    # If a default value is provided, use it
+                    value = field["default"]
+                    if "dataclasses._MISSING_TYPE" in value:
+                        value = guess_placeholder_value(field["type"], field["name"])
+                else:
+                    # Otherwise, guess a placeholder value based on the type
+                    value = guess_placeholder_value(field["type"], field["name"])
+                init_args.append(f"{field['name']}={value}")
+            lines.append(f"{re.sub(r'(?<!^)([A-Z])', r'_\1', cls['name']).lower()} = {cls['name']}(")
+            if init_args:
+                lines.append("\t" + ",\n\t".join(init_args))
+                lines.append(")")
             else:
-                # Otherwise, guess a placeholder value based on the type
-                value = guess_placeholder_value(field["type"], field["name"])
-            init_args.append(f"obj.{field['name']}={value}")
-        constructor = f"{cls['name']}()"
-        lines.append(f"obj = {constructor}")
-        if init_args:
-            for arg in init_args:
-                lines.append(f"{arg}")
-
-        # Optional method call
-        #lines.append("obj.run()  # or obj.grab(), etc.\n")
-        
-        # end code section
-        lines.append("```")
-        lines.append("")  # Extra newline between classes
-        summary_anchor = "[Go to Summary](#summary)"
-        lines.append(summary_anchor)
+                lines[-1] = lines[-1] + ")"
+            # Optional method call
+            #lines.append("obj.run()  # or obj.grab(), etc.\n")
+            
+            # end code section
+            lines.append("```")
+            lines.append("")  # Extra newline between classes
+            summary_anchor = "[Go to Summary](#summary)"
+            lines.append(summary_anchor)
         
     output_file.write_text("\n".join(lines), encoding="utf-8")
 
@@ -311,4 +326,16 @@ def generate_docs_for_type(name : str, type : str, src_folder : Path, docu_folde
     class_defs.clear()
     class_modules.clear()   
 
-
+def _is_abstract(class_name) -> bool:
+    return False
+    """fcn : str = classes_fully_qualified[class_name]
+    if fcn:
+        try:
+            clazz = ClassUtils.create_class(fcn)
+            return inspect.isabstract(clazz)
+        except Exception as e:
+            logger.warning(f"COuld not generate class {class_name}:\n{e}")
+            return False
+    else:
+        return False
+    """
