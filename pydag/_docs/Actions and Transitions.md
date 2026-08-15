@@ -108,7 +108,7 @@
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001C27837D250>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 
 
@@ -116,10 +116,11 @@
 # Example usage of `Action`
 from pydag.nodes.Action import Action  # Adjust import if needed
 
-obj = Action()
-obj.child_ids='list()'
-obj.id=<dataclasses._MISSING_TYPE object at 0x000001C27837D250>
-obj.load_on_install=False
+action = Action(
+	child_ids='list()',
+	id="<string>",
+	load_on_install=False
+)
 ```
 
 [Go to Summary](#summary)
@@ -128,7 +129,7 @@ obj.load_on_install=False
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001C27837D250>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 
 
@@ -136,10 +137,11 @@ obj.load_on_install=False
 # Example usage of `AgentNode`
 from pydag.nodes.AgentNode import AgentNode  # Adjust import if needed
 
-obj = AgentNode()
-obj.child_ids='list()'
-obj.id=<dataclasses._MISSING_TYPE object at 0x000001C27837D250>
-obj.load_on_install=False
+agent_node = AgentNode(
+	child_ids='list()',
+	id="<string>",
+	load_on_install=False
+)
 ```
 
 [Go to Summary](#summary)
@@ -148,9 +150,9 @@ obj.load_on_install=False
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001C27837D250>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
-| `buffer_id` | `str` | `` | unique ID of the buffer |
+| `buffer_id` | `str` | `"<string>"` | unique ID of the buffer |
 | `persistent` | `bool` | `True` | specifies whether data is removed (False) from parent or not (True) |
 | `n` | `int` | `0` | specifies how much data is retrieved from parent buffer. Default 0 -> all data |
 | `input_keys` | `list[str] | list[int] | str` | `'list()'` | list of input key names used to extract data from parent buffers. input_keys can also be a list of integers for indices or a Python-style slice string (e.g. '-1' for last index, '1:3' or '0:5:2' for start:stop:step exclusive indexing), or a type selector ('type:string' for text-like values, 'type:number' for numeric and bool values). Duplicates are removed while preserving first-match order. If empty, all parent keys are returned |
@@ -163,17 +165,18 @@ obj.load_on_install=False
 # Example usage of `BufferNode`
 from pydag.nodes.BufferNode import BufferNode  # Adjust import if needed
 
-obj = BufferNode()
-obj.child_ids='list()'
-obj.id=<dataclasses._MISSING_TYPE object at 0x000001C27837D250>
-obj.load_on_install=False
-obj.buffer_id="<string>"
-obj.persistent=True
-obj.n=0
-obj.input_keys='list()'
-obj.output_keys='list()'
-obj.ignore_keys='list()'
-obj.ignore_empty_parents=True
+buffer_node = BufferNode(
+	child_ids='list()',
+	id="<string>",
+	load_on_install=False,
+	buffer_id="<string>",
+	persistent=True,
+	n=0,
+	input_keys='list()',
+	output_keys='list()',
+	ignore_keys='list()',
+	ignore_empty_parents=True
+)
 ```
 
 [Go to Summary](#summary)
@@ -184,14 +187,14 @@ It extends the BufferNode class and provides additional functionality specific t
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
-| `buffer_id` | `str` | `` | unique ID of the buffer |
+| `buffer_id` | `str` | `"<string>"` | unique ID of the buffer |
 | `persistent` | `bool` | `True` | specifies whether data is removed (False) from parent or not (True) |
 | `n` | `int` | `0` | specifies how much data is retrieved from parent buffer. Default 0 -> all data |
 | `input_keys` | `list[str] | list[int] | str` | `'list()'` | list of input key names used to extract data from parent buffers. input_keys can also be a list of integers for indices or a Python-style slice string (e.g. '-1' for last index, '1:3' or '0:5:2' for start:stop:step exclusive indexing), or a type selector ('type:string' for text-like values, 'type:number' for numeric and bool values). Duplicates are removed while preserving first-match order. If empty, all parent keys are returned |
 | `output_keys` | `list[str]` | `'list()'` | optional explicit output key names written by this node. output_keys are literal names only and do not support selector syntax. If empty, the node uses its default output naming |
 | `ignore_keys` | `list[str]` | `'list()'` | list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys |
 | `ignore_empty_parents` | `bool` | `True` | if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True) |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001C27837D250>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `min_learning_samples` | `int` | `0` | Minimum number of samples required for learning. |
 | `min_inference_samples` | `int` | `0` | Number of Samples to do inference on. |
@@ -204,22 +207,23 @@ It extends the BufferNode class and provides additional functionality specific t
 # Example usage of `LearningNode`
 from pydag.nodes.LearningNode import LearningNode  # Adjust import if needed
 
-obj = LearningNode()
-obj.child_ids='list()'
-obj.buffer_id="<string>"
-obj.persistent=True
-obj.n=0
-obj.input_keys='list()'
-obj.output_keys='list()'
-obj.ignore_keys='list()'
-obj.ignore_empty_parents=True
-obj.id=<dataclasses._MISSING_TYPE object at 0x000001C27837D250>
-obj.load_on_install=False
-obj.min_learning_samples=0
-obj.min_inference_samples=0
-obj.sample_length=0
-obj.normalize=False
-obj.nan_to_num=False
+learning_node = LearningNode(
+	child_ids='list()',
+	buffer_id="<string>",
+	persistent=True,
+	n=0,
+	input_keys='list()',
+	output_keys='list()',
+	ignore_keys='list()',
+	ignore_empty_parents=True,
+	id="<string>",
+	load_on_install=False,
+	min_learning_samples=0,
+	min_inference_samples=0,
+	sample_length=0,
+	normalize=False,
+	nan_to_num=False
+)
 ```
 
 [Go to Summary](#summary)
@@ -227,7 +231,7 @@ obj.nan_to_num=False
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001C27837D250>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
 
@@ -236,10 +240,11 @@ obj.nan_to_num=False
 # Example usage of `Node`
 from pydag.nodes.Node import Node  # Adjust import if needed
 
-obj = Node()
-obj.id=<dataclasses._MISSING_TYPE object at 0x000001C27837D250>
-obj.load_on_install=False
-obj.child_ids='list()'
+node = Node(
+	id="<string>",
+	load_on_install=False,
+	child_ids='list()'
+)
 ```
 
 [Go to Summary](#summary)
@@ -250,20 +255,21 @@ Inherits from Node and adds functionality specific to service nodes.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001C27837D250>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
-| `service_id` | `str` | `` | ID of the service |
+| `service_id` | `str` | `"<string>"` | ID of the service |
 
 
 ```python
 # Example usage of `ServiceNode`
 from pydag.nodes.ServiceNode import ServiceNode  # Adjust import if needed
 
-obj = ServiceNode()
-obj.child_ids='list()'
-obj.id=<dataclasses._MISSING_TYPE object at 0x000001C27837D250>
-obj.load_on_install=False
-obj.service_id="<string>"
+service_node = ServiceNode(
+	child_ids='list()',
+	id="<string>",
+	load_on_install=False,
+	service_id="<string>"
+)
 ```
 
 [Go to Summary](#summary)
@@ -274,7 +280,7 @@ A `Transition` `Node` that defines conditions for state transitions in a state m
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001C27837D250>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 
 
@@ -282,10 +288,11 @@ A `Transition` `Node` that defines conditions for state transitions in a state m
 # Example usage of `Transition`
 from pydag.nodes.Transition import Transition  # Adjust import if needed
 
-obj = Transition()
-obj.child_ids='list()'
-obj.id=<dataclasses._MISSING_TYPE object at 0x000001C27837D250>
-obj.load_on_install=False
+transition = Transition(
+	child_ids='list()',
+	id="<string>",
+	load_on_install=False
+)
 ```
 
 [Go to Summary](#summary)
@@ -296,7 +303,7 @@ but are rather started from external events and trigger the execution `Statemach
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001C27837D250>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 
 
@@ -304,10 +311,11 @@ but are rather started from external events and trigger the execution `Statemach
 # Example usage of `TriggerAction`
 from pydag.nodes.TriggerAction import TriggerAction  # Adjust import if needed
 
-obj = TriggerAction()
-obj.child_ids='list()'
-obj.id=<dataclasses._MISSING_TYPE object at 0x000001C27837D250>
-obj.load_on_install=False
+trigger_action = TriggerAction(
+	child_ids='list()',
+	id="<string>",
+	load_on_install=False
+)
 ```
 
 [Go to Summary](#summary)
@@ -317,20 +325,21 @@ Action to add a buffer to the agent node.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001C27837D250>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
-| `config` | `dict` | `` | Configuration for the buffer to be added. |
+| `config` | `dict` | `{}` | Configuration for the buffer to be added. |
 
 
 ```python
 # Example usage of `AddBufferAction`
 from pydag.nodes.buffers.AddBufferAction import AddBufferAction  # Adjust import if needed
 
-obj = AddBufferAction()
-obj.child_ids='list()'
-obj.id=<dataclasses._MISSING_TYPE object at 0x000001C27837D250>
-obj.load_on_install=False
-obj.config={}
+add_buffer_action = AddBufferAction(
+	child_ids='list()',
+	id="<string>",
+	load_on_install=False,
+	config={}
+)
 ```
 
 [Go to Summary](#summary)
@@ -341,14 +350,14 @@ If the buffer is empty, the transition is successful.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
-| `buffer_id` | `str` | `` | unique ID of the buffer |
+| `buffer_id` | `str` | `"<string>"` | unique ID of the buffer |
 | `persistent` | `bool` | `True` | specifies whether data is removed (False) from parent or not (True) |
 | `n` | `int` | `0` | specifies how much data is retrieved from parent buffer. Default 0 -> all data |
 | `input_keys` | `list[str] | list[int] | str` | `'list()'` | list of input key names used to extract data from parent buffers. input_keys can also be a list of integers for indices or a Python-style slice string (e.g. '-1' for last index, '1:3' or '0:5:2' for start:stop:step exclusive indexing), or a type selector ('type:string' for text-like values, 'type:number' for numeric and bool values). Duplicates are removed while preserving first-match order. If empty, all parent keys are returned |
 | `output_keys` | `list[str]` | `'list()'` | optional explicit output key names written by this node. output_keys are literal names only and do not support selector syntax. If empty, the node uses its default output naming |
 | `ignore_keys` | `list[str]` | `'list()'` | list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys |
 | `ignore_empty_parents` | `bool` | `True` | if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True) |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001C27837D250>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 
 
@@ -356,17 +365,18 @@ If the buffer is empty, the transition is successful.
 # Example usage of `BufferEmptyTransition`
 from pydag.nodes.buffers.BufferEmptyTransition import BufferEmptyTransition  # Adjust import if needed
 
-obj = BufferEmptyTransition()
-obj.child_ids='list()'
-obj.buffer_id="<string>"
-obj.persistent=True
-obj.n=0
-obj.input_keys='list()'
-obj.output_keys='list()'
-obj.ignore_keys='list()'
-obj.ignore_empty_parents=True
-obj.id=<dataclasses._MISSING_TYPE object at 0x000001C27837D250>
-obj.load_on_install=False
+buffer_empty_transition = BufferEmptyTransition(
+	child_ids='list()',
+	buffer_id="<string>",
+	persistent=True,
+	n=0,
+	input_keys='list()',
+	output_keys='list()',
+	ignore_keys='list()',
+	ignore_empty_parents=True,
+	id="<string>",
+	load_on_install=False
+)
 ```
 
 [Go to Summary](#summary)
@@ -377,34 +387,35 @@ This `Action` can only be applied on if the specified buffer is of type `DictBuf
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
-| `buffer_id` | `str` | `` | unique ID of the buffer |
+| `buffer_id` | `str` | `"<string>"` | unique ID of the buffer |
 | `persistent` | `bool` | `True` | specifies whether data is removed (False) from parent or not (True) |
 | `n` | `int` | `0` | specifies how much data is retrieved from parent buffer. Default 0 -> all data |
 | `input_keys` | `list[str] | list[int] | str` | `'list()'` | list of input key names used to extract data from parent buffers. input_keys can also be a list of integers for indices or a Python-style slice string (e.g. '-1' for last index, '1:3' or '0:5:2' for start:stop:step exclusive indexing), or a type selector ('type:string' for text-like values, 'type:number' for numeric and bool values). Duplicates are removed while preserving first-match order. If empty, all parent keys are returned |
 | `output_keys` | `list[str]` | `'list()'` | optional explicit output key names written by this node. output_keys are literal names only and do not support selector syntax. If empty, the node uses its default output naming |
 | `ignore_keys` | `list[str]` | `'list()'` | list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys |
 | `ignore_empty_parents` | `bool` | `True` | if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True) |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001C27837D250>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
-| `extract_buffer_id` | `str` | `` | id of the buffer to extract data from |
+| `extract_buffer_id` | `str` | `"<string>"` | id of the buffer to extract data from |
 
 
 ```python
 # Example usage of `BufferExtractAction`
 from pydag.nodes.buffers.BufferExtractAction import BufferExtractAction  # Adjust import if needed
 
-obj = BufferExtractAction()
-obj.child_ids='list()'
-obj.buffer_id="<string>"
-obj.persistent=True
-obj.n=0
-obj.input_keys='list()'
-obj.output_keys='list()'
-obj.ignore_keys='list()'
-obj.ignore_empty_parents=True
-obj.id=<dataclasses._MISSING_TYPE object at 0x000001C27837D250>
-obj.load_on_install=False
-obj.extract_buffer_id="<string>"
+buffer_extract_action = BufferExtractAction(
+	child_ids='list()',
+	buffer_id="<string>",
+	persistent=True,
+	n=0,
+	input_keys='list()',
+	output_keys='list()',
+	ignore_keys='list()',
+	ignore_empty_parents=True,
+	id="<string>",
+	load_on_install=False,
+	extract_buffer_id="<string>"
+)
 ```
 
 [Go to Summary](#summary)
@@ -415,38 +426,39 @@ If the buffer matches the target, the transition is successful.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
-| `buffer_id` | `str` | `` | unique ID of the buffer |
+| `buffer_id` | `str` | `"<string>"` | unique ID of the buffer |
 | `persistent` | `bool` | `True` | specifies whether data is removed (False) from parent or not (True) |
 | `n` | `int` | `0` | specifies how much data is retrieved from parent buffer. Default 0 -> all data |
 | `input_keys` | `list[str] | list[int] | str` | `'list()'` | list of input key names used to extract data from parent buffers. input_keys can also be a list of integers for indices or a Python-style slice string (e.g. '-1' for last index, '1:3' or '0:5:2' for start:stop:step exclusive indexing), or a type selector ('type:string' for text-like values, 'type:number' for numeric and bool values). Duplicates are removed while preserving first-match order. If empty, all parent keys are returned |
 | `output_keys` | `list[str]` | `'list()'` | optional explicit output key names written by this node. output_keys are literal names only and do not support selector syntax. If empty, the node uses its default output naming |
 | `ignore_keys` | `list[str]` | `'list()'` | list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys |
 | `ignore_empty_parents` | `bool` | `True` | if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True) |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001C27837D250>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
-| `comparator` | `str` | `` | the comparison operator to use |
-| `upper_limit` | `any` | `` | the upper limit of the range |
-| `lower_limit` | `any` | `` | the lower limit of the range |
+| `comparator` | `str` | `"<string>"` | the comparison operator to use |
+| `upper_limit` | `any` | `"<value>"` | the upper limit of the range |
+| `lower_limit` | `any` | `"<value>"` | the lower limit of the range |
 
 
 ```python
 # Example usage of `BufferInRangeTransition`
 from pydag.nodes.buffers.BufferInRangeTransition import BufferInRangeTransition  # Adjust import if needed
 
-obj = BufferInRangeTransition()
-obj.child_ids='list()'
-obj.buffer_id="<string>"
-obj.persistent=True
-obj.n=0
-obj.input_keys='list()'
-obj.output_keys='list()'
-obj.ignore_keys='list()'
-obj.ignore_empty_parents=True
-obj.id=<dataclasses._MISSING_TYPE object at 0x000001C27837D250>
-obj.load_on_install=False
-obj.comparator="<string>"
-obj.upper_limit="<value>"
-obj.lower_limit="<value>"
+buffer_in_range_transition = BufferInRangeTransition(
+	child_ids='list()',
+	buffer_id="<string>",
+	persistent=True,
+	n=0,
+	input_keys='list()',
+	output_keys='list()',
+	ignore_keys='list()',
+	ignore_empty_parents=True,
+	id="<string>",
+	load_on_install=False,
+	comparator="<string>",
+	upper_limit="<value>",
+	lower_limit="<value>"
+)
 ```
 
 [Go to Summary](#summary)
@@ -457,14 +469,14 @@ If the buffer is not empty, the transition is successful.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
-| `buffer_id` | `str` | `` | unique ID of the buffer |
+| `buffer_id` | `str` | `"<string>"` | unique ID of the buffer |
 | `persistent` | `bool` | `True` | specifies whether data is removed (False) from parent or not (True) |
 | `n` | `int` | `0` | specifies how much data is retrieved from parent buffer. Default 0 -> all data |
 | `input_keys` | `list[str] | list[int] | str` | `'list()'` | list of input key names used to extract data from parent buffers. input_keys can also be a list of integers for indices or a Python-style slice string (e.g. '-1' for last index, '1:3' or '0:5:2' for start:stop:step exclusive indexing), or a type selector ('type:string' for text-like values, 'type:number' for numeric and bool values). Duplicates are removed while preserving first-match order. If empty, all parent keys are returned |
 | `output_keys` | `list[str]` | `'list()'` | optional explicit output key names written by this node. output_keys are literal names only and do not support selector syntax. If empty, the node uses its default output naming |
 | `ignore_keys` | `list[str]` | `'list()'` | list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys |
 | `ignore_empty_parents` | `bool` | `True` | if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True) |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001C27837D250>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 
 
@@ -472,17 +484,18 @@ If the buffer is not empty, the transition is successful.
 # Example usage of `BufferNotEmptyTransition`
 from pydag.nodes.buffers.BufferNotEmptyTransition import BufferNotEmptyTransition  # Adjust import if needed
 
-obj = BufferNotEmptyTransition()
-obj.child_ids='list()'
-obj.buffer_id="<string>"
-obj.persistent=True
-obj.n=0
-obj.input_keys='list()'
-obj.output_keys='list()'
-obj.ignore_keys='list()'
-obj.ignore_empty_parents=True
-obj.id=<dataclasses._MISSING_TYPE object at 0x000001C27837D250>
-obj.load_on_install=False
+buffer_not_empty_transition = BufferNotEmptyTransition(
+	child_ids='list()',
+	buffer_id="<string>",
+	persistent=True,
+	n=0,
+	input_keys='list()',
+	output_keys='list()',
+	ignore_keys='list()',
+	ignore_empty_parents=True,
+	id="<string>",
+	load_on_install=False
+)
 ```
 
 [Go to Summary](#summary)
@@ -493,50 +506,51 @@ payload data to its own buffer.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
-| `buffer_id` | `str` | `` | unique ID of the buffer |
+| `buffer_id` | `str` | `"<string>"` | unique ID of the buffer |
 | `persistent` | `bool` | `True` | specifies whether data is removed (False) from parent or not (True) |
 | `n` | `int` | `0` | specifies how much data is retrieved from parent buffer. Default 0 -> all data |
 | `input_keys` | `list[str] | list[int] | str` | `'list()'` | list of input key names used to extract data from parent buffers. input_keys can also be a list of integers for indices or a Python-style slice string (e.g. '-1' for last index, '1:3' or '0:5:2' for start:stop:step exclusive indexing), or a type selector ('type:string' for text-like values, 'type:number' for numeric and bool values). Duplicates are removed while preserving first-match order. If empty, all parent keys are returned |
 | `output_keys` | `list[str]` | `'list()'` | optional explicit output key names written by this node. output_keys are literal names only and do not support selector syntax. If empty, the node uses its default output naming |
 | `ignore_keys` | `list[str]` | `'list()'` | list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys |
 | `ignore_empty_parents` | `bool` | `True` | if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True) |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001C27837D250>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
-| `case_key` | `str` | `` | key from parent buffer data used for case evaluation |
+| `case_key` | `str` | `"<string>"` | key from parent buffer data used for case evaluation |
 | `comparator` | `str` | `'Comparator.EQUAL.value'` | comparison operator to use for case evaluation |
-| `value` | `Any` | `` | target value used by the comparator |
+| `value` | `Any` | `"<value>"` | target value used by the comparator |
 | `check_n` | `int` | `1` | number of parent rows used for checking the case |
 | `payload_n` | `int` | `0` | number of parent rows moved to this transition buffer after a successful check |
 | `payload_keys` | `list[str] | list[int] | str` | `'list()'` | keys, indices, or selector pattern moved to this transition buffer after a successful check. If empty, all parent keys are moved |
 | `default` | `bool` | `False` | if True, the transition passes without evaluating case_key/comparator/value |
-| `COMPARATOR_ALIASES` | `ClassVar[dict[str, str]]` | `` |  |
-| `BINARY_COMPARATORS` | `ClassVar[dict[str, Callable[[Any, Any], bool]]]` | `` |  |
+| `COMPARATOR_ALIASES` | `ClassVar[dict[str, str]]` | `"<string>"` |  |
+| `BINARY_COMPARATORS` | `ClassVar[dict[str, Callable[[Any, Any], bool]]]` | `"<string>"` |  |
 
 
 ```python
 # Example usage of `CaseBufferTransition`
 from pydag.nodes.buffers.CaseBufferTransition import CaseBufferTransition  # Adjust import if needed
 
-obj = CaseBufferTransition()
-obj.child_ids='list()'
-obj.buffer_id="<string>"
-obj.persistent=True
-obj.n=0
-obj.input_keys='list()'
-obj.output_keys='list()'
-obj.ignore_keys='list()'
-obj.ignore_empty_parents=True
-obj.id=<dataclasses._MISSING_TYPE object at 0x000001C27837D250>
-obj.load_on_install=False
-obj.case_key="<string>"
-obj.comparator='Comparator.EQUAL.value'
-obj.value="<value>"
-obj.check_n=1
-obj.payload_n=0
-obj.payload_keys='list()'
-obj.default=False
-obj.COMPARATOR_ALIASES="<string>"
-obj.BINARY_COMPARATORS="<string>"
+case_buffer_transition = CaseBufferTransition(
+	child_ids='list()',
+	buffer_id="<string>",
+	persistent=True,
+	n=0,
+	input_keys='list()',
+	output_keys='list()',
+	ignore_keys='list()',
+	ignore_empty_parents=True,
+	id="<string>",
+	load_on_install=False,
+	case_key="<string>",
+	comparator='Comparator.EQUAL.value',
+	value="<value>",
+	check_n=1,
+	payload_n=0,
+	payload_keys='list()',
+	default=False,
+	COMPARATOR_ALIASES="<string>",
+	BINARY_COMPARATORS="<string>"
+)
 ```
 
 [Go to Summary](#summary)
@@ -545,14 +559,14 @@ obj.BINARY_COMPARATORS="<string>"
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
-| `buffer_id` | `str` | `` | unique ID of the buffer |
+| `buffer_id` | `str` | `"<string>"` | unique ID of the buffer |
 | `persistent` | `bool` | `True` | specifies whether data is removed (False) from parent or not (True) |
 | `n` | `int` | `0` | specifies how much data is retrieved from parent buffer. Default 0 -> all data |
 | `input_keys` | `list[str] | list[int] | str` | `'list()'` | list of input key names used to extract data from parent buffers. input_keys can also be a list of integers for indices or a Python-style slice string (e.g. '-1' for last index, '1:3' or '0:5:2' for start:stop:step exclusive indexing), or a type selector ('type:string' for text-like values, 'type:number' for numeric and bool values). Duplicates are removed while preserving first-match order. If empty, all parent keys are returned |
 | `output_keys` | `list[str]` | `'list()'` | optional explicit output key names written by this node. output_keys are literal names only and do not support selector syntax. If empty, the node uses its default output naming |
 | `ignore_keys` | `list[str]` | `'list()'` | list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys |
 | `ignore_empty_parents` | `bool` | `True` | if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True) |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001C27837D250>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 
 
@@ -560,17 +574,18 @@ obj.BINARY_COMPARATORS="<string>"
 # Example usage of `ClearBufferAction`
 from pydag.nodes.buffers.ClearBufferAction import ClearBufferAction  # Adjust import if needed
 
-obj = ClearBufferAction()
-obj.child_ids='list()'
-obj.buffer_id="<string>"
-obj.persistent=True
-obj.n=0
-obj.input_keys='list()'
-obj.output_keys='list()'
-obj.ignore_keys='list()'
-obj.ignore_empty_parents=True
-obj.id=<dataclasses._MISSING_TYPE object at 0x000001C27837D250>
-obj.load_on_install=False
+clear_buffer_action = ClearBufferAction(
+	child_ids='list()',
+	buffer_id="<string>",
+	persistent=True,
+	n=0,
+	input_keys='list()',
+	output_keys='list()',
+	ignore_keys='list()',
+	ignore_empty_parents=True,
+	id="<string>",
+	load_on_install=False
+)
 ```
 
 [Go to Summary](#summary)
@@ -581,36 +596,37 @@ If the buffer matches the target, the transition is successful.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
-| `buffer_id` | `str` | `` | unique ID of the buffer |
+| `buffer_id` | `str` | `"<string>"` | unique ID of the buffer |
 | `persistent` | `bool` | `True` | specifies whether data is removed (False) from parent or not (True) |
 | `n` | `int` | `0` | specifies how much data is retrieved from parent buffer. Default 0 -> all data |
 | `input_keys` | `list[str] | list[int] | str` | `'list()'` | list of input key names used to extract data from parent buffers. input_keys can also be a list of integers for indices or a Python-style slice string (e.g. '-1' for last index, '1:3' or '0:5:2' for start:stop:step exclusive indexing), or a type selector ('type:string' for text-like values, 'type:number' for numeric and bool values). Duplicates are removed while preserving first-match order. If empty, all parent keys are returned |
 | `output_keys` | `list[str]` | `'list()'` | optional explicit output key names written by this node. output_keys are literal names only and do not support selector syntax. If empty, the node uses its default output naming |
 | `ignore_keys` | `list[str]` | `'list()'` | list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys |
 | `ignore_empty_parents` | `bool` | `True` | if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True) |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001C27837D250>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
-| `comparator` | `str` | `` | The comparison operator to use. |
-| `value` | `any` | `` | The value to compare against the buffer. |
+| `comparator` | `str` | `"<string>"` | The comparison operator to use. |
+| `value` | `any` | `"<value>"` | The value to compare against the buffer. |
 
 
 ```python
 # Example usage of `CompareBufferTransition`
 from pydag.nodes.buffers.CompareBufferTransition import CompareBufferTransition  # Adjust import if needed
 
-obj = CompareBufferTransition()
-obj.child_ids='list()'
-obj.buffer_id="<string>"
-obj.persistent=True
-obj.n=0
-obj.input_keys='list()'
-obj.output_keys='list()'
-obj.ignore_keys='list()'
-obj.ignore_empty_parents=True
-obj.id=<dataclasses._MISSING_TYPE object at 0x000001C27837D250>
-obj.load_on_install=False
-obj.comparator="<string>"
-obj.value="<value>"
+compare_buffer_transition = CompareBufferTransition(
+	child_ids='list()',
+	buffer_id="<string>",
+	persistent=True,
+	n=0,
+	input_keys='list()',
+	output_keys='list()',
+	ignore_keys='list()',
+	ignore_empty_parents=True,
+	id="<string>",
+	load_on_install=False,
+	comparator="<string>",
+	value="<value>"
+)
 ```
 
 [Go to Summary](#summary)
@@ -621,14 +637,14 @@ The copy procedure makes a deep of all the parent's `Buffer` elements
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
-| `buffer_id` | `str` | `` | unique ID of the buffer |
+| `buffer_id` | `str` | `"<string>"` | unique ID of the buffer |
 | `persistent` | `bool` | `True` | specifies whether data is removed (False) from parent or not (True) |
 | `n` | `int` | `0` | specifies how much data is retrieved from parent buffer. Default 0 -> all data |
 | `input_keys` | `list[str] | list[int] | str` | `'list()'` | list of input key names used to extract data from parent buffers. input_keys can also be a list of integers for indices or a Python-style slice string (e.g. '-1' for last index, '1:3' or '0:5:2' for start:stop:step exclusive indexing), or a type selector ('type:string' for text-like values, 'type:number' for numeric and bool values). Duplicates are removed while preserving first-match order. If empty, all parent keys are returned |
 | `output_keys` | `list[str]` | `'list()'` | optional explicit output key names written by this node. output_keys are literal names only and do not support selector syntax. If empty, the node uses its default output naming |
 | `ignore_keys` | `list[str]` | `'list()'` | list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys |
 | `ignore_empty_parents` | `bool` | `True` | if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True) |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001C27837D250>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 
 
@@ -636,17 +652,18 @@ The copy procedure makes a deep of all the parent's `Buffer` elements
 # Example usage of `CopyBufferAction`
 from pydag.nodes.buffers.CopyBufferAction import CopyBufferAction  # Adjust import if needed
 
-obj = CopyBufferAction()
-obj.child_ids='list()'
-obj.buffer_id="<string>"
-obj.persistent=True
-obj.n=0
-obj.input_keys='list()'
-obj.output_keys='list()'
-obj.ignore_keys='list()'
-obj.ignore_empty_parents=True
-obj.id=<dataclasses._MISSING_TYPE object at 0x000001C27837D250>
-obj.load_on_install=False
+copy_buffer_action = CopyBufferAction(
+	child_ids='list()',
+	buffer_id="<string>",
+	persistent=True,
+	n=0,
+	input_keys='list()',
+	output_keys='list()',
+	ignore_keys='list()',
+	ignore_empty_parents=True,
+	id="<string>",
+	load_on_install=False
+)
 ```
 
 [Go to Summary](#summary)
@@ -658,14 +675,14 @@ Before this `Node`s `Buffer` is filled, all other elements are cleared.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
-| `buffer_id` | `str` | `` | unique ID of the buffer |
+| `buffer_id` | `str` | `"<string>"` | unique ID of the buffer |
 | `persistent` | `bool` | `True` | specifies whether data is removed (False) from parent or not (True) |
 | `n` | `int` | `0` | specifies how much data is retrieved from parent buffer. Default 0 -> all data |
 | `input_keys` | `list[str] | list[int] | str` | `'list()'` | list of input key names used to extract data from parent buffers. input_keys can also be a list of integers for indices or a Python-style slice string (e.g. '-1' for last index, '1:3' or '0:5:2' for start:stop:step exclusive indexing), or a type selector ('type:string' for text-like values, 'type:number' for numeric and bool values). Duplicates are removed while preserving first-match order. If empty, all parent keys are returned |
 | `output_keys` | `list[str]` | `'list()'` | optional explicit output key names written by this node. output_keys are literal names only and do not support selector syntax. If empty, the node uses its default output naming |
 | `ignore_keys` | `list[str]` | `'list()'` | list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys |
 | `ignore_empty_parents` | `bool` | `True` | if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True) |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001C27837D250>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `clear_first` | `bool` | `True` | if set to true, this Buffer's content is cleared before copying |
 
@@ -674,18 +691,19 @@ Before this `Node`s `Buffer` is filled, all other elements are cleared.
 # Example usage of `CopyDataAction`
 from pydag.nodes.buffers.CopyDataAction import CopyDataAction  # Adjust import if needed
 
-obj = CopyDataAction()
-obj.child_ids='list()'
-obj.buffer_id="<string>"
-obj.persistent=True
-obj.n=0
-obj.input_keys='list()'
-obj.output_keys='list()'
-obj.ignore_keys='list()'
-obj.ignore_empty_parents=True
-obj.id=<dataclasses._MISSING_TYPE object at 0x000001C27837D250>
-obj.load_on_install=False
-obj.clear_first=True
+copy_data_action = CopyDataAction(
+	child_ids='list()',
+	buffer_id="<string>",
+	persistent=True,
+	n=0,
+	input_keys='list()',
+	output_keys='list()',
+	ignore_keys='list()',
+	ignore_empty_parents=True,
+	id="<string>",
+	load_on_install=False,
+	clear_first=True
+)
 ```
 
 [Go to Summary](#summary)
@@ -694,16 +712,16 @@ obj.clear_first=True
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
-| `buffer_id` | `str` | `` | unique ID of the buffer |
+| `buffer_id` | `str` | `"<string>"` | unique ID of the buffer |
 | `persistent` | `bool` | `True` | specifies whether data is removed (False) from parent or not (True) |
 | `n` | `int` | `0` | specifies how much data is retrieved from parent buffer. Default 0 -> all data |
 | `input_keys` | `list[str] | list[int] | str` | `'list()'` | list of input key names used to extract data from parent buffers. input_keys can also be a list of integers for indices or a Python-style slice string (e.g. '-1' for last index, '1:3' or '0:5:2' for start:stop:step exclusive indexing), or a type selector ('type:string' for text-like values, 'type:number' for numeric and bool values). Duplicates are removed while preserving first-match order. If empty, all parent keys are returned |
 | `output_keys` | `list[str]` | `'list()'` | optional explicit output key names written by this node. output_keys are literal names only and do not support selector syntax. If empty, the node uses its default output naming |
 | `ignore_keys` | `list[str]` | `'list()'` | list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys |
 | `ignore_empty_parents` | `bool` | `True` | if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True) |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001C27837D250>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
-| `row_filter` | `str` | `` | pandas filter command to apply to filter the rows of the buffer converted to dataframe |
+| `row_filter` | `str` | `"<string>"` | pandas filter command to apply to filter the rows of the buffer converted to dataframe |
 | `column_filter` | `list[str]` | `'list()'` | list of columns to filter for |
 
 
@@ -711,19 +729,20 @@ obj.clear_first=True
 # Example usage of `DataFrameFilterAction`
 from pydag.nodes.buffers.DataFrameFilterAction import DataFrameFilterAction  # Adjust import if needed
 
-obj = DataFrameFilterAction()
-obj.child_ids='list()'
-obj.buffer_id="<string>"
-obj.persistent=True
-obj.n=0
-obj.input_keys='list()'
-obj.output_keys='list()'
-obj.ignore_keys='list()'
-obj.ignore_empty_parents=True
-obj.id=<dataclasses._MISSING_TYPE object at 0x000001C27837D250>
-obj.load_on_install=False
-obj.row_filter="<string>"
-obj.column_filter='list()'
+data_frame_filter_action = DataFrameFilterAction(
+	child_ids='list()',
+	buffer_id="<string>",
+	persistent=True,
+	n=0,
+	input_keys='list()',
+	output_keys='list()',
+	ignore_keys='list()',
+	ignore_empty_parents=True,
+	id="<string>",
+	load_on_install=False,
+	row_filter="<string>",
+	column_filter='list()'
+)
 ```
 
 [Go to Summary](#summary)
@@ -734,14 +753,14 @@ If this `Node`'s parents contain more than one `BufferNode`, only the first is r
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
-| `buffer_id` | `str` | `` | unique ID of the buffer |
+| `buffer_id` | `str` | `"<string>"` | unique ID of the buffer |
 | `persistent` | `bool` | `True` | specifies whether data is removed (False) from parent or not (True) |
 | `n` | `int` | `0` | specifies how much data is retrieved from parent buffer. Default 0 -> all data |
 | `input_keys` | `list[str] | list[int] | str` | `'list()'` | list of input key names used to extract data from parent buffers. input_keys can also be a list of integers for indices or a Python-style slice string (e.g. '-1' for last index, '1:3' or '0:5:2' for start:stop:step exclusive indexing), or a type selector ('type:string' for text-like values, 'type:number' for numeric and bool values). Duplicates are removed while preserving first-match order. If empty, all parent keys are returned |
 | `output_keys` | `list[str]` | `'list()'` | optional explicit output key names written by this node. output_keys are literal names only and do not support selector syntax. If empty, the node uses its default output naming |
 | `ignore_keys` | `list[str]` | `'list()'` | list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys |
 | `ignore_empty_parents` | `bool` | `True` | if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True) |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001C27837D250>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `clear_first` | `bool` | `True` | if set to true, this Buffer's content is cleared before copying |
 | `buffer_ids` | `list[str]` | `'list()'` | ids of the buffers to copy data to |
@@ -751,19 +770,20 @@ If this `Node`'s parents contain more than one `BufferNode`, only the first is r
 # Example usage of `DataToBuffersAction`
 from pydag.nodes.buffers.DataToBuffersAction import DataToBuffersAction  # Adjust import if needed
 
-obj = DataToBuffersAction()
-obj.child_ids='list()'
-obj.buffer_id="<string>"
-obj.persistent=True
-obj.n=0
-obj.input_keys='list()'
-obj.output_keys='list()'
-obj.ignore_keys='list()'
-obj.ignore_empty_parents=True
-obj.id=<dataclasses._MISSING_TYPE object at 0x000001C27837D250>
-obj.load_on_install=False
-obj.clear_first=True
-obj.buffer_ids='list()'
+data_to_buffers_action = DataToBuffersAction(
+	child_ids='list()',
+	buffer_id="<string>",
+	persistent=True,
+	n=0,
+	input_keys='list()',
+	output_keys='list()',
+	ignore_keys='list()',
+	ignore_empty_parents=True,
+	id="<string>",
+	load_on_install=False,
+	clear_first=True,
+	buffer_ids='list()'
+)
 ```
 
 [Go to Summary](#summary)
@@ -772,40 +792,41 @@ obj.buffer_ids='list()'
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
-| `buffer_id` | `str` | `` | unique ID of the buffer |
+| `buffer_id` | `str` | `"<string>"` | unique ID of the buffer |
 | `persistent` | `bool` | `True` | specifies whether data is removed (False) from parent or not (True) |
 | `n` | `int` | `0` | specifies how much data is retrieved from parent buffer. Default 0 -> all data |
 | `input_keys` | `list[str] | list[int] | str` | `'list()'` | list of input key names used to extract data from parent buffers. input_keys can also be a list of integers for indices or a Python-style slice string (e.g. '-1' for last index, '1:3' or '0:5:2' for start:stop:step exclusive indexing), or a type selector ('type:string' for text-like values, 'type:number' for numeric and bool values). Duplicates are removed while preserving first-match order. If empty, all parent keys are returned |
 | `output_keys` | `list[str]` | `'list()'` | optional explicit output key names written by this node. output_keys are literal names only and do not support selector syntax. If empty, the node uses its default output naming |
 | `ignore_keys` | `list[str]` | `'list()'` | list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys |
 | `ignore_empty_parents` | `bool` | `True` | if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True) |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001C27837D250>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `create_new` | `bool` | `True` | specifies whether to create a new Buffer or append the referenced one |
 | `format_keys` | `list[str]` | `'list[str]()'` | specifies the keys to use from original buffer(s) to format new column |
-| `new_key` | `str` | `` | specifies the new column key for the formatted data |
-| `format_pattern` | `str` | `` | specifies the format pattern for the new column |
+| `new_key` | `str` | `"<string>"` | specifies the new column key for the formatted data |
+| `format_pattern` | `str` | `"<string>"` | specifies the format pattern for the new column |
 
 
 ```python
 # Example usage of `FormatBufferColumnAction`
 from pydag.nodes.buffers.FormatBufferColumnAction import FormatBufferColumnAction  # Adjust import if needed
 
-obj = FormatBufferColumnAction()
-obj.child_ids='list()'
-obj.buffer_id="<string>"
-obj.persistent=True
-obj.n=0
-obj.input_keys='list()'
-obj.output_keys='list()'
-obj.ignore_keys='list()'
-obj.ignore_empty_parents=True
-obj.id=<dataclasses._MISSING_TYPE object at 0x000001C27837D250>
-obj.load_on_install=False
-obj.create_new=True
-obj.format_keys='list[str]()'
-obj.new_key="<string>"
-obj.format_pattern="<string>"
+format_buffer_column_action = FormatBufferColumnAction(
+	child_ids='list()',
+	buffer_id="<string>",
+	persistent=True,
+	n=0,
+	input_keys='list()',
+	output_keys='list()',
+	ignore_keys='list()',
+	ignore_empty_parents=True,
+	id="<string>",
+	load_on_install=False,
+	create_new=True,
+	format_keys='list[str]()',
+	new_key="<string>",
+	format_pattern="<string>"
+)
 ```
 
 [Go to Summary](#summary)
@@ -816,34 +837,35 @@ using its parent's buffer to create the new string
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
-| `buffer_id` | `str` | `` | unique ID of the buffer |
+| `buffer_id` | `str` | `"<string>"` | unique ID of the buffer |
 | `persistent` | `bool` | `True` | specifies whether data is removed (False) from parent or not (True) |
 | `n` | `int` | `0` | specifies how much data is retrieved from parent buffer. Default 0 -> all data |
 | `input_keys` | `list[str] | list[int] | str` | `'list()'` | list of input key names used to extract data from parent buffers. input_keys can also be a list of integers for indices or a Python-style slice string (e.g. '-1' for last index, '1:3' or '0:5:2' for start:stop:step exclusive indexing), or a type selector ('type:string' for text-like values, 'type:number' for numeric and bool values). Duplicates are removed while preserving first-match order. If empty, all parent keys are returned |
 | `output_keys` | `list[str]` | `'list()'` | optional explicit output key names written by this node. output_keys are literal names only and do not support selector syntax. If empty, the node uses its default output naming |
 | `ignore_keys` | `list[str]` | `'list()'` | list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys |
 | `ignore_empty_parents` | `bool` | `True` | if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True) |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001C27837D250>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
-| `template` | `str` | `` | string template to insert the data from the parent buffer into, e.g. 'Hi {}, are you from {}' |
+| `template` | `str` | `"<string>"` | string template to insert the data from the parent buffer into, e.g. 'Hi {}, are you from {}' |
 
 
 ```python
 # Example usage of `FormattedStringAction`
 from pydag.nodes.buffers.FormattedStringAction import FormattedStringAction  # Adjust import if needed
 
-obj = FormattedStringAction()
-obj.child_ids='list()'
-obj.buffer_id="<string>"
-obj.persistent=True
-obj.n=0
-obj.input_keys='list()'
-obj.output_keys='list()'
-obj.ignore_keys='list()'
-obj.ignore_empty_parents=True
-obj.id=<dataclasses._MISSING_TYPE object at 0x000001C27837D250>
-obj.load_on_install=False
-obj.template="<string>"
+formatted_string_action = FormattedStringAction(
+	child_ids='list()',
+	buffer_id="<string>",
+	persistent=True,
+	n=0,
+	input_keys='list()',
+	output_keys='list()',
+	ignore_keys='list()',
+	ignore_empty_parents=True,
+	id="<string>",
+	load_on_install=False,
+	template="<string>"
+)
 ```
 
 [Go to Summary](#summary)
@@ -854,14 +876,14 @@ therefore an empty execute method is provided
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
-| `buffer_id` | `str` | `` | unique ID of the buffer |
+| `buffer_id` | `str` | `"<string>"` | unique ID of the buffer |
 | `persistent` | `bool` | `True` | specifies whether data is removed (False) from parent or not (True) |
 | `n` | `int` | `0` | specifies how much data is retrieved from parent buffer. Default 0 -> all data |
 | `input_keys` | `list[str] | list[int] | str` | `'list()'` | list of input key names used to extract data from parent buffers. input_keys can also be a list of integers for indices or a Python-style slice string (e.g. '-1' for last index, '1:3' or '0:5:2' for start:stop:step exclusive indexing), or a type selector ('type:string' for text-like values, 'type:number' for numeric and bool values). Duplicates are removed while preserving first-match order. If empty, all parent keys are returned |
 | `output_keys` | `list[str]` | `'list()'` | optional explicit output key names written by this node. output_keys are literal names only and do not support selector syntax. If empty, the node uses its default output naming |
 | `ignore_keys` | `list[str]` | `'list()'` | list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys |
 | `ignore_empty_parents` | `bool` | `True` | if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True) |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001C27837D250>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 
 
@@ -869,17 +891,18 @@ therefore an empty execute method is provided
 # Example usage of `LinkBufferAction`
 from pydag.nodes.buffers.LinkBufferAction import LinkBufferAction  # Adjust import if needed
 
-obj = LinkBufferAction()
-obj.child_ids='list()'
-obj.buffer_id="<string>"
-obj.persistent=True
-obj.n=0
-obj.input_keys='list()'
-obj.output_keys='list()'
-obj.ignore_keys='list()'
-obj.ignore_empty_parents=True
-obj.id=<dataclasses._MISSING_TYPE object at 0x000001C27837D250>
-obj.load_on_install=False
+link_buffer_action = LinkBufferAction(
+	child_ids='list()',
+	buffer_id="<string>",
+	persistent=True,
+	n=0,
+	input_keys='list()',
+	output_keys='list()',
+	ignore_keys='list()',
+	ignore_empty_parents=True,
+	id="<string>",
+	load_on_install=False
+)
 ```
 
 [Go to Summary](#summary)
@@ -888,34 +911,35 @@ obj.load_on_install=False
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
-| `buffer_id` | `str` | `` | unique ID of the buffer |
+| `buffer_id` | `str` | `"<string>"` | unique ID of the buffer |
 | `persistent` | `bool` | `True` | specifies whether data is removed (False) from parent or not (True) |
 | `n` | `int` | `0` | specifies how much data is retrieved from parent buffer. Default 0 -> all data |
 | `input_keys` | `list[str] | list[int] | str` | `'list()'` | list of input key names used to extract data from parent buffers. input_keys can also be a list of integers for indices or a Python-style slice string (e.g. '-1' for last index, '1:3' or '0:5:2' for start:stop:step exclusive indexing), or a type selector ('type:string' for text-like values, 'type:number' for numeric and bool values). Duplicates are removed while preserving first-match order. If empty, all parent keys are returned |
 | `output_keys` | `list[str]` | `'list()'` | optional explicit output key names written by this node. output_keys are literal names only and do not support selector syntax. If empty, the node uses its default output naming |
 | `ignore_keys` | `list[str]` | `'list()'` | list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys |
 | `ignore_empty_parents` | `bool` | `True` | if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True) |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001C27837D250>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
-| `signal` | `SampledSignal` | `` |  |
+| `signal` | `SampledSignal` | `"<value>"` |  |
 
 
 ```python
 # Example usage of `SampledSignalAction`
 from pydag.nodes.buffers.SampledSignalAction import SampledSignalAction  # Adjust import if needed
 
-obj = SampledSignalAction()
-obj.child_ids='list()'
-obj.buffer_id="<string>"
-obj.persistent=True
-obj.n=0
-obj.input_keys='list()'
-obj.output_keys='list()'
-obj.ignore_keys='list()'
-obj.ignore_empty_parents=True
-obj.id=<dataclasses._MISSING_TYPE object at 0x000001C27837D250>
-obj.load_on_install=False
-obj.signal="<value>"
+sampled_signal_action = SampledSignalAction(
+	child_ids='list()',
+	buffer_id="<string>",
+	persistent=True,
+	n=0,
+	input_keys='list()',
+	output_keys='list()',
+	ignore_keys='list()',
+	ignore_empty_parents=True,
+	id="<string>",
+	load_on_install=False,
+	signal="<value>"
+)
 ```
 
 [Go to Summary](#summary)
@@ -926,7 +950,7 @@ Returns the deviation as well as the outlier-decision to the first distribution 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
-| `buffer_id` | `str` | `` | unique ID of the buffer |
+| `buffer_id` | `str` | `"<string>"` | unique ID of the buffer |
 | `persistent` | `bool` | `True` | specifies whether data is removed (False) from parent or not (True) |
 | `n` | `int` | `0` | specifies how much data is retrieved from parent buffer. Default 0 -> all data |
 | `input_keys` | `list[str] | list[int] | str` | `'list()'` | list of input key names used to extract data from parent buffers. input_keys can also be a list of integers for indices or a Python-style slice string (e.g. '-1' for last index, '1:3' or '0:5:2' for start:stop:step exclusive indexing), or a type selector ('type:string' for text-like values, 'type:number' for numeric and bool values). Duplicates are removed while preserving first-match order. If empty, all parent keys are returned |
@@ -938,7 +962,7 @@ Returns the deviation as well as the outlier-decision to the first distribution 
 | `sample_length` | `int` | `0` | Expected length of each sample. If 0, a sample with shape (1, min_learning_samples) is assumed. Otherwise, (1, sample_length) is assumed. |
 | `normalize` | `bool` | `False` | Flag to indicate whether to normalize the input data using z-score normalization on the input batch. |
 | `nan_to_num` | `bool` | `False` | If True, replace NaN/Inf values with finite numbers (0.0). |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001C27837D250>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `inference_buffer_size` | `int` | `10000000.0` | Size of the buffer for the inference data. This is the data which is appended to the training data to calculate the distribution to compare with the distribution of the training data. |
 | `bin_count` | `int` | `10` | number of bins per dimension of the grid. Each dimension is spanned by one value of the input data, e.g. if you have data like [[10,2,2],....,[12,2,5]], the first dimension is spanned by the values [10, ..., 12 ] and so on. Can be imagined as the # of squares in x and y direction. The features are binned to the number of bins to calculate the distribution. |
@@ -954,30 +978,31 @@ Returns the deviation as well as the outlier-decision to the first distribution 
 # Example usage of `ShiftMonitoring`
 from pydag.nodes.clustering.ShiftMonitoring import ShiftMonitoring  # Adjust import if needed
 
-obj = ShiftMonitoring()
-obj.child_ids='list()'
-obj.buffer_id="<string>"
-obj.persistent=True
-obj.n=0
-obj.input_keys='list()'
-obj.output_keys='list()'
-obj.ignore_keys='list()'
-obj.ignore_empty_parents=True
-obj.min_learning_samples=0
-obj.min_inference_samples=0
-obj.sample_length=0
-obj.normalize=False
-obj.nan_to_num=False
-obj.id=<dataclasses._MISSING_TYPE object at 0x000001C27837D250>
-obj.load_on_install=False
-obj.inference_buffer_size=10000000.0
-obj.bin_count=10
-obj.compare_mode='CompareMode.JSD.value'
-obj.n_distributions=2
-obj.return_input=False
-obj.sensitivity=1.0
-obj.shift_name='shift'
-obj.decision_name='decision'
+shift_monitoring = ShiftMonitoring(
+	child_ids='list()',
+	buffer_id="<string>",
+	persistent=True,
+	n=0,
+	input_keys='list()',
+	output_keys='list()',
+	ignore_keys='list()',
+	ignore_empty_parents=True,
+	min_learning_samples=0,
+	min_inference_samples=0,
+	sample_length=0,
+	normalize=False,
+	nan_to_num=False,
+	id="<string>",
+	load_on_install=False,
+	inference_buffer_size=10000000.0,
+	bin_count=10,
+	compare_mode='CompareMode.JSD.value',
+	n_distributions=2,
+	return_input=False,
+	sensitivity=1.0,
+	shift_name='shift',
+	decision_name='decision'
+)
 ```
 
 [Go to Summary](#summary)
@@ -989,14 +1014,14 @@ Args:
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
-| `buffer_id` | `str` | `` | unique ID of the buffer |
+| `buffer_id` | `str` | `"<string>"` | unique ID of the buffer |
 | `persistent` | `bool` | `True` | specifies whether data is removed (False) from parent or not (True) |
 | `n` | `int` | `0` | specifies how much data is retrieved from parent buffer. Default 0 -> all data |
 | `input_keys` | `list[str] | list[int] | str` | `'list()'` | list of input key names used to extract data from parent buffers. input_keys can also be a list of integers for indices or a Python-style slice string (e.g. '-1' for last index, '1:3' or '0:5:2' for start:stop:step exclusive indexing), or a type selector ('type:string' for text-like values, 'type:number' for numeric and bool values). Duplicates are removed while preserving first-match order. If empty, all parent keys are returned |
 | `output_keys` | `list[str]` | `'list()'` | optional explicit output key names written by this node. output_keys are literal names only and do not support selector syntax. If empty, the node uses its default output naming |
 | `ignore_keys` | `list[str]` | `'list()'` | list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys |
 | `ignore_empty_parents` | `bool` | `True` | if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True) |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001C27837D250>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `index` | `str | list` | `'list()'` |  |
 | `columns` | `str | list` | `'list()'` |  |
@@ -1008,21 +1033,22 @@ Args:
 # Example usage of `PivotAction`
 from pydag.nodes.db.PivotAction import PivotAction  # Adjust import if needed
 
-obj = PivotAction()
-obj.child_ids='list()'
-obj.buffer_id="<string>"
-obj.persistent=True
-obj.n=0
-obj.input_keys='list()'
-obj.output_keys='list()'
-obj.ignore_keys='list()'
-obj.ignore_empty_parents=True
-obj.id=<dataclasses._MISSING_TYPE object at 0x000001C27837D250>
-obj.load_on_install=False
-obj.index='list()'
-obj.columns='list()'
-obj.values='list()'
-obj.aggfunc='list()'
+pivot_action = PivotAction(
+	child_ids='list()',
+	buffer_id="<string>",
+	persistent=True,
+	n=0,
+	input_keys='list()',
+	output_keys='list()',
+	ignore_keys='list()',
+	ignore_empty_parents=True,
+	id="<string>",
+	load_on_install=False,
+	index='list()',
+	columns='list()',
+	values='list()',
+	aggfunc='list()'
+)
 ```
 
 [Go to Summary](#summary)
@@ -1033,36 +1059,37 @@ obj.aggfunc='list()'
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
-| `buffer_id` | `str` | `` | unique ID of the buffer |
+| `buffer_id` | `str` | `"<string>"` | unique ID of the buffer |
 | `persistent` | `bool` | `True` | specifies whether data is removed (False) from parent or not (True) |
 | `n` | `int` | `0` | specifies how much data is retrieved from parent buffer. Default 0 -> all data |
 | `input_keys` | `list[str] | list[int] | str` | `'list()'` | list of input key names used to extract data from parent buffers. input_keys can also be a list of integers for indices or a Python-style slice string (e.g. '-1' for last index, '1:3' or '0:5:2' for start:stop:step exclusive indexing), or a type selector ('type:string' for text-like values, 'type:number' for numeric and bool values). Duplicates are removed while preserving first-match order. If empty, all parent keys are returned |
 | `output_keys` | `list[str]` | `'list()'` | optional explicit output key names written by this node. output_keys are literal names only and do not support selector syntax. If empty, the node uses its default output naming |
 | `ignore_keys` | `list[str]` | `'list()'` | list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys |
 | `ignore_empty_parents` | `bool` | `True` | if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True) |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001C27837D250>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
-| `connection_str` | `str` | `` | connection string for the specific SQL database |
-| `query` | `str` | `` | SQL query to execute. If `input_keys` are defined, the query is treated as a parameterized query and values are taken from the buffers. |
+| `connection_str` | `str` | `"<string>"` | connection string for the specific SQL database |
+| `query` | `str` | `"<string>"` | SQL query to execute. If `input_keys` are defined, the query is treated as a parameterized query and values are taken from the buffers. |
 
 
 ```python
 # Example usage of `SQLAction`
 from pydag.nodes.db.SQLAction import SQLAction  # Adjust import if needed
 
-obj = SQLAction()
-obj.child_ids='list()'
-obj.buffer_id="<string>"
-obj.persistent=True
-obj.n=0
-obj.input_keys='list()'
-obj.output_keys='list()'
-obj.ignore_keys='list()'
-obj.ignore_empty_parents=True
-obj.id=<dataclasses._MISSING_TYPE object at 0x000001C27837D250>
-obj.load_on_install=False
-obj.connection_str="<string>"
-obj.query="<string>"
+s_q_l_action = SQLAction(
+	child_ids='list()',
+	buffer_id="<string>",
+	persistent=True,
+	n=0,
+	input_keys='list()',
+	output_keys='list()',
+	ignore_keys='list()',
+	ignore_empty_parents=True,
+	id="<string>",
+	load_on_install=False,
+	connection_str="<string>",
+	query="<string>"
+)
 ```
 
 [Go to Summary](#summary)
@@ -1073,7 +1100,7 @@ Hence sample_length should be larger than the number of dimensions.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
-| `buffer_id` | `str` | `` | unique ID of the buffer |
+| `buffer_id` | `str` | `"<string>"` | unique ID of the buffer |
 | `persistent` | `bool` | `True` | specifies whether data is removed (False) from parent or not (True) |
 | `n` | `int` | `0` | specifies how much data is retrieved from parent buffer. Default 0 -> all data |
 | `input_keys` | `list[str] | list[int] | str` | `'list()'` | list of input key names used to extract data from parent buffers. input_keys can also be a list of integers for indices or a Python-style slice string (e.g. '-1' for last index, '1:3' or '0:5:2' for start:stop:step exclusive indexing), or a type selector ('type:string' for text-like values, 'type:number' for numeric and bool values). Duplicates are removed while preserving first-match order. If empty, all parent keys are returned |
@@ -1084,7 +1111,7 @@ Hence sample_length should be larger than the number of dimensions.
 | `sample_length` | `int` | `0` | Expected length of each sample. If 0, a sample with shape (1, min_learning_samples) is assumed. Otherwise, (1, sample_length) is assumed. |
 | `normalize` | `bool` | `False` | Flag to indicate whether to normalize the input data using z-score normalization on the input batch. |
 | `nan_to_num` | `bool` | `False` | If True, replace NaN/Inf values with finite numbers (0.0). |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001C27837D250>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `dimensions` | `int` | `2` | number of dimensions to reduce the data to |
 | `output_keys` | `list[str]` | `'list()'` | optional explicit output keys; if empty, default naming is used |
@@ -1094,23 +1121,24 @@ Hence sample_length should be larger than the number of dimensions.
 # Example usage of `IsomapDimReduction`
 from pydag.nodes.dimreduction.IsomapDimReduction import IsomapDimReduction  # Adjust import if needed
 
-obj = IsomapDimReduction()
-obj.child_ids='list()'
-obj.buffer_id="<string>"
-obj.persistent=True
-obj.n=0
-obj.input_keys='list()'
-obj.ignore_keys='list()'
-obj.ignore_empty_parents=True
-obj.min_learning_samples=0
-obj.min_inference_samples=0
-obj.sample_length=0
-obj.normalize=False
-obj.nan_to_num=False
-obj.id=<dataclasses._MISSING_TYPE object at 0x000001C27837D250>
-obj.load_on_install=False
-obj.dimensions=2
-obj.output_keys='list()'
+isomap_dim_reduction = IsomapDimReduction(
+	child_ids='list()',
+	buffer_id="<string>",
+	persistent=True,
+	n=0,
+	input_keys='list()',
+	ignore_keys='list()',
+	ignore_empty_parents=True,
+	min_learning_samples=0,
+	min_inference_samples=0,
+	sample_length=0,
+	normalize=False,
+	nan_to_num=False,
+	id="<string>",
+	load_on_install=False,
+	dimensions=2,
+	output_keys='list()'
+)
 ```
 
 [Go to Summary](#summary)
@@ -1121,7 +1149,7 @@ Hence sample_length should be larger than the number of dimensions.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
-| `buffer_id` | `str` | `` | unique ID of the buffer |
+| `buffer_id` | `str` | `"<string>"` | unique ID of the buffer |
 | `persistent` | `bool` | `True` | specifies whether data is removed (False) from parent or not (True) |
 | `n` | `int` | `0` | specifies how much data is retrieved from parent buffer. Default 0 -> all data |
 | `input_keys` | `list[str] | list[int] | str` | `'list()'` | list of input key names used to extract data from parent buffers. input_keys can also be a list of integers for indices or a Python-style slice string (e.g. '-1' for last index, '1:3' or '0:5:2' for start:stop:step exclusive indexing), or a type selector ('type:string' for text-like values, 'type:number' for numeric and bool values). Duplicates are removed while preserving first-match order. If empty, all parent keys are returned |
@@ -1132,7 +1160,7 @@ Hence sample_length should be larger than the number of dimensions.
 | `sample_length` | `int` | `0` | Expected length of each sample. If 0, a sample with shape (1, min_learning_samples) is assumed. Otherwise, (1, sample_length) is assumed. |
 | `normalize` | `bool` | `False` | Flag to indicate whether to normalize the input data using z-score normalization on the input batch. |
 | `nan_to_num` | `bool` | `False` | If True, replace NaN/Inf values with finite numbers (0.0). |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001C27837D250>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `dimensions` | `int` | `2` |  |
 | `output_keys` | `list[str]` | `'list()'` | optional explicit output keys; if empty, default naming is used |
@@ -1142,23 +1170,24 @@ Hence sample_length should be larger than the number of dimensions.
 # Example usage of `LocallyLinearEmbeddingsReduction`
 from pydag.nodes.dimreduction.LocallyLinearEmbeddingsReduction import LocallyLinearEmbeddingsReduction  # Adjust import if needed
 
-obj = LocallyLinearEmbeddingsReduction()
-obj.child_ids='list()'
-obj.buffer_id="<string>"
-obj.persistent=True
-obj.n=0
-obj.input_keys='list()'
-obj.ignore_keys='list()'
-obj.ignore_empty_parents=True
-obj.min_learning_samples=0
-obj.min_inference_samples=0
-obj.sample_length=0
-obj.normalize=False
-obj.nan_to_num=False
-obj.id=<dataclasses._MISSING_TYPE object at 0x000001C27837D250>
-obj.load_on_install=False
-obj.dimensions=2
-obj.output_keys='list()'
+locally_linear_embeddings_reduction = LocallyLinearEmbeddingsReduction(
+	child_ids='list()',
+	buffer_id="<string>",
+	persistent=True,
+	n=0,
+	input_keys='list()',
+	ignore_keys='list()',
+	ignore_empty_parents=True,
+	min_learning_samples=0,
+	min_inference_samples=0,
+	sample_length=0,
+	normalize=False,
+	nan_to_num=False,
+	id="<string>",
+	load_on_install=False,
+	dimensions=2,
+	output_keys='list()'
+)
 ```
 
 [Go to Summary](#summary)
@@ -1169,7 +1198,7 @@ Hence sample_length should be larger than the number of dimensions.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
-| `buffer_id` | `str` | `` | unique ID of the buffer |
+| `buffer_id` | `str` | `"<string>"` | unique ID of the buffer |
 | `persistent` | `bool` | `True` | specifies whether data is removed (False) from parent or not (True) |
 | `n` | `int` | `0` | specifies how much data is retrieved from parent buffer. Default 0 -> all data |
 | `input_keys` | `list[str] | list[int] | str` | `'list()'` | list of input key names used to extract data from parent buffers. input_keys can also be a list of integers for indices or a Python-style slice string (e.g. '-1' for last index, '1:3' or '0:5:2' for start:stop:step exclusive indexing), or a type selector ('type:string' for text-like values, 'type:number' for numeric and bool values). Duplicates are removed while preserving first-match order. If empty, all parent keys are returned |
@@ -1180,7 +1209,7 @@ Hence sample_length should be larger than the number of dimensions.
 | `sample_length` | `int` | `0` | Expected length of each sample. If 0, a sample with shape (1, min_learning_samples) is assumed. Otherwise, (1, sample_length) is assumed. |
 | `normalize` | `bool` | `False` | Flag to indicate whether to normalize the input data using z-score normalization on the input batch. |
 | `nan_to_num` | `bool` | `False` | If True, replace NaN/Inf values with finite numbers (0.0). |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001C27837D250>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `dimensions` | `int` | `2` |  |
 | `output_keys` | `list[str]` | `'list()'` | optional explicit output keys; if empty, default naming is used |
@@ -1190,23 +1219,24 @@ Hence sample_length should be larger than the number of dimensions.
 # Example usage of `PCADimReduction`
 from pydag.nodes.dimreduction.PCADimReduction import PCADimReduction  # Adjust import if needed
 
-obj = PCADimReduction()
-obj.child_ids='list()'
-obj.buffer_id="<string>"
-obj.persistent=True
-obj.n=0
-obj.input_keys='list()'
-obj.ignore_keys='list()'
-obj.ignore_empty_parents=True
-obj.min_learning_samples=0
-obj.min_inference_samples=0
-obj.sample_length=0
-obj.normalize=False
-obj.nan_to_num=False
-obj.id=<dataclasses._MISSING_TYPE object at 0x000001C27837D250>
-obj.load_on_install=False
-obj.dimensions=2
-obj.output_keys='list()'
+p_c_a_dim_reduction = PCADimReduction(
+	child_ids='list()',
+	buffer_id="<string>",
+	persistent=True,
+	n=0,
+	input_keys='list()',
+	ignore_keys='list()',
+	ignore_empty_parents=True,
+	min_learning_samples=0,
+	min_inference_samples=0,
+	sample_length=0,
+	normalize=False,
+	nan_to_num=False,
+	id="<string>",
+	load_on_install=False,
+	dimensions=2,
+	output_keys='list()'
+)
 ```
 
 [Go to Summary](#summary)
@@ -1217,22 +1247,23 @@ obj.output_keys='list()'
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001C27837D250>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
-| `source_file` | `str` | `` | path of the source file for being compressed. If source_file is a folder, the whole folder will be compressed. |
-| `target_file` | `str` | `` | new target filepath. If a folder is specified, the name of the source file is used. If no target filepath is specified, the file is compressed in place. |
+| `source_file` | `str` | `"path/to/file.txt"` | path of the source file for being compressed. If source_file is a folder, the whole folder will be compressed. |
+| `target_file` | `str` | `"path/to/file.txt"` | new target filepath. If a folder is specified, the name of the source file is used. If no target filepath is specified, the file is compressed in place. |
 
 
 ```python
 # Example usage of `CompressAction`
 from pydag.nodes.documents.CompressAction import CompressAction  # Adjust import if needed
 
-obj = CompressAction()
-obj.child_ids='list()'
-obj.id=<dataclasses._MISSING_TYPE object at 0x000001C27837D250>
-obj.load_on_install=False
-obj.source_file="path/to/file.txt"
-obj.target_file="path/to/file.txt"
+compress_action = CompressAction(
+	child_ids='list()',
+	id="<string>",
+	load_on_install=False,
+	source_file="path/to/file.txt",
+	target_file="path/to/file.txt"
+)
 ```
 
 [Go to Summary](#summary)
@@ -1241,14 +1272,14 @@ obj.target_file="path/to/file.txt"
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
-| `buffer_id` | `str` | `` | unique ID of the buffer |
+| `buffer_id` | `str` | `"<string>"` | unique ID of the buffer |
 | `persistent` | `bool` | `True` | specifies whether data is removed (False) from parent or not (True) |
 | `n` | `int` | `0` | specifies how much data is retrieved from parent buffer. Default 0 -> all data |
 | `input_keys` | `list[str] | list[int] | str` | `'list()'` | list of input key names used to extract data from parent buffers. input_keys can also be a list of integers for indices or a Python-style slice string (e.g. '-1' for last index, '1:3' or '0:5:2' for start:stop:step exclusive indexing), or a type selector ('type:string' for text-like values, 'type:number' for numeric and bool values). Duplicates are removed while preserving first-match order. If empty, all parent keys are returned |
 | `output_keys` | `list[str]` | `'list()'` | optional explicit output key names written by this node. output_keys are literal names only and do not support selector syntax. If empty, the node uses its default output naming |
 | `ignore_keys` | `list[str]` | `'list()'` | list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys |
 | `ignore_empty_parents` | `bool` | `True` | if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True) |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001C27837D250>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `file_paths` | `list[str]` | `'list()'` | path to the file to convert to base64, e.g. PNG | JPG | PDF | MP4 | AVI | MOV | MP3 |
 
@@ -1257,18 +1288,19 @@ obj.target_file="path/to/file.txt"
 # Example usage of `ConvertFile2Base64Action`
 from pydag.nodes.documents.ConvertFile2Base64Action import ConvertFile2Base64Action  # Adjust import if needed
 
-obj = ConvertFile2Base64Action()
-obj.child_ids='list()'
-obj.buffer_id="<string>"
-obj.persistent=True
-obj.n=0
-obj.input_keys='list()'
-obj.output_keys='list()'
-obj.ignore_keys='list()'
-obj.ignore_empty_parents=True
-obj.id=<dataclasses._MISSING_TYPE object at 0x000001C27837D250>
-obj.load_on_install=False
-obj.file_paths='list()'
+convert_file2_base64_action = ConvertFile2Base64Action(
+	child_ids='list()',
+	buffer_id="<string>",
+	persistent=True,
+	n=0,
+	input_keys='list()',
+	output_keys='list()',
+	ignore_keys='list()',
+	ignore_empty_parents=True,
+	id="<string>",
+	load_on_install=False,
+	file_paths='list()'
+)
 ```
 
 [Go to Summary](#summary)
@@ -1277,34 +1309,35 @@ obj.file_paths='list()'
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
-| `buffer_id` | `str` | `` | unique ID of the buffer |
+| `buffer_id` | `str` | `"<string>"` | unique ID of the buffer |
 | `persistent` | `bool` | `True` | specifies whether data is removed (False) from parent or not (True) |
 | `n` | `int` | `0` | specifies how much data is retrieved from parent buffer. Default 0 -> all data |
 | `input_keys` | `list[str] | list[int] | str` | `'list()'` | list of input key names used to extract data from parent buffers. input_keys can also be a list of integers for indices or a Python-style slice string (e.g. '-1' for last index, '1:3' or '0:5:2' for start:stop:step exclusive indexing), or a type selector ('type:string' for text-like values, 'type:number' for numeric and bool values). Duplicates are removed while preserving first-match order. If empty, all parent keys are returned |
 | `output_keys` | `list[str]` | `'list()'` | optional explicit output key names written by this node. output_keys are literal names only and do not support selector syntax. If empty, the node uses its default output naming |
 | `ignore_keys` | `list[str]` | `'list()'` | list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys |
 | `ignore_empty_parents` | `bool` | `True` | if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True) |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001C27837D250>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
-| `target_folder` | `str` | `` | target folder to copy all the files to in Buffer |
+| `target_folder` | `str` | `"path/to/folder"` | target folder to copy all the files to in Buffer |
 
 
 ```python
 # Example usage of `CopyFilesAction`
 from pydag.nodes.documents.CopyFilesAction import CopyFilesAction  # Adjust import if needed
 
-obj = CopyFilesAction()
-obj.child_ids='list()'
-obj.buffer_id="<string>"
-obj.persistent=True
-obj.n=0
-obj.input_keys='list()'
-obj.output_keys='list()'
-obj.ignore_keys='list()'
-obj.ignore_empty_parents=True
-obj.id=<dataclasses._MISSING_TYPE object at 0x000001C27837D250>
-obj.load_on_install=False
-obj.target_folder="path/to/folder"
+copy_files_action = CopyFilesAction(
+	child_ids='list()',
+	buffer_id="<string>",
+	persistent=True,
+	n=0,
+	input_keys='list()',
+	output_keys='list()',
+	ignore_keys='list()',
+	ignore_empty_parents=True,
+	id="<string>",
+	load_on_install=False,
+	target_folder="path/to/folder"
+)
 ```
 
 [Go to Summary](#summary)
@@ -1315,22 +1348,23 @@ obj.target_folder="path/to/folder"
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001C27837D250>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
-| `source_file` | `str` | `` | path of the source file for being compressed. If source_file is a folder, the whole folder will be compressed. |
-| `target_dir` | `str` | `` | new target filepath. If a folder is specified, the name of the source file is used. If no target filepath is specified, the file is compressed in place. |
+| `source_file` | `str` | `"path/to/file.txt"` | path of the source file for being compressed. If source_file is a folder, the whole folder will be compressed. |
+| `target_dir` | `str` | `"<string>"` | new target filepath. If a folder is specified, the name of the source file is used. If no target filepath is specified, the file is compressed in place. |
 
 
 ```python
 # Example usage of `DecompressAction`
 from pydag.nodes.documents.DecompressAction import DecompressAction  # Adjust import if needed
 
-obj = DecompressAction()
-obj.child_ids='list()'
-obj.id=<dataclasses._MISSING_TYPE object at 0x000001C27837D250>
-obj.load_on_install=False
-obj.source_file="path/to/file.txt"
-obj.target_dir="<string>"
+decompress_action = DecompressAction(
+	child_ids='list()',
+	id="<string>",
+	load_on_install=False,
+	source_file="path/to/file.txt",
+	target_dir="<string>"
+)
 ```
 
 [Go to Summary](#summary)
@@ -1342,36 +1376,37 @@ buffers of parent elements can be used to populate the docx file, if `buffer_id`
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
-| `buffer_id` | `str` | `` | unique ID of the buffer |
+| `buffer_id` | `str` | `"<string>"` | unique ID of the buffer |
 | `persistent` | `bool` | `True` | specifies whether data is removed (False) from parent or not (True) |
 | `n` | `int` | `0` | specifies how much data is retrieved from parent buffer. Default 0 -> all data |
 | `input_keys` | `list[str] | list[int] | str` | `'list()'` | list of input key names used to extract data from parent buffers. input_keys can also be a list of integers for indices or a Python-style slice string (e.g. '-1' for last index, '1:3' or '0:5:2' for start:stop:step exclusive indexing), or a type selector ('type:string' for text-like values, 'type:number' for numeric and bool values). Duplicates are removed while preserving first-match order. If empty, all parent keys are returned |
 | `output_keys` | `list[str]` | `'list()'` | optional explicit output key names written by this node. output_keys are literal names only and do not support selector syntax. If empty, the node uses its default output naming |
 | `ignore_keys` | `list[str]` | `'list()'` | list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys |
 | `ignore_empty_parents` | `bool` | `True` | if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True) |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001C27837D250>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `output_path` | `str` | `'output.docx'` | output path for the template to be saved to |
-| `template_path` | `str` | `` | template file path |
+| `template_path` | `str` | `"<string>"` | template file path |
 
 
 ```python
 # Example usage of `DocxTemplateAction`
 from pydag.nodes.documents.DocxTemplateAction import DocxTemplateAction  # Adjust import if needed
 
-obj = DocxTemplateAction()
-obj.child_ids='list()'
-obj.buffer_id="<string>"
-obj.persistent=True
-obj.n=0
-obj.input_keys='list()'
-obj.output_keys='list()'
-obj.ignore_keys='list()'
-obj.ignore_empty_parents=True
-obj.id=<dataclasses._MISSING_TYPE object at 0x000001C27837D250>
-obj.load_on_install=False
-obj.output_path='output.docx'
-obj.template_path="<string>"
+docx_template_action = DocxTemplateAction(
+	child_ids='list()',
+	buffer_id="<string>",
+	persistent=True,
+	n=0,
+	input_keys='list()',
+	output_keys='list()',
+	ignore_keys='list()',
+	ignore_empty_parents=True,
+	id="<string>",
+	load_on_install=False,
+	output_path='output.docx',
+	template_path="<string>"
+)
 ```
 
 [Go to Summary](#summary)
@@ -1380,15 +1415,15 @@ obj.template_path="<string>"
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
-| `buffer_id` | `str` | `` | unique ID of the buffer |
+| `buffer_id` | `str` | `"<string>"` | unique ID of the buffer |
 | `persistent` | `bool` | `True` | specifies whether data is removed (False) from parent or not (True) |
 | `n` | `int` | `0` | specifies how much data is retrieved from parent buffer. Default 0 -> all data |
 | `input_keys` | `list[str] | list[int] | str` | `'list()'` | list of input key names used to extract data from parent buffers. input_keys can also be a list of integers for indices or a Python-style slice string (e.g. '-1' for last index, '1:3' or '0:5:2' for start:stop:step exclusive indexing), or a type selector ('type:string' for text-like values, 'type:number' for numeric and bool values). Duplicates are removed while preserving first-match order. If empty, all parent keys are returned |
 | `ignore_keys` | `list[str]` | `'list()'` | list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys |
 | `ignore_empty_parents` | `bool` | `True` | if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True) |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001C27837D250>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
-| `path` | `str` | `` | output folder or filepath to write the HTML files to, if a file is specified, then all html strings retrieved are (over)written to this location, if a folder is specified, then all html strings are written to files in this folder with the name schema <key>_<COUNTER>.html |
+| `path` | `str` | `"<string>"` | output folder or filepath to write the HTML files to, if a file is specified, then all html strings retrieved are (over)written to this location, if a folder is specified, then all html strings are written to files in this folder with the name schema <key>_<COUNTER>.html |
 | `encoding` | `str` | `'utf-8'` | encoding for html file(s), defalts to utf-8 |
 | `output_keys` | `list[str]` | `"lambda: ['path']()"` | default output_keys are 'path', for this node only ever one output key is required |
 
@@ -1397,19 +1432,20 @@ obj.template_path="<string>"
 # Example usage of `HTMLFileAction`
 from pydag.nodes.documents.HTMLFileAction import HTMLFileAction  # Adjust import if needed
 
-obj = HTMLFileAction()
-obj.child_ids='list()'
-obj.buffer_id="<string>"
-obj.persistent=True
-obj.n=0
-obj.input_keys='list()'
-obj.ignore_keys='list()'
-obj.ignore_empty_parents=True
-obj.id=<dataclasses._MISSING_TYPE object at 0x000001C27837D250>
-obj.load_on_install=False
-obj.path="<string>"
-obj.encoding='utf-8'
-obj.output_keys="lambda: ['path']()"
+h_t_m_l_file_action = HTMLFileAction(
+	child_ids='list()',
+	buffer_id="<string>",
+	persistent=True,
+	n=0,
+	input_keys='list()',
+	ignore_keys='list()',
+	ignore_empty_parents=True,
+	id="<string>",
+	load_on_install=False,
+	path="<string>",
+	encoding='utf-8',
+	output_keys="lambda: ['path']()"
+)
 ```
 
 [Go to Summary](#summary)
@@ -1420,13 +1456,13 @@ By default it outputs the HTML to a key named 'html' for child `Node`s to consum
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
-| `buffer_id` | `str` | `` | unique ID of the buffer |
+| `buffer_id` | `str` | `"<string>"` | unique ID of the buffer |
 | `persistent` | `bool` | `True` | specifies whether data is removed (False) from parent or not (True) |
 | `n` | `int` | `0` | specifies how much data is retrieved from parent buffer. Default 0 -> all data |
 | `input_keys` | `list[str] | list[int] | str` | `'list()'` | list of input key names used to extract data from parent buffers. input_keys can also be a list of integers for indices or a Python-style slice string (e.g. '-1' for last index, '1:3' or '0:5:2' for start:stop:step exclusive indexing), or a type selector ('type:string' for text-like values, 'type:number' for numeric and bool values). Duplicates are removed while preserving first-match order. If empty, all parent keys are returned |
 | `ignore_keys` | `list[str]` | `'list()'` | list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys |
 | `ignore_empty_parents` | `bool` | `True` | if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True) |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001C27837D250>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `output_keys` | `list[str]` | `"lambda: ['html']()"` |  |
 
@@ -1435,17 +1471,18 @@ By default it outputs the HTML to a key named 'html' for child `Node`s to consum
 # Example usage of `HTMLTableAction`
 from pydag.nodes.documents.HTMLTableAction import HTMLTableAction  # Adjust import if needed
 
-obj = HTMLTableAction()
-obj.child_ids='list()'
-obj.buffer_id="<string>"
-obj.persistent=True
-obj.n=0
-obj.input_keys='list()'
-obj.ignore_keys='list()'
-obj.ignore_empty_parents=True
-obj.id=<dataclasses._MISSING_TYPE object at 0x000001C27837D250>
-obj.load_on_install=False
-obj.output_keys="lambda: ['html']()"
+h_t_m_l_table_action = HTMLTableAction(
+	child_ids='list()',
+	buffer_id="<string>",
+	persistent=True,
+	n=0,
+	input_keys='list()',
+	ignore_keys='list()',
+	ignore_empty_parents=True,
+	id="<string>",
+	load_on_install=False,
+	output_keys="lambda: ['html']()"
+)
 ```
 
 [Go to Summary](#summary)
@@ -1454,22 +1491,22 @@ obj.output_keys="lambda: ['html']()"
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
-| `buffer_id` | `str` | `` | unique ID of the buffer |
+| `buffer_id` | `str` | `"<string>"` | unique ID of the buffer |
 | `persistent` | `bool` | `True` | specifies whether data is removed (False) from parent or not (True) |
 | `n` | `int` | `0` | specifies how much data is retrieved from parent buffer. Default 0 -> all data |
 | `input_keys` | `list[str] | list[int] | str` | `'list()'` | list of input key names used to extract data from parent buffers. input_keys can also be a list of integers for indices or a Python-style slice string (e.g. '-1' for last index, '1:3' or '0:5:2' for start:stop:step exclusive indexing), or a type selector ('type:string' for text-like values, 'type:number' for numeric and bool values). Duplicates are removed while preserving first-match order. If empty, all parent keys are returned |
 | `output_keys` | `list[str]` | `'list()'` | optional explicit output key names written by this node. output_keys are literal names only and do not support selector syntax. If empty, the node uses its default output naming |
 | `ignore_keys` | `list[str]` | `'list()'` | list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys |
 | `ignore_empty_parents` | `bool` | `True` | if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True) |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001C27837D250>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
-| `ical_path` | `str` | `` | path for ics file export, full path to the file |
+| `ical_path` | `str` | `"<string>"` | path for ics file export, full path to the file |
 | `date_format` | `str` | `'%d.%m.%Y'` | date format to parse the incoming date fields from |
-| `name_key` | `str` | `` | name of the key that contains the event name |
-| `start_key` | `str` | `` | name of the key that contains the start date |
-| `end_key` | `str` | `` | name of the key that contains the end date |
-| `description_key` | `str` | `` | name of the key that contains the event description |
-| `location_key` | `str` | `` | name of the key that contains the location of the event |
+| `name_key` | `str` | `"John Doe"` | name of the key that contains the event name |
+| `start_key` | `str` | `"<string>"` | name of the key that contains the start date |
+| `end_key` | `str` | `"<string>"` | name of the key that contains the end date |
+| `description_key` | `str` | `"<string>"` | name of the key that contains the event description |
+| `location_key` | `str` | `"<string>"` | name of the key that contains the location of the event |
 | `time_zone` | `str` | `'Europe/Berlin'` | name of the key that contains the time zone info |
 
 
@@ -1477,25 +1514,26 @@ obj.output_keys="lambda: ['html']()"
 # Example usage of `ICalAction`
 from pydag.nodes.documents.ICalAction import ICalAction  # Adjust import if needed
 
-obj = ICalAction()
-obj.child_ids='list()'
-obj.buffer_id="<string>"
-obj.persistent=True
-obj.n=0
-obj.input_keys='list()'
-obj.output_keys='list()'
-obj.ignore_keys='list()'
-obj.ignore_empty_parents=True
-obj.id=<dataclasses._MISSING_TYPE object at 0x000001C27837D250>
-obj.load_on_install=False
-obj.ical_path="<string>"
-obj.date_format='%d.%m.%Y'
-obj.name_key="John Doe"
-obj.start_key="<string>"
-obj.end_key="<string>"
-obj.description_key="<string>"
-obj.location_key="<string>"
-obj.time_zone='Europe/Berlin'
+i_cal_action = ICalAction(
+	child_ids='list()',
+	buffer_id="<string>",
+	persistent=True,
+	n=0,
+	input_keys='list()',
+	output_keys='list()',
+	ignore_keys='list()',
+	ignore_empty_parents=True,
+	id="<string>",
+	load_on_install=False,
+	ical_path="<string>",
+	date_format='%d.%m.%Y',
+	name_key="John Doe",
+	start_key="<string>",
+	end_key="<string>",
+	description_key="<string>",
+	location_key="<string>",
+	time_zone='Europe/Berlin'
+)
 ```
 
 [Go to Summary](#summary)
@@ -1504,19 +1542,19 @@ obj.time_zone='Europe/Berlin'
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
-| `buffer_id` | `str` | `` | unique ID of the buffer |
+| `buffer_id` | `str` | `"<string>"` | unique ID of the buffer |
 | `persistent` | `bool` | `True` | specifies whether data is removed (False) from parent or not (True) |
 | `n` | `int` | `0` | specifies how much data is retrieved from parent buffer. Default 0 -> all data |
 | `input_keys` | `list[str] | list[int] | str` | `'list()'` | list of input key names used to extract data from parent buffers. input_keys can also be a list of integers for indices or a Python-style slice string (e.g. '-1' for last index, '1:3' or '0:5:2' for start:stop:step exclusive indexing), or a type selector ('type:string' for text-like values, 'type:number' for numeric and bool values). Duplicates are removed while preserving first-match order. If empty, all parent keys are returned |
 | `output_keys` | `list[str]` | `'list()'` | optional explicit output key names written by this node. output_keys are literal names only and do not support selector syntax. If empty, the node uses its default output naming |
 | `ignore_keys` | `list[str]` | `'list()'` | list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys |
 | `ignore_empty_parents` | `bool` | `True` | if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True) |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001C27837D250>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
-| `folder` | `str` | `` | folder to list the files from into a Buffer |
-| `pattern` | `Union[str | list[str]]` | `` | pattern to look for in file names, can be str or list, e.g. ['png', 'jpg'] |
-| `extension` | `str` | `` | extension to include |
-| `newer_than_seconds` | `int` | `` | specifies how old in seconds a file can be to be included |
+| `folder` | `str` | `"path/to/folder"` | folder to list the files from into a Buffer |
+| `pattern` | `Union[str | list[str]]` | `"<string>"` | pattern to look for in file names, can be str or list, e.g. ['png', 'jpg'] |
+| `extension` | `str` | `"<string>"` | extension to include |
+| `newer_than_seconds` | `int` | `1` | specifies how old in seconds a file can be to be included |
 | `recursive` | `bool` | `False` | specifies whether to search subdirectories aswell |
 
 
@@ -1524,22 +1562,23 @@ obj.time_zone='Europe/Berlin'
 # Example usage of `ListFilesAction`
 from pydag.nodes.documents.ListFilesAction import ListFilesAction  # Adjust import if needed
 
-obj = ListFilesAction()
-obj.child_ids='list()'
-obj.buffer_id="<string>"
-obj.persistent=True
-obj.n=0
-obj.input_keys='list()'
-obj.output_keys='list()'
-obj.ignore_keys='list()'
-obj.ignore_empty_parents=True
-obj.id=<dataclasses._MISSING_TYPE object at 0x000001C27837D250>
-obj.load_on_install=False
-obj.folder="path/to/folder"
-obj.pattern="<string>"
-obj.extension="<string>"
-obj.newer_than_seconds=1
-obj.recursive=False
+list_files_action = ListFilesAction(
+	child_ids='list()',
+	buffer_id="<string>",
+	persistent=True,
+	n=0,
+	input_keys='list()',
+	output_keys='list()',
+	ignore_keys='list()',
+	ignore_empty_parents=True,
+	id="<string>",
+	load_on_install=False,
+	folder="path/to/folder",
+	pattern="<string>",
+	extension="<string>",
+	newer_than_seconds=1,
+	recursive=False
+)
 ```
 
 [Go to Summary](#summary)
@@ -1553,34 +1592,35 @@ Raises:
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
-| `buffer_id` | `str` | `` | unique ID of the buffer |
+| `buffer_id` | `str` | `"<string>"` | unique ID of the buffer |
 | `persistent` | `bool` | `True` | specifies whether data is removed (False) from parent or not (True) |
 | `n` | `int` | `0` | specifies how much data is retrieved from parent buffer. Default 0 -> all data |
 | `input_keys` | `list[str] | list[int] | str` | `'list()'` | list of input key names used to extract data from parent buffers. input_keys can also be a list of integers for indices or a Python-style slice string (e.g. '-1' for last index, '1:3' or '0:5:2' for start:stop:step exclusive indexing), or a type selector ('type:string' for text-like values, 'type:number' for numeric and bool values). Duplicates are removed while preserving first-match order. If empty, all parent keys are returned |
 | `output_keys` | `list[str]` | `'list()'` | optional explicit output key names written by this node. output_keys are literal names only and do not support selector syntax. If empty, the node uses its default output naming |
 | `ignore_keys` | `list[str]` | `'list()'` | list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys |
 | `ignore_empty_parents` | `bool` | `True` | if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True) |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001C27837D250>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
-| `target_folder` | `str` | `` | target folder to move all the files to in Buffer |
+| `target_folder` | `str` | `"path/to/folder"` | target folder to move all the files to in Buffer |
 
 
 ```python
 # Example usage of `MoveFilesAction`
 from pydag.nodes.documents.MoveFilesAction import MoveFilesAction  # Adjust import if needed
 
-obj = MoveFilesAction()
-obj.child_ids='list()'
-obj.buffer_id="<string>"
-obj.persistent=True
-obj.n=0
-obj.input_keys='list()'
-obj.output_keys='list()'
-obj.ignore_keys='list()'
-obj.ignore_empty_parents=True
-obj.id=<dataclasses._MISSING_TYPE object at 0x000001C27837D250>
-obj.load_on_install=False
-obj.target_folder="path/to/folder"
+move_files_action = MoveFilesAction(
+	child_ids='list()',
+	buffer_id="<string>",
+	persistent=True,
+	n=0,
+	input_keys='list()',
+	output_keys='list()',
+	ignore_keys='list()',
+	ignore_empty_parents=True,
+	id="<string>",
+	load_on_install=False,
+	target_folder="path/to/folder"
+)
 ```
 
 [Go to Summary](#summary)
@@ -1590,12 +1630,12 @@ Extract context-rich AcroForm fields from PDF files using PyMuPDF.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
-| `buffer_id` | `str` | `` | unique ID of the buffer |
+| `buffer_id` | `str` | `"<string>"` | unique ID of the buffer |
 | `persistent` | `bool` | `True` | specifies whether data is removed (False) from parent or not (True) |
 | `n` | `int` | `0` | specifies how much data is retrieved from parent buffer. Default 0 -> all data |
 | `ignore_keys` | `list[str]` | `'list()'` | list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys |
 | `ignore_empty_parents` | `bool` | `True` | if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True) |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001C27837D250>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `input_keys` | `list[str]` | `"lambda: ['values']()"` | parent buffer keys to scan for PDF file paths |
 | `output_keys` | `list[str]` | `"lambda: ['filepath', 'metadata', 'fields', 'full_text_content', 'llm_prompt']()"` | output columns for source path, metadata, extracted fields, page text, and the llm_prompt bridge column used by downstream form-filling LLM steps; exactly 5 output_keys are mandatory, and llm_prompt must remain present even when include_bridge_prompt=False (it is then emitted as an empty string) |
@@ -1613,25 +1653,26 @@ Extract context-rich AcroForm fields from PDF files using PyMuPDF.
 # Example usage of `PDFReadFormAction`
 from pydag.nodes.documents.PDFReadFormAction import PDFReadFormAction  # Adjust import if needed
 
-obj = PDFReadFormAction()
-obj.child_ids='list()'
-obj.buffer_id="<string>"
-obj.persistent=True
-obj.n=0
-obj.ignore_keys='list()'
-obj.ignore_empty_parents=True
-obj.id=<dataclasses._MISSING_TYPE object at 0x000001C27837D250>
-obj.load_on_install=False
-obj.input_keys="lambda: ['values']()"
-obj.output_keys="lambda: ['filepath', 'metadata', 'fields', 'full_text_content', 'llm_prompt']()"
-obj.row_mode='per_pdf'
-obj.include_bridge_prompt=True
-obj.emit_writable_only=True
-obj.require_pdf_extension=True
-obj.label_search_left=90.0
-obj.label_search_above=60.0
-obj.label_search_right=20.0
-obj.context_search_padding=140.0
+p_d_f_read_form_action = PDFReadFormAction(
+	child_ids='list()',
+	buffer_id="<string>",
+	persistent=True,
+	n=0,
+	ignore_keys='list()',
+	ignore_empty_parents=True,
+	id="<string>",
+	load_on_install=False,
+	input_keys="lambda: ['values']()",
+	output_keys="lambda: ['filepath', 'metadata', 'fields', 'full_text_content', 'llm_prompt']()",
+	row_mode='per_pdf',
+	include_bridge_prompt=True,
+	emit_writable_only=True,
+	require_pdf_extension=True,
+	label_search_left=90.0,
+	label_search_above=60.0,
+	label_search_right=20.0,
+	context_search_padding=140.0
+)
 ```
 
 [Go to Summary](#summary)
@@ -1641,13 +1682,13 @@ Write LLM- or user-provided values into PDF AcroForm fields using PyMuPDF.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
-| `buffer_id` | `str` | `` | unique ID of the buffer |
+| `buffer_id` | `str` | `"<string>"` | unique ID of the buffer |
 | `persistent` | `bool` | `True` | specifies whether data is removed (False) from parent or not (True) |
 | `n` | `int` | `0` | specifies how much data is retrieved from parent buffer. Default 0 -> all data |
 | `input_keys` | `list[str] | list[int] | str` | `'list()'` | list of input key names used to extract data from parent buffers. input_keys can also be a list of integers for indices or a Python-style slice string (e.g. '-1' for last index, '1:3' or '0:5:2' for start:stop:step exclusive indexing), or a type selector ('type:string' for text-like values, 'type:number' for numeric and bool values). Duplicates are removed while preserving first-match order. If empty, all parent keys are returned |
 | `ignore_keys` | `list[str]` | `'list()'` | list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys |
 | `ignore_empty_parents` | `bool` | `True` | if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True) |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001C27837D250>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `path_input_keys` | `list[str]` | `"lambda: ['values', 'filepath', 'pdf_path']()"` | parent buffer keys to scan for source PDF file paths |
 | `fill_input_keys` | `list[str]` | `"lambda: ['answer', 'answers', 'fields', 'field_values', 'llm_data', 'content']()"` | parent buffer keys to scan for strict field_updates payloads whose field values are the final PDF write instructions: each update uses internal_field_id plus either value for text/dropdown/list fields or selected_state for checkbox/radio fields |
@@ -1665,26 +1706,27 @@ Write LLM- or user-provided values into PDF AcroForm fields using PyMuPDF.
 # Example usage of `PDFWriteFormAction`
 from pydag.nodes.documents.PDFWriteFormAction import PDFWriteFormAction  # Adjust import if needed
 
-obj = PDFWriteFormAction()
-obj.child_ids='list()'
-obj.buffer_id="<string>"
-obj.persistent=True
-obj.n=0
-obj.input_keys='list()'
-obj.ignore_keys='list()'
-obj.ignore_empty_parents=True
-obj.id=<dataclasses._MISSING_TYPE object at 0x000001C27837D250>
-obj.load_on_install=False
-obj.path_input_keys="lambda: ['values', 'filepath', 'pdf_path']()"
-obj.fill_input_keys="lambda: ['answer', 'answers', 'fields', 'field_values', 'llm_data', 'content']()"
-obj.row_mode='per_pdf'
-obj.output_keys="lambda: ['filepath', 'output_filepath', 'written_fields', 'written_field_count']()"
-obj.output_folder='resources/outputs'
-obj.output_suffix='_filled'
-obj.overwrite_source=False
-obj.flatten=False
-obj.strict_unknown_fields=True
-obj.require_pdf_extension=True
+p_d_f_write_form_action = PDFWriteFormAction(
+	child_ids='list()',
+	buffer_id="<string>",
+	persistent=True,
+	n=0,
+	input_keys='list()',
+	ignore_keys='list()',
+	ignore_empty_parents=True,
+	id="<string>",
+	load_on_install=False,
+	path_input_keys="lambda: ['values', 'filepath', 'pdf_path']()",
+	fill_input_keys="lambda: ['answer', 'answers', 'fields', 'field_values', 'llm_data', 'content']()",
+	row_mode='per_pdf',
+	output_keys="lambda: ['filepath', 'output_filepath', 'written_fields', 'written_field_count']()",
+	output_folder='resources/outputs',
+	output_suffix='_filled',
+	overwrite_source=False,
+	flatten=False,
+	strict_unknown_fields=True,
+	require_pdf_extension=True
+)
 ```
 
 [Go to Summary](#summary)
@@ -1694,14 +1736,14 @@ An `Action` that splits incoming filenames by a delimiter into separate output c
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
-| `buffer_id` | `str` | `` | unique ID of the buffer |
+| `buffer_id` | `str` | `"<string>"` | unique ID of the buffer |
 | `persistent` | `bool` | `True` | specifies whether data is removed (False) from parent or not (True) |
 | `n` | `int` | `0` | specifies how much data is retrieved from parent buffer. Default 0 -> all data |
 | `input_keys` | `list[str] | list[int] | str` | `'list()'` | list of input key names used to extract data from parent buffers. input_keys can also be a list of integers for indices or a Python-style slice string (e.g. '-1' for last index, '1:3' or '0:5:2' for start:stop:step exclusive indexing), or a type selector ('type:string' for text-like values, 'type:number' for numeric and bool values). Duplicates are removed while preserving first-match order. If empty, all parent keys are returned |
 | `output_keys` | `list[str]` | `'list()'` | optional explicit output key names written by this node. output_keys are literal names only and do not support selector syntax. If empty, the node uses its default output naming |
 | `ignore_keys` | `list[str]` | `'list()'` | list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys |
 | `ignore_empty_parents` | `bool` | `True` | if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True) |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001C27837D250>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `delimiter` | `str` | `'_'` | delimiter used to split the incoming filename into separate fields |
 | `parsing_functions` | `list[str]` | `'list()'` | optional per-output parsing functions to apply after splitting |
@@ -1711,19 +1753,20 @@ An `Action` that splits incoming filenames by a delimiter into separate output c
 # Example usage of `ParseFileNameAction`
 from pydag.nodes.documents.ParseFileNameAction import ParseFileNameAction  # Adjust import if needed
 
-obj = ParseFileNameAction()
-obj.child_ids='list()'
-obj.buffer_id="<string>"
-obj.persistent=True
-obj.n=0
-obj.input_keys='list()'
-obj.output_keys='list()'
-obj.ignore_keys='list()'
-obj.ignore_empty_parents=True
-obj.id=<dataclasses._MISSING_TYPE object at 0x000001C27837D250>
-obj.load_on_install=False
-obj.delimiter='_'
-obj.parsing_functions='list()'
+parse_file_name_action = ParseFileNameAction(
+	child_ids='list()',
+	buffer_id="<string>",
+	persistent=True,
+	n=0,
+	input_keys='list()',
+	output_keys='list()',
+	ignore_keys='list()',
+	ignore_empty_parents=True,
+	id="<string>",
+	load_on_install=False,
+	delimiter='_',
+	parsing_functions='list()'
+)
 ```
 
 [Go to Summary](#summary)
@@ -1734,44 +1777,45 @@ obj.parsing_functions='list()'
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
-| `buffer_id` | `str` | `` | unique ID of the buffer |
+| `buffer_id` | `str` | `"<string>"` | unique ID of the buffer |
 | `persistent` | `bool` | `True` | specifies whether data is removed (False) from parent or not (True) |
 | `n` | `int` | `0` | specifies how much data is retrieved from parent buffer. Default 0 -> all data |
 | `input_keys` | `list[str] | list[int] | str` | `'list()'` | list of input key names used to extract data from parent buffers. input_keys can also be a list of integers for indices or a Python-style slice string (e.g. '-1' for last index, '1:3' or '0:5:2' for start:stop:step exclusive indexing), or a type selector ('type:string' for text-like values, 'type:number' for numeric and bool values). Duplicates are removed while preserving first-match order. If empty, all parent keys are returned |
 | `output_keys` | `list[str]` | `'list()'` | optional explicit output key names written by this node. output_keys are literal names only and do not support selector syntax. If empty, the node uses its default output naming |
 | `ignore_keys` | `list[str]` | `'list()'` | list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys |
 | `ignore_empty_parents` | `bool` | `True` | if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True) |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001C27837D250>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
-| `plot_path` | `str` | `` | path for plotly html file |
+| `plot_path` | `str` | `"<string>"` | path for plotly html file |
 | `data` | `list[dict]` | `'list[dict]()'` | plotly data dictionary with buffer keys for x,y,z data |
 | `layout` | `dict` | `'dict()'` | plotly layout dictionary |
 | `open_in_browser` | `bool` | `True` | specifies whether to open the plotly file in browser after creation |
 | `auto_refresh` | `int` | `0` | if an interval greater than 0s is specified, then an meta-tag for page auto refresh is added to html |
-| `colors` | `list[str]` | `` | lets you specify the colors to use from, when creating traces |
+| `colors` | `list[str]` | `"<string>"` | lets you specify the colors to use from, when creating traces |
 
 
 ```python
 # Example usage of `PlotlifyAction`
 from pydag.nodes.documents.PlotlifyAction import PlotlifyAction  # Adjust import if needed
 
-obj = PlotlifyAction()
-obj.child_ids='list()'
-obj.buffer_id="<string>"
-obj.persistent=True
-obj.n=0
-obj.input_keys='list()'
-obj.output_keys='list()'
-obj.ignore_keys='list()'
-obj.ignore_empty_parents=True
-obj.id=<dataclasses._MISSING_TYPE object at 0x000001C27837D250>
-obj.load_on_install=False
-obj.plot_path="<string>"
-obj.data='list[dict]()'
-obj.layout='dict()'
-obj.open_in_browser=True
-obj.auto_refresh=0
-obj.colors="<string>"
+plotlify_action = PlotlifyAction(
+	child_ids='list()',
+	buffer_id="<string>",
+	persistent=True,
+	n=0,
+	input_keys='list()',
+	output_keys='list()',
+	ignore_keys='list()',
+	ignore_empty_parents=True,
+	id="<string>",
+	load_on_install=False,
+	plot_path="<string>",
+	data='list[dict]()',
+	layout='dict()',
+	open_in_browser=True,
+	auto_refresh=0,
+	colors="<string>"
+)
 ```
 
 [Go to Summary](#summary)
@@ -1780,16 +1824,16 @@ obj.colors="<string>"
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
-| `buffer_id` | `str` | `` | unique ID of the buffer |
+| `buffer_id` | `str` | `"<string>"` | unique ID of the buffer |
 | `persistent` | `bool` | `True` | specifies whether data is removed (False) from parent or not (True) |
 | `n` | `int` | `0` | specifies how much data is retrieved from parent buffer. Default 0 -> all data |
 | `input_keys` | `list[str] | list[int] | str` | `'list()'` | list of input key names used to extract data from parent buffers. input_keys can also be a list of integers for indices or a Python-style slice string (e.g. '-1' for last index, '1:3' or '0:5:2' for start:stop:step exclusive indexing), or a type selector ('type:string' for text-like values, 'type:number' for numeric and bool values). Duplicates are removed while preserving first-match order. If empty, all parent keys are returned |
 | `output_keys` | `list[str]` | `'list()'` | optional explicit output key names written by this node. output_keys are literal names only and do not support selector syntax. If empty, the node uses its default output naming |
 | `ignore_keys` | `list[str]` | `'list()'` | list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys |
 | `ignore_empty_parents` | `bool` | `True` | if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True) |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001C27837D250>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
-| `file_path` | `str` | `` | path to the csv file to read the data from |
+| `file_path` | `str` | `"path/to/file.txt"` | path to the csv file to read the data from |
 | `delimiter` | `str` | `';'` | delimiter character(s) for this csv file |
 
 
@@ -1797,19 +1841,20 @@ obj.colors="<string>"
 # Example usage of `ReadCsvAction`
 from pydag.nodes.documents.ReadCsvAction import ReadCsvAction  # Adjust import if needed
 
-obj = ReadCsvAction()
-obj.child_ids='list()'
-obj.buffer_id="<string>"
-obj.persistent=True
-obj.n=0
-obj.input_keys='list()'
-obj.output_keys='list()'
-obj.ignore_keys='list()'
-obj.ignore_empty_parents=True
-obj.id=<dataclasses._MISSING_TYPE object at 0x000001C27837D250>
-obj.load_on_install=False
-obj.file_path="path/to/file.txt"
-obj.delimiter=';'
+read_csv_action = ReadCsvAction(
+	child_ids='list()',
+	buffer_id="<string>",
+	persistent=True,
+	n=0,
+	input_keys='list()',
+	output_keys='list()',
+	ignore_keys='list()',
+	ignore_empty_parents=True,
+	id="<string>",
+	load_on_install=False,
+	file_path="path/to/file.txt",
+	delimiter=';'
+)
 ```
 
 [Go to Summary](#summary)
@@ -1826,18 +1871,18 @@ Raises:
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
-| `buffer_id` | `str` | `` | unique ID of the buffer |
+| `buffer_id` | `str` | `"<string>"` | unique ID of the buffer |
 | `persistent` | `bool` | `True` | specifies whether data is removed (False) from parent or not (True) |
 | `n` | `int` | `0` | specifies how much data is retrieved from parent buffer. Default 0 -> all data |
 | `input_keys` | `list[str] | list[int] | str` | `'list()'` | list of input key names used to extract data from parent buffers. input_keys can also be a list of integers for indices or a Python-style slice string (e.g. '-1' for last index, '1:3' or '0:5:2' for start:stop:step exclusive indexing), or a type selector ('type:string' for text-like values, 'type:number' for numeric and bool values). Duplicates are removed while preserving first-match order. If empty, all parent keys are returned |
 | `output_keys` | `list[str]` | `'list()'` | optional explicit output key names written by this node. output_keys are literal names only and do not support selector syntax. If empty, the node uses its default output naming |
 | `ignore_keys` | `list[str]` | `'list()'` | list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys |
 | `ignore_empty_parents` | `bool` | `True` | if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True) |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001C27837D250>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
-| `excel_file` | `str` | `` | path to the excel files to read the range from |
-| `worksheet` | `Union[str | int]` | `` | name of the worksheet inside the excel to read from or the index of the worksheet starting with 0 for the first worksheet |
-| `range` | `str` | `` | address of the range in the worksheet inside the excel to read from |
+| `excel_file` | `str` | `"path/to/file.txt"` | path to the excel files to read the range from |
+| `worksheet` | `Union[str | int]` | `"<string>"` | name of the worksheet inside the excel to read from or the index of the worksheet starting with 0 for the first worksheet |
+| `range` | `str` | `"<string>"` | address of the range in the worksheet inside the excel to read from |
 | `has_header` | `bool` | `False` | specifies whether the first row in range contains header descriptions |
 
 
@@ -1845,21 +1890,22 @@ Raises:
 # Example usage of `ReadExcelRangeAction`
 from pydag.nodes.documents.ReadExcelRangeAction import ReadExcelRangeAction  # Adjust import if needed
 
-obj = ReadExcelRangeAction()
-obj.child_ids='list()'
-obj.buffer_id="<string>"
-obj.persistent=True
-obj.n=0
-obj.input_keys='list()'
-obj.output_keys='list()'
-obj.ignore_keys='list()'
-obj.ignore_empty_parents=True
-obj.id=<dataclasses._MISSING_TYPE object at 0x000001C27837D250>
-obj.load_on_install=False
-obj.excel_file="path/to/file.txt"
-obj.worksheet="<string>"
-obj.range="<string>"
-obj.has_header=False
+read_excel_range_action = ReadExcelRangeAction(
+	child_ids='list()',
+	buffer_id="<string>",
+	persistent=True,
+	n=0,
+	input_keys='list()',
+	output_keys='list()',
+	ignore_keys='list()',
+	ignore_empty_parents=True,
+	id="<string>",
+	load_on_install=False,
+	excel_file="path/to/file.txt",
+	worksheet="<string>",
+	range="<string>",
+	has_header=False
+)
 ```
 
 [Go to Summary](#summary)
@@ -1868,36 +1914,37 @@ obj.has_header=False
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
-| `buffer_id` | `str` | `` | unique ID of the buffer |
+| `buffer_id` | `str` | `"<string>"` | unique ID of the buffer |
 | `persistent` | `bool` | `True` | specifies whether data is removed (False) from parent or not (True) |
 | `n` | `int` | `0` | specifies how much data is retrieved from parent buffer. Default 0 -> all data |
 | `input_keys` | `list[str] | list[int] | str` | `'list()'` | list of input key names used to extract data from parent buffers. input_keys can also be a list of integers for indices or a Python-style slice string (e.g. '-1' for last index, '1:3' or '0:5:2' for start:stop:step exclusive indexing), or a type selector ('type:string' for text-like values, 'type:number' for numeric and bool values). Duplicates are removed while preserving first-match order. If empty, all parent keys are returned |
 | `output_keys` | `list[str]` | `'list()'` | optional explicit output key names written by this node. output_keys are literal names only and do not support selector syntax. If empty, the node uses its default output naming |
 | `ignore_keys` | `list[str]` | `'list()'` | list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys |
 | `ignore_empty_parents` | `bool` | `True` | if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True) |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001C27837D250>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
-| `excel_file` | `str` | `` | path to the excel files to read named table from |
-| `table_name` | `str` | `` | name of the table inside the excel to read from |
+| `excel_file` | `str` | `"path/to/file.txt"` | path to the excel files to read named table from |
+| `table_name` | `str` | `"John Doe"` | name of the table inside the excel to read from |
 
 
 ```python
 # Example usage of `ReadExcelTableAction`
 from pydag.nodes.documents.ReadExcelTableAction import ReadExcelTableAction  # Adjust import if needed
 
-obj = ReadExcelTableAction()
-obj.child_ids='list()'
-obj.buffer_id="<string>"
-obj.persistent=True
-obj.n=0
-obj.input_keys='list()'
-obj.output_keys='list()'
-obj.ignore_keys='list()'
-obj.ignore_empty_parents=True
-obj.id=<dataclasses._MISSING_TYPE object at 0x000001C27837D250>
-obj.load_on_install=False
-obj.excel_file="path/to/file.txt"
-obj.table_name="John Doe"
+read_excel_table_action = ReadExcelTableAction(
+	child_ids='list()',
+	buffer_id="<string>",
+	persistent=True,
+	n=0,
+	input_keys='list()',
+	output_keys='list()',
+	ignore_keys='list()',
+	ignore_empty_parents=True,
+	id="<string>",
+	load_on_install=False,
+	excel_file="path/to/file.txt",
+	table_name="John Doe"
+)
 ```
 
 [Go to Summary](#summary)
@@ -1917,18 +1964,18 @@ Raises:
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
-| `buffer_id` | `str` | `` | unique ID of the buffer |
+| `buffer_id` | `str` | `"<string>"` | unique ID of the buffer |
 | `persistent` | `bool` | `True` | specifies whether data is removed (False) from parent or not (True) |
 | `n` | `int` | `0` | specifies how much data is retrieved from parent buffer. Default 0 -> all data |
 | `input_keys` | `list[str] | list[int] | str` | `'list()'` | list of input key names used to extract data from parent buffers. input_keys can also be a list of integers for indices or a Python-style slice string (e.g. '-1' for last index, '1:3' or '0:5:2' for start:stop:step exclusive indexing), or a type selector ('type:string' for text-like values, 'type:number' for numeric and bool values). Duplicates are removed while preserving first-match order. If empty, all parent keys are returned |
 | `output_keys` | `list[str]` | `'list()'` | optional explicit output key names written by this node. output_keys are literal names only and do not support selector syntax. If empty, the node uses its default output naming |
 | `ignore_keys` | `list[str]` | `'list()'` | list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys |
 | `ignore_empty_parents` | `bool` | `True` | if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True) |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001C27837D250>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
-| `excel_file` | `str` | `` | Path to the Excel file to read from |
-| `worksheet` | `Union[str, int]` | `` | Name (str) or index (int, 0-based) of the worksheet. If None, reads from first worksheet with data |
-| `start_range` | `str` | `` | Cell address to start reading from (e.g., 'A1'). If None, auto-detects the first connected data range |
+| `excel_file` | `str` | `"path/to/file.txt"` | Path to the Excel file to read from |
+| `worksheet` | `Union[str, int]` | `"<string>"` | Name (str) or index (int, 0-based) of the worksheet. If None, reads from first worksheet with data |
+| `start_range` | `str` | `"<string>"` | Cell address to start reading from (e.g., 'A1'). If None, auto-detects the first connected data range |
 | `has_header` | `bool` | `True` | If True, treats first row as column headers. If False, generates COL0, COL1, etc. |
 
 
@@ -1936,21 +1983,22 @@ Raises:
 # Example usage of `ReadExcelWorksheetAction`
 from pydag.nodes.documents.ReadExcelWorksheetAction import ReadExcelWorksheetAction  # Adjust import if needed
 
-obj = ReadExcelWorksheetAction()
-obj.child_ids='list()'
-obj.buffer_id="<string>"
-obj.persistent=True
-obj.n=0
-obj.input_keys='list()'
-obj.output_keys='list()'
-obj.ignore_keys='list()'
-obj.ignore_empty_parents=True
-obj.id=<dataclasses._MISSING_TYPE object at 0x000001C27837D250>
-obj.load_on_install=False
-obj.excel_file="path/to/file.txt"
-obj.worksheet="<string>"
-obj.start_range="<string>"
-obj.has_header=True
+read_excel_worksheet_action = ReadExcelWorksheetAction(
+	child_ids='list()',
+	buffer_id="<string>",
+	persistent=True,
+	n=0,
+	input_keys='list()',
+	output_keys='list()',
+	ignore_keys='list()',
+	ignore_empty_parents=True,
+	id="<string>",
+	load_on_install=False,
+	excel_file="path/to/file.txt",
+	worksheet="<string>",
+	start_range="<string>",
+	has_header=True
+)
 ```
 
 [Go to Summary](#summary)
@@ -1959,17 +2007,17 @@ obj.has_header=True
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
-| `buffer_id` | `str` | `` | unique ID of the buffer |
+| `buffer_id` | `str` | `"<string>"` | unique ID of the buffer |
 | `persistent` | `bool` | `True` | specifies whether data is removed (False) from parent or not (True) |
 | `n` | `int` | `0` | specifies how much data is retrieved from parent buffer. Default 0 -> all data |
 | `input_keys` | `list[str] | list[int] | str` | `'list()'` | list of input key names used to extract data from parent buffers. input_keys can also be a list of integers for indices or a Python-style slice string (e.g. '-1' for last index, '1:3' or '0:5:2' for start:stop:step exclusive indexing), or a type selector ('type:string' for text-like values, 'type:number' for numeric and bool values). Duplicates are removed while preserving first-match order. If empty, all parent keys are returned |
 | `output_keys` | `list[str]` | `'list()'` | optional explicit output key names written by this node. output_keys are literal names only and do not support selector syntax. If empty, the node uses its default output naming |
 | `ignore_keys` | `list[str]` | `'list()'` | list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys |
 | `ignore_empty_parents` | `bool` | `True` | if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True) |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001C27837D250>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
-| `file_path` | `str` | `` | path to the json file to read the data from |
-| `json_path` | `str` | `` | json schema to parse the file for |
+| `file_path` | `str` | `"path/to/file.txt"` | path to the json file to read the data from |
+| `json_path` | `str` | `"<string>"` | json schema to parse the file for |
 | `encoding` | `str` | `'utf-8'` | name of the file encoding to use, e.g. utf-8 (default), utf-16, ... |
 
 
@@ -1977,20 +2025,21 @@ obj.has_header=True
 # Example usage of `ReadJsonAction`
 from pydag.nodes.documents.ReadJsonAction import ReadJsonAction  # Adjust import if needed
 
-obj = ReadJsonAction()
-obj.child_ids='list()'
-obj.buffer_id="<string>"
-obj.persistent=True
-obj.n=0
-obj.input_keys='list()'
-obj.output_keys='list()'
-obj.ignore_keys='list()'
-obj.ignore_empty_parents=True
-obj.id=<dataclasses._MISSING_TYPE object at 0x000001C27837D250>
-obj.load_on_install=False
-obj.file_path="path/to/file.txt"
-obj.json_path="<string>"
-obj.encoding='utf-8'
+read_json_action = ReadJsonAction(
+	child_ids='list()',
+	buffer_id="<string>",
+	persistent=True,
+	n=0,
+	input_keys='list()',
+	output_keys='list()',
+	ignore_keys='list()',
+	ignore_empty_parents=True,
+	id="<string>",
+	load_on_install=False,
+	file_path="path/to/file.txt",
+	json_path="<string>",
+	encoding='utf-8'
+)
 ```
 
 [Go to Summary](#summary)
@@ -1999,34 +2048,35 @@ obj.encoding='utf-8'
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
-| `buffer_id` | `str` | `` | unique ID of the buffer |
+| `buffer_id` | `str` | `"<string>"` | unique ID of the buffer |
 | `persistent` | `bool` | `True` | specifies whether data is removed (False) from parent or not (True) |
 | `n` | `int` | `0` | specifies how much data is retrieved from parent buffer. Default 0 -> all data |
 | `input_keys` | `list[str] | list[int] | str` | `'list()'` | list of input key names used to extract data from parent buffers. input_keys can also be a list of integers for indices or a Python-style slice string (e.g. '-1' for last index, '1:3' or '0:5:2' for start:stop:step exclusive indexing), or a type selector ('type:string' for text-like values, 'type:number' for numeric and bool values). Duplicates are removed while preserving first-match order. If empty, all parent keys are returned |
 | `output_keys` | `list[str]` | `'list()'` | optional explicit output key names written by this node. output_keys are literal names only and do not support selector syntax. If empty, the node uses its default output naming |
 | `ignore_keys` | `list[str]` | `'list()'` | list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys |
 | `ignore_empty_parents` | `bool` | `True` | if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True) |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001C27837D250>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
-| `file_path` | `str` | `` | path to the *.npz file to read the data from |
+| `file_path` | `str` | `"path/to/file.txt"` | path to the *.npz file to read the data from |
 
 
 ```python
 # Example usage of `ReadNpzAction`
 from pydag.nodes.documents.ReadNpzAction import ReadNpzAction  # Adjust import if needed
 
-obj = ReadNpzAction()
-obj.child_ids='list()'
-obj.buffer_id="<string>"
-obj.persistent=True
-obj.n=0
-obj.input_keys='list()'
-obj.output_keys='list()'
-obj.ignore_keys='list()'
-obj.ignore_empty_parents=True
-obj.id=<dataclasses._MISSING_TYPE object at 0x000001C27837D250>
-obj.load_on_install=False
-obj.file_path="path/to/file.txt"
+read_npz_action = ReadNpzAction(
+	child_ids='list()',
+	buffer_id="<string>",
+	persistent=True,
+	n=0,
+	input_keys='list()',
+	output_keys='list()',
+	ignore_keys='list()',
+	ignore_empty_parents=True,
+	id="<string>",
+	load_on_install=False,
+	file_path="path/to/file.txt"
+)
 ```
 
 [Go to Summary](#summary)
@@ -2040,12 +2090,12 @@ return an empty `fields` list.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
-| `buffer_id` | `str` | `` | unique ID of the buffer |
+| `buffer_id` | `str` | `"<string>"` | unique ID of the buffer |
 | `persistent` | `bool` | `True` | specifies whether data is removed (False) from parent or not (True) |
 | `n` | `int` | `0` | specifies how much data is retrieved from parent buffer. Default 0 -> all data |
 | `ignore_keys` | `list[str]` | `'list()'` | list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys |
 | `ignore_empty_parents` | `bool` | `True` | if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True) |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001C27837D250>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `input_keys` | `list[str]` | `"lambda: ['values']()"` | keys to read file paths from parent buffer data |
 | `output_keys` | `list[str]` | `"lambda: ['filepath', 'metadata', 'fields', 'full_text_content']()"` | output keys in the order [filepath, metadata, fields, full_text_content] |
@@ -2058,20 +2108,21 @@ return an empty `fields` list.
 # Example usage of `ReadPDFFormAction`
 from pydag.nodes.documents.ReadPDFFormAction import ReadPDFFormAction  # Adjust import if needed
 
-obj = ReadPDFFormAction()
-obj.child_ids='list()'
-obj.buffer_id="<string>"
-obj.persistent=True
-obj.n=0
-obj.ignore_keys='list()'
-obj.ignore_empty_parents=True
-obj.id=<dataclasses._MISSING_TYPE object at 0x000001C27837D250>
-obj.load_on_install=False
-obj.input_keys="lambda: ['values']()"
-obj.output_keys="lambda: ['filepath', 'metadata', 'fields', 'full_text_content']()"
-obj.label_y_tolerance=18.0
-obj.label_max_tokens=6
-obj.require_pdf_extension=True
+read_p_d_f_form_action = ReadPDFFormAction(
+	child_ids='list()',
+	buffer_id="<string>",
+	persistent=True,
+	n=0,
+	ignore_keys='list()',
+	ignore_empty_parents=True,
+	id="<string>",
+	load_on_install=False,
+	input_keys="lambda: ['values']()",
+	output_keys="lambda: ['filepath', 'metadata', 'fields', 'full_text_content']()",
+	label_y_tolerance=18.0,
+	label_max_tokens=6,
+	require_pdf_extension=True
+)
 ```
 
 [Go to Summary](#summary)
@@ -2080,36 +2131,37 @@ obj.require_pdf_extension=True
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
-| `buffer_id` | `str` | `` | unique ID of the buffer |
+| `buffer_id` | `str` | `"<string>"` | unique ID of the buffer |
 | `persistent` | `bool` | `True` | specifies whether data is removed (False) from parent or not (True) |
 | `n` | `int` | `0` | specifies how much data is retrieved from parent buffer. Default 0 -> all data |
 | `input_keys` | `list[str] | list[int] | str` | `'list()'` | list of input key names used to extract data from parent buffers. input_keys can also be a list of integers for indices or a Python-style slice string (e.g. '-1' for last index, '1:3' or '0:5:2' for start:stop:step exclusive indexing), or a type selector ('type:string' for text-like values, 'type:number' for numeric and bool values). Duplicates are removed while preserving first-match order. If empty, all parent keys are returned |
 | `output_keys` | `list[str]` | `'list()'` | optional explicit output key names written by this node. output_keys are literal names only and do not support selector syntax. If empty, the node uses its default output naming |
 | `ignore_keys` | `list[str]` | `'list()'` | list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys |
 | `ignore_empty_parents` | `bool` | `True` | if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True) |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001C27837D250>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
-| `file_path` | `str` | `` | path to the xml file to read the data from |
-| `xpath` | `str` | `` | xml xpath schema to parse the file for |
+| `file_path` | `str` | `"path/to/file.txt"` | path to the xml file to read the data from |
+| `xpath` | `str` | `"<string>"` | xml xpath schema to parse the file for |
 
 
 ```python
 # Example usage of `ReadXMLAction`
 from pydag.nodes.documents.ReadXMLAction import ReadXMLAction  # Adjust import if needed
 
-obj = ReadXMLAction()
-obj.child_ids='list()'
-obj.buffer_id="<string>"
-obj.persistent=True
-obj.n=0
-obj.input_keys='list()'
-obj.output_keys='list()'
-obj.ignore_keys='list()'
-obj.ignore_empty_parents=True
-obj.id=<dataclasses._MISSING_TYPE object at 0x000001C27837D250>
-obj.load_on_install=False
-obj.file_path="path/to/file.txt"
-obj.xpath="<string>"
+read_x_m_l_action = ReadXMLAction(
+	child_ids='list()',
+	buffer_id="<string>",
+	persistent=True,
+	n=0,
+	input_keys='list()',
+	output_keys='list()',
+	ignore_keys='list()',
+	ignore_empty_parents=True,
+	id="<string>",
+	load_on_install=False,
+	file_path="path/to/file.txt",
+	xpath="<string>"
+)
 ```
 
 [Go to Summary](#summary)
@@ -2119,19 +2171,19 @@ obj.xpath="<string>"
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
-| `buffer_id` | `str` | `` | unique ID of the buffer |
+| `buffer_id` | `str` | `"<string>"` | unique ID of the buffer |
 | `persistent` | `bool` | `True` | specifies whether data is removed (False) from parent or not (True) |
 | `n` | `int` | `0` | specifies how much data is retrieved from parent buffer. Default 0 -> all data |
 | `input_keys` | `list[str] | list[int] | str` | `'list()'` | list of input key names used to extract data from parent buffers. input_keys can also be a list of integers for indices or a Python-style slice string (e.g. '-1' for last index, '1:3' or '0:5:2' for start:stop:step exclusive indexing), or a type selector ('type:string' for text-like values, 'type:number' for numeric and bool values). Duplicates are removed while preserving first-match order. If empty, all parent keys are returned |
 | `ignore_keys` | `list[str]` | `'list()'` | list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys |
 | `ignore_empty_parents` | `bool` | `True` | if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True) |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001C27837D250>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `path_input_keys` | `list[str]` | `"lambda: ['values', 'filepath']()"` | keys used to extract source PDF paths from parent data |
 | `fill_input_keys` | `list[str]` | `"lambda: ['answer', 'answers', 'fields', 'form_fields', 'field_values', 'content']()"` | keys used to extract filled form payloads from parent data |
 | `output_keys` | `list[str]` | `"lambda: ['filepath', 'output_filepath', 'written_fields', 'written_field_count']()"` | output keys in the order [filepath, output_filepath, written_fields, written_field_count] |
 | `output_suffix` | `str` | `'_filled'` | suffix appended to output files when overwrite_source is False |
-| `output_folder` | `str` | `` | optional folder for written PDFs; defaults to source file folder |
+| `output_folder` | `str` | `"path/to/folder"` | optional folder for written PDFs; defaults to source file folder |
 | `overwrite_source` | `bool` | `False` | if True, write directly into source PDFs |
 | `require_pdf_extension` | `bool` | `True` | if True, reject non-.pdf inputs before parsing |
 | `require_two_parents` | `bool` | `True` | if True, require at least two parents (paths + fill payloads) |
@@ -2141,24 +2193,25 @@ obj.xpath="<string>"
 # Example usage of `WritePDFFormAction`
 from pydag.nodes.documents.WritePDFFormAction import WritePDFFormAction  # Adjust import if needed
 
-obj = WritePDFFormAction()
-obj.child_ids='list()'
-obj.buffer_id="<string>"
-obj.persistent=True
-obj.n=0
-obj.input_keys='list()'
-obj.ignore_keys='list()'
-obj.ignore_empty_parents=True
-obj.id=<dataclasses._MISSING_TYPE object at 0x000001C27837D250>
-obj.load_on_install=False
-obj.path_input_keys="lambda: ['values', 'filepath']()"
-obj.fill_input_keys="lambda: ['answer', 'answers', 'fields', 'form_fields', 'field_values', 'content']()"
-obj.output_keys="lambda: ['filepath', 'output_filepath', 'written_fields', 'written_field_count']()"
-obj.output_suffix='_filled'
-obj.output_folder="path/to/folder"
-obj.overwrite_source=False
-obj.require_pdf_extension=True
-obj.require_two_parents=True
+write_p_d_f_form_action = WritePDFFormAction(
+	child_ids='list()',
+	buffer_id="<string>",
+	persistent=True,
+	n=0,
+	input_keys='list()',
+	ignore_keys='list()',
+	ignore_empty_parents=True,
+	id="<string>",
+	load_on_install=False,
+	path_input_keys="lambda: ['values', 'filepath']()",
+	fill_input_keys="lambda: ['answer', 'answers', 'fields', 'form_fields', 'field_values', 'content']()",
+	output_keys="lambda: ['filepath', 'output_filepath', 'written_fields', 'written_field_count']()",
+	output_suffix='_filled',
+	output_folder="path/to/folder",
+	overwrite_source=False,
+	require_pdf_extension=True,
+	require_two_parents=True
+)
 ```
 
 [Go to Summary](#summary)
@@ -2168,7 +2221,7 @@ This `DataElement` represents a time series feature extraction model using a 1D 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
-| `buffer_id` | `str` | `` | unique ID of the buffer |
+| `buffer_id` | `str` | `"<string>"` | unique ID of the buffer |
 | `persistent` | `bool` | `True` | specifies whether data is removed (False) from parent or not (True) |
 | `n` | `int` | `0` | specifies how much data is retrieved from parent buffer. Default 0 -> all data |
 | `input_keys` | `list[str] | list[int] | str` | `'list()'` | list of input key names used to extract data from parent buffers. input_keys can also be a list of integers for indices or a Python-style slice string (e.g. '-1' for last index, '1:3' or '0:5:2' for start:stop:step exclusive indexing), or a type selector ('type:string' for text-like values, 'type:number' for numeric and bool values). Duplicates are removed while preserving first-match order. If empty, all parent keys are returned |
@@ -2179,7 +2232,7 @@ This `DataElement` represents a time series feature extraction model using a 1D 
 | `sample_length` | `int` | `0` | Expected length of each sample. If 0, a sample with shape (1, min_learning_samples) is assumed. Otherwise, (1, sample_length) is assumed. |
 | `normalize` | `bool` | `False` | Flag to indicate whether to normalize the input data using z-score normalization on the input batch. |
 | `nan_to_num` | `bool` | `False` | If True, replace NaN/Inf values with finite numbers (0.0). |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001C27837D250>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `input_length` | `int` | `5` |  |
 | `input_features` | `int` | `1` |  |
@@ -2197,31 +2250,32 @@ This `DataElement` represents a time series feature extraction model using a 1D 
 # Example usage of `CNN1DAutoencoder`
 from pydag.nodes.featureextraction.CNN1DAutoencoder import CNN1DAutoencoder  # Adjust import if needed
 
-obj = CNN1DAutoencoder()
-obj.child_ids='list()'
-obj.buffer_id="<string>"
-obj.persistent=True
-obj.n=0
-obj.input_keys='list()'
-obj.ignore_keys='list()'
-obj.ignore_empty_parents=True
-obj.min_learning_samples=0
-obj.min_inference_samples=0
-obj.sample_length=0
-obj.normalize=False
-obj.nan_to_num=False
-obj.id=<dataclasses._MISSING_TYPE object at 0x000001C27837D250>
-obj.load_on_install=False
-obj.input_length=5
-obj.input_features=1
-obj.epochs=10
-obj.batch_size=10
-obj.learning_rate=0.001
-obj.bottleneck_features=2
-obj.output_length=1
-obj.apply_per_feature=True
-obj.output_keys='list()'
-obj.y_hat_key='AgentKeywords.Y_HAT'
+c_n_n1_d_autoencoder = CNN1DAutoencoder(
+	child_ids='list()',
+	buffer_id="<string>",
+	persistent=True,
+	n=0,
+	input_keys='list()',
+	ignore_keys='list()',
+	ignore_empty_parents=True,
+	min_learning_samples=0,
+	min_inference_samples=0,
+	sample_length=0,
+	normalize=False,
+	nan_to_num=False,
+	id="<string>",
+	load_on_install=False,
+	input_length=5,
+	input_features=1,
+	epochs=10,
+	batch_size=10,
+	learning_rate=0.001,
+	bottleneck_features=2,
+	output_length=1,
+	apply_per_feature=True,
+	output_keys='list()',
+	y_hat_key='AgentKeywords.Y_HAT'
+)
 ```
 
 [Go to Summary](#summary)
@@ -2231,7 +2285,7 @@ Chronos Extractor for time series data. Returns 384-dimensional embeddings for e
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
-| `buffer_id` | `str` | `` | unique ID of the buffer |
+| `buffer_id` | `str` | `"<string>"` | unique ID of the buffer |
 | `persistent` | `bool` | `True` | specifies whether data is removed (False) from parent or not (True) |
 | `n` | `int` | `0` | specifies how much data is retrieved from parent buffer. Default 0 -> all data |
 | `input_keys` | `list[str] | list[int] | str` | `'list()'` | list of input key names used to extract data from parent buffers. input_keys can also be a list of integers for indices or a Python-style slice string (e.g. '-1' for last index, '1:3' or '0:5:2' for start:stop:step exclusive indexing), or a type selector ('type:string' for text-like values, 'type:number' for numeric and bool values). Duplicates are removed while preserving first-match order. If empty, all parent keys are returned |
@@ -2241,7 +2295,7 @@ Chronos Extractor for time series data. Returns 384-dimensional embeddings for e
 | `sample_length` | `int` | `0` | Expected length of each sample. If 0, a sample with shape (1, min_learning_samples) is assumed. Otherwise, (1, sample_length) is assumed. |
 | `normalize` | `bool` | `False` | Flag to indicate whether to normalize the input data using z-score normalization on the input batch. |
 | `nan_to_num` | `bool` | `False` | If True, replace NaN/Inf values with finite numbers (0.0). |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001C27837D250>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `model_name` | `str` | `'amazon/chronos-bolt-mini'` | name of available pretrained models, e.g. 'amazon/chronos-bolt-mini'. For further information look here: https://github.com/amazon-science/chronos-forecasting |
 | `min_inference_samples` | `int` | `1` | Number of Samples to do inference on. |
@@ -2252,23 +2306,24 @@ Chronos Extractor for time series data. Returns 384-dimensional embeddings for e
 # Example usage of `ChronosExtractor`
 from pydag.nodes.featureextraction.ChronosExtractor import ChronosExtractor  # Adjust import if needed
 
-obj = ChronosExtractor()
-obj.child_ids='list()'
-obj.buffer_id="<string>"
-obj.persistent=True
-obj.n=0
-obj.input_keys='list()'
-obj.ignore_keys='list()'
-obj.ignore_empty_parents=True
-obj.min_learning_samples=0
-obj.sample_length=0
-obj.normalize=False
-obj.nan_to_num=False
-obj.id=<dataclasses._MISSING_TYPE object at 0x000001C27837D250>
-obj.load_on_install=False
-obj.model_name='amazon/chronos-bolt-mini'
-obj.min_inference_samples=1
-obj.output_keys='list()'
+chronos_extractor = ChronosExtractor(
+	child_ids='list()',
+	buffer_id="<string>",
+	persistent=True,
+	n=0,
+	input_keys='list()',
+	ignore_keys='list()',
+	ignore_empty_parents=True,
+	min_learning_samples=0,
+	sample_length=0,
+	normalize=False,
+	nan_to_num=False,
+	id="<string>",
+	load_on_install=False,
+	model_name='amazon/chronos-bolt-mini',
+	min_inference_samples=1,
+	output_keys='list()'
+)
 ```
 
 [Go to Summary](#summary)
@@ -2279,7 +2334,7 @@ PSD for time series data. Returns 261-dimensional embeddings for each input time
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
-| `buffer_id` | `str` | `` | unique ID of the buffer |
+| `buffer_id` | `str` | `"<string>"` | unique ID of the buffer |
 | `persistent` | `bool` | `True` | specifies whether data is removed (False) from parent or not (True) |
 | `n` | `int` | `0` | specifies how much data is retrieved from parent buffer. Default 0 -> all data |
 | `input_keys` | `list[str] | list[int] | str` | `'list()'` | list of input key names used to extract data from parent buffers. input_keys can also be a list of integers for indices or a Python-style slice string (e.g. '-1' for last index, '1:3' or '0:5:2' for start:stop:step exclusive indexing), or a type selector ('type:string' for text-like values, 'type:number' for numeric and bool values). Duplicates are removed while preserving first-match order. If empty, all parent keys are returned |
@@ -2289,7 +2344,7 @@ PSD for time series data. Returns 261-dimensional embeddings for each input time
 | `sample_length` | `int` | `0` | Expected length of each sample. If 0, a sample with shape (1, min_learning_samples) is assumed. Otherwise, (1, sample_length) is assumed. |
 | `normalize` | `bool` | `False` | Flag to indicate whether to normalize the input data using z-score normalization on the input batch. |
 | `nan_to_num` | `bool` | `False` | If True, replace NaN/Inf values with finite numbers (0.0). |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001C27837D250>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `min_inference_samples` | `int` | `1` | Number of Samples to do inference on. |
 | `output_keys` | `list[str]` | `'list()'` | optional explicit output keys; if empty, default naming is used |
@@ -2299,22 +2354,23 @@ PSD for time series data. Returns 261-dimensional embeddings for each input time
 # Example usage of `PSDExtractor`
 from pydag.nodes.featureextraction.PSDExtractor import PSDExtractor  # Adjust import if needed
 
-obj = PSDExtractor()
-obj.child_ids='list()'
-obj.buffer_id="<string>"
-obj.persistent=True
-obj.n=0
-obj.input_keys='list()'
-obj.ignore_keys='list()'
-obj.ignore_empty_parents=True
-obj.min_learning_samples=0
-obj.sample_length=0
-obj.normalize=False
-obj.nan_to_num=False
-obj.id=<dataclasses._MISSING_TYPE object at 0x000001C27837D250>
-obj.load_on_install=False
-obj.min_inference_samples=1
-obj.output_keys='list()'
+p_s_d_extractor = PSDExtractor(
+	child_ids='list()',
+	buffer_id="<string>",
+	persistent=True,
+	n=0,
+	input_keys='list()',
+	ignore_keys='list()',
+	ignore_empty_parents=True,
+	min_learning_samples=0,
+	sample_length=0,
+	normalize=False,
+	nan_to_num=False,
+	id="<string>",
+	load_on_install=False,
+	min_inference_samples=1,
+	output_keys='list()'
+)
 ```
 
 [Go to Summary](#summary)
@@ -2338,7 +2394,7 @@ Notes:
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
-| `buffer_id` | `str` | `` | unique ID of the buffer |
+| `buffer_id` | `str` | `"<string>"` | unique ID of the buffer |
 | `persistent` | `bool` | `True` | specifies whether data is removed (False) from parent or not (True) |
 | `n` | `int` | `0` | specifies how much data is retrieved from parent buffer. Default 0 -> all data |
 | `input_keys` | `list[str] | list[int] | str` | `'list()'` | list of input key names used to extract data from parent buffers. input_keys can also be a list of integers for indices or a Python-style slice string (e.g. '-1' for last index, '1:3' or '0:5:2' for start:stop:step exclusive indexing), or a type selector ('type:string' for text-like values, 'type:number' for numeric and bool values). Duplicates are removed while preserving first-match order. If empty, all parent keys are returned |
@@ -2347,11 +2403,11 @@ Notes:
 | `min_learning_samples` | `int` | `0` | Minimum number of samples required for learning. |
 | `normalize` | `bool` | `False` | Flag to indicate whether to normalize the input data using z-score normalization on the input batch. |
 | `nan_to_num` | `bool` | `False` | If True, replace NaN/Inf values with finite numbers (0.0). |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001C27837D250>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `min_inference_samples` | `int` | `1` | Number of samples to accumulate before inference. |
 | `sample_length` | `int` | `64` | Length of each input time series sample; must be >= MIN_SERIES_LENGTH for meaningful features. |
-| `MIN_SERIES_LENGTH` | `int` | `` |  |
+| `MIN_SERIES_LENGTH` | `int` | `1` |  |
 | `output_keys` | `list[str]` | `'list()'` | optional explicit output keys; if empty, default naming is used |
 
 
@@ -2359,23 +2415,24 @@ Notes:
 # Example usage of `RIFEExtractor`
 from pydag.nodes.featureextraction.RIFEExtractor import RIFEExtractor  # Adjust import if needed
 
-obj = RIFEExtractor()
-obj.child_ids='list()'
-obj.buffer_id="<string>"
-obj.persistent=True
-obj.n=0
-obj.input_keys='list()'
-obj.ignore_keys='list()'
-obj.ignore_empty_parents=True
-obj.min_learning_samples=0
-obj.normalize=False
-obj.nan_to_num=False
-obj.id=<dataclasses._MISSING_TYPE object at 0x000001C27837D250>
-obj.load_on_install=False
-obj.min_inference_samples=1
-obj.sample_length=64
-obj.MIN_SERIES_LENGTH=1
-obj.output_keys='list()'
+r_i_f_e_extractor = RIFEExtractor(
+	child_ids='list()',
+	buffer_id="<string>",
+	persistent=True,
+	n=0,
+	input_keys='list()',
+	ignore_keys='list()',
+	ignore_empty_parents=True,
+	min_learning_samples=0,
+	normalize=False,
+	nan_to_num=False,
+	id="<string>",
+	load_on_install=False,
+	min_inference_samples=1,
+	sample_length=64,
+	MIN_SERIES_LENGTH=1,
+	output_keys='list()'
+)
 ```
 
 [Go to Summary](#summary)
@@ -2386,7 +2443,7 @@ https://www.sktime.net/en/stable/api_reference/auto_generated/sktime.transformat
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
-| `buffer_id` | `str` | `` | unique ID of the buffer |
+| `buffer_id` | `str` | `"<string>"` | unique ID of the buffer |
 | `persistent` | `bool` | `True` | specifies whether data is removed (False) from parent or not (True) |
 | `n` | `int` | `0` | specifies how much data is retrieved from parent buffer. Default 0 -> all data |
 | `input_keys` | `list[str] | list[int] | str` | `'list()'` | list of input key names used to extract data from parent buffers. input_keys can also be a list of integers for indices or a Python-style slice string (e.g. '-1' for last index, '1:3' or '0:5:2' for start:stop:step exclusive indexing), or a type selector ('type:string' for text-like values, 'type:number' for numeric and bool values). Duplicates are removed while preserving first-match order. If empty, all parent keys are returned |
@@ -2394,7 +2451,7 @@ https://www.sktime.net/en/stable/api_reference/auto_generated/sktime.transformat
 | `ignore_empty_parents` | `bool` | `True` | if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True) |
 | `sample_length` | `int` | `0` | Expected length of each sample. If 0, a sample with shape (1, min_learning_samples) is assumed. Otherwise, (1, sample_length) is assumed. |
 | `nan_to_num` | `bool` | `False` | If True, replace NaN/Inf values with finite numbers (0.0). |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001C27837D250>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `num_of_kernels` | `int` | `10000` | Number of kernels used in the ROCKET model. |
 | `min_learning_samples` | `int` | `1` | Number of Samples to learn on. Keep this, since ROCKET needs the sample only to instantiate the random kernels. Having more points does not improve performance. |
@@ -2407,23 +2464,24 @@ https://www.sktime.net/en/stable/api_reference/auto_generated/sktime.transformat
 # Example usage of `ROCKETExtractor`
 from pydag.nodes.featureextraction.ROCKETExtractor import ROCKETExtractor  # Adjust import if needed
 
-obj = ROCKETExtractor()
-obj.child_ids='list()'
-obj.buffer_id="<string>"
-obj.persistent=True
-obj.n=0
-obj.input_keys='list()'
-obj.ignore_keys='list()'
-obj.ignore_empty_parents=True
-obj.sample_length=0
-obj.nan_to_num=False
-obj.id=<dataclasses._MISSING_TYPE object at 0x000001C27837D250>
-obj.load_on_install=False
-obj.num_of_kernels=10000
-obj.min_learning_samples=1
-obj.min_inference_samples=1
-obj.normalize=True
-obj.output_keys='list()'
+r_o_c_k_e_t_extractor = ROCKETExtractor(
+	child_ids='list()',
+	buffer_id="<string>",
+	persistent=True,
+	n=0,
+	input_keys='list()',
+	ignore_keys='list()',
+	ignore_empty_parents=True,
+	sample_length=0,
+	nan_to_num=False,
+	id="<string>",
+	load_on_install=False,
+	num_of_kernels=10000,
+	min_learning_samples=1,
+	min_inference_samples=1,
+	normalize=True,
+	output_keys='list()'
+)
 ```
 
 [Go to Summary](#summary)
@@ -2435,7 +2493,7 @@ for more information.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
-| `buffer_id` | `str` | `` | unique ID of the buffer |
+| `buffer_id` | `str` | `"<string>"` | unique ID of the buffer |
 | `persistent` | `bool` | `True` | specifies whether data is removed (False) from parent or not (True) |
 | `n` | `int` | `0` | specifies how much data is retrieved from parent buffer. Default 0 -> all data |
 | `input_keys` | `list[str] | list[int] | str` | `'list()'` | list of input key names used to extract data from parent buffers. input_keys can also be a list of integers for indices or a Python-style slice string (e.g. '-1' for last index, '1:3' or '0:5:2' for start:stop:step exclusive indexing), or a type selector ('type:string' for text-like values, 'type:number' for numeric and bool values). Duplicates are removed while preserving first-match order. If empty, all parent keys are returned |
@@ -2446,7 +2504,7 @@ for more information.
 | `sample_length` | `int` | `0` | Expected length of each sample. If 0, a sample with shape (1, min_learning_samples) is assumed. Otherwise, (1, sample_length) is assumed. |
 | `normalize` | `bool` | `False` | Flag to indicate whether to normalize the input data using z-score normalization on the input batch. |
 | `nan_to_num` | `bool` | `False` | If True, replace NaN/Inf values with finite numbers (0.0). |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001C27837D250>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `prediction_length` | `int` | `64` | length of the prediction horizon |
 | `output_keys` | `list[str]` | `'list()'` | optional explicit output keys; if empty, default naming is used |
@@ -2456,23 +2514,24 @@ for more information.
 # Example usage of `TirexExtractor`
 from pydag.nodes.featureextraction.TirexExtractor import TirexExtractor  # Adjust import if needed
 
-obj = TirexExtractor()
-obj.child_ids='list()'
-obj.buffer_id="<string>"
-obj.persistent=True
-obj.n=0
-obj.input_keys='list()'
-obj.ignore_keys='list()'
-obj.ignore_empty_parents=True
-obj.min_learning_samples=0
-obj.min_inference_samples=0
-obj.sample_length=0
-obj.normalize=False
-obj.nan_to_num=False
-obj.id=<dataclasses._MISSING_TYPE object at 0x000001C27837D250>
-obj.load_on_install=False
-obj.prediction_length=64
-obj.output_keys='list()'
+tirex_extractor = TirexExtractor(
+	child_ids='list()',
+	buffer_id="<string>",
+	persistent=True,
+	n=0,
+	input_keys='list()',
+	ignore_keys='list()',
+	ignore_empty_parents=True,
+	min_learning_samples=0,
+	min_inference_samples=0,
+	sample_length=0,
+	normalize=False,
+	nan_to_num=False,
+	id="<string>",
+	load_on_install=False,
+	prediction_length=64,
+	output_keys='list()'
+)
 ```
 
 [Go to Summary](#summary)
@@ -2481,40 +2540,41 @@ obj.output_keys='list()'
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
-| `buffer_id` | `str` | `` | unique ID of the buffer |
+| `buffer_id` | `str` | `"<string>"` | unique ID of the buffer |
 | `persistent` | `bool` | `True` | specifies whether data is removed (False) from parent or not (True) |
 | `n` | `int` | `0` | specifies how much data is retrieved from parent buffer. Default 0 -> all data |
 | `input_keys` | `list[str] | list[int] | str` | `'list()'` | list of input key names used to extract data from parent buffers. input_keys can also be a list of integers for indices or a Python-style slice string (e.g. '-1' for last index, '1:3' or '0:5:2' for start:stop:step exclusive indexing), or a type selector ('type:string' for text-like values, 'type:number' for numeric and bool values). Duplicates are removed while preserving first-match order. If empty, all parent keys are returned |
 | `output_keys` | `list[str]` | `'list()'` | optional explicit output key names written by this node. output_keys are literal names only and do not support selector syntax. If empty, the node uses its default output naming |
 | `ignore_keys` | `list[str]` | `'list()'` | list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys |
 | `ignore_empty_parents` | `bool` | `True` | if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True) |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001C27837D250>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
-| `url` | `str` | `` | url for HTTP GET method |
-| `headers` | `dict[str]` | `` | headers to be used in the HTTP requests, e.g. {'Content-Type': 'application/json', 'Authorization' : 'Bearer token'} |
+| `url` | `str` | `"https://example.com"` | url for HTTP GET method |
+| `headers` | `dict[str]` | `"<string>"` | headers to be used in the HTTP requests, e.g. {'Content-Type': 'application/json', 'Authorization' : 'Bearer token'} |
 | `timeout` | `float` | `10` | timeout for requests |
-| `json_path` | `str` | `` | JSONPath specififcation to parse or access the data in buffer |
+| `json_path` | `str` | `"<string>"` | JSONPath specififcation to parse or access the data in buffer |
 
 
 ```python
 # Example usage of `HttpGetAction`
 from pydag.nodes.http.HttpGetAction import HttpGetAction  # Adjust import if needed
 
-obj = HttpGetAction()
-obj.child_ids='list()'
-obj.buffer_id="<string>"
-obj.persistent=True
-obj.n=0
-obj.input_keys='list()'
-obj.output_keys='list()'
-obj.ignore_keys='list()'
-obj.ignore_empty_parents=True
-obj.id=<dataclasses._MISSING_TYPE object at 0x000001C27837D250>
-obj.load_on_install=False
-obj.url="https://example.com"
-obj.headers="<string>"
-obj.timeout=10
-obj.json_path="<string>"
+http_get_action = HttpGetAction(
+	child_ids='list()',
+	buffer_id="<string>",
+	persistent=True,
+	n=0,
+	input_keys='list()',
+	output_keys='list()',
+	ignore_keys='list()',
+	ignore_empty_parents=True,
+	id="<string>",
+	load_on_install=False,
+	url="https://example.com",
+	headers="<string>",
+	timeout=10,
+	json_path="<string>"
+)
 ```
 
 [Go to Summary](#summary)
@@ -2524,40 +2584,41 @@ obj.json_path="<string>"
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
-| `buffer_id` | `str` | `` | unique ID of the buffer |
+| `buffer_id` | `str` | `"<string>"` | unique ID of the buffer |
 | `persistent` | `bool` | `True` | specifies whether data is removed (False) from parent or not (True) |
 | `n` | `int` | `0` | specifies how much data is retrieved from parent buffer. Default 0 -> all data |
 | `input_keys` | `list[str] | list[int] | str` | `'list()'` | list of input key names used to extract data from parent buffers. input_keys can also be a list of integers for indices or a Python-style slice string (e.g. '-1' for last index, '1:3' or '0:5:2' for start:stop:step exclusive indexing), or a type selector ('type:string' for text-like values, 'type:number' for numeric and bool values). Duplicates are removed while preserving first-match order. If empty, all parent keys are returned |
 | `output_keys` | `list[str]` | `'list()'` | optional explicit output key names written by this node. output_keys are literal names only and do not support selector syntax. If empty, the node uses its default output naming |
 | `ignore_keys` | `list[str]` | `'list()'` | list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys |
 | `ignore_empty_parents` | `bool` | `True` | if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True) |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001C27837D250>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
-| `url` | `str` | `` |  |
-| `headers` | `dict[str]` | `` | headers to be used in the HTTP requests, e.g. {'Content-Type': 'application/json', 'Authorization' : 'Bearer token'} |
+| `url` | `str` | `"https://example.com"` |  |
+| `headers` | `dict[str]` | `"<string>"` | headers to be used in the HTTP requests, e.g. {'Content-Type': 'application/json', 'Authorization' : 'Bearer token'} |
 | `timeout` | `float` | `10` | timeout for requests |
-| `json_path` | `str` | `` | JSONPath specififcation to parse the returned POST response |
+| `json_path` | `str` | `"<string>"` | JSONPath specififcation to parse the returned POST response |
 
 
 ```python
 # Example usage of `HttpPostAction`
 from pydag.nodes.http.HttpPostAction import HttpPostAction  # Adjust import if needed
 
-obj = HttpPostAction()
-obj.child_ids='list()'
-obj.buffer_id="<string>"
-obj.persistent=True
-obj.n=0
-obj.input_keys='list()'
-obj.output_keys='list()'
-obj.ignore_keys='list()'
-obj.ignore_empty_parents=True
-obj.id=<dataclasses._MISSING_TYPE object at 0x000001C27837D250>
-obj.load_on_install=False
-obj.url="https://example.com"
-obj.headers="<string>"
-obj.timeout=10
-obj.json_path="<string>"
+http_post_action = HttpPostAction(
+	child_ids='list()',
+	buffer_id="<string>",
+	persistent=True,
+	n=0,
+	input_keys='list()',
+	output_keys='list()',
+	ignore_keys='list()',
+	ignore_empty_parents=True,
+	id="<string>",
+	load_on_install=False,
+	url="https://example.com",
+	headers="<string>",
+	timeout=10,
+	json_path="<string>"
+)
 ```
 
 [Go to Summary](#summary)
@@ -2567,40 +2628,41 @@ obj.json_path="<string>"
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
-| `buffer_id` | `str` | `` | unique ID of the buffer |
+| `buffer_id` | `str` | `"<string>"` | unique ID of the buffer |
 | `persistent` | `bool` | `True` | specifies whether data is removed (False) from parent or not (True) |
 | `n` | `int` | `0` | specifies how much data is retrieved from parent buffer. Default 0 -> all data |
 | `input_keys` | `list[str] | list[int] | str` | `'list()'` | list of input key names used to extract data from parent buffers. input_keys can also be a list of integers for indices or a Python-style slice string (e.g. '-1' for last index, '1:3' or '0:5:2' for start:stop:step exclusive indexing), or a type selector ('type:string' for text-like values, 'type:number' for numeric and bool values). Duplicates are removed while preserving first-match order. If empty, all parent keys are returned |
 | `output_keys` | `list[str]` | `'list()'` | optional explicit output key names written by this node. output_keys are literal names only and do not support selector syntax. If empty, the node uses its default output naming |
 | `ignore_keys` | `list[str]` | `'list()'` | list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys |
 | `ignore_empty_parents` | `bool` | `True` | if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True) |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001C27837D250>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
-| `url` | `str` | `` |  |
-| `headers` | `dict[str]` | `` | headers to be used in the HTTP requests, e.g. {'Content-Type': 'application/json', 'Authorization' : 'Bearer token'} |
+| `url` | `str` | `"https://example.com"` |  |
+| `headers` | `dict[str]` | `"<string>"` | headers to be used in the HTTP requests, e.g. {'Content-Type': 'application/json', 'Authorization' : 'Bearer token'} |
 | `timeout` | `float` | `10` | timeout for requests |
-| `json_path` | `str` | `` | JSONPath specififcation to parse the returned PUT response |
+| `json_path` | `str` | `"<string>"` | JSONPath specififcation to parse the returned PUT response |
 
 
 ```python
 # Example usage of `HttpPutAction`
 from pydag.nodes.http.HttpPutAction import HttpPutAction  # Adjust import if needed
 
-obj = HttpPutAction()
-obj.child_ids='list()'
-obj.buffer_id="<string>"
-obj.persistent=True
-obj.n=0
-obj.input_keys='list()'
-obj.output_keys='list()'
-obj.ignore_keys='list()'
-obj.ignore_empty_parents=True
-obj.id=<dataclasses._MISSING_TYPE object at 0x000001C27837D250>
-obj.load_on_install=False
-obj.url="https://example.com"
-obj.headers="<string>"
-obj.timeout=10
-obj.json_path="<string>"
+http_put_action = HttpPutAction(
+	child_ids='list()',
+	buffer_id="<string>",
+	persistent=True,
+	n=0,
+	input_keys='list()',
+	output_keys='list()',
+	ignore_keys='list()',
+	ignore_empty_parents=True,
+	id="<string>",
+	load_on_install=False,
+	url="https://example.com",
+	headers="<string>",
+	timeout=10,
+	json_path="<string>"
+)
 ```
 
 [Go to Summary](#summary)
@@ -2614,14 +2676,14 @@ Download with: python -m spacy download de_core_news_lg
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
-| `buffer_id` | `str` | `` | unique ID of the buffer |
+| `buffer_id` | `str` | `"<string>"` | unique ID of the buffer |
 | `persistent` | `bool` | `True` | specifies whether data is removed (False) from parent or not (True) |
 | `n` | `int` | `0` | specifies how much data is retrieved from parent buffer. Default 0 -> all data |
 | `input_keys` | `list[str] | list[int] | str` | `'list()'` | list of input key names used to extract data from parent buffers. input_keys can also be a list of integers for indices or a Python-style slice string (e.g. '-1' for last index, '1:3' or '0:5:2' for start:stop:step exclusive indexing), or a type selector ('type:string' for text-like values, 'type:number' for numeric and bool values). Duplicates are removed while preserving first-match order. If empty, all parent keys are returned |
 | `output_keys` | `list[str]` | `'list()'` | optional explicit output key names written by this node. output_keys are literal names only and do not support selector syntax. If empty, the node uses its default output naming |
 | `ignore_keys` | `list[str]` | `'list()'` | list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys |
 | `ignore_empty_parents` | `bool` | `True` | if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True) |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001C27837D250>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `mails` | `bool` | `True` | Whether to anonymize email addresses. |
 | `phones` | `bool` | `True` | Whether to anonymize phone numbers. |
@@ -2635,23 +2697,24 @@ Download with: python -m spacy download de_core_news_lg
 # Example usage of `AnonymousPromptAction`
 from pydag.nodes.llm.AnonymousPromptAction import AnonymousPromptAction  # Adjust import if needed
 
-obj = AnonymousPromptAction()
-obj.child_ids='list()'
-obj.buffer_id="<string>"
-obj.persistent=True
-obj.n=0
-obj.input_keys='list()'
-obj.output_keys='list()'
-obj.ignore_keys='list()'
-obj.ignore_empty_parents=True
-obj.id=<dataclasses._MISSING_TYPE object at 0x000001C27837D250>
-obj.load_on_install=False
-obj.mails=True
-obj.phones=True
-obj.urls=True
-obj.bank_details=True
-obj.addresses_names=True
-obj.lang='de'
+anonymous_prompt_action = AnonymousPromptAction(
+	child_ids='list()',
+	buffer_id="<string>",
+	persistent=True,
+	n=0,
+	input_keys='list()',
+	output_keys='list()',
+	ignore_keys='list()',
+	ignore_empty_parents=True,
+	id="<string>",
+	load_on_install=False,
+	mails=True,
+	phones=True,
+	urls=True,
+	bank_details=True,
+	addresses_names=True,
+	lang='de'
+)
 ```
 
 [Go to Summary](#summary)
@@ -2660,16 +2723,16 @@ obj.lang='de'
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
-| `buffer_id` | `str` | `` | unique ID of the buffer |
+| `buffer_id` | `str` | `"<string>"` | unique ID of the buffer |
 | `persistent` | `bool` | `True` | specifies whether data is removed (False) from parent or not (True) |
 | `n` | `int` | `0` | specifies how much data is retrieved from parent buffer. Default 0 -> all data |
 | `input_keys` | `list[str] | list[int] | str` | `'list()'` | list of input key names used to extract data from parent buffers. input_keys can also be a list of integers for indices or a Python-style slice string (e.g. '-1' for last index, '1:3' or '0:5:2' for start:stop:step exclusive indexing), or a type selector ('type:string' for text-like values, 'type:number' for numeric and bool values). Duplicates are removed while preserving first-match order. If empty, all parent keys are returned |
 | `output_keys` | `list[str]` | `'list()'` | optional explicit output key names written by this node. output_keys are literal names only and do not support selector syntax. If empty, the node uses its default output naming |
 | `ignore_empty_parents` | `bool` | `True` | if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True) |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001C27837D250>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
-| `task` | `str` | `` | task category of the model to use, e.g. image-classification, text-generation, sentiment-analysis, ... execute HuggingFaceNode.tasklist for full list |
-| `model` | `str` | `` |  |
+| `task` | `str` | `"<string>"` | task category of the model to use, e.g. image-classification, text-generation, sentiment-analysis, ... execute HuggingFaceNode.tasklist for full list |
+| `model` | `str` | `"<string>"` |  |
 | `ignore_keys` | `list[str]` | `"lambda: ['index', 'timestamps']()"` | list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys |
 
 
@@ -2677,19 +2740,20 @@ obj.lang='de'
 # Example usage of `HuggingFaceAction`
 from pydag.nodes.llm.HuggingFaceAction import HuggingFaceAction  # Adjust import if needed
 
-obj = HuggingFaceAction()
-obj.child_ids='list()'
-obj.buffer_id="<string>"
-obj.persistent=True
-obj.n=0
-obj.input_keys='list()'
-obj.output_keys='list()'
-obj.ignore_empty_parents=True
-obj.id=<dataclasses._MISSING_TYPE object at 0x000001C27837D250>
-obj.load_on_install=False
-obj.task="<string>"
-obj.model="<string>"
-obj.ignore_keys="lambda: ['index', 'timestamps']()"
+hugging_face_action = HuggingFaceAction(
+	child_ids='list()',
+	buffer_id="<string>",
+	persistent=True,
+	n=0,
+	input_keys='list()',
+	output_keys='list()',
+	ignore_empty_parents=True,
+	id="<string>",
+	load_on_install=False,
+	task="<string>",
+	model="<string>",
+	ignore_keys="lambda: ['index', 'timestamps']()"
+)
 ```
 
 [Go to Summary](#summary)
@@ -2720,30 +2784,30 @@ continues text-only.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
-| `buffer_id` | `str` | `` | unique ID of the buffer |
+| `buffer_id` | `str` | `"<string>"` | unique ID of the buffer |
 | `persistent` | `bool` | `True` | specifies whether data is removed (False) from parent or not (True) |
 | `n` | `int` | `0` | specifies how much data is retrieved from parent buffer. Default 0 -> all data |
 | `input_keys` | `list[str] | list[int] | str` | `'list()'` | list of input key names used to extract data from parent buffers. input_keys can also be a list of integers for indices or a Python-style slice string (e.g. '-1' for last index, '1:3' or '0:5:2' for start:stop:step exclusive indexing), or a type selector ('type:string' for text-like values, 'type:number' for numeric and bool values). Duplicates are removed while preserving first-match order. If empty, all parent keys are returned |
 | `ignore_keys` | `list[str]` | `'list()'` | list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys |
 | `ignore_empty_parents` | `bool` | `True` | if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True) |
-| `service_id` | `str` | `` | ID of the service |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001C27837D250>` | unique identifier of element in DataAgent application |
+| `service_id` | `str` | `"<string>"` | ID of the service |
+| `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
-| `template` | `str` | `` | 
+| `template` | `str` | `"<string>"` | 
             Legacy question template fallback when question_key/question_value are not configured.
             For example: 'How much costs the article number {}?' or
             'Summarize the following text: {0}. And answer the following question: {1}'.
              |
-| `question_key` | `str` | `` | Key from which to receive the data for the final task/question the model must answer. This is what the generated answer should respond to.  |
-| `question_value` | `str` | `` | Fixed value for the final task/question the model must answer. This is what the generated answer should respond to. |
-| `instruction_key` | `str` | `` | Key from which to receive prompt instructions. The resolved value is passed to RAGService.chat as instruction and rendered under the prompt's Instruction section; use it for answer rules, format, style, constraints, and priorities. |
-| `instruction_value` | `str` | `` | Fixed prompt instructions for all rows. The value is passed to RAGService.chat as instruction and rendered under the prompt's Instruction section; use it for answer rules, format, style, constraints, and priorities. |
-| `retrieval_query_key` | `str` | `` | Key from which to receive the The query used only for document retrieval from the vector store.  |
-| `retrieval_query_value` | `str` | `` | Fixed value for the query used only for document retrieval from the vector store.  |
+| `question_key` | `str` | `"<string>"` | Key from which to receive the data for the final task/question the model must answer. This is what the generated answer should respond to.  |
+| `question_value` | `str` | `"<string>"` | Fixed value for the final task/question the model must answer. This is what the generated answer should respond to. |
+| `instruction_key` | `str` | `"<string>"` | Key from which to receive prompt instructions. The resolved value is passed to RAGService.chat as instruction and rendered under the prompt's Instruction section; use it for answer rules, format, style, constraints, and priorities. |
+| `instruction_value` | `str` | `"<string>"` | Fixed prompt instructions for all rows. The value is passed to RAGService.chat as instruction and rendered under the prompt's Instruction section; use it for answer rules, format, style, constraints, and priorities. |
+| `retrieval_query_key` | `str` | `"<string>"` | Key from which to receive the The query used only for document retrieval from the vector store.  |
+| `retrieval_query_value` | `str` | `"<string>"` | Fixed value for the query used only for document retrieval from the vector store.  |
 | `input_context_keys` | `list[str]` | `'list()'` | Key from which to receive the Additional runtime context passed directly from parent buffers (not retrieved from vector DB). |
-| `input_context_value` | `str | dict | list | None` | `` | Fixed value for the Additional runtime context passed directly from parent buffers (not retrieved from vector DB). if input_context_keys is not configured, this value is used as the input context for all rows. |
-| `context_files_key` | `str` | `` | Key from which to receive optional file context. V1 accepts str, bytes, or list[str | bytes]. |
-| `context_files_value` | `str | bytes | list[str | bytes] | None` | `` | Fixed optional file context for all rows. V1 accepts external URLs, file URLs, local paths absolute or relative to the current working directory, data URIs, plain base64 strings, raw bytes, or lists of those values. |
+| `input_context_value` | `str | dict | list | None` | `"<string>"` | Fixed value for the Additional runtime context passed directly from parent buffers (not retrieved from vector DB). if input_context_keys is not configured, this value is used as the input context for all rows. |
+| `context_files_key` | `str` | `"path/to/file.txt"` | Key from which to receive optional file context. V1 accepts str, bytes, or list[str | bytes]. |
+| `context_files_value` | `str | bytes | list[str | bytes] | None` | `"path/to/file.txt"` | Fixed optional file context for all rows. V1 accepts external URLs, file URLs, local paths absolute or relative to the current working directory, data URIs, plain base64 strings, raw bytes, or lists of those values. |
 | `input_context_mode` | `str` | `'augment'` | Either 'augment' or 'template_fill'. 'augment' mode simply appends the input_context to the question and feeds it to the model as one prompt. 'template_fill' mode treats the input_context as a template for the expected answer structure and enforces that the model's answer adheres to this structure by validating that all keys in the input_context are present in the model's answer and that there are no extra keys in the model's answer that are not present in the input_context. This is useful to ensure that the model's answer can be reliably parsed and processed downstream, but it also requires that the input_context is carefully crafted to match the expected answer format. |
 | `use_rag_context` | `bool` | `False` | Set to False to disable vector retrieval for this action. |
 | `use_internet_access` | `bool` | `False` | Whether to access the internet to answer a question. |
@@ -2755,33 +2819,34 @@ continues text-only.
 # Example usage of `LLMChatAction`
 from pydag.nodes.llm.LLMChatAction import LLMChatAction  # Adjust import if needed
 
-obj = LLMChatAction()
-obj.child_ids='list()'
-obj.buffer_id="<string>"
-obj.persistent=True
-obj.n=0
-obj.input_keys='list()'
-obj.ignore_keys='list()'
-obj.ignore_empty_parents=True
-obj.service_id="<string>"
-obj.id=<dataclasses._MISSING_TYPE object at 0x000001C27837D250>
-obj.load_on_install=False
-obj.template="<string>"
-obj.question_key="<string>"
-obj.question_value="<string>"
-obj.instruction_key="<string>"
-obj.instruction_value="<string>"
-obj.retrieval_query_key="<string>"
-obj.retrieval_query_value="<string>"
-obj.input_context_keys='list()'
-obj.input_context_value="<string>"
-obj.context_files_key="path/to/file.txt"
-obj.context_files_value="path/to/file.txt"
-obj.input_context_mode='augment'
-obj.use_rag_context=False
-obj.use_internet_access=False
-obj.pass_through_keys='list()'
-obj.output_keys="lambda: ['question', 'answer']()"
+l_l_m_chat_action = LLMChatAction(
+	child_ids='list()',
+	buffer_id="<string>",
+	persistent=True,
+	n=0,
+	input_keys='list()',
+	ignore_keys='list()',
+	ignore_empty_parents=True,
+	service_id="<string>",
+	id="<string>",
+	load_on_install=False,
+	template="<string>",
+	question_key="<string>",
+	question_value="<string>",
+	instruction_key="<string>",
+	instruction_value="<string>",
+	retrieval_query_key="<string>",
+	retrieval_query_value="<string>",
+	input_context_keys='list()',
+	input_context_value="<string>",
+	context_files_key="path/to/file.txt",
+	context_files_value="path/to/file.txt",
+	input_context_mode='augment',
+	use_rag_context=False,
+	use_internet_access=False,
+	pass_through_keys='list()',
+	output_keys="lambda: ['question', 'answer']()"
+)
 ```
 
 [Go to Summary](#summary)
@@ -2822,15 +2887,15 @@ See https://docs.mistral.ai/capabilities/document_ai/basic_ocr for more details.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
-| `buffer_id` | `str` | `` | unique ID of the buffer |
+| `buffer_id` | `str` | `"<string>"` | unique ID of the buffer |
 | `persistent` | `bool` | `True` | specifies whether data is removed (False) from parent or not (True) |
 | `n` | `int` | `0` | specifies how much data is retrieved from parent buffer. Default 0 -> all data |
 | `input_keys` | `list[str] | list[int] | str` | `'list()'` | list of input key names used to extract data from parent buffers. input_keys can also be a list of integers for indices or a Python-style slice string (e.g. '-1' for last index, '1:3' or '0:5:2' for start:stop:step exclusive indexing), or a type selector ('type:string' for text-like values, 'type:number' for numeric and bool values). Duplicates are removed while preserving first-match order. If empty, all parent keys are returned |
 | `ignore_keys` | `list[str]` | `'list()'` | list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys |
 | `ignore_empty_parents` | `bool` | `True` | if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True) |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001C27837D250>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
-| `api_key` | `str` | `` | a mistral ai api key |
+| `api_key` | `str` | `"<string>"` | a mistral ai api key |
 | `output_keys` | `list[str]` | `"lambda: ['documents', 'filepath']()"` |  |
 | `model` | `str` | `'mistral-ocr-latest'` | Mistral OCR model name |
 | `include_image_base64` | `bool` | `False` | Whether OCR page payloads should include embedded base64 images |
@@ -2840,20 +2905,21 @@ See https://docs.mistral.ai/capabilities/document_ai/basic_ocr for more details.
 # Example usage of `LLMOCRAction`
 from pydag.nodes.llm.LLMOCRAction import LLMOCRAction  # Adjust import if needed
 
-obj = LLMOCRAction()
-obj.child_ids='list()'
-obj.buffer_id="<string>"
-obj.persistent=True
-obj.n=0
-obj.input_keys='list()'
-obj.ignore_keys='list()'
-obj.ignore_empty_parents=True
-obj.id=<dataclasses._MISSING_TYPE object at 0x000001C27837D250>
-obj.load_on_install=False
-obj.api_key="<string>"
-obj.output_keys="lambda: ['documents', 'filepath']()"
-obj.model='mistral-ocr-latest'
-obj.include_image_base64=False
+l_l_m_o_c_r_action = LLMOCRAction(
+	child_ids='list()',
+	buffer_id="<string>",
+	persistent=True,
+	n=0,
+	input_keys='list()',
+	ignore_keys='list()',
+	ignore_empty_parents=True,
+	id="<string>",
+	load_on_install=False,
+	api_key="<string>",
+	output_keys="lambda: ['documents', 'filepath']()",
+	model='mistral-ocr-latest',
+	include_image_base64=False
+)
 ```
 
 [Go to Summary](#summary)
@@ -2864,7 +2930,7 @@ obj.include_image_base64=False
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
-| `buffer_id` | `str` | `` | unique ID of the buffer |
+| `buffer_id` | `str` | `"<string>"` | unique ID of the buffer |
 | `persistent` | `bool` | `True` | specifies whether data is removed (False) from parent or not (True) |
 | `n` | `int` | `0` | specifies how much data is retrieved from parent buffer. Default 0 -> all data |
 | `input_keys` | `list[str] | list[int] | str` | `'list()'` | list of input key names used to extract data from parent buffers. input_keys can also be a list of integers for indices or a Python-style slice string (e.g. '-1' for last index, '1:3' or '0:5:2' for start:stop:step exclusive indexing), or a type selector ('type:string' for text-like values, 'type:number' for numeric and bool values). Duplicates are removed while preserving first-match order. If empty, all parent keys are returned |
@@ -2876,36 +2942,37 @@ obj.include_image_base64=False
 | `sample_length` | `int` | `0` | Expected length of each sample. If 0, a sample with shape (1, min_learning_samples) is assumed. Otherwise, (1, sample_length) is assumed. |
 | `normalize` | `bool` | `False` | Flag to indicate whether to normalize the input data using z-score normalization on the input batch. |
 | `nan_to_num` | `bool` | `False` | If True, replace NaN/Inf values with finite numbers (0.0). |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001C27837D250>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `system_message` | `str` | `'SYS_PYTHON_EXPERT'` | Default System message to give to the LLM Agent |
-| `human_msg` | `str` | `` | Human message to give to the LLM Agent for generating code |
-| `service_id` | `str` | `` | unique id of the LLM service required for this DataElement |
+| `human_msg` | `str` | `"<string>"` | Human message to give to the LLM Agent for generating code |
+| `service_id` | `str` | `"<string>"` | unique id of the LLM service required for this DataElement |
 
 
 ```python
 # Example usage of `LLMScriptElement`
 from pydag.nodes.llm.LLMScriptElement import LLMScriptElement  # Adjust import if needed
 
-obj = LLMScriptElement()
-obj.child_ids='list()'
-obj.buffer_id="<string>"
-obj.persistent=True
-obj.n=0
-obj.input_keys='list()'
-obj.output_keys='list()'
-obj.ignore_keys='list()'
-obj.ignore_empty_parents=True
-obj.min_learning_samples=0
-obj.min_inference_samples=0
-obj.sample_length=0
-obj.normalize=False
-obj.nan_to_num=False
-obj.id=<dataclasses._MISSING_TYPE object at 0x000001C27837D250>
-obj.load_on_install=False
-obj.system_message='SYS_PYTHON_EXPERT'
-obj.human_msg="<string>"
-obj.service_id="<string>"
+l_l_m_script_element = LLMScriptElement(
+	child_ids='list()',
+	buffer_id="<string>",
+	persistent=True,
+	n=0,
+	input_keys='list()',
+	output_keys='list()',
+	ignore_keys='list()',
+	ignore_empty_parents=True,
+	min_learning_samples=0,
+	min_inference_samples=0,
+	sample_length=0,
+	normalize=False,
+	nan_to_num=False,
+	id="<string>",
+	load_on_install=False,
+	system_message='SYS_PYTHON_EXPERT',
+	human_msg="<string>",
+	service_id="<string>"
+)
 ```
 
 [Go to Summary](#summary)
@@ -2914,14 +2981,14 @@ obj.service_id="<string>"
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
-| `buffer_id` | `str` | `` | unique ID of the buffer |
+| `buffer_id` | `str` | `"<string>"` | unique ID of the buffer |
 | `persistent` | `bool` | `True` | specifies whether data is removed (False) from parent or not (True) |
 | `n` | `int` | `0` | specifies how much data is retrieved from parent buffer. Default 0 -> all data |
 | `input_keys` | `list[str] | list[int] | str` | `'list()'` | list of input key names used to extract data from parent buffers. input_keys can also be a list of integers for indices or a Python-style slice string (e.g. '-1' for last index, '1:3' or '0:5:2' for start:stop:step exclusive indexing), or a type selector ('type:string' for text-like values, 'type:number' for numeric and bool values). Duplicates are removed while preserving first-match order. If empty, all parent keys are returned |
 | `output_keys` | `list[str]` | `'list()'` | optional explicit output key names written by this node. output_keys are literal names only and do not support selector syntax. If empty, the node uses its default output naming |
 | `ignore_keys` | `list[str]` | `'list()'` | list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys |
 | `ignore_empty_parents` | `bool` | `True` | if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True) |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001C27837D250>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 
 
@@ -2929,17 +2996,18 @@ obj.service_id="<string>"
 # Example usage of `FFTTransform`
 from pydag.nodes.preprocessing.frequency.FFTTransform import FFTTransform  # Adjust import if needed
 
-obj = FFTTransform()
-obj.child_ids='list()'
-obj.buffer_id="<string>"
-obj.persistent=True
-obj.n=0
-obj.input_keys='list()'
-obj.output_keys='list()'
-obj.ignore_keys='list()'
-obj.ignore_empty_parents=True
-obj.id=<dataclasses._MISSING_TYPE object at 0x000001C27837D250>
-obj.load_on_install=False
+f_f_t_transform = FFTTransform(
+	child_ids='list()',
+	buffer_id="<string>",
+	persistent=True,
+	n=0,
+	input_keys='list()',
+	output_keys='list()',
+	ignore_keys='list()',
+	ignore_empty_parents=True,
+	id="<string>",
+	load_on_install=False
+)
 ```
 
 [Go to Summary](#summary)
@@ -2948,14 +3016,14 @@ obj.load_on_install=False
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
-| `buffer_id` | `str` | `` | unique ID of the buffer |
+| `buffer_id` | `str` | `"<string>"` | unique ID of the buffer |
 | `persistent` | `bool` | `True` | specifies whether data is removed (False) from parent or not (True) |
 | `n` | `int` | `0` | specifies how much data is retrieved from parent buffer. Default 0 -> all data |
 | `input_keys` | `list[str] | list[int] | str` | `'list()'` | list of input key names used to extract data from parent buffers. input_keys can also be a list of integers for indices or a Python-style slice string (e.g. '-1' for last index, '1:3' or '0:5:2' for start:stop:step exclusive indexing), or a type selector ('type:string' for text-like values, 'type:number' for numeric and bool values). Duplicates are removed while preserving first-match order. If empty, all parent keys are returned |
 | `output_keys` | `list[str]` | `'list()'` | optional explicit output key names written by this node. output_keys are literal names only and do not support selector syntax. If empty, the node uses its default output naming |
 | `ignore_keys` | `list[str]` | `'list()'` | list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys |
 | `ignore_empty_parents` | `bool` | `True` | if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True) |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001C27837D250>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 
 
@@ -2963,17 +3031,18 @@ obj.load_on_install=False
 # Example usage of `ZScore`
 from pydag.nodes.preprocessing.statistics.ZScore import ZScore  # Adjust import if needed
 
-obj = ZScore()
-obj.child_ids='list()'
-obj.buffer_id="<string>"
-obj.persistent=True
-obj.n=0
-obj.input_keys='list()'
-obj.output_keys='list()'
-obj.ignore_keys='list()'
-obj.ignore_empty_parents=True
-obj.id=<dataclasses._MISSING_TYPE object at 0x000001C27837D250>
-obj.load_on_install=False
+z_score = ZScore(
+	child_ids='list()',
+	buffer_id="<string>",
+	persistent=True,
+	n=0,
+	input_keys='list()',
+	output_keys='list()',
+	ignore_keys='list()',
+	ignore_empty_parents=True,
+	id="<string>",
+	load_on_install=False
+)
 ```
 
 [Go to Summary](#summary)
@@ -2988,14 +3057,14 @@ Base Classes:
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
-| `buffer_id` | `str` | `` | unique ID of the buffer |
+| `buffer_id` | `str` | `"<string>"` | unique ID of the buffer |
 | `persistent` | `bool` | `True` | specifies whether data is removed (False) from parent or not (True) |
 | `n` | `int` | `0` | specifies how much data is retrieved from parent buffer. Default 0 -> all data |
 | `input_keys` | `list[str] | list[int] | str` | `'list()'` | list of input key names used to extract data from parent buffers. input_keys can also be a list of integers for indices or a Python-style slice string (e.g. '-1' for last index, '1:3' or '0:5:2' for start:stop:step exclusive indexing), or a type selector ('type:string' for text-like values, 'type:number' for numeric and bool values). Duplicates are removed while preserving first-match order. If empty, all parent keys are returned |
 | `output_keys` | `list[str]` | `'list()'` | optional explicit output key names written by this node. output_keys are literal names only and do not support selector syntax. If empty, the node uses its default output naming |
 | `ignore_keys` | `list[str]` | `'list()'` | list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys |
 | `ignore_empty_parents` | `bool` | `True` | if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True) |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001C27837D250>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `max_windows` | `int` | `10` | number of windows to keep |
 | `date_format` | `str` | `'%Y-%m-%d %H:%M:%S'` | dateformat to convert the new keys to |
@@ -3006,20 +3075,21 @@ Base Classes:
 # Example usage of `TrendWindowNode`
 from pydag.nodes.preprocessing.windowing.TrendWindowNode import TrendWindowNode  # Adjust import if needed
 
-obj = TrendWindowNode()
-obj.child_ids='list()'
-obj.buffer_id="<string>"
-obj.persistent=True
-obj.n=0
-obj.input_keys='list()'
-obj.output_keys='list()'
-obj.ignore_keys='list()'
-obj.ignore_empty_parents=True
-obj.id=<dataclasses._MISSING_TYPE object at 0x000001C27837D250>
-obj.load_on_install=False
-obj.max_windows=10
-obj.date_format='%Y-%m-%d %H:%M:%S'
-obj.date_separator='#'
+trend_window_node = TrendWindowNode(
+	child_ids='list()',
+	buffer_id="<string>",
+	persistent=True,
+	n=0,
+	input_keys='list()',
+	output_keys='list()',
+	ignore_keys='list()',
+	ignore_empty_parents=True,
+	id="<string>",
+	load_on_install=False,
+	max_windows=10,
+	date_format='%Y-%m-%d %H:%M:%S',
+	date_separator='#'
+)
 ```
 
 [Go to Summary](#summary)
@@ -3030,7 +3100,7 @@ Code Service to do Regression on Inputs
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
-| `buffer_id` | `str` | `` | unique ID of the buffer |
+| `buffer_id` | `str` | `"<string>"` | unique ID of the buffer |
 | `persistent` | `bool` | `True` | specifies whether data is removed (False) from parent or not (True) |
 | `n` | `int` | `0` | specifies how much data is retrieved from parent buffer. Default 0 -> all data |
 | `input_keys` | `list[str] | list[int] | str` | `'list()'` | list of input key names used to extract data from parent buffers. input_keys can also be a list of integers for indices or a Python-style slice string (e.g. '-1' for last index, '1:3' or '0:5:2' for start:stop:step exclusive indexing), or a type selector ('type:string' for text-like values, 'type:number' for numeric and bool values). Duplicates are removed while preserving first-match order. If empty, all parent keys are returned |
@@ -3041,7 +3111,7 @@ Code Service to do Regression on Inputs
 | `sample_length` | `int` | `0` | Expected length of each sample. If 0, a sample with shape (1, min_learning_samples) is assumed. Otherwise, (1, sample_length) is assumed. |
 | `normalize` | `bool` | `False` | Flag to indicate whether to normalize the input data using z-score normalization on the input batch. |
 | `nan_to_num` | `bool` | `False` | If True, replace NaN/Inf values with finite numbers (0.0). |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001C27837D250>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `model_name` | `str` | `'Tirex'` | name of the model to use for regression. Default is Tirex |
 | `learning_required` | `bool` | `True` | whether the model requires a learning phase before inference |
@@ -3053,25 +3123,26 @@ Code Service to do Regression on Inputs
 # Example usage of `RegressionTransform`
 from pydag.nodes.regression.RegressionTransform import RegressionTransform  # Adjust import if needed
 
-obj = RegressionTransform()
-obj.child_ids='list()'
-obj.buffer_id="<string>"
-obj.persistent=True
-obj.n=0
-obj.input_keys='list()'
-obj.ignore_keys='list()'
-obj.ignore_empty_parents=True
-obj.min_learning_samples=0
-obj.min_inference_samples=0
-obj.sample_length=0
-obj.normalize=False
-obj.nan_to_num=False
-obj.id=<dataclasses._MISSING_TYPE object at 0x000001C27837D250>
-obj.load_on_install=False
-obj.model_name='Tirex'
-obj.learning_required=True
-obj.prediction_length=64
-obj.output_keys='list()'
+regression_transform = RegressionTransform(
+	child_ids='list()',
+	buffer_id="<string>",
+	persistent=True,
+	n=0,
+	input_keys='list()',
+	ignore_keys='list()',
+	ignore_empty_parents=True,
+	min_learning_samples=0,
+	min_inference_samples=0,
+	sample_length=0,
+	normalize=False,
+	nan_to_num=False,
+	id="<string>",
+	load_on_install=False,
+	model_name='Tirex',
+	learning_required=True,
+	prediction_length=64,
+	output_keys='list()'
+)
 ```
 
 [Go to Summary](#summary)
@@ -3086,15 +3157,15 @@ obj.output_keys='list()'
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
-| `buffer_id` | `str` | `` | unique ID of the buffer |
+| `buffer_id` | `str` | `"<string>"` | unique ID of the buffer |
 | `persistent` | `bool` | `True` | specifies whether data is removed (False) from parent or not (True) |
 | `n` | `int` | `0` | specifies how much data is retrieved from parent buffer. Default 0 -> all data |
 | `input_keys` | `list[str] | list[int] | str` | `'list()'` | list of input key names used to extract data from parent buffers. input_keys can also be a list of integers for indices or a Python-style slice string (e.g. '-1' for last index, '1:3' or '0:5:2' for start:stop:step exclusive indexing), or a type selector ('type:string' for text-like values, 'type:number' for numeric and bool values). Duplicates are removed while preserving first-match order. If empty, all parent keys are returned |
 | `ignore_keys` | `list[str]` | `'list()'` | list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys |
 | `ignore_empty_parents` | `bool` | `True` | if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True) |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001C27837D250>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
-| `script_path` | `str` | `` | Python code snippet defining a script to process buffer data |
+| `script_path` | `str` | `"<string>"` | Python code snippet defining a script to process buffer data |
 | `output_keys` | `list[str]` | `'list()'` | keys to extract from the script and store their values into this element's buffer. If empty, no data is stored in the buffer. |
 | `use_parent_data` | `bool` | `True` | whether to use data from parent buffers. If set to false, the script will only receive data from its own buffer. This can be useful if you want to execute a script that does not depend on parent data, but you still may want to use the output_keys to store data in the buffer. |
 
@@ -3103,19 +3174,20 @@ obj.output_keys='list()'
 # Example usage of `ScriptAction`
 from pydag.nodes.script.ScriptAction import ScriptAction  # Adjust import if needed
 
-obj = ScriptAction()
-obj.child_ids='list()'
-obj.buffer_id="<string>"
-obj.persistent=True
-obj.n=0
-obj.input_keys='list()'
-obj.ignore_keys='list()'
-obj.ignore_empty_parents=True
-obj.id=<dataclasses._MISSING_TYPE object at 0x000001C27837D250>
-obj.load_on_install=False
-obj.script_path="<string>"
-obj.output_keys='list()'
-obj.use_parent_data=True
+script_action = ScriptAction(
+	child_ids='list()',
+	buffer_id="<string>",
+	persistent=True,
+	n=0,
+	input_keys='list()',
+	ignore_keys='list()',
+	ignore_empty_parents=True,
+	id="<string>",
+	load_on_install=False,
+	script_path="<string>",
+	output_keys='list()',
+	use_parent_data=True
+)
 ```
 
 [Go to Summary](#summary)
@@ -3124,16 +3196,16 @@ obj.use_parent_data=True
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
-| `buffer_id` | `str` | `` | unique ID of the buffer |
+| `buffer_id` | `str` | `"<string>"` | unique ID of the buffer |
 | `persistent` | `bool` | `True` | specifies whether data is removed (False) from parent or not (True) |
 | `n` | `int` | `0` | specifies how much data is retrieved from parent buffer. Default 0 -> all data |
 | `input_keys` | `list[str] | list[int] | str` | `'list()'` | list of input key names used to extract data from parent buffers. input_keys can also be a list of integers for indices or a Python-style slice string (e.g. '-1' for last index, '1:3' or '0:5:2' for start:stop:step exclusive indexing), or a type selector ('type:string' for text-like values, 'type:number' for numeric and bool values). Duplicates are removed while preserving first-match order. If empty, all parent keys are returned |
 | `ignore_keys` | `list[str]` | `'list()'` | list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys |
 | `ignore_empty_parents` | `bool` | `True` | if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True) |
-| `service_id` | `str` | `` | ID of the service |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001C27837D250>` | unique identifier of element in DataAgent application |
+| `service_id` | `str` | `"<string>"` | ID of the service |
+| `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
-| `folder` | `str` | `` | folder to wach for file events |
+| `folder` | `str` | `"path/to/folder"` | folder to wach for file events |
 | `recursive` | `bool` | `False` | listen to events in subfolders as well |
 | `create_events` | `bool` | `True` | listen to create events |
 | `modified_events` | `bool` | `False` | listen to modified events |
@@ -3146,24 +3218,25 @@ obj.use_parent_data=True
 # Example usage of `FileTriggerAction`
 from pydag.nodes.triggers.FileTriggerAction import FileTriggerAction  # Adjust import if needed
 
-obj = FileTriggerAction()
-obj.child_ids='list()'
-obj.buffer_id="<string>"
-obj.persistent=True
-obj.n=0
-obj.input_keys='list()'
-obj.ignore_keys='list()'
-obj.ignore_empty_parents=True
-obj.service_id="<string>"
-obj.id=<dataclasses._MISSING_TYPE object at 0x000001C27837D250>
-obj.load_on_install=False
-obj.folder="path/to/folder"
-obj.recursive=False
-obj.create_events=True
-obj.modified_events=False
-obj.moved_events=False
-obj.delete_events=False
-obj.output_keys="lambda: ['filepaths']()"
+file_trigger_action = FileTriggerAction(
+	child_ids='list()',
+	buffer_id="<string>",
+	persistent=True,
+	n=0,
+	input_keys='list()',
+	ignore_keys='list()',
+	ignore_empty_parents=True,
+	service_id="<string>",
+	id="<string>",
+	load_on_install=False,
+	folder="path/to/folder",
+	recursive=False,
+	create_events=True,
+	modified_events=False,
+	moved_events=False,
+	delete_events=False,
+	output_keys="lambda: ['filepaths']()"
+)
 ```
 
 [Go to Summary](#summary)
@@ -3174,8 +3247,8 @@ trigger event occurs. This `Node` does not define `start_trigger`, but rather ex
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
-| `service_id` | `str` | `` | ID of the service |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001C27837D250>` | unique identifier of element in DataAgent application |
+| `service_id` | `str` | `"<string>"` | ID of the service |
+| `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 
 
@@ -3183,11 +3256,12 @@ trigger event occurs. This `Node` does not define `start_trigger`, but rather ex
 # Example usage of `ObserverTriggerAction`
 from pydag.nodes.triggers.ObserverTriggerAction import ObserverTriggerAction  # Adjust import if needed
 
-obj = ObserverTriggerAction()
-obj.child_ids='list()'
-obj.service_id="<string>"
-obj.id=<dataclasses._MISSING_TYPE object at 0x000001C27837D250>
-obj.load_on_install=False
+observer_trigger_action = ObserverTriggerAction(
+	child_ids='list()',
+	service_id="<string>",
+	id="<string>",
+	load_on_install=False
+)
 ```
 
 [Go to Summary](#summary)
@@ -3206,36 +3280,37 @@ Raises:
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
-| `buffer_id` | `str` | `` | unique ID of the buffer |
+| `buffer_id` | `str` | `"<string>"` | unique ID of the buffer |
 | `persistent` | `bool` | `True` | specifies whether data is removed (False) from parent or not (True) |
 | `n` | `int` | `0` | specifies how much data is retrieved from parent buffer. Default 0 -> all data |
 | `input_keys` | `list[str] | list[int] | str` | `'list()'` | list of input key names used to extract data from parent buffers. input_keys can also be a list of integers for indices or a Python-style slice string (e.g. '-1' for last index, '1:3' or '0:5:2' for start:stop:step exclusive indexing), or a type selector ('type:string' for text-like values, 'type:number' for numeric and bool values). Duplicates are removed while preserving first-match order. If empty, all parent keys are returned |
 | `output_keys` | `list[str]` | `'list()'` | optional explicit output key names written by this node. output_keys are literal names only and do not support selector syntax. If empty, the node uses its default output naming |
 | `ignore_keys` | `list[str]` | `'list()'` | list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys |
 | `ignore_empty_parents` | `bool` | `True` | if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True) |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001C27837D250>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
-| `option` | `str` | `` | option to configure with new value |
-| `element_id` | `str` | `` | id of the element to change the option for |
+| `option` | `str` | `"<string>"` | option to configure with new value |
+| `element_id` | `str` | `"<string>"` | id of the element to change the option for |
 
 
 ```python
 # Example usage of `ConfigureElementAction`
 from pydag.nodes.utils.ConfigureElementAction import ConfigureElementAction  # Adjust import if needed
 
-obj = ConfigureElementAction()
-obj.child_ids='list()'
-obj.buffer_id="<string>"
-obj.persistent=True
-obj.n=0
-obj.input_keys='list()'
-obj.output_keys='list()'
-obj.ignore_keys='list()'
-obj.ignore_empty_parents=True
-obj.id=<dataclasses._MISSING_TYPE object at 0x000001C27837D250>
-obj.load_on_install=False
-obj.option="<string>"
-obj.element_id="<string>"
+configure_element_action = ConfigureElementAction(
+	child_ids='list()',
+	buffer_id="<string>",
+	persistent=True,
+	n=0,
+	input_keys='list()',
+	output_keys='list()',
+	ignore_keys='list()',
+	ignore_empty_parents=True,
+	id="<string>",
+	load_on_install=False,
+	option="<string>",
+	element_id="<string>"
+)
 ```
 
 [Go to Summary](#summary)
@@ -3245,7 +3320,7 @@ Action that counts the number of times it has been called.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001C27837D250>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 
 
@@ -3253,10 +3328,11 @@ Action that counts the number of times it has been called.
 # Example usage of `CountAction`
 from pydag.nodes.utils.CountAction import CountAction  # Adjust import if needed
 
-obj = CountAction()
-obj.child_ids='list()'
-obj.id=<dataclasses._MISSING_TYPE object at 0x000001C27837D250>
-obj.load_on_install=False
+count_action = CountAction(
+	child_ids='list()',
+	id="<string>",
+	load_on_install=False
+)
 ```
 
 [Go to Summary](#summary)
@@ -3266,7 +3342,7 @@ A transition that counts the number of times it has been triggered.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001C27837D250>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 
 
@@ -3274,10 +3350,11 @@ A transition that counts the number of times it has been triggered.
 # Example usage of `CountTransition`
 from pydag.nodes.utils.CountTransition import CountTransition  # Adjust import if needed
 
-obj = CountTransition()
-obj.child_ids='list()'
-obj.id=<dataclasses._MISSING_TYPE object at 0x000001C27837D250>
-obj.load_on_install=False
+count_transition = CountTransition(
+	child_ids='list()',
+	id="<string>",
+	load_on_install=False
+)
 ```
 
 [Go to Summary](#summary)
@@ -3287,7 +3364,7 @@ A transition that always returns False.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001C27837D250>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 
 
@@ -3295,10 +3372,11 @@ A transition that always returns False.
 # Example usage of `FalseTransition`
 from pydag.nodes.utils.FalseTransition import FalseTransition  # Adjust import if needed
 
-obj = FalseTransition()
-obj.child_ids='list()'
-obj.id=<dataclasses._MISSING_TYPE object at 0x000001C27837D250>
-obj.load_on_install=False
+false_transition = FalseTransition(
+	child_ids='list()',
+	id="<string>",
+	load_on_install=False
+)
 ```
 
 [Go to Summary](#summary)
@@ -3307,7 +3385,7 @@ obj.load_on_install=False
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001C27837D250>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 
 
@@ -3315,10 +3393,11 @@ obj.load_on_install=False
 # Example usage of `JoinTransition`
 from pydag.nodes.utils.JoinTransition import JoinTransition  # Adjust import if needed
 
-obj = JoinTransition()
-obj.child_ids='list()'
-obj.id=<dataclasses._MISSING_TYPE object at 0x000001C27837D250>
-obj.load_on_install=False
+join_transition = JoinTransition(
+	child_ids='list()',
+	id="<string>",
+	load_on_install=False
+)
 ```
 
 [Go to Summary](#summary)
@@ -3327,15 +3406,15 @@ obj.load_on_install=False
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001C27837D250>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
-| `smtp_server` | `str` | `` | host of the mail server to use |
-| `port` | `int` | `` | port of the smtp server |
-| `mail_account` | `str` | `` | mail account to use for login |
-| `pw` | `str` | `` | password of the mail server |
+| `smtp_server` | `str` | `"<string>"` | host of the mail server to use |
+| `port` | `int` | `1` | port of the smtp server |
+| `mail_account` | `str` | `"<string>"` | mail account to use for login |
+| `pw` | `str` | `"<string>"` | password of the mail server |
 | `recipients` | `str | list[str]` | `'list[str]()'` | mail address of the recipient |
-| `subject` | `str` | `` | subject of the mail |
-| `body` | `str` | `` | body of the mail |
+| `subject` | `str` | `"<string>"` | subject of the mail |
+| `body` | `str` | `"<string>"` | body of the mail |
 | `tls` | `bool` | `True` | use TLS for the connection |
 | `debug_mode` | `bool` | `False` | if set to true, no mails are send, but only logged to console |
 
@@ -3344,19 +3423,20 @@ obj.load_on_install=False
 # Example usage of `MailAction`
 from pydag.nodes.utils.MailAction import MailAction  # Adjust import if needed
 
-obj = MailAction()
-obj.child_ids='list()'
-obj.id=<dataclasses._MISSING_TYPE object at 0x000001C27837D250>
-obj.load_on_install=False
-obj.smtp_server="<string>"
-obj.port=1
-obj.mail_account="<string>"
-obj.pw="<string>"
-obj.recipients='list[str]()'
-obj.subject="<string>"
-obj.body="<string>"
-obj.tls=True
-obj.debug_mode=False
+mail_action = MailAction(
+	child_ids='list()',
+	id="<string>",
+	load_on_install=False,
+	smtp_server="<string>",
+	port=1,
+	mail_account="<string>",
+	pw="<string>",
+	recipients='list[str]()',
+	subject="<string>",
+	body="<string>",
+	tls=True,
+	debug_mode=False
+)
 ```
 
 [Go to Summary](#summary)
@@ -3383,16 +3463,16 @@ Raises:
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
-| `buffer_id` | `str` | `` | unique ID of the buffer |
+| `buffer_id` | `str` | `"<string>"` | unique ID of the buffer |
 | `output_keys` | `list[str]` | `'list()'` | optional explicit output key names written by this node. output_keys are literal names only and do not support selector syntax. If empty, the node uses its default output naming |
 | `ignore_keys` | `list[str]` | `'list()'` | list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys |
 | `ignore_empty_parents` | `bool` | `True` | if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True) |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001C27837D250>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
-| `smtp_server` | `str` | `` | host of the mail server to use |
-| `port` | `int` | `` | port of the smtp server |
-| `mail_account` | `str` | `` | mail account to use for login |
-| `pw` | `str` | `` | password of the mail server |
+| `smtp_server` | `str` | `"<string>"` | host of the mail server to use |
+| `port` | `int` | `1` | port of the smtp server |
+| `mail_account` | `str` | `"<string>"` | mail account to use for login |
+| `pw` | `str` | `"<string>"` | password of the mail server |
 | `tls` | `bool` | `True` | use TLS for the connection |
 | `debug_mode` | `bool` | `False` | if set to true, no mails are send, but only logged to console |
 | `input_keys` | `list[str]` | `"lambda: ['recipients', 'subject', 'body']()"` | the input keys must be 3 in total and in the fixed order: recipients, subject and body |
@@ -3404,23 +3484,24 @@ Raises:
 # Example usage of `MailBufferAction`
 from pydag.nodes.utils.MailBufferAction import MailBufferAction  # Adjust import if needed
 
-obj = MailBufferAction()
-obj.child_ids='list()'
-obj.buffer_id="<string>"
-obj.output_keys='list()'
-obj.ignore_keys='list()'
-obj.ignore_empty_parents=True
-obj.id=<dataclasses._MISSING_TYPE object at 0x000001C27837D250>
-obj.load_on_install=False
-obj.smtp_server="<string>"
-obj.port=1
-obj.mail_account="<string>"
-obj.pw="<string>"
-obj.tls=True
-obj.debug_mode=False
-obj.input_keys="lambda: ['recipients', 'subject', 'body']()"
-obj.persistent=False
-obj.n=0
+mail_buffer_action = MailBufferAction(
+	child_ids='list()',
+	buffer_id="<string>",
+	output_keys='list()',
+	ignore_keys='list()',
+	ignore_empty_parents=True,
+	id="<string>",
+	load_on_install=False,
+	smtp_server="<string>",
+	port=1,
+	mail_account="<string>",
+	pw="<string>",
+	tls=True,
+	debug_mode=False,
+	input_keys="lambda: ['recipients', 'subject', 'body']()",
+	persistent=False,
+	n=0
+)
 ```
 
 [Go to Summary](#summary)
@@ -3432,20 +3513,21 @@ obj.n=0
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001C27837D250>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
-| `executable` | `str` | `` | The executable to kill, e.g. 'python.exe' |
+| `executable` | `str` | `"<string>"` | The executable to kill, e.g. 'python.exe' |
 
 
 ```python
 # Example usage of `OSKillProcessAction`
 from pydag.nodes.utils.OSKillProcessAction import OSKillProcessAction  # Adjust import if needed
 
-obj = OSKillProcessAction()
-obj.child_ids='list()'
-obj.id=<dataclasses._MISSING_TYPE object at 0x000001C27837D250>
-obj.load_on_install=False
-obj.executable="<string>"
+o_s_kill_process_action = OSKillProcessAction(
+	child_ids='list()',
+	id="<string>",
+	load_on_install=False,
+	executable="<string>"
+)
 ```
 
 [Go to Summary](#summary)
@@ -3454,16 +3536,16 @@ obj.executable="<string>"
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
-| `buffer_id` | `str` | `` | unique ID of the buffer |
+| `buffer_id` | `str` | `"<string>"` | unique ID of the buffer |
 | `persistent` | `bool` | `True` | specifies whether data is removed (False) from parent or not (True) |
 | `n` | `int` | `0` | specifies how much data is retrieved from parent buffer. Default 0 -> all data |
 | `input_keys` | `list[str] | list[int] | str` | `'list()'` | list of input key names used to extract data from parent buffers. input_keys can also be a list of integers for indices or a Python-style slice string (e.g. '-1' for last index, '1:3' or '0:5:2' for start:stop:step exclusive indexing), or a type selector ('type:string' for text-like values, 'type:number' for numeric and bool values). Duplicates are removed while preserving first-match order. If empty, all parent keys are returned |
 | `output_keys` | `list[str]` | `'list()'` | optional explicit output key names written by this node. output_keys are literal names only and do not support selector syntax. If empty, the node uses its default output naming |
 | `ignore_keys` | `list[str]` | `'list()'` | list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys |
 | `ignore_empty_parents` | `bool` | `True` | if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True) |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001C27837D250>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
-| `executable` | `str` | `` | The executable to run, e.g., 'python.exe' |
+| `executable` | `str` | `"<string>"` | The executable to run, e.g., 'python.exe' |
 | `arguments` | `list` | `'list()'` | List of arguments to pass to the executable |
 | `detached` | `bool` | `True` | Whether to run the process in a detached state |
 | `encoding` | `str` | `'cp850'` | force utf-8, cp1252 or cp850 decoding, cp850 works on german windows systems |
@@ -3473,21 +3555,22 @@ obj.executable="<string>"
 # Example usage of `OSProcessAction`
 from pydag.nodes.utils.OSProcessAction import OSProcessAction  # Adjust import if needed
 
-obj = OSProcessAction()
-obj.child_ids='list()'
-obj.buffer_id="<string>"
-obj.persistent=True
-obj.n=0
-obj.input_keys='list()'
-obj.output_keys='list()'
-obj.ignore_keys='list()'
-obj.ignore_empty_parents=True
-obj.id=<dataclasses._MISSING_TYPE object at 0x000001C27837D250>
-obj.load_on_install=False
-obj.executable="<string>"
-obj.arguments='list()'
-obj.detached=True
-obj.encoding='cp850'
+o_s_process_action = OSProcessAction(
+	child_ids='list()',
+	buffer_id="<string>",
+	persistent=True,
+	n=0,
+	input_keys='list()',
+	output_keys='list()',
+	ignore_keys='list()',
+	ignore_empty_parents=True,
+	id="<string>",
+	load_on_install=False,
+	executable="<string>",
+	arguments='list()',
+	detached=True,
+	encoding='cp850'
+)
 ```
 
 [Go to Summary](#summary)
@@ -3497,20 +3580,21 @@ An action that prints a message when executed.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001C27837D250>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
-| `message` | `str` | `` |  |
+| `message` | `str` | `"<string>"` |  |
 
 
 ```python
 # Example usage of `PrintAction`
 from pydag.nodes.utils.PrintAction import PrintAction  # Adjust import if needed
 
-obj = PrintAction()
-obj.child_ids='list()'
-obj.id=<dataclasses._MISSING_TYPE object at 0x000001C27837D250>
-obj.load_on_install=False
-obj.message="<string>"
+print_action = PrintAction(
+	child_ids='list()',
+	id="<string>",
+	load_on_install=False,
+	message="<string>"
+)
 ```
 
 [Go to Summary](#summary)
@@ -3524,14 +3608,14 @@ Args:
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
-| `buffer_id` | `str` | `` | unique ID of the buffer |
+| `buffer_id` | `str` | `"<string>"` | unique ID of the buffer |
 | `persistent` | `bool` | `True` | specifies whether data is removed (False) from parent or not (True) |
 | `n` | `int` | `0` | specifies how much data is retrieved from parent buffer. Default 0 -> all data |
 | `input_keys` | `list[str] | list[int] | str` | `'list()'` | list of input key names used to extract data from parent buffers. input_keys can also be a list of integers for indices or a Python-style slice string (e.g. '-1' for last index, '1:3' or '0:5:2' for start:stop:step exclusive indexing), or a type selector ('type:string' for text-like values, 'type:number' for numeric and bool values). Duplicates are removed while preserving first-match order. If empty, all parent keys are returned |
 | `output_keys` | `list[str]` | `'list()'` | optional explicit output key names written by this node. output_keys are literal names only and do not support selector syntax. If empty, the node uses its default output naming |
 | `ignore_keys` | `list[str]` | `'list()'` | list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys |
 | `ignore_empty_parents` | `bool` | `True` | if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True) |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001C27837D250>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 
 
@@ -3539,17 +3623,18 @@ Args:
 # Example usage of `PrintBufferAction`
 from pydag.nodes.utils.PrintBufferAction import PrintBufferAction  # Adjust import if needed
 
-obj = PrintBufferAction()
-obj.child_ids='list()'
-obj.buffer_id="<string>"
-obj.persistent=True
-obj.n=0
-obj.input_keys='list()'
-obj.output_keys='list()'
-obj.ignore_keys='list()'
-obj.ignore_empty_parents=True
-obj.id=<dataclasses._MISSING_TYPE object at 0x000001C27837D250>
-obj.load_on_install=False
+print_buffer_action = PrintBufferAction(
+	child_ids='list()',
+	buffer_id="<string>",
+	persistent=True,
+	n=0,
+	input_keys='list()',
+	output_keys='list()',
+	ignore_keys='list()',
+	ignore_empty_parents=True,
+	id="<string>",
+	load_on_install=False
+)
 ```
 
 [Go to Summary](#summary)
@@ -3559,7 +3644,7 @@ An action that sleeps for a specified number of seconds.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001C27837D250>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `sleep_time` | `int` | `0` | number of seconds to sleep for |
 
@@ -3568,11 +3653,12 @@ An action that sleeps for a specified number of seconds.
 # Example usage of `SleepAction`
 from pydag.nodes.utils.SleepAction import SleepAction  # Adjust import if needed
 
-obj = SleepAction()
-obj.child_ids='list()'
-obj.id=<dataclasses._MISSING_TYPE object at 0x000001C27837D250>
-obj.load_on_install=False
-obj.sleep_time=0
+sleep_action = SleepAction(
+	child_ids='list()',
+	id="<string>",
+	load_on_install=False,
+	sleep_time=0
+)
 ```
 
 [Go to Summary](#summary)
@@ -3582,20 +3668,21 @@ An action that sleeps until the specified daytime.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001C27837D250>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
-| `daytime` | `str` | `` | day time when the sleep should end, format hh:mm:ss |
+| `daytime` | `str` | `"<string>"` | day time when the sleep should end, format hh:mm:ss |
 
 
 ```python
 # Example usage of `SleepUntilAction`
 from pydag.nodes.utils.SleepUntilAction import SleepUntilAction  # Adjust import if needed
 
-obj = SleepUntilAction()
-obj.child_ids='list()'
-obj.id=<dataclasses._MISSING_TYPE object at 0x000001C27837D250>
-obj.load_on_install=False
-obj.daytime="<string>"
+sleep_until_action = SleepUntilAction(
+	child_ids='list()',
+	id="<string>",
+	load_on_install=False,
+	daytime="<string>"
+)
 ```
 
 [Go to Summary](#summary)
@@ -3605,7 +3692,7 @@ An action that starts the state machine.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001C27837D250>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 
 
@@ -3613,10 +3700,11 @@ An action that starts the state machine.
 # Example usage of `StartAction`
 from pydag.nodes.utils.StartAction import StartAction  # Adjust import if needed
 
-obj = StartAction()
-obj.child_ids='list()'
-obj.id=<dataclasses._MISSING_TYPE object at 0x000001C27837D250>
-obj.load_on_install=False
+start_action = StartAction(
+	child_ids='list()',
+	id="<string>",
+	load_on_install=False
+)
 ```
 
 [Go to Summary](#summary)
@@ -3626,7 +3714,7 @@ An action that stops the state machine.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001C27837D250>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 
 
@@ -3634,10 +3722,11 @@ An action that stops the state machine.
 # Example usage of `StopAction`
 from pydag.nodes.utils.StopAction import StopAction  # Adjust import if needed
 
-obj = StopAction()
-obj.child_ids='list()'
-obj.id=<dataclasses._MISSING_TYPE object at 0x000001C27837D250>
-obj.load_on_install=False
+stop_action = StopAction(
+	child_ids='list()',
+	id="<string>",
+	load_on_install=False
+)
 ```
 
 [Go to Summary](#summary)
@@ -3648,7 +3737,7 @@ This is used to test the statemachine without any conditions.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001C27837D250>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 
 
@@ -3656,10 +3745,11 @@ This is used to test the statemachine without any conditions.
 # Example usage of `TrueTransition`
 from pydag.nodes.utils.TrueTransition import TrueTransition  # Adjust import if needed
 
-obj = TrueTransition()
-obj.child_ids='list()'
-obj.id=<dataclasses._MISSING_TYPE object at 0x000001C27837D250>
-obj.load_on_install=False
+true_transition = TrueTransition(
+	child_ids='list()',
+	id="<string>",
+	load_on_install=False
+)
 ```
 
 [Go to Summary](#summary)
@@ -3677,14 +3767,14 @@ https://tesseract-ocr.github.io/tessdoc/Installation.html and https://github.com
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
-| `buffer_id` | `str` | `` | unique ID of the buffer |
+| `buffer_id` | `str` | `"<string>"` | unique ID of the buffer |
 | `persistent` | `bool` | `True` | specifies whether data is removed (False) from parent or not (True) |
 | `n` | `int` | `0` | specifies how much data is retrieved from parent buffer. Default 0 -> all data |
 | `input_keys` | `list[str] | list[int] | str` | `'list()'` | list of input key names used to extract data from parent buffers. input_keys can also be a list of integers for indices or a Python-style slice string (e.g. '-1' for last index, '1:3' or '0:5:2' for start:stop:step exclusive indexing), or a type selector ('type:string' for text-like values, 'type:number' for numeric and bool values). Duplicates are removed while preserving first-match order. If empty, all parent keys are returned |
 | `output_keys` | `list[str]` | `'list()'` | optional explicit output key names written by this node. output_keys are literal names only and do not support selector syntax. If empty, the node uses its default output naming |
 | `ignore_keys` | `list[str]` | `'list()'` | list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys |
 | `ignore_empty_parents` | `bool` | `True` | if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True) |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001C27837D250>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `path_key` | `str` | `'path'` | Key for the source file path in the output dictionary. |
 | `text_key` | `str` | `'text'` | Key for text output in the output dictionary. |
@@ -3694,19 +3784,20 @@ https://tesseract-ocr.github.io/tessdoc/Installation.html and https://github.com
 # Example usage of `OCRAction`
 from pydag.nodes.vision.OCRAction import OCRAction  # Adjust import if needed
 
-obj = OCRAction()
-obj.child_ids='list()'
-obj.buffer_id="<string>"
-obj.persistent=True
-obj.n=0
-obj.input_keys='list()'
-obj.output_keys='list()'
-obj.ignore_keys='list()'
-obj.ignore_empty_parents=True
-obj.id=<dataclasses._MISSING_TYPE object at 0x000001C27837D250>
-obj.load_on_install=False
-obj.path_key='path'
-obj.text_key='text'
+o_c_r_action = OCRAction(
+	child_ids='list()',
+	buffer_id="<string>",
+	persistent=True,
+	n=0,
+	input_keys='list()',
+	output_keys='list()',
+	ignore_keys='list()',
+	ignore_empty_parents=True,
+	id="<string>",
+	load_on_install=False,
+	path_key='path',
+	text_key='text'
+)
 ```
 
 [Go to Summary](#summary)
@@ -3715,8 +3806,8 @@ obj.text_key='text'
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
-| `service_id` | `str` | `` | ID of the service |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001C27837D250>` | unique identifier of element in DataAgent application |
+| `service_id` | `str` | `"<string>"` | ID of the service |
+| `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 
 
@@ -3724,11 +3815,12 @@ obj.text_key='text'
 # Example usage of `BrowserAutomationAction`
 from pydag.nodes.webbrowser.BrowserAutomationAction import BrowserAutomationAction  # Adjust import if needed
 
-obj = BrowserAutomationAction()
-obj.child_ids='list()'
-obj.service_id="<string>"
-obj.id=<dataclasses._MISSING_TYPE object at 0x000001C27837D250>
-obj.load_on_install=False
+browser_automation_action = BrowserAutomationAction(
+	child_ids='list()',
+	service_id="<string>",
+	id="<string>",
+	load_on_install=False
+)
 ```
 
 [Go to Summary](#summary)
@@ -3737,30 +3829,31 @@ obj.load_on_install=False
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
-| `service_id` | `str` | `` | ID of the service |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001C27837D250>` | unique identifier of element in DataAgent application |
+| `service_id` | `str` | `"<string>"` | ID of the service |
+| `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
-| `xpath` | `str` | `` | XPath definition to locate the element to get a value from |
+| `xpath` | `str` | `"<string>"` | XPath definition to locate the element to get a value from |
 | `wait` | `int` | `0` | maximum wait time before the UI element is accessed |
 | `scroll_into_view` | `bool` | `False` | scrolls the element into view before attempting click |
 | `force_click` | `bool` | `False` | forces click via javascript |
-| `wait_for_modal` | `str` | `` | waits for the modal element specified by class |
+| `wait_for_modal` | `str` | `"<string>"` | waits for the modal element specified by class |
 
 
 ```python
 # Example usage of `BrowserClickElementAction`
 from pydag.nodes.webbrowser.BrowserClickElementAction import BrowserClickElementAction  # Adjust import if needed
 
-obj = BrowserClickElementAction()
-obj.child_ids='list()'
-obj.service_id="<string>"
-obj.id=<dataclasses._MISSING_TYPE object at 0x000001C27837D250>
-obj.load_on_install=False
-obj.xpath="<string>"
-obj.wait=0
-obj.scroll_into_view=False
-obj.force_click=False
-obj.wait_for_modal="<string>"
+browser_click_element_action = BrowserClickElementAction(
+	child_ids='list()',
+	service_id="<string>",
+	id="<string>",
+	load_on_install=False,
+	xpath="<string>",
+	wait=0,
+	scroll_into_view=False,
+	force_click=False,
+	wait_for_modal="<string>"
+)
 ```
 
 [Go to Summary](#summary)
@@ -3769,17 +3862,17 @@ obj.wait_for_modal="<string>"
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
-| `service_id` | `str` | `` | ID of the service |
-| `buffer_id` | `str` | `` | unique ID of the buffer |
+| `service_id` | `str` | `"<string>"` | ID of the service |
+| `buffer_id` | `str` | `"<string>"` | unique ID of the buffer |
 | `persistent` | `bool` | `True` | specifies whether data is removed (False) from parent or not (True) |
 | `n` | `int` | `0` | specifies how much data is retrieved from parent buffer. Default 0 -> all data |
 | `input_keys` | `list[str] | list[int] | str` | `'list()'` | list of input key names used to extract data from parent buffers. input_keys can also be a list of integers for indices or a Python-style slice string (e.g. '-1' for last index, '1:3' or '0:5:2' for start:stop:step exclusive indexing), or a type selector ('type:string' for text-like values, 'type:number' for numeric and bool values). Duplicates are removed while preserving first-match order. If empty, all parent keys are returned |
 | `ignore_keys` | `list[str]` | `'list()'` | list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys |
 | `ignore_empty_parents` | `bool` | `True` | if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True) |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001C27837D250>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
-| `xpath` | `str` | `` | XPath definition to locate the element to get a value from |
-| `attribute` | `str` | `` | specifies the name of the attribute to retrieve data from, defaults to None, then only the inner text of element is retrieved |
+| `xpath` | `str` | `"<string>"` | XPath definition to locate the element to get a value from |
+| `attribute` | `str` | `"<string>"` | specifies the name of the attribute to retrieve data from, defaults to None, then only the inner text of element is retrieved |
 | `output_keys` | `list[str]` | `"lambda: ['tags', 'values']()"` |  |
 
 
@@ -3787,20 +3880,21 @@ obj.wait_for_modal="<string>"
 # Example usage of `BrowserGetElementAction`
 from pydag.nodes.webbrowser.BrowserGetElementAction import BrowserGetElementAction  # Adjust import if needed
 
-obj = BrowserGetElementAction()
-obj.child_ids='list()'
-obj.service_id="<string>"
-obj.buffer_id="<string>"
-obj.persistent=True
-obj.n=0
-obj.input_keys='list()'
-obj.ignore_keys='list()'
-obj.ignore_empty_parents=True
-obj.id=<dataclasses._MISSING_TYPE object at 0x000001C27837D250>
-obj.load_on_install=False
-obj.xpath="<string>"
-obj.attribute="<string>"
-obj.output_keys="lambda: ['tags', 'values']()"
+browser_get_element_action = BrowserGetElementAction(
+	child_ids='list()',
+	service_id="<string>",
+	buffer_id="<string>",
+	persistent=True,
+	n=0,
+	input_keys='list()',
+	ignore_keys='list()',
+	ignore_empty_parents=True,
+	id="<string>",
+	load_on_install=False,
+	xpath="<string>",
+	attribute="<string>",
+	output_keys="lambda: ['tags', 'values']()"
+)
 ```
 
 [Go to Summary](#summary)
@@ -3809,15 +3903,15 @@ obj.output_keys="lambda: ['tags', 'values']()"
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
-| `service_id` | `str` | `` | ID of the service |
-| `buffer_id` | `str` | `` | unique ID of the buffer |
+| `service_id` | `str` | `"<string>"` | ID of the service |
+| `buffer_id` | `str` | `"<string>"` | unique ID of the buffer |
 | `input_keys` | `list[str] | list[int] | str` | `'list()'` | list of input key names used to extract data from parent buffers. input_keys can also be a list of integers for indices or a Python-style slice string (e.g. '-1' for last index, '1:3' or '0:5:2' for start:stop:step exclusive indexing), or a type selector ('type:string' for text-like values, 'type:number' for numeric and bool values). Duplicates are removed while preserving first-match order. If empty, all parent keys are returned |
 | `output_keys` | `list[str]` | `'list()'` | optional explicit output key names written by this node. output_keys are literal names only and do not support selector syntax. If empty, the node uses its default output naming |
 | `ignore_keys` | `list[str]` | `'list()'` | list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys |
 | `ignore_empty_parents` | `bool` | `True` | if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True) |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001C27837D250>` | unique identifier of element in DataAgent application |
+| `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
-| `xpath` | `str` | `` | XPath definition to locate the element to set a value to |
+| `xpath` | `str` | `"<string>"` | XPath definition to locate the element to set a value to |
 | `persistent` | `bool` | `False` | specifies whether data is removed (False) from parent or not (True) |
 | `n` | `int` | `1` | specifies how much data is retrieved from parent buffer. Here Default 1 -> only one value per Set Action |
 
@@ -3826,19 +3920,20 @@ obj.output_keys="lambda: ['tags', 'values']()"
 # Example usage of `BrowserSetElementAction`
 from pydag.nodes.webbrowser.BrowserSetElementAction import BrowserSetElementAction  # Adjust import if needed
 
-obj = BrowserSetElementAction()
-obj.child_ids='list()'
-obj.service_id="<string>"
-obj.buffer_id="<string>"
-obj.input_keys='list()'
-obj.output_keys='list()'
-obj.ignore_keys='list()'
-obj.ignore_empty_parents=True
-obj.id=<dataclasses._MISSING_TYPE object at 0x000001C27837D250>
-obj.load_on_install=False
-obj.xpath="<string>"
-obj.persistent=False
-obj.n=1
+browser_set_element_action = BrowserSetElementAction(
+	child_ids='list()',
+	service_id="<string>",
+	buffer_id="<string>",
+	input_keys='list()',
+	output_keys='list()',
+	ignore_keys='list()',
+	ignore_empty_parents=True,
+	id="<string>",
+	load_on_install=False,
+	xpath="<string>",
+	persistent=False,
+	n=1
+)
 ```
 
 [Go to Summary](#summary)
@@ -3851,10 +3946,10 @@ Raises:
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
-| `service_id` | `str` | `` | ID of the service |
-| `id` | `str` | `<dataclasses._MISSING_TYPE object at 0x000001C27837D250>` | unique identifier of element in DataAgent application |
+| `service_id` | `str` | `"<string>"` | ID of the service |
+| `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
-| `url` | `str` | `` | url to navigate to in browser |
+| `url` | `str` | `"https://example.com"` | url to navigate to in browser |
 | `sleep_time` | `float` | `0.0` | time to wait after navigation (in seconds) |
 
 
@@ -3862,13 +3957,14 @@ Raises:
 # Example usage of `BrowserUrlNavigateAction`
 from pydag.nodes.webbrowser.BrowserUrlNavigateAction import BrowserUrlNavigateAction  # Adjust import if needed
 
-obj = BrowserUrlNavigateAction()
-obj.child_ids='list()'
-obj.service_id="<string>"
-obj.id=<dataclasses._MISSING_TYPE object at 0x000001C27837D250>
-obj.load_on_install=False
-obj.url="https://example.com"
-obj.sleep_time=0.0
+browser_url_navigate_action = BrowserUrlNavigateAction(
+	child_ids='list()',
+	service_id="<string>",
+	id="<string>",
+	load_on_install=False,
+	url="https://example.com",
+	sleep_time=0.0
+)
 ```
 
 [Go to Summary](#summary)
