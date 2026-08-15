@@ -1142,7 +1142,7 @@ npz_service = NpzService(
 | `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `path` | `Path` | `"<value>"` |  |
-| `timestamp` | `datetime` | `"2026-08-15T21:10:10Z"  # datetime as ISO string` |  |
+| `timestamp` | `datetime` | `"2026-08-15T21:25:08Z"  # datetime as ISO string` |  |
 
 
 ```python
@@ -1153,7 +1153,7 @@ backup = Backup(
 	id="<string>",
 	load_on_install=False,
 	path="<value>",
-	timestamp="2026-08-15T21:10:10Z"  # datetime as ISO string
+	timestamp="2026-08-15T21:25:08Z"  # datetime as ISO string
 )
 ```
 
