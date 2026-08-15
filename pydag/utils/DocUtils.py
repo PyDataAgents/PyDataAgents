@@ -318,9 +318,15 @@ def guess_placeholder_value(type_str: str, field : str) -> str:
     else:
         return '"<value>"'
 
-def generate_docs_for_type(name : str, type : str, src_folder : Path, docu_folder : Path, with_images : bool = False):
+def generate_docs_for_type(name : str, type : str | list[str], src_folder : Path, docu_folder : Path, with_images : bool = False):
     """Generate documentation for a specific type of class."""
-    class_info = scan_repository(src_folder, type)
+    if isinstance(type, list):
+        class_info = []
+        for t in type:
+            ci = scan_repository(src_folder, t)
+            class_info.extend(ci)
+    else:
+        class_info = scan_repository(src_folder, type)
     generate_readme(class_data=class_info, output_file=docu_folder / (name + ".md"), name=name, with_images=with_images)
     class_hierarchy.clear()
     class_defs.clear()
@@ -328,7 +334,8 @@ def generate_docs_for_type(name : str, type : str, src_folder : Path, docu_folde
 
 def _is_abstract(class_name) -> bool:
     return False
-    """fcn : str = classes_fully_qualified[class_name]
+    """
+    fcn : str = classes_fully_qualified[class_name]
     if fcn:
         try:
             clazz = ClassUtils.create_class(fcn)

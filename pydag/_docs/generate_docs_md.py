@@ -1,6 +1,7 @@
 from pathlib import Path
 from pydag.agents.Agent import Agent
 from pydag.agents.AgentElement import AgentElement
+from pydag.agents.app.AgentApp import AgentApp
 from pydag.buffers.Buffer import Buffer
 from pydag.services.Service import Service
 from pydag.nodes.Action import Action
@@ -12,7 +13,7 @@ from pydag.utils.DocUtils import generate_docs_for_type
 if __name__ == "__main__":
     
     # find all agents
-    #generate_docs_for_type(Agent.__name__ + "s", AgentElement.__name__, Path("pydag\\agents"), Path("pydag\\_docs\\"))
+    generate_docs_for_type(Agent.__name__ + "s", [Agent.__name__, AgentApp.__name__, AgentElement.__name__], Path("pydag\\agents"), Path("pydag\\_docs\\"))
     
     # find all buffers
     generate_docs_for_type(Buffer.__name__ + "s", AgentElement.__name__, Path("pydag\\buffers"), Path("pydag\\_docs\\"), with_images=True)
