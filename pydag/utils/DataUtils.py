@@ -224,16 +224,16 @@ class DataUtils:
         return cls(**kwargs)
         
     @staticmethod
-    def file_to_base64(image_path: str) -> str:
+    def file_to_base64(file_path: str) -> str:
         """Encodes an image file to a Base64 data URL."""
-        if not os.path.isfile(image_path):
-            logger.debug(f"File not found: {image_path}")
+        if not os.path.isfile(file_path):
+            logger.debug(f"File not found: {file_path}")
             return None
-        mime_type, _ = mimetypes.guess_type(image_path)
+        mime_type, _ = mimetypes.guess_type(file_path)
         if mime_type is None:
-            logger.debug(f"Could not determine MIME type for file: {image_path}")
+            logger.debug(f"Could not determine MIME type for file: {file_path}")
             return None
-        with open(image_path, "rb") as image_file:
+        with open(file_path, "rb") as image_file:
             encoded_string = base64.b64encode(image_file.read()).decode("utf-8")
             data_url = f"data:{mime_type};base64,{encoded_string}"
             return data_url

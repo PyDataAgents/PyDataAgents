@@ -2,10 +2,12 @@ from dataclasses import dataclass, field
 import os
 from loguru import logger
 from mistralai import Mistral
+from langchain_ollama import ChatOllama
+from langchain_core.messages import HumanMessage
 
-from pydag.utils.StringUtils import StringUtils
-
-
+from ..NodeException import NodeException
+from ...services.llm.LLMService import ModelProvider
+from ...utils.StringUtils import StringUtils
 from ...utils.DataUtils import DataUtils
 from ...nodes.BufferNode import BufferNode
 from ...nodes.Action import Action
@@ -19,40 +21,51 @@ class LLMOCRAction(BufferNode, Action):
     The allowed input formats for the file paths are:
     - A fully qualified file path as a string
     - an image/pdf as a Base64-encoded data URL 
-    The Mistral OCR-3 model is used to extract text from the images or PDFs.
-    For more information about the Mistral OCR-3 model: https://mistral.ai/news/mistral-ocr-3".
+    
+    depending on the model providers, the functionality is implemented in different ways:
+    
+    - Mistral:
+        The Mistral OCR-3 model is used to extract text from the images or PDFs.
+        For more information about the Mistral OCR-3 model: https://mistral.ai/news/mistral-ocr-3".
 
-    The output has the following format:
-    {
-        "documents": <String of extracted text pages creatred from the contents of the origial OCRPageObject returned by Mistral>,
-        "filepath": <file path for each processed input>
-    }
-    Where the original OCRPageObject has the following format:
+        The output has the following format:
         {
-        "pages": [ # The content of each page
-            {
-            "index": int, # The index of the corresponding page
-            "markdown": str, # The main output and raw markdown content
-            "images": list, # Image information when images are extracted
-            "tables": list, # Table information when using `table_format=html`
-            "hyperlinks": list, # Hyperlinks detected
-            "header": str|null, # Header content when using `extract_header=True`
-            "footer": str|null, # Footer content when using `extract_footer=True`
-            "dimensions": dict # The dimensions of the page
-            }
-        ],
-        "model": str, # The model used for the OCR
-        "document_annotation": dict|null, # Document annotation information when used, visit the Annotations documentation for more information
-        "usage_info": dict # Usage information
+            "documents": <String of extracted text pages creatred from the contents of the origial OCRPageObject returned by Mistral>,
+            "filepath": <file path for each processed input>
         }
-    See https://docs.mistral.ai/capabilities/document_ai/basic_ocr for more details.
+        Where the original OCRPageObject has the following format:
+            {
+            "pages": [ # The content of each page
+                {
+                "index": int, # The index of the corresponding page
+                "markdown": str, # The main output and raw markdown content
+                "images": list, # Image information when images are extracted
+                "tables": list, # Table information when using `table_format=html`
+                "hyperlinks": list, # Hyperlinks detected
+                "header": str|null, # Header content when using `extract_header=True`
+                "footer": str|null, # Footer content when using `extract_footer=True`
+                "dimensions": dict # The dimensions of the page
+                }
+            ],
+            "model": str, # The model used for the OCR
+            "document_annotation": dict|null, # Document annotation information when used, visit the Annotations documentation for more information
+            "usage_info": dict # Usage information
+            }
+        See https://docs.mistral.ai/capabilities/document_ai/basic_ocr for more details.
+
+    - Ollama:
+        Uses the chat api of the Ollama Client
+    
+    - OpenAI:
 
     """
 
     api_key : str = field(default=None, metadata={"description": "a mistral ai api key"})
     output_keys : list[str] = field(default_factory=lambda: ["content", "filepath"])
+    model_provider : str = field(default=ModelProvider.MISTRAL.value, metadata={"description": f"selection of model providers: {' | '.join([mp.value for mp in ModelProvider])}"})
     model : str = field(default="mistral-ocr-latest", metadata={"description": "Mistral OCR model name"})
     include_image_base64 : bool = field(default=False, metadata={"description": "Whether OCR page payloads should include embedded base64 images"})
+    endpoint : str = field(default=None, metadata={"description": "endpoint for the model provider, if it has to be specified, e.g. OLLAMA"})
     
     def __post_init__(self):
         super().__post_init__()
@@ -60,7 +73,13 @@ class LLMOCRAction(BufferNode, Action):
 
     def _on_install(self, agent : Agent = None):
         super()._on_install(agent)
-        self._client = Mistral(api_key=self.api_key)
+        match self.model_provider:
+            case ModelProvider.MISTRAL.value:
+                self._client = Mistral(api_key=self.api_key)
+            case ModelProvider.OLLAMA.value:
+                self._client = ChatOllama(model = self.model, base_url = self.endpoint)
+            case _:
+                raise NodeException(f"Could not install {self.__class__.__name__}, because of unknown {ModelProvider.__name__} {self.model_provider}")
 
     def _on_execute(self):    
         data = self.get_parent_data(by_rows=True)
@@ -70,16 +89,40 @@ class LLMOCRAction(BufferNode, Action):
                 file_ref = str(val)
                 if file_ref == "":
                     continue
-                document_payload, image_path = self._resolve_document_payload(file_ref)
+                document_payload, file_path = self._resolve_document_payload(file_ref)
                 if document_payload is None:
                     continue
-                resp = self._client.ocr.process(
-                    model=self.model,
-                    document=document_payload,
-                    include_image_base64=self.include_image_base64,
-                )
-                answer = self._serialize_ocr_response(resp)
-                dic = dict(zip(self.output_keys, [answer, image_path]))
+                match self.model_provider:
+                    case ModelProvider.MISTRAL.value:    
+                        resp = self._client.ocr.process(
+                            model=self.model,
+                            document=document_payload,
+                            include_image_base64=self.include_image_base64,
+                        )
+                        answer = self._serialize_ocr_response(resp)
+                    case ModelProvider.OLLAMA.value:
+                        message : HumanMessage = HumanMessage(
+                            content=[
+                                {
+                                    "type": "text",
+                                    "text": "Extract all text from the given document. Do not summarize and only return text."                                        
+                                },
+                                {
+                                    "type": "image_url",
+                                    "image_url": {
+                                        "url": document_payload
+                                    }
+                                }
+                            ]
+                        )
+                        response = self._client.invoke([message])
+                        answer = response.content
+                    case ModelProvider.OPENAI.value:
+                        pass                
+                    case _:
+                        raise NodeException(f"Unknown ModelProvider {self.model_provider} was specified")
+                    
+                dic = dict(zip(self.output_keys, [answer, file_path]))
                 self.add_data(dic)
 
     def _resolve_document_payload(self, file_ref: str):
