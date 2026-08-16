@@ -3,6 +3,8 @@ import os
 from loguru import logger
 from mistralai import Mistral
 
+from pydag.utils.StringUtils import StringUtils
+
 
 from ...utils.DataUtils import DataUtils
 from ...nodes.BufferNode import BufferNode
@@ -16,7 +18,7 @@ class LLMOCRAction(BufferNode, Action):
     The parent Buffer Node is expected to provide file paths to images or PDFs.
     The allowed input formats for the file paths are:
     - A fully qualified file path as a string
-    - an image as a Base64-encoded data URL 
+    - an image/pdf as a Base64-encoded data URL 
     The Mistral OCR-3 model is used to extract text from the images or PDFs.
     For more information about the Mistral OCR-3 model: https://mistral.ai/news/mistral-ocr-3".
 
@@ -48,7 +50,7 @@ class LLMOCRAction(BufferNode, Action):
     """
 
     api_key : str = field(default=None, metadata={"description": "a mistral ai api key"})
-    output_keys : list[str] = field(default_factory=lambda: ["documents", "filepath"])
+    output_keys : list[str] = field(default_factory=lambda: ["content", "filepath"])
     model : str = field(default="mistral-ocr-latest", metadata={"description": "Mistral OCR model name"})
     include_image_base64 : bool = field(default=False, metadata={"description": "Whether OCR page payloads should include embedded base64 images"})
     
@@ -61,51 +63,55 @@ class LLMOCRAction(BufferNode, Action):
         self._client = Mistral(api_key=self.api_key)
 
     def _on_execute(self):    
-        data = self.get_parent_data()
-        rows = DataUtils.dict_to_list(data)
-        for row in rows:
-            image_ref = " ".join([str(x) for x in row.values()]).strip()
-            if image_ref == "":
-                continue
-            document_payload, image_path = self._resolve_document_payload(image_ref)
-            if document_payload is None:
-                continue
-            resp = self._client.ocr.process(
-                model=self.model,
-                document=document_payload,
-                include_image_base64=self.include_image_base64,
-            )
-            answer = self._serialize_ocr_response(resp)
-            dic = dict(zip(self.output_keys, [answer, image_path]))
-            self.add_data(dic)
+        data = self.get_parent_data(by_rows=True)
+        row : dict
+        for row in data:
+            for val in row.values():
+                file_ref = str(val)
+                if file_ref == "":
+                    continue
+                document_payload, image_path = self._resolve_document_payload(file_ref)
+                if document_payload is None:
+                    continue
+                resp = self._client.ocr.process(
+                    model=self.model,
+                    document=document_payload,
+                    include_image_base64=self.include_image_base64,
+                )
+                answer = self._serialize_ocr_response(resp)
+                dic = dict(zip(self.output_keys, [answer, image_path]))
+                self.add_data(dic)
 
-    def _resolve_document_payload(self, image_ref: str):
-        image_path = None
-        image_type = image_ref.split(".")[-1].lower()
-        if os.path.isfile(image_ref):
-            image_path = image_ref
-            image_ref = DataUtils.image_to_base64(image_ref)
-            if image_ref is None:
+    def _resolve_document_payload(self, file_ref: str):
+        file_path = None
+        file_type = file_ref.split(".")[-1].lower()
+        if os.path.isfile(file_ref):
+            file_path = file_ref
+            file_ref = DataUtils.file_to_base64(file_ref)
+            if file_ref is None:
                 return None, None
-        elif "data:image/" in image_ref:
-            image_type = image_ref.split("data:image/")[1].split(";base64")[0]
-        elif image_ref.startswith("data:application/pdf"):
-            image_type = "pdf"
+        elif "data:image/" in file_ref:
+            file_type = file_ref.split("data:image/")[1].split(";base64")[0]
+        elif file_ref.startswith("data:application/pdf"):
+            file_type = "pdf"
+        elif StringUtils.is_valid_url(file_ref):
+            file_path = file_ref
         else:
-            logger.debug("could not detect supported OCR input: " + str(image_ref)[:120])
+            logger.debug(f"could not detect supported OCR input: {file_ref}")
             return None, None
 
-        if image_type in ["jpg", "jpeg", "png", "bmp", "gif", "tiff"]:
+        if file_type in ["jpg", "jpeg", "png", "bmp", "gif", "tiff"]:
             return {
                 "type": "image_url",
-                "image_url": str(image_ref),
-            }, image_path
-        if image_type == "pdf":
+                "image_url": file_ref,
+            }, file_path
+        elif file_type == "pdf":
             return {
                 "type": "document_url",
-                "document_url": str(image_ref),
-            }, image_path
-        return None, None
+                "document_url": file_ref,
+            }, file_path
+        else:
+            return None, None
 
     def _serialize_ocr_response(self, response) -> str:
         pages = getattr(response, "pages", []) or []

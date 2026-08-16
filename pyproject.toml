@@ -102,6 +102,7 @@ sap = []
 llm = [
   "langchain-ollama",
   "langchain-chroma",
+  "langchain_mistralai",
   "langchain-unstructured",
   "langchain-tavily<0.2",
   "langchain[huggingface,openai,all]",

@@ -1,10 +1,10 @@
 import configparser
 import pytest
+from pydag.buffers.DictBuffer import DictBuffer
 from pydag.buffers.ListBuffer import ListBuffer
 from pydag.nodes.buffers.LinkBufferAction import LinkBufferAction
 from pydag.nodes.llm.LLMOCRAction import LLMOCRAction
 import os
-
 
 def test_correctly_extract_value_from_pdf():
     # Test if the number 302689 of the Fertigungsauftrag is correctly extracted.
@@ -40,7 +40,45 @@ def test_correctly_extract_value_from_pdf():
     print(output)
 
     assert lca.get_buffer().size() == 1
-    assert "example of footnotes referenced" in output["documents"][0]
+    assert "example of footnotes referenced" in output["content"][0]
+    assert output["filepath"][0] == folder + "sample-tables.pdf"
+
+
+def test_correctly_extract_value_from_pdf_with_dictbuffer():
+    # Test if the number 302689 of the Fertigungsauftrag is correctly extracted.
+    config = configparser.ConfigParser()
+    config.read("config.ini")
+    if not config.has_section("MISTRAL") or not config.has_option("MISTRAL", "MISTRAL_API_KEY"):
+        pytest.skip("Skipping LLM OCR test: missing MISTRAL_API_KEY in [MISTRAL] of config.ini")
+    
+    #ls = LLMService(id="S1", api_key=config["OPENAI"]["OPENAI_API_KEY"], model="gpt-4.1-mini", model_provider="OPENAI")
+    #ls.install()
+    
+    buf = DictBuffer(id="BUF1", index_enabled=True)
+    buf.install()
+    folder = os.path.dirname(__file__) + os.sep
+    buf.push(folder + "sample-tables.pdf")
+    
+    lba = LinkBufferAction()
+    lba.set_buffer(buf)
+    lba.install()
+    
+    lca = LLMOCRAction(api_key=config["MISTRAL"]["MISTRAL_API_KEY"], n=1, persistent=False)
+    #lca.set_service(ls)
+    lca.add_parent(lba)
+    lca.install()    
+    
+    #ls.start()
+    
+    print(buf.data(persistent=True))
+    
+    lca.execute()
+    
+    output = lca.get_buffer().data(persistent=True)
+    print(output)
+
+    assert lca.get_buffer().size() == 1
+    assert "example of footnotes referenced" in output["content"][0]
     assert output["filepath"][0] == folder + "sample-tables.pdf"
 
 
@@ -79,7 +117,7 @@ def test_correctly_extract_value_from_pdf_different_output_keys():
     assert lca.get_buffer().size() == 1
     assert "example of footnotes referenced" in output["d"][0]
     assert output["fp"][0] == folder + "sample-tables.pdf"
-    assert "documents" not in output
+    assert "content" not in output
     assert "filepath" not in output
     assert "d" in output
     assert "fp" in output
@@ -118,7 +156,7 @@ def test_correctly_extract_value_from_image():
     output = lca.get_buffer().data(persistent=True)
 
     assert lca.get_buffer().size() == 1
-    assert "Artikel 5" in output["documents"][0]
+    assert "Artikel 5" in output["content"][0]
     assert output["filepath"][0] == folder + "960px-Art_5_GG.jpg"
 
 def test_no_value_parent_buffer():
@@ -179,8 +217,8 @@ def test_multiple_files_same_type():
     output = lca.get_buffer().data(persistent=True)
 
     assert lca.get_buffer().size() == 2
-    assert "Artikel 5" in output["documents"][0]
-    assert "Fertigungsauftrag" in output["documents"][1]
+    assert "Artikel 5" in output["content"][0]
+    assert "Fertigungsauftrag" in output["content"][1]
     assert output["filepath"][0] == folder + "960px-Art_5_GG.jpg"
     assert output["filepath"][1] == folder + "89_prod_fa_rep_abmitean.jpg"
 
@@ -211,8 +249,8 @@ def test_multiple_files_different_type():
     output = lca.get_buffer().data(persistent=True)
 
     assert lca.get_buffer().size() == 2
-    assert "Artikel 5" in output["documents"][0]
-    assert "example of footnotes referenced" in output["documents"][1]
+    assert "Artikel 5" in output["content"][0]
+    assert "example of footnotes referenced" in output["content"][1]
     assert output["filepath"][0] == folder + "960px-Art_5_GG.jpg"
     assert output["filepath"][1] == folder + "sample-tables.pdf"
 
@@ -276,5 +314,33 @@ def test_scanned_samples():
 
     assert lca.get_buffer().size() == 2        
     
+def test_scanned_image_url_ocr():
+    pdf_url = "https://dn760109.eu.archive.org/0/items/alex_Test/test.pdf"
+    
+    config = configparser.ConfigParser()
+    config.read("config.ini")
+    if not config.has_section("MISTRAL") or not config.has_option("MISTRAL", "MISTRAL_API_KEY"):
+        pytest.skip("Skipping LLM OCR test: missing MISTRAL_API_KEY in [MISTRAL] of config.ini")
+        
+    buf = ListBuffer(id="BUF1")
+    buf.install()
+    buf.push(pdf_url)
+    
+    lba = LinkBufferAction()
+    lba.set_buffer(buf)
+    lba.install()
+    
+    lca = LLMOCRAction(api_key=config["MISTRAL"]["MISTRAL_API_KEY"], n=0, persistent=False)
+    #lca.set_service(ls)
+    lca.add_parent(lba)
+    lca.install()    
+    
+    print(buf.data(persistent=True))
+    
+    lca.execute()
+    
+    output = lca.get_buffer().data(persistent=True)
+    print(output)
 
+    assert lca.get_buffer().size() == 1 
     

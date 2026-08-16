@@ -15,6 +15,7 @@ class StringUtils:
     
     @staticmethod
     def is_valid_url(url: str) -> bool:
+        """ checks the given string for a valid url """
         parsed = urlparse(url)
         return parsed.scheme in ("http", "https", "ftp") and parsed.netloc != ""
     

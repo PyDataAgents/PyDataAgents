@@ -58,7 +58,7 @@ class ConvertFile2Base64Action(BufferNode, Action):
         if len(file_paths) > 0:
             for file_path in file_paths:
                 if FileUtils.exists_file(file_path):
-                    b64 = DataUtils.image_to_base64(file_path)
+                    b64 = DataUtils.file_to_base64(file_path)
                     if b64:
                         self.add_data(b64)
                 else:

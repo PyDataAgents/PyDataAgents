@@ -9,6 +9,8 @@ from urllib.parse import unquote, urlparse
 import warnings
 
 from langchain_openai import AzureChatOpenAI, ChatOpenAI
+from langchain_ollama import ChatOllama
+from langchain_mistralai import ChatMistralAI
 from langchain_core.messages import HumanMessage, SystemMessage
 from langchain_core.prompts import PromptTemplate, ChatPromptTemplate, MessagesPlaceholder
 from loguru import logger
@@ -16,12 +18,10 @@ from loguru import logger
 from ...services.ServiceException import ServiceException
 from ...services.Service import Service
 from ...utils.LLMUtils import build_message_history_input, compile_message_history_graph, get_message_content
-from ...utils.ModelUtils import ModelUtils
 
 SYS_GENERAL_ASSISTANT : str = "You are a helpful assistant. Answer the following question:\n\n{question}"
 DEFAULT_INTERNET_SEARCH_MAX_RESULTS: int = 5
 GENERIC_FILE_MIME_TYPE: str = "application/octet-stream"
-OllamaLLM = None
 
 
 class ModelProvider(str, enum.Enum):
@@ -29,6 +29,7 @@ class ModelProvider(str, enum.Enum):
     OLLAMA = "OLLAMA"
     AZURE = "AZURE"
     LANGDOCK = "LANGDOCK"
+    MISTRAL = "MISTRAL"
     # Add other providers as needed
 
 
@@ -350,25 +351,7 @@ class LLMService(Service):
                 )
             
             case ModelProvider.OLLAMA.value:
-                global OllamaLLM
-                if OllamaLLM is None:
-                    from langchain_ollama import OllamaLLM as _OllamaLLM
-                    OllamaLLM = _OllamaLLM
-                try:
-                    ModelUtils.ensure_ollama_model_available(self.model, self.endpoint)
-                except Exception as exc:
-                    endpoint_display = self.endpoint if self.endpoint is not None and str(self.endpoint).strip() != "" else "http://localhost:11434"
-                    raise ServiceException(
-                        "Failed to ensure Ollama model '"
-                        + str(self.model)
-                        + "' at endpoint '"
-                        + str(endpoint_display)
-                        + "' for "
-                        + self.cname()
-                        + ". "
-                        + str(exc)
-                    ) from exc
-                self._llm = OllamaLLM(model = self.model, base_url = self.endpoint)
+                self._llm = ChatOllama(model = self.model, base_url = self.endpoint)
             
             case ModelProvider.LANGDOCK.value:
                 if self.endpoint is None or str(self.endpoint).strip() == "":
@@ -380,6 +363,9 @@ class LLMService(Service):
                     base_url=self.endpoint,
                     temperature=1,
                 )
+                
+            case ModelProvider.MISTRAL.value:
+                self._llm = ChatMistralAI(model=self.model, mistral_api_key=self.api_key, temperature=0)
             
             case _:
                 raise ServiceException("Unknown Model " + self.model + " for " + self.cname())

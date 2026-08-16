@@ -224,7 +224,7 @@ class DataUtils:
         return cls(**kwargs)
         
     @staticmethod
-    def image_to_base64(image_path: str) -> str:
+    def file_to_base64(image_path: str) -> str:
         """Encodes an image file to a Base64 data URL."""
         if not os.path.isfile(image_path):
             logger.debug(f"File not found: {image_path}")
