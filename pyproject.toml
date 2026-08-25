@@ -99,6 +99,10 @@ ocr = [
 
 sap = []
 
+sftp = [
+  "paramiko"
+]
+
 llm = [
   "langchain-ollama",
   "langchain-chroma",
