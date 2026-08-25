@@ -1,5 +1,4 @@
 from dataclasses import dataclass, field
-
 import paramiko
 from loguru import logger
 
@@ -20,27 +19,27 @@ class SFTPAction(BufferNode, Action):
         sa = SFTPAction(input_keys=["localpath", "remotepath"], ...)
         ```
     """
-    
+
     host : str = field(default=None)
     user : str = field(default=None)
     password : str = field(default=None)
-    
+
     def __post_init__(self):
         super().__post_init__()
         self._ssh_client : paramiko.SSHClient = None
-        
+
     def _on_install(self, agent : Agent = None):
         super()._on_install(agent)
         # check if there are two input keys specified for local file path and remote file path
         self._ssh_client = paramiko.SSHClient()
         self._ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         self._ssh_client.connect(self.host, username=self.user, password=self.password)
-        
+
     def _on_uninstall(self, agent : Agent = None):
         super()._on_uninstall(agent)
         self._ssh_client.close()
         self._ssh_client = None
-        
+
     def _on_execute(self):
         data = self.get_parent_data(by_rows=True)
         row : dict
