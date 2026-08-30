@@ -125,6 +125,15 @@ def test_millisecond_thread_next_time():
     s.start()
     time.sleep(2)
     s.stop()
+    
+def test_on_off_second_thread():
+    s = TestService(observing_time=[10, 20], thread_type=ThreadType.ON_OFF_SECONDS.value)
+    o = TestObserver2(s)
+    s.add_observer(o)
+    s.install()
+    s.start()
+    time.sleep(150)
+    s.stop()
 
 class TestObserver(Observer):
     def observe(self):

@@ -67,7 +67,8 @@ class MappingService(ObserverService):
                 if not issubclass(self.__class__, WriteService):
                     raise ServiceException(f"{Service.__name__} must be of type {WriteService.__name__}")
             case MappingType.SUB:
-                self.thread_type = ThreadType.DAEMON.value
+                if self.thread_type is None:
+                    self.thread_type = ThreadType.DAEMON.value
                 if not issubclass(self.__class__, SubscribeService):
                     raise ServiceException(f"{Service.__name__} must be of type {SubscribeService.__name__}")
             case MappingType.PUB:

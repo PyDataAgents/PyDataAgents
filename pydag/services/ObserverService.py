@@ -34,7 +34,7 @@ class ObserverService(Service):
     """
     
     thread_type : str = field(default=None, metadata={"description": "type of thread, e.g. MILLI_SECONDS, MICRO_SECONDS, INSTANT, ONLY_ONCE, DAYTIME, DATE, ..."})    
-    observing_time : Union[int|str] = field(default=None, metadata={"description": "observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for DAYTIME in %H:%M or %H:%M:%S, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ..."})    
+    observing_time : Union[int|str|list[int]] = field(default=None, metadata={"description": "observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for DAYTIME in %H:%M or %H:%M:%S, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ..., for ThreadType ON_OFF_SECONDS observing_time is expected to be an array with 2 elements"})    
     week_days : Optional[str] = field(default=None, metadata={"description": "specifies the week days the observer thread should run on, e.g. 'mon, fri, sun', 'mon - thu' or by numbers '0, 2, 4', where Monday = 0 and Sunday = 6"})
        
     def __post_init__(self):
@@ -85,6 +85,9 @@ class ObserverService(Service):
                 
             case ThreadType.EXPONENTIAL_SECOND.value:
                 self._thread = threading.Thread(target = self._run_exponential_thread, name=name)
+            
+            case ThreadType.ON_OFF_SECONDS.value:
+                self._thread = threading.Thread(target = self._run_on_off_seconds, name=name)
             
             case _:
                 self._thread = None
@@ -362,6 +365,32 @@ class ObserverService(Service):
                 time.sleep(diff * SLEEP_WITH_HOLD_FACTOR)        
         thread_name = threading.current_thread().name                
         logger.info(f"{self.__class__.__name__} [{thread_name}] has stopped")
+    
+    def _run_on_off_seconds(self):
+        self._last_time = 0 
+        current_time = 0
+        diff = 0
+        on_seconds : int = self.observing_time[0]
+        off_seconds : int = self.observing_time[1]
+        while self._is_running:
+            try:
+                current_time = time.time()
+                self.notify_observers()
+                self._counts += 1
+                self._last_time = time.time()
+                self._next_time = self._last_time + on_seconds + off_seconds
+                diff = on_seconds - (current_time - self._last_time)
+                time.sleep(diff)
+                self.denotify_observers()
+                diff = self._next_time - time.time()
+                time.sleep(diff)                    
+            except ObserverException as e:
+                logger.error(e)
+                with self._lock:
+                    self._is_running = False
+                    self._state = AgentElementState.ERROR                
+        thread_name = threading.current_thread().name
+        logger.info(f"{self.__class__.__name__} [{thread_name}] has stopped")
             
     def is_running(self) -> bool:
         with self._lock:
@@ -383,6 +412,8 @@ class ObserverService(Service):
                 return self._last_time / 1000.0 / 1000.0
             case ThreadType.EXPONENTIAL_SECOND.value:
                 return self._last_time * 1000.0
+            case ThreadType.ON_OFF_SECONDS.value:
+                return self._last_time * 1000.0
             case _:
                 return self._last_time
 
@@ -402,6 +433,8 @@ class ObserverService(Service):
                 return self._next_time / 1000.0 / 1000.0
             case ThreadType.EXPONENTIAL_SECOND.value:
                 return self._next_time * 1000.0
+            case ThreadType.ON_OFF_SECONDS.value:
+                return self._next_time * 1000.0
             case _:
                 return self._next_time
     
@@ -419,7 +452,19 @@ class ObserverService(Service):
         """
         try:
             ThreadType(self.thread_type)
-            return
         except ValueError as e:
             raise ServiceException(f"thread_type {self.thread_type} is not valid") from e
-    
+        # check for matching observing_time to ThreadType
+        if isinstance(self.observing_time, str):
+            if not self.thread_type in {ThreadType.DATETIME, ThreadType.DAYTIME}:
+                raise ServiceException(f"observing time must only be a str for {ThreadType.__name__}s {', '.join({ThreadType.DATETIME, ThreadType.DAYTIME})}")
+        if isinstance(self.observing_time, list):
+            if not self.thread_type in {ThreadType.ON_OFF_SECONDS}:
+                raise ServiceException(f"observing time must only be a list[int] for {ThreadType.__name__} {ThreadType.ON_OFF_SECONDS}")
+        if self.thread_type in {ThreadType.DATETIME, ThreadType.DAYTIME}:
+            if not isinstance(self.observing_time, str):
+                raise ServiceException(f"observing time must be a str for {ThreadType.__name__}s {', '.join({ThreadType.DATETIME, ThreadType.DAYTIME})}")
+        if self.thread_type in {ThreadType.ON_OFF_SECONDS}:
+            if not isinstance(self.observing_time, list):                    
+                raise ServiceException(f"observing time must be a list[int] for {ThreadType.__name__} {ThreadType.ON_OFF_SECONDS}")
+                

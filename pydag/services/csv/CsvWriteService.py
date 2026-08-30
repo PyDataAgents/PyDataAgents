@@ -25,6 +25,7 @@ class CsvWriteService(WriteService):
     delimiter : str = field(default=";", metadata={"description": "delimiter to use for column separation"})
     decimal_precision : int = field(default=3, metadata={"description": "maximum decimal precision of numeric values"})
     file_prefix_format : str = field(default=None, metadata={"description": "format of the timestamp prefix, if None then a unixtimestamp is used, otherwise formats like '%Y%m%d' can be specified"})
+    timeout : int = field(default=None, metadata={"description": "specifies the timeout in seconds, representing an idle time, after which a file is being closed for inactivity"})
     
     def __post_init__(self):
         super().__post_init__()
