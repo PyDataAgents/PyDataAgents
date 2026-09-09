@@ -9,7 +9,7 @@ from ..BufferNode import BufferNode
 
 
 @dataclass
-class ParseFileNameAction(BufferNode, Action):
+class SplitStringAction(BufferNode, Action):
     """An `Action` that splits incoming filenames by a delimiter into separate output columns."""
 
     delimiter: str = field(default="_", metadata={"description": "delimiter used to split the incoming filename into separate fields"})

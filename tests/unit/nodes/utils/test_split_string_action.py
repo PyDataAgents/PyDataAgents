@@ -1,6 +1,6 @@
 from pydag.buffers.DictBuffer import DictBuffer
 from pydag.nodes.buffers.LinkBufferAction import LinkBufferAction
-from pydag.nodes.documents.ParseFileNameAction import ParseFileNameAction
+from pydag.nodes.utils.SplitStringAction import SplitStringAction
 
 
 def test_parse_filename_action_splits_parent_filename_into_output_keys():
@@ -11,7 +11,7 @@ def test_parse_filename_action_splits_parent_filename_into_output_keys():
     link = LinkBufferAction()
     link.set_buffer(buf)
 
-    action = ParseFileNameAction(
+    action = SplitStringAction(
         delimiter="_",
         input_keys=["file"],
         output_keys=["postfix", "year", "month"],
@@ -47,7 +47,7 @@ def test_filename_parse_action_with_parsing_functions():
     
     pfuncs = [None, func1, func1]
     
-    action = ParseFileNameAction(
+    action = SplitStringAction(
         delimiter="_",
         input_keys=["file"],
         output_keys=["postfix", "year", "month"],
