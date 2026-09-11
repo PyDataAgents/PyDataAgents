@@ -23,8 +23,8 @@ class SolidPDMService(Service):
     """
     
     vault_name : str = field(default=None, metadata={"description": ""})
-    user : str = field()
-    password : str = field()
+    user : str = field(default=None)
+    password : str = field(default=None)
     
     def __post_init__(self):
         super().__post_init__()
