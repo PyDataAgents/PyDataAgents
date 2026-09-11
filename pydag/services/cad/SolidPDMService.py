@@ -2,6 +2,7 @@ from dataclasses import dataclass, field
 import win32com.client
 import pythoncom
 from pathlib import Path
+import os
 
 
 from ..ServiceException import ServiceException
@@ -55,47 +56,62 @@ class SolidPDMService(Service):
     def _on_stop(self):
         return
     
-    # ------------------------------------------------------------------
-    # FILE ACCESS
-    # ------------------------------------------------------------------
-
-    def get_file_from_path(self, file_path: str):
-        """Get IEdmFile5 object from full file path"""
-        folder = None
-        file = self._vault.GetFileFromPath(file_path, folder)
-        return file
+    def _get_folder_object(self, folder : str) -> object:
+        folder_obj = self._vault.GetFolderFromPath(folder)
+        return folder_obj
+    
+    def _get_file_object(self, file_path : str) -> object:
+        folder_path = os.path.dirname(file_path)        
+        folder = self._vault.GetFolderFromPath(folder_path)
+        if folder is None:
+            return None
+        else:
+            result = self._vault.GetFileFromPath(file_path, folder)
+            if isinstance(result, tuple):
+                file = result[0]
+            else:
+                file = result
+            return file
 
     def check_out(self, file_path: str, comment: str = ""):
         """Check out a file"""
-        file = self.get_file_from_path(file_path)
+        file = self._get_file_object(file_path)
         folder = self._vault.GetFolderFromPath(str(Path(file_path).parent))
         file.LockFile(folder.ID, 0, comment)
 
     def check_in(self, file_path: str, comment: str = ""):
         """Check in a file"""
-        file = self.get_file_from_path(file_path)
-        folder = self._vault.GetFolderFromPath(str(Path(file_path).parent))
+        file = self._get_file_object(file_path)
+        folder = self._get_folder_object(str(Path(file_path).parent))
         file.UnlockFile(folder.ID, comment)
 
     def undo_check_out(self, file_path: str):
-        file = self.get_file_from_path(file_path)
+        file = self._get_file_object(file_path)
         file.UndoLockFile(0)
 
     def get_latest_version(self, file_path: str):
-        file = self.get_file_from_path(file_path)
+        file = self._get_file_object(file_path)
         file.GetFileCopy(0)
 
-    # ------------------------------------------------------------------
-    # VARIABLES (Data Card)
-    # ------------------------------------------------------------------
-
     def get_variable(self, file_path: str, variable_name: str, config: str = ""):
-        file = self.get_file_from_path(file_path)
-        return file.GetVar(variable_name, config)
+        file = self._get_file_object(file_path)
+        enum_obj = file.GetEnumeratorVariable()
+        return enum_obj.GetVar(variable_name, config)
 
-    def set_variable(self, file_path: str, variable_name: str, value, config: str = ""):
-        file = self.get_file_from_path(file_path)
-        file.SetVar(variable_name, config, value)
+    def set_variable(self, file_path: str, variable_name: str, value, config: str = "", pdm_datacard : bool = True):
+        file = self._get_file_object(file_path)
+        enum_obj = file.GetEnumeratorVariable()
+        enum_obj.SetVar(variable_name, config, value, pdm_datacard)
+        enum_obj.Flush()
+        try:
+            # IEdmEnumeratorVariable8::CloseFile(True)
+            # is the preferred variant in PDM, provided
+            # that the COM object provides this method.
+            enum_obj.CloseFile(True)
+        except Exception:
+            # If the late-binding object does not offer CloseFile,
+            # Flush() has already been executed.
+            pass
 
     # ------------------------------------------------------------------
     # SEARCH
@@ -130,11 +146,11 @@ class SolidPDMService(Service):
     # ------------------------------------------------------------------
 
     def get_current_state(self, file_path: str):
-        file = self.get_file_from_path(file_path)
+        file = self._get_file_object(file_path)
         return file.CurrentState.Name
 
     def change_state(self, file_path: str, transition_name: str, comment: str = ""):
-        file = self.get_file_from_path(file_path)
+        file = self._get_file_object(file_path)
         transitions = file.GetTransitions()
 
         for transition in transitions:
@@ -152,7 +168,7 @@ class SolidPDMService(Service):
         return self._vault.GetFolderFromPath(folder_path)
 
     def create_folder(self, parent_folder_path: str, folder_name: str):
-        parent = self.get_folder(parent_folder_path)
+        parent = self._get_folder_object(parent_folder_path)
         parent.AddFolder(folder_name, 0)
 
     # ------------------------------------------------------------------
@@ -161,7 +177,7 @@ class SolidPDMService(Service):
 
     def get_references(self, file_path: str):
         """Return list of referenced files"""
-        file = self.get_file_from_path(file_path)
+        file = self._get_file_object(file_path)
         tree = file.GetReferenceTree(0)
         refs = []
 
@@ -177,11 +193,11 @@ class SolidPDMService(Service):
     # ------------------------------------------------------------------
 
     def is_checked_out(self, file_path: str):
-        file = self.get_file_from_path(file_path)
+        file = self._get_file_object(file_path)
         return file.IsLocked
 
     def get_version(self, file_path: str):
-        file = self.get_file_from_path(file_path)
+        file = self._get_file_object(file_path)
         return file.CurrentVersion
     
     def get_next_serial_number(self, serial_generator_name : str = VAULT_SERIAL_GENERATOR) -> str:
