@@ -24,7 +24,7 @@ def test_outlook_mail():
     ms.install()
     ms.start()
     
-    oa = OutlookMailAction(user=config["MS-GRAPH"]["user"], recipients=[config["GMX"]["test_mail"]], subject="Test Subject", body="Test Body<hr>Test Section")
+    oa = OutlookMailAction(recipients=[config["GMX"]["test_mail"]], subject="Test Subject", body="Test Body<hr>Test Section")
     oa.set_service(ms)
     oa.install()
     oa.execute()

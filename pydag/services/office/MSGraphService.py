@@ -42,23 +42,39 @@ class MSGraphService(Service):
         
     def _on_install(self, agent : Agent = None):
         super()._on_install(agent)
-        self._authority = f"{MICROSOFT_LOGIN_URL}/{self.tenant_id}"
-        self._scope = [GRAPH_DEFAULT_SCOPE_URL] if self.msgraph_type == MSGraphType.CLIENT.value else ["User.Read"]
         if self.msgraph_type == MSGraphType.CLIENT.value and not self.client_secret:
             raise ServiceException("Client secret is required for client credentials flow")
         import msal
 
-        if self.msgraph_type == MSGraphType.CLIENT.value:
-            self._app = msal.ConfidentialClientApplication(
-                self.client_id,
-                authority=self._authority,
-                client_credential=self.client_secret,
-            )
-        else:
-            self._app = msal.PublicClientApplication(
-                self.client_id,
-                authority=self._authority,
-            )
+        match self.msgraph_type:
+            case MSGraphType.CLIENT.value:                
+                self._authority = f"{MICROSOFT_LOGIN_URL}/{self.tenant_id}"
+                self._scope = [GRAPH_DEFAULT_SCOPE_URL]
+                self._app = msal.ConfidentialClientApplication(
+                    self.client_id,
+                    authority=self._authority,
+                    client_credential=self.client_secret,
+                )
+            case MSGraphType.USER.value:                
+                self._authority = f"{MICROSOFT_LOGIN_URL}/common"
+                self._scope = [ "User.Read",
+                                "Mail.Read",
+                                "Mail.Send"
+                              ]
+                self._app = msal.PublicClientApplication(
+                    self.client_id,
+                    authority=self._authority,
+                )
+            case MSGraphType.DEVICE_FLOW.value:
+                self._authority = f"{MICROSOFT_LOGIN_URL}/{self.tenant_id}"
+                self._scope = [ "User.Read",
+                                "Mail.Read",
+                                "Mail.Send"
+                              ]
+                self._app = msal.PublicClientApplication(
+                    self.client_id,
+                    authority=self._authority,
+                )
                 
     def _on_start(self):       
         self._authenticate()
@@ -87,7 +103,7 @@ class MSGraphService(Service):
                         </head>
                         <body>
                             <h1>Device Code</h1>
-                            <div>Please enter the following devic code in the sign-in window</div>
+                            <div>Please enter the following device code in the sign-in window</div>
                             <h4>{flow["user_code"]}</h4>
                         </body>
                     </html>    
@@ -102,6 +118,7 @@ class MSGraphService(Service):
                 html_service.stop()
                                 
                 #print(flow["message"])  # visit URL, enter code
+                
                 result = self._app.acquire_token_by_device_flow(flow)
                 #print(result["access_token"])
 
@@ -119,6 +136,16 @@ class MSGraphService(Service):
         """GET request to Microsoft Graph API."""
         url = f"{GRAPH_API_URL}{endpoint}"
         response = requests.get(url, headers=self._headers(), params=params, timeout=self.timeout)
+        if not response.ok:
+            logger.error(
+                "Graph request failed: status={} body={}",
+                response.status_code,
+                response.text,
+            )
+            logger.error(
+                "WWW-Authenticate: {}",
+                response.headers.get("WWW-Authenticate"),
+            )
         response.raise_for_status()
         return response.json()
 
@@ -176,7 +203,7 @@ class MSGraphService(Service):
                 "body": { "contentType": "Text", "content": body},
                 "toRecipients": addresses                
             },
-            "saveToSentItems": "true"
+            "saveToSentItems": True
         }
         self._post("/me/sendmail", data)
     
@@ -197,7 +224,7 @@ class MSGraphService(Service):
                 "body": { "contentType": "Text", "content": body},
                 "toRecipients": addresses                
             },
-            "saveToSentItems": "true"
+            "saveToSentItems": True
         }
         self._post(f"/users/{user_id}/sendMail", data)
     
