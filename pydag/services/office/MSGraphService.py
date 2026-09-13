@@ -175,7 +175,7 @@ class MSGraphService(Service):
                 "subject": subject,
                 "body": { "contentType": "Text", "content": body},
                 "toRecipients": addresses                
-            
+            },
             "saveToSentItems": "true"
         }
         self._post("/me/sendmail", data)
