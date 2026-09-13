@@ -5,7 +5,7 @@ from watchdog.events import FileSystemEventHandler
 
 from pydag.agents.Agent import Agent
 from pydag.nodes.BufferNode import BufferNode
-from pydag.nodes.triggers.ObserverTriggerAction import ObserverTriggerAction
+from pydag.nodes.ObserverTriggerAction import ObserverTriggerAction
 
 
 @dataclass

@@ -4,6 +4,7 @@ import time
 import webbrowser
 
 import requests
+from loguru import logger
 
 from ..webserver.HttpHTMLService import HttpHTMLService
 from ...agents.Agent import Agent
@@ -125,8 +126,10 @@ class MSGraphService(Service):
         """POST request to Microsoft Graph API."""
         url = f"{GRAPH_API_URL}{endpoint}"
         response = requests.post(url, headers=self._headers(), json=data, timeout=self.timeout)
+        if not response.ok:
+            logger.error(f"Graph request failed: status={response.status_code} body={response.text}")
+            logger.error(f"Headers: {response.headers}")
         response.raise_for_status()
-        return response.json()
 
     def _patch(self, endpoint, data) -> dict:
         """PATCH request to Microsoft Graph API."""
@@ -171,8 +174,8 @@ class MSGraphService(Service):
             "message": {
                 "subject": subject,
                 "body": { "contentType": "Text", "content": body},
-                "toRecipients": [addresses]                
-            },
+                "toRecipients": addresses                
+            
             "saveToSentItems": "true"
         }
         self._post("/me/sendmail", data)
@@ -184,6 +187,19 @@ class MSGraphService(Service):
             dict: json user output
         """
         return self._get("/users")
+    
+    def sendmail(self, user_id : str, subject : str, body : str, recipients : list[str]):
+        """ send a mail from specified `user_id` account """
+        addresses = [{"emailAddress": {"address": e}} for e in recipients]
+        data = {
+            "message": {
+                "subject": subject,
+                "body": { "contentType": "Text", "content": body},
+                "toRecipients": addresses                
+            },
+            "saveToSentItems": "true"
+        }
+        self._post(f"/users/{user_id}/sendMail", data)
     
     
     

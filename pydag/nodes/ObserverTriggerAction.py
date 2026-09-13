@@ -1,17 +1,17 @@
 from dataclasses import dataclass
 
 
-from ...services.ThreadType import ThreadType
-from ..NodeException import NodeException
-from ...services.ObserverService import ObserverService
-from ...agents.Agent import Agent
-from ..TriggerAction import TriggerAction
-from ..ServiceNode import ServiceNode
+from ..services.ThreadType import ThreadType
+from .NodeException import NodeException
+from ..services.ObserverService import ObserverService
+from ..agents.Agent import Agent
+from .TriggerAction import TriggerAction
+from .ServiceNode import ServiceNode
 
 
 @dataclass
 class ObserverTriggerAction(ServiceNode, TriggerAction):
-    """ A `TriggerAction`, that connects to a `ObserverService` and executes the `Observer` notification everytime the
+    """ An `TriggerAction`, that connects to a `ObserverService` and executes the `Observer` notification everytime the
     trigger event occurs. This `Node` does not define `start_trigger`, but rather expects being triggered externally from application or for example REST API.
     """
        

@@ -1,7 +1,7 @@
 import os
 import time
 from pydag.agents.Agent import Agent
-from pydag.nodes.triggers.FileTriggerAction import FileTriggerAction
+from pydag.nodes.documents.FileTriggerAction import FileTriggerAction
 from pydag.nodes.utils.PrintBufferAction import PrintBufferAction
 from pydag.services.ThreadType import ThreadType
 from pydag.services.statemachine.SimpleStatemachine import SimpleStatemachine

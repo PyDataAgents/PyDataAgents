@@ -11,7 +11,7 @@ from pydag.nodes.buffers.ClearBufferAction import ClearBufferAction
 from pydag.nodes.buffers.CopyDataAction import CopyDataAction
 from pydag.nodes.buffers.LinkBufferAction import LinkBufferAction
 from pydag.nodes.documents.ConvertFile2Base64Action import ConvertFile2Base64Action
-from pydag.nodes.triggers.ObserverTriggerAction import ObserverTriggerAction
+from pydag.nodes.ObserverTriggerAction import ObserverTriggerAction
 from pydag.services.ThreadType import ThreadType
 from pydag.services.llm.RAGService import RAGService
 from pydag.nodes.llm.LLMOCRAction import LLMOCRAction
