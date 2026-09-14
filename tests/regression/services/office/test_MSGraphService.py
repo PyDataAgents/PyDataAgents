@@ -124,3 +124,24 @@ def test_030():
 
     print(response.status_code)
     print(response.text)
+    
+def test_040():
+    config = configparser.ConfigParser()
+    config.read("config.ini")
+    if not config.has_section("MS-GRAPH"):
+        pytest.skip("Skipping MS Graph regression test: missing [MS-GRAPH] in config.ini")
+    for key in ("client_id", "tenant_id", "client_secret"):
+        if not config.has_option("MS-GRAPH", key):
+            pytest.skip(f"Skipping MS Graph regression test: missing {key} in [MS-GRAPH] of config.ini")
+    
+    ms = MSGraphService(msgraph_type=MSGraphType.CLIENT.value,
+                        client_id = config["MS-GRAPH-AUTOMATE"]["client_id2"],
+                        tenant_id=config["MS-GRAPH-AUTOMATE"]["tenant_id2"],
+                        client_secret=config["MS-GRAPH-AUTOMATE"]["client_secret2"]
+                    )
+    
+    ms.install()
+    
+    ms.start()
+    
+    ms.sendmail("hillenbrand@automate-shw.de", "Test Subject", "Test Body", [config["GMX"]["test_mail"]])
