@@ -2,6 +2,7 @@ from dataclasses import dataclass, field
 from datetime import datetime
 import enum
 import time
+from typing import Any
 import webbrowser
 
 import requests
@@ -135,7 +136,7 @@ class MSGraphService(Service):
             self._authenticate()
         return {"Authorization": f"Bearer {self._token}"}    
     
-    def _get(self, endpoint, params=None) -> dict:
+    def _get(self, endpoint, params=None) -> Any:
         """GET request to Microsoft Graph API."""
         url = f"{GRAPH_API_URL}{endpoint}"
         response = requests.get(url, headers=self._headers(), params=params, timeout=self.timeout)
@@ -146,9 +147,12 @@ class MSGraphService(Service):
                 response.text,
             )
         response.raise_for_status()
-        return response.json()
+        try:
+            return response.json()
+        except requests.exceptions.JSONDecodeError:
+            return response.text
 
-    def _post(self, endpoint, data) -> dict:
+    def _post(self, endpoint, data) -> Any:
         """POST request to Microsoft Graph API."""
         url = f"{GRAPH_API_URL}{endpoint}"
         response = requests.post(url, headers=self._headers(), json=data, timeout=self.timeout)
@@ -161,19 +165,31 @@ class MSGraphService(Service):
         except requests.exceptions.JSONDecodeError:
             return response.text
 
-    def _patch(self, endpoint, data) -> dict:
+    def _patch(self, endpoint, data) -> Any:
         """PATCH request to Microsoft Graph API."""
         url = f"{GRAPH_API_URL}{endpoint}"
         response = requests.patch(url, headers=self._headers(), json=data, timeout=self.timeout)
+        if not response.ok:
+            logger.error(f"Graph request failed: status={response.status_code} body={response.text}")
+            logger.error(f"Headers: {response.headers}")
         response.raise_for_status()
-        return response.json()
+        try:
+            return response.json()
+        except requests.exceptions.JSONDecodeError:
+            return response.text
 
-    def _delete(self, endpoint) -> dict:
+    def _delete(self, endpoint) -> Any:
         """DELETE request to Microsoft Graph API."""
         url = f"{GRAPH_API_URL}{endpoint}"
         response = requests.delete(url, headers=self._headers(), timeout=self.timeout)
-        response.raise_for_status()        
-        return response.json()
+        response.raise_for_status()
+        if not response.ok:
+            logger.error(f"Graph request failed: status={response.status_code} body={response.text}")
+            logger.error(f"Headers: {response.headers}")
+        try:
+            return response.json()
+        except requests.exceptions.JSONDecodeError:
+            return response.text
     
     def me(self) -> dict:
         """ get personal info of signed-in user
@@ -337,4 +353,20 @@ class MSGraphService(Service):
             "$filter": filter
         }
         response = self._get(f"/users/{user_id}/calendars/{calendar_id}/events", params)
-        return response.get("value", []) 
+        return response.get("value", [])
+    
+    def get_all_calendar_events(self, user_id : str, calendar_id : str) -> list[str]:
+        endpoint = f"/users/{user_id}/calendars/{calendar_id}/events?$select=id"
+        event_ids : list[str] = []
+        while endpoint:
+            response = self._get(endpoint)
+            
+            for event in response.get("value", []):
+                event_ids.append(event["id"])
+                
+            endpoint = response.get("@odata.nextLink")
+        return event_ids
+    
+    def delete_calendar_event(self, user_id : str, calendar_id : str, event_id : str) -> dict:
+        response = self._delete(f"/users/{user_id}/calendars/{calendar_id}/events/{event_id}")
+        return
