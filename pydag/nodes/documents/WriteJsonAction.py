@@ -32,13 +32,13 @@ class WriteJsonAction(BufferNode, Action):
                     for row in d:
                         fp : str = row[self.file_path_key]                        
                         with open(self.file_path, encoding=self.encoding, mode="+w") as f:
-                            json.dump(row, fp=f, indent=4, ensure_ascii=True)
+                            json.dump(row, fp=f, indent=4, ensure_ascii=False)
                 else:
                     raise NodeException(f"file_path_key {self.file_path_key} is not contained in parent data")
             else:
                 if self.file_path:
                     with open(self.file_path, encoding=self.encoding, mode="+w") as f:
-                        json.dump(d, fp=f, indent=4, ensure_ascii=True)
+                        json.dump(d, fp=f, indent=4, ensure_ascii=False)
                     
         
     
