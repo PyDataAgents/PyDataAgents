@@ -353,7 +353,8 @@ class MSGraphService(Service):
             "$filter": filter
         }
         response = self._get(f"/users/{user_id}/calendars/{calendar_id}/events", params)
-        return response.get("value", [])
+        events = response.get("value", [])
+        return [event["id"] for event in events]
     
     def get_all_calendar_events(self, user_id : str, calendar_id : str) -> list[str]:
         endpoint = f"/users/{user_id}/calendars/{calendar_id}/events?$select=id"
@@ -367,6 +368,6 @@ class MSGraphService(Service):
             endpoint = response.get("@odata.nextLink")
         return event_ids
     
-    def delete_calendar_event(self, user_id : str, calendar_id : str, event_id : str) -> dict:
+    def delete_calendar_event(self, user_id : str, calendar_id : str, event_id : str) -> bool:
         response = self._delete(f"/users/{user_id}/calendars/{calendar_id}/events/{event_id}")
-        return
+        return True

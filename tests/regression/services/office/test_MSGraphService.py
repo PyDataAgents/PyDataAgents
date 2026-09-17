@@ -261,3 +261,71 @@ def test_create_event3():
     print(eid2)
     eid_found = ms.get_event_by_external_id(user_id, cid, uuid2)
     print(f"Found event id: {eid_found}")
+    
+def test_get_events_by_filter():
+    config = configparser.ConfigParser()
+    config.read("config.ini")
+    if not config.has_section("MS-GRAPH-AUTOMATE"):
+        pytest.skip("Skipping MS Graph regression test: missing [MS-GRAPH-AUTOMATE] in config.ini")
+    
+    ms = MSGraphService(msgraph_type=MSGraphType.CLIENT.value,
+            client_id = config["MS-GRAPH-AUTOMATE"]["client_id2"],
+            tenant_id=config["MS-GRAPH-AUTOMATE"]["tenant_id2"],
+            client_secret=config["MS-GRAPH-AUTOMATE"]["client_secret2"]
+        )
+    
+    ms.install()    
+    ms.start()
+    
+    user_id = config["MS-GRAPH-AUTOMATE"]["user_mail1"]
+    cal_name = "Test-Calendar"
+    cid = ms.get_calendar_by_name(config["MS-GRAPH-AUTOMATE"]["user_mail1"], cal_name)
+    
+    e_ids = ms.get_events_by_filter(user_id, cid, "contains(subject, 'Test Event1')")
+    print(e_ids)
+    
+def test_get_events_by_filter2():
+    config = configparser.ConfigParser()
+    config.read("config.ini")
+    if not config.has_section("MS-GRAPH-AUTOMATE"):
+        pytest.skip("Skipping MS Graph regression test: missing [MS-GRAPH-AUTOMATE] in config.ini")
+    
+    ms = MSGraphService(msgraph_type=MSGraphType.CLIENT.value,
+            client_id = config["MS-GRAPH-AUTOMATE"]["client_id2"],
+            tenant_id=config["MS-GRAPH-AUTOMATE"]["tenant_id2"],
+            client_secret=config["MS-GRAPH-AUTOMATE"]["client_secret2"]
+        )
+    
+    ms.install()    
+    ms.start()
+    
+    user_id = config["MS-GRAPH-AUTOMATE"]["user_mail1"]
+    cal_name = "Test-Calendar"
+    cid = ms.get_calendar_by_name(config["MS-GRAPH-AUTOMATE"]["user_mail1"], cal_name)
+    
+    e_ids = ms.get_events_by_filter(user_id, cid, "subject eq 'Test Event1'")
+    print(e_ids)
+    
+def test_delete_event():
+    config = configparser.ConfigParser()
+    config.read("config.ini")
+    if not config.has_section("MS-GRAPH-AUTOMATE"):
+        pytest.skip("Skipping MS Graph regression test: missing [MS-GRAPH-AUTOMATE] in config.ini")
+    
+    ms = MSGraphService(msgraph_type=MSGraphType.CLIENT.value,
+            client_id = config["MS-GRAPH-AUTOMATE"]["client_id2"],
+            tenant_id=config["MS-GRAPH-AUTOMATE"]["tenant_id2"],
+            client_secret=config["MS-GRAPH-AUTOMATE"]["client_secret2"]
+        )
+    
+    ms.install()    
+    ms.start()
+    
+    user_id = config["MS-GRAPH-AUTOMATE"]["user_mail1"]
+    cal_name = "Test-Calendar"
+    cid = ms.get_calendar_by_name(config["MS-GRAPH-AUTOMATE"]["user_mail1"], cal_name)
+    
+    e_ids = ms.get_events_by_filter(user_id, cid, "subject eq 'Test Event1'")
+    print(e_ids)
+    
+    ms.delete_calendar_event(user_id, cid, e_ids[0])
