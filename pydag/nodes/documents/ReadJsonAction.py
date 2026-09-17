@@ -16,7 +16,6 @@ class ReadJsonAction(BufferNode, Action):
     def _on_execute(self):
         with open(self.file_path, encoding=self.encoding) as f:
             d = json.loads(f.read())
-            f.close()
         jsonpath_expression = jsonpath_ng.parse(self.json_path)
         matches = jsonpath_expression.find(d)
         self.add_data(matches)
