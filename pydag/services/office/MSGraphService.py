@@ -136,49 +136,40 @@ class MSGraphService(Service):
             self._authenticate()
         return {"Authorization": f"Bearer {self._token}"}    
     
-    def _get(self, endpoint, params=None) -> Any:
+    def _get(self, endpoint, params=None) -> requests.Response:
         """GET request to Microsoft Graph API."""
         url = f"{GRAPH_API_URL}{endpoint}"
         response = requests.get(url, headers=self._headers(), params=params, timeout=self.timeout)
         if not response.ok:
-            logger.error(
-                "Graph request failed: status={} body={}",
-                response.status_code,
-                response.text,
-            )
-        response.raise_for_status()
-        try:
-            return response.json()
-        except requests.exceptions.JSONDecodeError:
-            return response.text
+            logger.error(f"Graph request failed: status={response.status_code} body={response.text}")
+            logger.error(f"Headers: {response.headers}")
+            return None
+        else:
+            return response
 
-    def _post(self, endpoint, data) -> Any:
+    def _post(self, endpoint, data) -> requests.Response:
         """POST request to Microsoft Graph API."""
         url = f"{GRAPH_API_URL}{endpoint}"
         response = requests.post(url, headers=self._headers(), json=data, timeout=self.timeout)
         if not response.ok:
             logger.error(f"Graph request failed: status={response.status_code} body={response.text}")
             logger.error(f"Headers: {response.headers}")
-        response.raise_for_status()
-        try:
-            return response.json()
-        except requests.exceptions.JSONDecodeError:
-            return response.text
+            return None
+        else:
+            return response
 
-    def _patch(self, endpoint, data) -> Any:
+    def _patch(self, endpoint, data) -> requests.Response:
         """PATCH request to Microsoft Graph API."""
         url = f"{GRAPH_API_URL}{endpoint}"
         response = requests.patch(url, headers=self._headers(), json=data, timeout=self.timeout)
         if not response.ok:
             logger.error(f"Graph request failed: status={response.status_code} body={response.text}")
             logger.error(f"Headers: {response.headers}")
-        response.raise_for_status()
-        try:
-            return response.json()
-        except requests.exceptions.JSONDecodeError:
-            return response.text
+            return None
+        else:
+            return response
 
-    def _delete(self, endpoint) -> Any:
+    def _delete(self, endpoint) -> requests.Response:
         """DELETE request to Microsoft Graph API."""
         url = f"{GRAPH_API_URL}{endpoint}"
         response = requests.delete(url, headers=self._headers(), timeout=self.timeout)
@@ -186,10 +177,13 @@ class MSGraphService(Service):
         if not response.ok:
             logger.error(f"Graph request failed: status={response.status_code} body={response.text}")
             logger.error(f"Headers: {response.headers}")
-        try:
-            return response.json()
-        except requests.exceptions.JSONDecodeError:
-            return response.text
+            return None
+        else:
+            return response
+    
+    # ---------------------------
+    # Office 365
+    # ---------------------------
     
     def me(self) -> dict:
         """ get personal info of signed-in user
@@ -197,7 +191,23 @@ class MSGraphService(Service):
         Returns:
             dict: json output
         """
-        return self._get("/me")
+        resp : requests.Response = self._get("/me")
+        if resp:
+            return resp.json()
+    
+    def users(self) -> dict:
+        """ retrieve the users related to this sign-in
+
+        Returns:
+            dict: json user output
+        """
+        resp : requests.Response = self._get("/users")
+        if resp:
+            return resp.json()
+    
+    # ---------------------------
+    # Outlook Mail
+    # ---------------------------        
     
     def me_messages(self) -> dict:
         """ get emails from signed-in user
@@ -205,9 +215,11 @@ class MSGraphService(Service):
         Returns:
             dict: json message output
         """
-        return self._get("/me/messages")
+        resp : requests.Response = self._get("/me/messages")
+        if resp:
+            return resp.json()
         
-    def me_sendmail(self, subject : str, body : str, recipients : list[str]):
+    def me_sendmail(self, subject : str, body : str, recipients : list[str]) -> bool:
         """ send a mail from signed-in account
         
         Args:
@@ -224,17 +236,14 @@ class MSGraphService(Service):
             },
             "saveToSentItems": True
         }
-        self._post("/me/sendmail", data)
+        resp : requests.Response = self._post("/me/sendmail", data)
+        if resp:
+            return True
+        else:
+            return False
     
-    def users(self) -> dict:
-        """ retrieve the users related to this sign-in
-
-        Returns:
-            dict: json user output
-        """
-        return self._get("/users")
     
-    def sendmail(self, user_id : str, subject : str, body : str, recipients : list[str]):
+    def send_mail(self, user_id : str, subject : str, body : str, recipients : list[str]) -> bool:
         """ send a mail from specified `user_id` account """
         addresses = [{"emailAddress": {"address": e}} for e in recipients]
         data = {
@@ -245,7 +254,44 @@ class MSGraphService(Service):
             },
             "saveToSentItems": True
         }
-        self._post(f"/users/{user_id}/sendMail", data)
+        resp : requests.Response = self._post(f"/users/{user_id}/sendMail", data)
+        if resp:
+            return True
+        else:
+            return False
+    
+    def get_messages(self, user_id : str, folder : str = None, select : str = "id, subject, from, receivedDateTime, bodyPreview", search : str = None, filter : str = None, top : int = 1000) -> dict:
+        endpoint : str
+        if folder:
+            endpoint = f"/users/{user_id}/mailFolders/{folder}/messages"
+        else:
+            endpoint = f"/users/{user_id}/messages"
+        if filter:
+            params = {
+                "$select": select,
+                "$top": top,
+                "$filter": filter
+            }
+        elif search:
+            params = {
+                "$select": select,
+                "$top": top,
+                "$search": f'"{search}"'
+            }
+        else:
+            params = {
+                "$select": select,
+                "$top": top,
+            }
+        response : requests.Response = self._get(endpoint, params)
+        if response:
+            return response.json()
+        else:
+            return None
+    
+    # --------------------------------
+    # Outlook Calendar
+    # --------------------------------
     
     def create_calendar(self, user_id : str, calendar_name : str) -> str:
         """Create a calendar for the specified user.
@@ -260,8 +306,11 @@ class MSGraphService(Service):
         data = {
             "name": calendar_name
         }
-        response : dict = self._post(f"/users/{user_id}/calendars", data)
-        return response.get("id", None)
+        response : requests.Response = self._post(f"/users/{user_id}/calendars", data)
+        if response:
+            return response.json().get("id", None)
+        else:
+            return None
     
     def get_calendar_by_name(self, user_id : str, calendar_name : str) -> str:
         """Retrieve a user's calendar by name, following paginated results.
@@ -275,15 +324,19 @@ class MSGraphService(Service):
         """
         
         endpoint : str = f"/users/{user_id}/calendars?$select=id,name"
-        while endpoint:            
-            data = self._get(endpoint)
+        while endpoint:
+            resp : requests.Response = self._get(endpoint)
+            if resp:
+                data : dict = resp.json()
 
-            for calendar in data.get("value", []):
-                if calendar["name"] == calendar_name:
-                    return calendar["id"]
+                for calendar in data.get("value", []):
+                    if calendar["name"] == calendar_name:
+                        return calendar["id"]
 
-            # Handle pagination
-            endpoint = data.get("@odata.nextLink").replace(GRAPH_API_URL, "")
+                # Handle pagination
+                endpoint = data.get("@odata.nextLink").replace(GRAPH_API_URL, "")
+            else:
+                endpoint = None
             
     def create_event(self, user_id : str, calendar_id : str, subject : str, body : str, start : datetime, end : datetime, reminder_minutes_before_start : int = 0, tz_start : str = "Europe/Berlin", tz_end : str = "Europe/Berlin", external_id : str = None) -> str:
         """Create an event in a user's calendar.
@@ -328,8 +381,11 @@ class MSGraphService(Service):
                         "value": external_id
                     }
                 ]
-        response = self._post(f"/users/{user_id}/calendars/{calendar_id}/events", data)
-        return response.get("id", None)
+        response : requests.Response = self._post(f"/users/{user_id}/calendars/{calendar_id}/events", data)
+        if response:
+            return response.json().get("id", None)
+        else:
+            return None
     
     def get_event_by_external_id(self, user_id : str, calendar_id : str, external_id : str) -> str:
         params = {
@@ -344,30 +400,148 @@ class MSGraphService(Service):
                 ")"
             )
         }
-        response = self._get(f"/users/{user_id}/calendars/{calendar_id}/events", params)
-        return response.get("value", [])[0].get("id", None)
+        response : requests.Response = self._get(f"/users/{user_id}/calendars/{calendar_id}/events", params)
+        if response:
+            return response.json().get("value", [])[0].get("id", None)
+        else:
+            return None
         
     
     def get_events_by_filter(self, user_id : str, calendar_id : str, filter : str) -> list[str]:
         params = {
             "$filter": filter
         }
-        response = self._get(f"/users/{user_id}/calendars/{calendar_id}/events", params)
-        events = response.get("value", [])
-        return [event["id"] for event in events]
+        response : requests.Response = self._get(f"/users/{user_id}/calendars/{calendar_id}/events", params)
+        if response:
+            events = response.json().get("value", [])
+            return [event["id"] for event in events]
+        else:
+            return None
     
     def get_all_calendar_events(self, user_id : str, calendar_id : str) -> list[str]:
         endpoint = f"/users/{user_id}/calendars/{calendar_id}/events?$select=id"
         event_ids : list[str] = []
         while endpoint:
-            response = self._get(endpoint)
-            
-            for event in response.get("value", []):
-                event_ids.append(event["id"])
-                
-            endpoint = response.get("@odata.nextLink")
+            response : requests.Response = self._get(endpoint)
+            if response:
+                data : dict = response.json()                
+                for event in data.get("value", []):
+                    event_ids.append(event["id"])
+                    
+                endpoint = data.get("@odata.nextLink")
         return event_ids
     
     def delete_calendar_event(self, user_id : str, calendar_id : str, event_id : str) -> bool:
-        response = self._delete(f"/users/{user_id}/calendars/{calendar_id}/events/{event_id}")
-        return True
+        response : requests.Response = self._delete(f"/users/{user_id}/calendars/{calendar_id}/events/{event_id}")
+        if response:
+            return True
+        else:
+            return False
+    
+    def update_calendar_event(self, user_id : str, calendar_id : str, event_id : str, subject : str = None, body : str = None, start : datetime = None, end : datetime = None, reminder_minutes_before_start : int = 0, tz_start : str = "Europe/Berlin", tz_end : str = "Europe/Berlin") -> bool:
+        endpoint = f"/users/{user_id}/calendars/{calendar_id}/events/{event_id}"
+        data : dict = {}
+        if subject:
+            data["subject"] = subject
+        if body:
+            data["body"] = {
+                "contentType": "html",
+                "content": body
+            }
+        if start:
+            data["start"] = {
+                "dateTime": start.strftime("%Y-%m-%dT%H:%M:%S.%f") + "0",
+                "timeZone": tz_start
+            }
+        if end:
+            data["end"] = {
+                "dateTime": end.strftime("%Y-%m-%dT%H:%M:%S.%f") + "0",
+                "timeZone": tz_end
+            }
+        if reminder_minutes_before_start > 0:
+            data["reminderMinutesBeforeStart"] = reminder_minutes_before_start
+            data["isReminderOn"] = True
+        response : requests.Response = self._patch(endpoint, data)
+        if response:
+            return True
+        else:
+            return False
+    
+    # ----------------------------------------
+    # SHAREPOINT
+    # ----------------------------------------
+    def get_sites(self, hostname : str) -> list[dict]:
+        endpoint : str = "/sites/getAllSites"
+        sites : list[str] = []
+        while endpoint:
+            response : requests.Response = self._get(endpoint)
+            if response:
+                data : dict = response.json()
+                for site in data.get("value", []):
+                    # Primary method: siteCollection.hostName
+                    site_hostname = (
+                        site.get("siteCollection", {})
+                        .get("hostName")
+                    )
+
+                    # Fallback: hostname is also the first part
+                    # of the Graph site ID.
+                    if not site_hostname:
+                        site_id = site.get("id", "")
+                        site_hostname = site_id.split(",")[0]
+
+                    if site_hostname.lower() == hostname.lower():
+                        sites.append(site)
+
+                # Graph pagination
+                
+                endpoint = data.get("@odata.nextLink", None)
+                if endpoint:
+                    endpoint = endpoint.replace(GRAPH_API_URL, "")
+            else:
+                endpoint = None
+
+        return sites
+
+    def get_site_by_name(self, hostname : str, name : str) -> str:
+        sites : list[dict] = self.get_sites(hostname)
+        if len(sites) > 0:
+            for site in sites:
+                if site["name"] == name:
+                    return site["id"]
+            return None
+        else:
+            return None
+    
+    def get_drive_ids(self, site_id) -> list[dict]:
+        endpoint : str = f"/sites/{site_id}/drives"
+        response : requests.Response = self._get(endpoint)
+        if response:
+            return response.json()["value"]
+        else:
+            return None   
+    
+    def get_drive_by_name(self, site_id, drive_name : str) -> str:
+        pass
+            
+    # ----------------------------------------
+    # ONEDRIVE
+    # ----------------------------------------
+       
+    def get_file_info(self, user_id : str, onedrive_path : str) -> dict:
+        endpoint : str =  f"/users/{user_id}/drive/root:/{onedrive_path}"
+        response : requests.Response = self._get(endpoint)
+        if response:
+            return response.json()
+        else:
+            return None
+    
+    def get_file_content(self, user_id : str, onedrive_path : str, download_path : str) -> bool:
+        endpoint : str =  f"/users/{user_id}/drive/root:/{onedrive_path}/:content"
+        response : requests.Response = self._get(endpoint)
+        if response:
+            with open(download_path, "wb") as f:
+                f.write(response.content)
+            return True
+        else:
+            return False    
