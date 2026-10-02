@@ -2,6 +2,7 @@ import os
 
 import pytest
 from pydag.buffers.DatasetBuffer import DatasetBuffer
+from pydag.buffers.DictBuffer import DictBuffer
 from pydag.nodes.Action import Action
 from pydag.nodes.BufferNode import BufferNode
 from pydag.nodes.buffers.CopyDataAction import CopyDataAction
@@ -179,5 +180,38 @@ def test_012():
                     assert d12 != d22, f"Data match at iteration {i}" # Buffers contain the same data
                     assert d21 == d22, f"Data mismatch at iteration {i}" # Buffers contain the same data
         i = i + 1
+        
+def test_duplicate_keys_in_parents():
+    buf1 = DictBuffer(index_enabled=True)
+    buf1.install()
+    buf2 = DictBuffer(index_enabled=True)
+    buf2.install()
+    
+    buf1.push({"value1": 1})
+    buf1.push({"value1": 2})
+    buf1.push({"value1": 3})
+    buf2.push({"value2": 1})
+    buf2.push({"value2": 2})
+    buf2.push({"value2": 3})
+    
+    lba1 = LinkBufferAction()
+    lba1.set_buffer(buf1)
+    lba1.install()
+    
+    lba2 = LinkBufferAction()
+    lba2.set_buffer(buf2)
+    lba2.install()
+    
+    ca = CopyDataAction()
+    ca.add_parent(lba1)
+    ca.add_parent(lba2)
+    ca.install()
+    
+    ca.execute()
+    print(ca.get_buffer().data())
+    
+    
+        
+        
 
 
