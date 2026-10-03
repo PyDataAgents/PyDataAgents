@@ -3,6 +3,8 @@ import copy
 from dataclasses import dataclass, field
 import time
 
+from loguru import logger
+
 
 from ..buffers.BufferException import BufferException
 from ..agents.AgentKeywords import AgentKeywords
@@ -45,9 +47,14 @@ class DictBuffer(Buffer):
             list_lengths = [len(v) for v in elements.values() if isinstance(v, list)]
             if list_lengths:
                 first_len = list_lengths[0]
-                if any(l != first_len for l in list_lengths[1:]):
-                    raise ValueError(f"Inconsistent list lengths in batch insert: {list_lengths}")
-                batch_len = first_len
+                max_len = max(list_lengths)
+                batch_len = max_len
+                if any(l != first_len for l in list_lengths[1:]):                    
+                    logger.debug(f"Inconsistent list lengths in batch insert: {list_lengths}")
+                    for k, v in list(elements.items()):
+                        if isinstance(v, list):
+                            if len(v) != batch_len:
+                                elements[k] = v + [None] * (batch_len - len(v))  # pad with None
             else:
                 batch_len = 1  # scalar-only insert
 
