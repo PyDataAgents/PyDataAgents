@@ -1,3 +1,4 @@
+import datetime
 import os
 import shutil
 from pathlib import Path
@@ -147,4 +148,21 @@ def test_decompress_file_to_target():
     target_dir = Path.home() / "Downloads" / "__pycache__"
     p = FileUtils.decompress(source_file, target_dir)
     print(p)
-      
+    
+def test_set_access_datetime():
+    file_path = os.path.dirname(__file__) + os.sep + "test_table.html"
+    dt = datetime.datetime(2023, 1, 1, 12, 0, 0)
+    result = FileUtils.set_access_datetime(str(file_path), dt)
+    print(f"Set access datetime result: {result}")
+    
+def test_set_modified_datetime():
+    file_path = os.path.dirname(__file__) + os.sep + "test_table.html"
+    dt = datetime.datetime(2024, 1, 1, 12, 0, 0)
+    result = FileUtils.set_modified_datetime(str(file_path), dt)
+    print(f"Set modified datetime result: {result}")
+    
+def test_set_created_datetime():
+    file_path = os.path.dirname(__file__) + os.sep + "test_table.html"
+    dt = datetime.datetime(2022, 1, 1, 12, 0, 0)
+    result = FileUtils.set_created_datetime(str(file_path), dt)
+    print(f"Set created datetime result: {result}")
