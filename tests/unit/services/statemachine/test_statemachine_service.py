@@ -1,8 +1,7 @@
 import os
 import time
 from pydag.agents.Agent import Agent
-from pydag.agents.AgentKeywords import AgentKeywords
-from pydag.agents.YAMLConfig import YAMLConfig
+from pydag.agents.app.AgentApp import AgentApp
 from pydag.nodes.utils.JoinTransition import JoinTransition
 from pydag.services.statemachine.SFCService import SFCService
 from pydag.services.statemachine.StatemachineException import StatemachineException
@@ -13,45 +12,25 @@ from pydag.nodes.utils.TrueTransition import TrueTransition
 from pydag.nodes.utils.CountAction import CountAction
 from pydag.nodes.utils.CountTransition import CountTransition
 from pydag.nodes.utils.PrintAction import PrintAction
-<<<<<<< HEAD
 from pydag.services.statemachine.SimpleStatemachine import SimpleStatemachine
-=======
->>>>>>> develop
 from pydag.services.ThreadType import ThreadType
 
 
-def test_000():
-    
-    g = Agent()
-    
-    n1 = StartAction()
-    
-    sms = SFCService()
-        
-    sms.add_node(n1)
-    
-    print(sms.config_options() )
-    
-    g.add_service(sms)
-    
-    gc = AgentKeywords(g)
-    
-    yc = YAMLConfig(os.path.dirname(__file__) + "\\agent_statemachine_config1.yaml")
-    
-    yc.save(gc)
+def test_000():   
+    ag = Agent()
+    aa = AgentApp(agent=ag)            
+    n1 = StartAction()   
+    sms = SFCService()        
+    sms.add_node(n1)    
+    print(sms.config_options())   
+    ag.add_service(sms)   
+    aa.save(os.path.dirname(__file__) + "\\agent_statemachine_config1.yaml")
     
     
-def test_001():
+def test_001():    
+    aa = AgentApp.load(os.path.dirname(__file__) + "\\agent_statemachine_config1.yaml")
+    print(aa.config_options())
     
-    yc = YAMLConfig(os.path.dirname(__file__) + "\\agent_statemachine_config1.yaml")
-    gc : AgentKeywords = yc.load()
-    
-    g = gc.create()
-    
-    print(gc.to_dict())
-    
-    
-
 def test_010():
     
     n1 = StartAction()
