@@ -1,3 +1,4 @@
+---
 name: implement-feature
 description: Implement features and code changes by first inspecting repository documentation and existing code patterns.
 ---
