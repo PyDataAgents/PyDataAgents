@@ -155,7 +155,7 @@ class Agent():
                 except AgentElementException as e:
                     logger.error(e)
     
-    def release(self, blocking : bool = False):
+    def release(self, blocking : bool = True):
         """Release the `Agent` for operation.
         
         Installs all elements and starts services. If blocking is True,

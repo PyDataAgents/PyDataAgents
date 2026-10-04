@@ -76,7 +76,7 @@
 |-------|------|---------|-------------|
 | `auto_start` | `bool` | `True` | specifies whether to start the mapping with agent start |
 | `thread_type` | `str` | `"<string>"` | type of thread, e.g. MILLI_SECONDS, MICRO_SECONDS, INSTANT, ONLY_ONCE, DAYTIME, DATE, ... |
-| `observing_time` | `Union[int | str]` | `"<string>"` | observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for DAYTIME in %H:%M or %H:%M:%S, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ... |
+| `observing_time` | `Union[int | str | list[int]]` | `"<string>"` | observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for DAYTIME in %H:%M or %H:%M:%S, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ..., for ThreadType ON_OFF_SECONDS observing_time is expected to be an array with 2 elements |
 | `week_days` | `Optional[str]` | `"<string>"` | specifies the week days the observer thread should run on, e.g. 'mon, fri, sun', 'mon - thu' or by numbers '0, 2, 4', where Monday = 0 and Sunday = 6 |
 | `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
@@ -108,7 +108,7 @@ Args:
 |-------|------|---------|-------------|
 | `auto_start` | `bool` | `True` | specifies whether to start the mapping with agent start |
 | `thread_type` | `str` | `"<string>"` | type of thread, e.g. MILLI_SECONDS, MICRO_SECONDS, INSTANT, ONLY_ONCE, DAYTIME, DATE, ... |
-| `observing_time` | `Union[int | str]` | `"<string>"` | observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for DAYTIME in %H:%M or %H:%M:%S, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ... |
+| `observing_time` | `Union[int | str | list[int]]` | `"<string>"` | observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for DAYTIME in %H:%M or %H:%M:%S, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ..., for ThreadType ON_OFF_SECONDS observing_time is expected to be an array with 2 elements |
 | `week_days` | `Optional[str]` | `"<string>"` | specifies the week days the observer thread should run on, e.g. 'mon, fri, sun', 'mon - thu' or by numbers '0, 2, 4', where Monday = 0 and Sunday = 6 |
 | `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
@@ -142,7 +142,7 @@ Returns:
 |-------|------|---------|-------------|
 | `auto_start` | `bool` | `True` | specifies whether to start the mapping with agent start |
 | `thread_type` | `str` | `"<string>"` | type of thread, e.g. MILLI_SECONDS, MICRO_SECONDS, INSTANT, ONLY_ONCE, DAYTIME, DATE, ... |
-| `observing_time` | `Union[int | str]` | `"<string>"` | observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for DAYTIME in %H:%M or %H:%M:%S, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ... |
+| `observing_time` | `Union[int | str | list[int]]` | `"<string>"` | observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for DAYTIME in %H:%M or %H:%M:%S, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ..., for ThreadType ON_OFF_SECONDS observing_time is expected to be an array with 2 elements |
 | `week_days` | `Optional[str]` | `"<string>"` | specifies the week days the observer thread should run on, e.g. 'mon, fri, sun', 'mon - thu' or by numbers '0, 2, 4', where Monday = 0 and Sunday = 6 |
 | `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
@@ -183,7 +183,7 @@ abstract base class for Services with ObserverThreads
 | `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `thread_type` | `str` | `"<string>"` | type of thread, e.g. MILLI_SECONDS, MICRO_SECONDS, INSTANT, ONLY_ONCE, DAYTIME, DATE, ... |
-| `observing_time` | `Union[int | str]` | `"<string>"` | observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for DAYTIME in %H:%M or %H:%M:%S, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ... |
+| `observing_time` | `Union[int | str | list[int]]` | `"<string>"` | observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for DAYTIME in %H:%M or %H:%M:%S, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ..., for ThreadType ON_OFF_SECONDS observing_time is expected to be an array with 2 elements |
 | `week_days` | `Optional[str]` | `"<string>"` | specifies the week days the observer thread should run on, e.g. 'mon, fri, sun', 'mon - thu' or by numbers '0, 2, 4', where Monday = 0 and Sunday = 6 |
 
 
@@ -208,7 +208,7 @@ observer_service = ObserverService(
 |-------|------|---------|-------------|
 | `auto_start` | `bool` | `True` | specifies whether to start the mapping with agent start |
 | `thread_type` | `str` | `"<string>"` | type of thread, e.g. MILLI_SECONDS, MICRO_SECONDS, INSTANT, ONLY_ONCE, DAYTIME, DATE, ... |
-| `observing_time` | `Union[int | str]` | `"<string>"` | observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for DAYTIME in %H:%M or %H:%M:%S, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ... |
+| `observing_time` | `Union[int | str | list[int]]` | `"<string>"` | observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for DAYTIME in %H:%M or %H:%M:%S, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ..., for ThreadType ON_OFF_SECONDS observing_time is expected to be an array with 2 elements |
 | `week_days` | `Optional[str]` | `"<string>"` | specifies the week days the observer thread should run on, e.g. 'mon, fri, sun', 'mon - thu' or by numbers '0, 2, 4', where Monday = 0 and Sunday = 6 |
 | `buffer_ids` | `list[str]` | `'list()'` | list of buffer ids to map from |
 | `addresses` | `list[str]` | `'list()'` | list of addresses to read/subscribe from or write/publish to |
@@ -245,7 +245,7 @@ publish_service = PublishService(
 |-------|------|---------|-------------|
 | `auto_start` | `bool` | `True` | specifies whether to start the mapping with agent start |
 | `thread_type` | `str` | `"<string>"` | type of thread, e.g. MILLI_SECONDS, MICRO_SECONDS, INSTANT, ONLY_ONCE, DAYTIME, DATE, ... |
-| `observing_time` | `Union[int | str]` | `"<string>"` | observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for DAYTIME in %H:%M or %H:%M:%S, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ... |
+| `observing_time` | `Union[int | str | list[int]]` | `"<string>"` | observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for DAYTIME in %H:%M or %H:%M:%S, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ..., for ThreadType ON_OFF_SECONDS observing_time is expected to be an array with 2 elements |
 | `week_days` | `Optional[str]` | `"<string>"` | specifies the week days the observer thread should run on, e.g. 'mon, fri, sun', 'mon - thu' or by numbers '0, 2, 4', where Monday = 0 and Sunday = 6 |
 | `buffer_ids` | `list[str]` | `'list()'` | list of buffer ids to map from |
 | `addresses` | `list[str]` | `'list()'` | list of addresses to read/subscribe from or write/publish to |
@@ -305,7 +305,7 @@ service = Service(
 |-------|------|---------|-------------|
 | `auto_start` | `bool` | `True` | specifies whether to start the mapping with agent start |
 | `thread_type` | `str` | `"<string>"` | type of thread, e.g. MILLI_SECONDS, MICRO_SECONDS, INSTANT, ONLY_ONCE, DAYTIME, DATE, ... |
-| `observing_time` | `Union[int | str]` | `"<string>"` | observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for DAYTIME in %H:%M or %H:%M:%S, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ... |
+| `observing_time` | `Union[int | str | list[int]]` | `"<string>"` | observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for DAYTIME in %H:%M or %H:%M:%S, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ..., for ThreadType ON_OFF_SECONDS observing_time is expected to be an array with 2 elements |
 | `week_days` | `Optional[str]` | `"<string>"` | specifies the week days the observer thread should run on, e.g. 'mon, fri, sun', 'mon - thu' or by numbers '0, 2, 4', where Monday = 0 and Sunday = 6 |
 | `buffer_ids` | `list[str]` | `'list()'` | list of buffer ids to map from |
 | `addresses` | `list[str]` | `'list()'` | list of addresses to read/subscribe from or write/publish to |
@@ -342,7 +342,7 @@ subscribe_service = SubscribeService(
 |-------|------|---------|-------------|
 | `auto_start` | `bool` | `True` | specifies whether to start the mapping with agent start |
 | `thread_type` | `str` | `"<string>"` | type of thread, e.g. MILLI_SECONDS, MICRO_SECONDS, INSTANT, ONLY_ONCE, DAYTIME, DATE, ... |
-| `observing_time` | `Union[int | str]` | `"<string>"` | observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for DAYTIME in %H:%M or %H:%M:%S, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ... |
+| `observing_time` | `Union[int | str | list[int]]` | `"<string>"` | observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for DAYTIME in %H:%M or %H:%M:%S, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ..., for ThreadType ON_OFF_SECONDS observing_time is expected to be an array with 2 elements |
 | `week_days` | `Optional[str]` | `"<string>"` | specifies the week days the observer thread should run on, e.g. 'mon, fri, sun', 'mon - thu' or by numbers '0, 2, 4', where Monday = 0 and Sunday = 6 |
 | `buffer_ids` | `list[str]` | `'list()'` | list of buffer ids to map from |
 | `addresses` | `list[str]` | `'list()'` | list of addresses to read/subscribe from or write/publish to |
@@ -381,7 +381,7 @@ write_service = WriteService(
 |-------|------|---------|-------------|
 | `auto_start` | `bool` | `True` | specifies whether to start the mapping with agent start |
 | `thread_type` | `str` | `"<string>"` | type of thread, e.g. MILLI_SECONDS, MICRO_SECONDS, INSTANT, ONLY_ONCE, DAYTIME, DATE, ... |
-| `observing_time` | `Union[int | str]` | `"<string>"` | observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for DAYTIME in %H:%M or %H:%M:%S, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ... |
+| `observing_time` | `Union[int | str | list[int]]` | `"<string>"` | observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for DAYTIME in %H:%M or %H:%M:%S, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ..., for ThreadType ON_OFF_SECONDS observing_time is expected to be an array with 2 elements |
 | `week_days` | `Optional[str]` | `"<string>"` | specifies the week days the observer thread should run on, e.g. 'mon, fri, sun', 'mon - thu' or by numbers '0, 2, 4', where Monday = 0 and Sunday = 6 |
 | `buffer_ids` | `list[str]` | `'list()'` | list of buffer ids to map from |
 | `addresses` | `list[str]` | `'list()'` | list of addresses to read/subscribe from or write/publish to |
@@ -426,7 +426,7 @@ ads_service = AdsService(
 |-------|------|---------|-------------|
 | `auto_start` | `bool` | `True` | specifies whether to start the mapping with agent start |
 | `thread_type` | `str` | `"<string>"` | type of thread, e.g. MILLI_SECONDS, MICRO_SECONDS, INSTANT, ONLY_ONCE, DAYTIME, DATE, ... |
-| `observing_time` | `Union[int | str]` | `"<string>"` | observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for DAYTIME in %H:%M or %H:%M:%S, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ... |
+| `observing_time` | `Union[int | str | list[int]]` | `"<string>"` | observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for DAYTIME in %H:%M or %H:%M:%S, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ..., for ThreadType ON_OFF_SECONDS observing_time is expected to be an array with 2 elements |
 | `week_days` | `Optional[str]` | `"<string>"` | specifies the week days the observer thread should run on, e.g. 'mon, fri, sun', 'mon - thu' or by numbers '0, 2, 4', where Monday = 0 and Sunday = 6 |
 | `buffer_ids` | `list[str]` | `'list()'` | list of buffer ids to map from |
 | `addresses` | `list[str]` | `'list()'` | list of addresses to read/subscribe from or write/publish to |
@@ -524,7 +524,7 @@ solid_works_service = SolidWorksService(
 |-------|------|---------|-------------|
 | `auto_start` | `bool` | `True` | specifies whether to start the mapping with agent start |
 | `thread_type` | `str` | `"<string>"` | type of thread, e.g. MILLI_SECONDS, MICRO_SECONDS, INSTANT, ONLY_ONCE, DAYTIME, DATE, ... |
-| `observing_time` | `Union[int | str]` | `"<string>"` | observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for DAYTIME in %H:%M or %H:%M:%S, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ... |
+| `observing_time` | `Union[int | str | list[int]]` | `"<string>"` | observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for DAYTIME in %H:%M or %H:%M:%S, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ..., for ThreadType ON_OFF_SECONDS observing_time is expected to be an array with 2 elements |
 | `week_days` | `Optional[str]` | `"<string>"` | specifies the week days the observer thread should run on, e.g. 'mon, fri, sun', 'mon - thu' or by numbers '0, 2, 4', where Monday = 0 and Sunday = 6 |
 | `buffer_ids` | `list[str]` | `'list()'` | list of buffer ids to map from |
 | `addresses` | `list[str]` | `'list()'` | list of addresses to read/subscribe from or write/publish to |
@@ -577,7 +577,7 @@ csv_read_service = CsvReadService(
 |-------|------|---------|-------------|
 | `auto_start` | `bool` | `True` | specifies whether to start the mapping with agent start |
 | `thread_type` | `str` | `"<string>"` | type of thread, e.g. MILLI_SECONDS, MICRO_SECONDS, INSTANT, ONLY_ONCE, DAYTIME, DATE, ... |
-| `observing_time` | `Union[int | str]` | `"<string>"` | observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for DAYTIME in %H:%M or %H:%M:%S, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ... |
+| `observing_time` | `Union[int | str | list[int]]` | `"<string>"` | observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for DAYTIME in %H:%M or %H:%M:%S, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ..., for ThreadType ON_OFF_SECONDS observing_time is expected to be an array with 2 elements |
 | `week_days` | `Optional[str]` | `"<string>"` | specifies the week days the observer thread should run on, e.g. 'mon, fri, sun', 'mon - thu' or by numbers '0, 2, 4', where Monday = 0 and Sunday = 6 |
 | `buffer_ids` | `list[str]` | `'list()'` | list of buffer ids to map from |
 | `addresses` | `list[str]` | `'list()'` | list of addresses to read/subscribe from or write/publish to |
@@ -593,6 +593,7 @@ csv_read_service = CsvReadService(
 | `delimiter` | `str` | `';'` | delimiter to use for column separation |
 | `decimal_precision` | `int` | `3` | maximum decimal precision of numeric values |
 | `file_prefix_format` | `str` | `"path/to/file.txt"` | format of the timestamp prefix, if None then a unixtimestamp is used, otherwise formats like '%Y%m%d' can be specified |
+| `timeout` | `int` | `1` | specifies the timeout in seconds, representing an idle time, after which a file is being closed for inactivity |
 
 
 ```python
@@ -617,7 +618,8 @@ csv_write_service = CsvWriteService(
 	max_samples=1000000,
 	delimiter=';',
 	decimal_precision=3,
-	file_prefix_format="path/to/file.txt"
+	file_prefix_format="path/to/file.txt",
+	timeout=1
 )
 ```
 
@@ -719,7 +721,7 @@ multi_model_service = MultiModelService(
 |-------|------|---------|-------------|
 | `auto_start` | `bool` | `True` | specifies whether to start the mapping with agent start |
 | `thread_type` | `str` | `"<string>"` | type of thread, e.g. MILLI_SECONDS, MICRO_SECONDS, INSTANT, ONLY_ONCE, DAYTIME, DATE, ... |
-| `observing_time` | `Union[int | str]` | `"<string>"` | observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for DAYTIME in %H:%M or %H:%M:%S, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ... |
+| `observing_time` | `Union[int | str | list[int]]` | `"<string>"` | observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for DAYTIME in %H:%M or %H:%M:%S, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ..., for ThreadType ON_OFF_SECONDS observing_time is expected to be an array with 2 elements |
 | `week_days` | `Optional[str]` | `"<string>"` | specifies the week days the observer thread should run on, e.g. 'mon, fri, sun', 'mon - thu' or by numbers '0, 2, 4', where Monday = 0 and Sunday = 6 |
 | `buffer_ids` | `list[str]` | `'list()'` | list of buffer ids to map from |
 | `addresses` | `list[str]` | `'list()'` | list of addresses to read/subscribe from or write/publish to |
@@ -762,7 +764,7 @@ influx_db_service = InfluxDbService(
 |-------|------|---------|-------------|
 | `auto_start` | `bool` | `True` | specifies whether to start the mapping with agent start |
 | `thread_type` | `str` | `"<string>"` | type of thread, e.g. MILLI_SECONDS, MICRO_SECONDS, INSTANT, ONLY_ONCE, DAYTIME, DATE, ... |
-| `observing_time` | `Union[int | str]` | `"<string>"` | observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for DAYTIME in %H:%M or %H:%M:%S, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ... |
+| `observing_time` | `Union[int | str | list[int]]` | `"<string>"` | observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for DAYTIME in %H:%M or %H:%M:%S, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ..., for ThreadType ON_OFF_SECONDS observing_time is expected to be an array with 2 elements |
 | `week_days` | `Optional[str]` | `"<string>"` | specifies the week days the observer thread should run on, e.g. 'mon, fri, sun', 'mon - thu' or by numbers '0, 2, 4', where Monday = 0 and Sunday = 6 |
 | `buffer_ids` | `list[str]` | `'list()'` | list of buffer ids to map from |
 | `addresses` | `list[str]` | `'list()'` | list of addresses to read/subscribe from or write/publish to |
@@ -872,7 +874,7 @@ delete_file_service = DeleteFileService(
 |-------|------|---------|-------------|
 | `auto_start` | `bool` | `True` | specifies whether to start the mapping with agent start |
 | `thread_type` | `str` | `"<string>"` | type of thread, e.g. MILLI_SECONDS, MICRO_SECONDS, INSTANT, ONLY_ONCE, DAYTIME, DATE, ... |
-| `observing_time` | `Union[int | str]` | `"<string>"` | observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for DAYTIME in %H:%M or %H:%M:%S, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ... |
+| `observing_time` | `Union[int | str | list[int]]` | `"<string>"` | observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for DAYTIME in %H:%M or %H:%M:%S, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ..., for ThreadType ON_OFF_SECONDS observing_time is expected to be an array with 2 elements |
 | `week_days` | `Optional[str]` | `"<string>"` | specifies the week days the observer thread should run on, e.g. 'mon, fri, sun', 'mon - thu' or by numbers '0, 2, 4', where Monday = 0 and Sunday = 6 |
 | `buffer_ids` | `list[str]` | `'list()'` | list of buffer ids to map from |
 | `addresses` | `list[str]` | `'list()'` | list of addresses to read/subscribe from or write/publish to |
@@ -915,7 +917,7 @@ If no addresses are specified all buffer keys are directly mapped to the context
 |-------|------|---------|-------------|
 | `auto_start` | `bool` | `True` | specifies whether to start the mapping with agent start |
 | `thread_type` | `str` | `"<string>"` | type of thread, e.g. MILLI_SECONDS, MICRO_SECONDS, INSTANT, ONLY_ONCE, DAYTIME, DATE, ... |
-| `observing_time` | `Union[int | str]` | `"<string>"` | observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for DAYTIME in %H:%M or %H:%M:%S, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ... |
+| `observing_time` | `Union[int | str | list[int]]` | `"<string>"` | observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for DAYTIME in %H:%M or %H:%M:%S, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ..., for ThreadType ON_OFF_SECONDS observing_time is expected to be an array with 2 elements |
 | `week_days` | `Optional[str]` | `"<string>"` | specifies the week days the observer thread should run on, e.g. 'mon, fri, sun', 'mon - thu' or by numbers '0, 2, 4', where Monday = 0 and Sunday = 6 |
 | `buffer_ids` | `list[str]` | `'list()'` | list of buffer ids to map from |
 | `addresses` | `list[str]` | `'list()'` | list of addresses to read/subscribe from or write/publish to |
@@ -1102,7 +1104,7 @@ folder_observe_mail_service = FolderObserveMailService(
 |-------|------|---------|-------------|
 | `auto_start` | `bool` | `True` | specifies whether to start the mapping with agent start |
 | `thread_type` | `str` | `"<string>"` | type of thread, e.g. MILLI_SECONDS, MICRO_SECONDS, INSTANT, ONLY_ONCE, DAYTIME, DATE, ... |
-| `observing_time` | `Union[int | str]` | `"<string>"` | observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for DAYTIME in %H:%M or %H:%M:%S, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ... |
+| `observing_time` | `Union[int | str | list[int]]` | `"<string>"` | observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for DAYTIME in %H:%M or %H:%M:%S, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ..., for ThreadType ON_OFF_SECONDS observing_time is expected to be an array with 2 elements |
 | `week_days` | `Optional[str]` | `"<string>"` | specifies the week days the observer thread should run on, e.g. 'mon, fri, sun', 'mon - thu' or by numbers '0, 2, 4', where Monday = 0 and Sunday = 6 |
 | `buffer_ids` | `list[str]` | `'list()'` | list of buffer ids to map from |
 | `addresses` | `list[str]` | `'list()'` | list of addresses to read/subscribe from or write/publish to |
@@ -1142,7 +1144,7 @@ npz_service = NpzService(
 | `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `path` | `Path` | `"<value>"` |  |
-| `timestamp` | `datetime` | `"2026-08-15T21:25:08Z"  # datetime as ISO string` |  |
+| `timestamp` | `datetime` | `"2026-10-04T00:22:19Z"  # datetime as ISO string` |  |
 
 
 ```python
@@ -1153,7 +1155,7 @@ backup = Backup(
 	id="<string>",
 	load_on_install=False,
 	path="<value>",
-	timestamp="2026-08-15T21:25:08Z"  # datetime as ISO string
+	timestamp="2026-10-04T00:22:19Z"  # datetime as ISO string
 )
 ```
 
@@ -1164,7 +1166,7 @@ backup = Backup(
 |-------|------|---------|-------------|
 | `auto_start` | `bool` | `True` | specifies whether to start the mapping with agent start |
 | `thread_type` | `str` | `"<string>"` | type of thread, e.g. MILLI_SECONDS, MICRO_SECONDS, INSTANT, ONLY_ONCE, DAYTIME, DATE, ... |
-| `observing_time` | `Union[int | str]` | `"<string>"` | observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for DAYTIME in %H:%M or %H:%M:%S, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ... |
+| `observing_time` | `Union[int | str | list[int]]` | `"<string>"` | observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for DAYTIME in %H:%M or %H:%M:%S, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ..., for ThreadType ON_OFF_SECONDS observing_time is expected to be an array with 2 elements |
 | `week_days` | `Optional[str]` | `"<string>"` | specifies the week days the observer thread should run on, e.g. 'mon, fri, sun', 'mon - thu' or by numbers '0, 2, 4', where Monday = 0 and Sunday = 6 |
 | `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
@@ -1205,7 +1207,7 @@ rolling_backup_service = RollingBackupService(
 |-------|------|---------|-------------|
 | `auto_start` | `bool` | `True` | specifies whether to start the mapping with agent start |
 | `thread_type` | `str` | `"<string>"` | type of thread, e.g. MILLI_SECONDS, MICRO_SECONDS, INSTANT, ONLY_ONCE, DAYTIME, DATE, ... |
-| `observing_time` | `Union[int | str]` | `"<string>"` | observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for DAYTIME in %H:%M or %H:%M:%S, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ... |
+| `observing_time` | `Union[int | str | list[int]]` | `"<string>"` | observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for DAYTIME in %H:%M or %H:%M:%S, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ..., for ThreadType ON_OFF_SECONDS observing_time is expected to be an array with 2 elements |
 | `week_days` | `Optional[str]` | `"<string>"` | specifies the week days the observer thread should run on, e.g. 'mon, fri, sun', 'mon - thu' or by numbers '0, 2, 4', where Monday = 0 and Sunday = 6 |
 | `buffer_ids` | `list[str]` | `'list()'` | list of buffer ids to map from |
 | `addresses` | `list[str]` | `'list()'` | list of addresses to read/subscribe from or write/publish to |
@@ -1427,7 +1429,7 @@ r_a_g_service = RAGService(
 |-------|------|---------|-------------|
 | `auto_start` | `bool` | `True` | specifies whether to start the mapping with agent start |
 | `thread_type` | `str` | `"<string>"` | type of thread, e.g. MILLI_SECONDS, MICRO_SECONDS, INSTANT, ONLY_ONCE, DAYTIME, DATE, ... |
-| `observing_time` | `Union[int | str]` | `"<string>"` | observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for DAYTIME in %H:%M or %H:%M:%S, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ... |
+| `observing_time` | `Union[int | str | list[int]]` | `"<string>"` | observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for DAYTIME in %H:%M or %H:%M:%S, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ..., for ThreadType ON_OFF_SECONDS observing_time is expected to be an array with 2 elements |
 | `week_days` | `Optional[str]` | `"<string>"` | specifies the week days the observer thread should run on, e.g. 'mon, fri, sun', 'mon - thu' or by numbers '0, 2, 4', where Monday = 0 and Sunday = 6 |
 | `buffer_ids` | `list[str]` | `'list()'` | list of buffer ids to map from |
 | `addresses` | `list[str]` | `'list()'` | list of addresses to read/subscribe from or write/publish to |
@@ -1512,7 +1514,7 @@ m_s_graph_service = MSGraphService(
 |-------|------|---------|-------------|
 | `auto_start` | `bool` | `True` | specifies whether to start the mapping with agent start |
 | `thread_type` | `str` | `"<string>"` | type of thread, e.g. MILLI_SECONDS, MICRO_SECONDS, INSTANT, ONLY_ONCE, DAYTIME, DATE, ... |
-| `observing_time` | `Union[int | str]` | `"<string>"` | observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for DAYTIME in %H:%M or %H:%M:%S, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ... |
+| `observing_time` | `Union[int | str | list[int]]` | `"<string>"` | observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for DAYTIME in %H:%M or %H:%M:%S, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ..., for ThreadType ON_OFF_SECONDS observing_time is expected to be an array with 2 elements |
 | `week_days` | `Optional[str]` | `"<string>"` | specifies the week days the observer thread should run on, e.g. 'mon, fri, sun', 'mon - thu' or by numbers '0, 2, 4', where Monday = 0 and Sunday = 6 |
 | `buffer_ids` | `list[str]` | `'list()'` | list of buffer ids to map from |
 | `addresses` | `list[str]` | `'list()'` | list of addresses to read/subscribe from or write/publish to |
@@ -1595,7 +1597,7 @@ plotlify_service = PlotlifyService(
 |-------|------|---------|-------------|
 | `auto_start` | `bool` | `True` | specifies whether to start the mapping with agent start |
 | `thread_type` | `str` | `"<string>"` | type of thread, e.g. MILLI_SECONDS, MICRO_SECONDS, INSTANT, ONLY_ONCE, DAYTIME, DATE, ... |
-| `observing_time` | `Union[int | str]` | `"<string>"` | observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for DAYTIME in %H:%M or %H:%M:%S, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ... |
+| `observing_time` | `Union[int | str | list[int]]` | `"<string>"` | observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for DAYTIME in %H:%M or %H:%M:%S, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ..., for ThreadType ON_OFF_SECONDS observing_time is expected to be an array with 2 elements |
 | `week_days` | `Optional[str]` | `"<string>"` | specifies the week days the observer thread should run on, e.g. 'mon, fri, sun', 'mon - thu' or by numbers '0, 2, 4', where Monday = 0 and Sunday = 6 |
 | `buffer_ids` | `list[str]` | `'list()'` | list of buffer ids to map from |
 | `addresses` | `list[str]` | `'list()'` | list of addresses to read/subscribe from or write/publish to |
@@ -1690,7 +1692,7 @@ But it has to match the number of elements in the schema used for reading or wri
 |-------|------|---------|-------------|
 | `auto_start` | `bool` | `True` | specifies whether to start the mapping with agent start |
 | `thread_type` | `str` | `"<string>"` | type of thread, e.g. MILLI_SECONDS, MICRO_SECONDS, INSTANT, ONLY_ONCE, DAYTIME, DATE, ... |
-| `observing_time` | `Union[int | str]` | `"<string>"` | observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for DAYTIME in %H:%M or %H:%M:%S, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ... |
+| `observing_time` | `Union[int | str | list[int]]` | `"<string>"` | observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for DAYTIME in %H:%M or %H:%M:%S, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ..., for ThreadType ON_OFF_SECONDS observing_time is expected to be an array with 2 elements |
 | `week_days` | `Optional[str]` | `"<string>"` | specifies the week days the observer thread should run on, e.g. 'mon, fri, sun', 'mon - thu' or by numbers '0, 2, 4', where Monday = 0 and Sunday = 6 |
 | `buffer_ids` | `list[str]` | `'list()'` | list of buffer ids to map from |
 | `addresses` | `list[str]` | `'list()'` | list of addresses to read/subscribe from or write/publish to |
@@ -1751,7 +1753,7 @@ byte_stream_service = ByteStreamService(
 |-------|------|---------|-------------|
 | `auto_start` | `bool` | `True` | specifies whether to start the mapping with agent start |
 | `thread_type` | `str` | `"<string>"` | type of thread, e.g. MILLI_SECONDS, MICRO_SECONDS, INSTANT, ONLY_ONCE, DAYTIME, DATE, ... |
-| `observing_time` | `Union[int | str]` | `"<string>"` | observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for DAYTIME in %H:%M or %H:%M:%S, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ... |
+| `observing_time` | `Union[int | str | list[int]]` | `"<string>"` | observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for DAYTIME in %H:%M or %H:%M:%S, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ..., for ThreadType ON_OFF_SECONDS observing_time is expected to be an array with 2 elements |
 | `week_days` | `Optional[str]` | `"<string>"` | specifies the week days the observer thread should run on, e.g. 'mon, fri, sun', 'mon - thu' or by numbers '0, 2, 4', where Monday = 0 and Sunday = 6 |
 | `buffer_ids` | `list[str]` | `'list()'` | list of buffer ids to map from |
 | `addresses` | `list[str]` | `'list()'` | list of addresses to read/subscribe from or write/publish to |
@@ -1816,7 +1818,7 @@ serial_service = SerialService(
 |-------|------|---------|-------------|
 | `auto_start` | `bool` | `True` | specifies whether to start the mapping with agent start |
 | `thread_type` | `str` | `"<string>"` | type of thread, e.g. MILLI_SECONDS, MICRO_SECONDS, INSTANT, ONLY_ONCE, DAYTIME, DATE, ... |
-| `observing_time` | `Union[int | str]` | `"<string>"` | observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for DAYTIME in %H:%M or %H:%M:%S, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ... |
+| `observing_time` | `Union[int | str | list[int]]` | `"<string>"` | observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for DAYTIME in %H:%M or %H:%M:%S, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ..., for ThreadType ON_OFF_SECONDS observing_time is expected to be an array with 2 elements |
 | `week_days` | `Optional[str]` | `"<string>"` | specifies the week days the observer thread should run on, e.g. 'mon, fri, sun', 'mon - thu' or by numbers '0, 2, 4', where Monday = 0 and Sunday = 6 |
 | `buffer_ids` | `list[str]` | `'list()'` | list of buffer ids to map from |
 | `addresses` | `list[str]` | `'list()'` | list of addresses to read/subscribe from or write/publish to |
@@ -1877,7 +1879,7 @@ t_c_p_client_service = TCPClientService(
 |-------|------|---------|-------------|
 | `auto_start` | `bool` | `True` | specifies whether to start the mapping with agent start |
 | `thread_type` | `str` | `"<string>"` | type of thread, e.g. MILLI_SECONDS, MICRO_SECONDS, INSTANT, ONLY_ONCE, DAYTIME, DATE, ... |
-| `observing_time` | `Union[int | str]` | `"<string>"` | observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for DAYTIME in %H:%M or %H:%M:%S, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ... |
+| `observing_time` | `Union[int | str | list[int]]` | `"<string>"` | observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for DAYTIME in %H:%M or %H:%M:%S, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ..., for ThreadType ON_OFF_SECONDS observing_time is expected to be an array with 2 elements |
 | `week_days` | `Optional[str]` | `"<string>"` | specifies the week days the observer thread should run on, e.g. 'mon, fri, sun', 'mon - thu' or by numbers '0, 2, 4', where Monday = 0 and Sunday = 6 |
 | `buffer_ids` | `list[str]` | `'list()'` | list of buffer ids to map from |
 | `addresses` | `list[str]` | `'list()'` | list of addresses to read/subscribe from or write/publish to |
@@ -1916,7 +1918,7 @@ web_socket_service = WebSocketService(
 |-------|------|---------|-------------|
 | `auto_start` | `bool` | `True` | specifies whether to start the mapping with agent start |
 | `thread_type` | `str` | `"<string>"` | type of thread, e.g. MILLI_SECONDS, MICRO_SECONDS, INSTANT, ONLY_ONCE, DAYTIME, DATE, ... |
-| `observing_time` | `Union[int | str]` | `"<string>"` | observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for DAYTIME in %H:%M or %H:%M:%S, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ... |
+| `observing_time` | `Union[int | str | list[int]]` | `"<string>"` | observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for DAYTIME in %H:%M or %H:%M:%S, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ..., for ThreadType ON_OFF_SECONDS observing_time is expected to be an array with 2 elements |
 | `week_days` | `Optional[str]` | `"<string>"` | specifies the week days the observer thread should run on, e.g. 'mon, fri, sun', 'mon - thu' or by numbers '0, 2, 4', where Monday = 0 and Sunday = 6 |
 | `buffer_ids` | `list[str]` | `'list()'` | list of buffer ids to map from |
 | `addresses` | `list[str]` | `'list()'` | list of addresses to read/subscribe from or write/publish to |
@@ -2054,7 +2056,7 @@ statemachine_service = StatemachineService(
 A Service for running conventional callables and Action/BufferNode steps in one sequence.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| `observing_time` | `Union[int | str]` | `"<string>"` | observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for DAYTIME in %H:%M or %H:%M:%S, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ... |
+| `observing_time` | `Union[int | str | list[int]]` | `"<string>"` | observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for DAYTIME in %H:%M or %H:%M:%S, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ..., for ThreadType ON_OFF_SECONDS observing_time is expected to be an array with 2 elements |
 | `week_days` | `Optional[str]` | `"<string>"` | specifies the week days the observer thread should run on, e.g. 'mon, fri, sun', 'mon - thu' or by numbers '0, 2, 4', where Monday = 0 and Sunday = 6 |
 | `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
@@ -2095,7 +2097,7 @@ task_runner_service = TaskRunnerService(
 |-------|------|---------|-------------|
 | `auto_start` | `bool` | `True` | specifies whether to start the mapping with agent start |
 | `thread_type` | `str` | `"<string>"` | type of thread, e.g. MILLI_SECONDS, MICRO_SECONDS, INSTANT, ONLY_ONCE, DAYTIME, DATE, ... |
-| `observing_time` | `Union[int | str]` | `"<string>"` | observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for DAYTIME in %H:%M or %H:%M:%S, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ... |
+| `observing_time` | `Union[int | str | list[int]]` | `"<string>"` | observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for DAYTIME in %H:%M or %H:%M:%S, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ..., for ThreadType ON_OFF_SECONDS observing_time is expected to be an array with 2 elements |
 | `week_days` | `Optional[str]` | `"<string>"` | specifies the week days the observer thread should run on, e.g. 'mon, fri, sun', 'mon - thu' or by numbers '0, 2, 4', where Monday = 0 and Sunday = 6 |
 | `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
@@ -2157,7 +2159,7 @@ An `MappingService` that captures webcam video feed into a `Buffer`
 |-------|------|---------|-------------|
 | `auto_start` | `bool` | `True` | specifies whether to start the mapping with agent start |
 | `thread_type` | `str` | `"<string>"` | type of thread, e.g. MILLI_SECONDS, MICRO_SECONDS, INSTANT, ONLY_ONCE, DAYTIME, DATE, ... |
-| `observing_time` | `Union[int | str]` | `"<string>"` | observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for DAYTIME in %H:%M or %H:%M:%S, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ... |
+| `observing_time` | `Union[int | str | list[int]]` | `"<string>"` | observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for DAYTIME in %H:%M or %H:%M:%S, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ..., for ThreadType ON_OFF_SECONDS observing_time is expected to be an array with 2 elements |
 | `week_days` | `Optional[str]` | `"<string>"` | specifies the week days the observer thread should run on, e.g. 'mon, fri, sun', 'mon - thu' or by numbers '0, 2, 4', where Monday = 0 and Sunday = 6 |
 | `buffer_ids` | `list[str]` | `'list()'` | list of buffer ids to map from |
 | `addresses` | `list[str]` | `'list()'` | list of addresses to read/subscribe from or write/publish to |
