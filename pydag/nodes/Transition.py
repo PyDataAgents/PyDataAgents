@@ -29,3 +29,7 @@ class Transition(Node):
     def _on_check(self) -> bool:
         """ checking logic defined by each transition sub class 
         """
+
+    def get_next_children(self) -> list[Node]:
+        """Return children to activate after a successful check."""
+        return self.get_children()

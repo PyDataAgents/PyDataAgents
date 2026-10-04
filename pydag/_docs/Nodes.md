@@ -1,5 +1,75 @@
 # Nodes Documentation
 
+## IfElseTransition
+
+`pydag.nodes.utils.IfElseTransition` routes parent buffer data to exactly one
+of two children in `SFCService`. Add the true child first and the false child
+second (or use `child_ids=["true_id", "false_id"]`). Use `SFCService` for this
+graph branching; `SimpleStatemachine` only runs a flat sequence.
+
+Install `jsonpath-ng`, also included in `pydag[iiot]`. The dependency is loaded
+only when the node is installed.
+
+```python
+from pydag.buffers.DictBuffer import DictBuffer
+from pydag.nodes.buffers.LinkBufferAction import LinkBufferAction
+from pydag.nodes.buffers.CopyDataAction import CopyDataAction
+from pydag.nodes.utils.IfElseTransition import IfElseTransition
+from pydag.nodes.utils.StopAction import StopAction
+from pydag.services.statemachine.SFCService import SFCService
+from pydag.services.ThreadType import ThreadType
+
+buffer = DictBuffer(index_enabled=False, timestamps_enabled=False)
+buffer.install()
+buffer.push({"temperature": [72, 91]})
+source = LinkBufferAction(id="source")
+source.set_buffer(buffer)
+branch = IfElseTransition(
+    id="temperature_check",
+    json_path="$.temperature[-1]",
+    condition="greater_than",
+    value=80,
+)
+hot = CopyDataAction(id="hot")
+normal = CopyDataAction(id="normal")
+hot_stop, normal_stop = StopAction(), StopAction()
+source.add_child(branch)
+branch.add_child(hot)       # true
+branch.add_child(normal)    # false
+hot.add_child(hot_stop)
+normal.add_child(normal_stop)
+service = SFCService(thread_type=ThreadType.ONLY_ONCE.value)
+for node in (source, branch, hot, normal, hot_stop, normal_stop):
+    service.add_node(node)
+service.install()
+service.start()             # only hot receives the data
+```
+
+The query operates on a JSON round trip of `get_parent_data()`, normally a
+column-oriented object such as `{"temperature": [72, 91]}`. Inherited `n`,
+`input_keys`, and `ignore_keys` select the input. Data must be JSON serializable
+and contain finite numbers. `persistent=True` preserves parent data;
+`persistent=False` consumes it when read, including when later evaluation fails.
+
+Supported conditions are `equals`, `not_equals`, `greater_than`,
+`greater_or_equal`, `less_than`, `less_or_equal`, `contains`, `exists`, `is_null`,
+and `is_not_null`. The last three ignore `value`. `contains` checks whether the
+matched string, list, or object contains `value`. Comparisons use JSON-decoded
+Python values without string-to-number coercion; incompatible comparisons raise
+`NodeException`. A missing path is false, even for `not_equals` or `is_null`;
+an explicit JSON null matches `is_null` and `exists`.
+
+Use `$.temperature[*]` with `match_mode="any"` (default) or `"all"` to combine
+multiple comparisons. No query matches always selects the false branch.
+Malformed queries and invalid configuration fail installation.
+
+Each successful evaluation replaces this node's buffer with the selected input
+payload so its child can read it. `check()` returns **True for both outcomes**
+because either branch advances the workflow; `get_next_children()` returns the
+one selected child. It returns an empty list before evaluation. The scheduler
+executes that child; calling `check()` alone does not execute it. Ordinary
+transitions continue to return all their children from `get_next_children()`.
+
 ## Summary
 
 | Class | Description | Icon |

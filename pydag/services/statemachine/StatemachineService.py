@@ -71,8 +71,8 @@ class StatemachineService(ObserverService):
         This method should be called after all nodes have been added to the service.
         """
         for node in self.nodes.values():
-            if len(node.get_children()) == 0 and len(node.get_parents()) == 0:
-                for child_id in node.child_ids:
+            for child_id in node.child_ids:
+                if not node.has_child(child_id):
                     if child_id in self.nodes:
                         node.add_child(self.nodes[child_id])
                     else:
