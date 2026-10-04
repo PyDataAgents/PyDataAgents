@@ -67,16 +67,15 @@ def test_only_once_thread():
     s.install()
     s.start()
 
-def test_daytime_thread():
-    wt : int = 5
-    dt : datetime = TimeUtils.dt_plus(datetime.now(), seconds=wt)
-    ot : str = dt.strftime("%H:%M:%S")
-    s = TestService(observing_time=ot, thread_type=ThreadType.DAYTIME.value)
+def test_cron_thread():
+    wt : int = 120
+    ot : str = "* * * * *" # every minute
+    s = TestService(observing_time=ot, thread_type=ThreadType.CRON.value)
     o = TestObserver()
     s.add_observer(o)
     s.install()
     s.start()
-    time.sleep(2 * wt)
+    time.sleep(wt)
     s.stop()
 
 def test_datetime_thread():
@@ -127,12 +126,12 @@ def test_millisecond_thread_next_time():
     s.stop()
     
 def test_on_off_second_thread():
-    s = TestService(observing_time=[10, 20], thread_type=ThreadType.ON_OFF_SECONDS.value)
+    s = TestService(observing_time=[3, 5], thread_type=ThreadType.ON_OFF_SECONDS.value)
     o = TestObserver2(s)
     s.add_observer(o)
     s.install()
     s.start()
-    time.sleep(150)
+    time.sleep(24)
     s.stop()
 
 class TestObserver(Observer):

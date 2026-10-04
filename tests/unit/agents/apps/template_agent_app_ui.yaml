@@ -3,8 +3,7 @@ port: 8081
 with_ui: true
 agent:
   id: 1f76486e-0bbf-49f9-b1bc-251be65e6a57
-  description: null
-  create_config: false
+  description: empty agent for testing
   load_on_install: false
   with_persistence: false
   save_folder: .save\

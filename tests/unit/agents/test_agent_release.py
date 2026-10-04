@@ -1,3 +1,4 @@
+import os
 from unittest.mock import Mock
 
 import pytest
@@ -5,8 +6,13 @@ import pytest
 from pydag.agents.Agent import Agent
 from pydag.agents.AgentStates import AgentElementState, ServiceState
 from pydag.buffers.DictBuffer import DictBuffer
+from pydag.nodes.documents.CopyFilesAction import CopyFilesAction
+from pydag.nodes.documents.ListFilesAction import ListFilesAction
 from pydag.services.Service import Service
 from pydag.services.ServiceException import ServiceException
+from pydag.services.ThreadType import ThreadType
+from pydag.services.statemachine.SimpleStatemachine import SimpleStatemachine
+from pydag.utils.FileUtils import FileUtils
 
 
 class ControlledService(Service):
@@ -105,3 +111,24 @@ def test_blocking_release_can_be_terminated_manually(monkeypatch):
     agent.release(stop_when_idle=True)
 
     assert not agent.is_running()
+    
+def test_statemachine_release_stop():
+    agent = Agent()
+    
+    sm = SimpleStatemachine(thread_type=ThreadType.ONLY_ONCE.value)
+    
+    folder = os.path.dirname(__file__)
+    la = ListFilesAction(folder=folder)
+    sm.add_node(la)
+    
+    tfolder = FileUtils.user_home() + os.sep + "Downloads" + os.sep + "test_agent_release"
+    ca = CopyFilesAction(target_folder=tfolder)
+    ca.add_parent(la)
+    sm.add_node(ca)
+    
+    agent.add_service(sm)
+    
+    agent.release(stop_when_idle=True)
+    
+    assert len(FileUtils.list_files(tfolder)) > 0
+    FileUtils.delete_dir(tfolder)

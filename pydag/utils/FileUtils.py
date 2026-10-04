@@ -76,6 +76,19 @@ class FileUtils:
         else:
             logger.error("File " + file_path + " does not exist")
             return False
+    
+    @staticmethod
+    def delete_dir(folder_path : str) -> bool:
+        if FileUtils.exists_folder(folder_path):
+            try:
+                shutil.rmtree(folder_path)
+                return True
+            except Exception as e:
+                logger.error(f"Error deleting directory {folder_path}: {e}")
+                return False
+        else:
+            logger.error("Folder " + folder_path + " does not exist")
+            return False
       
     @staticmethod  
     def list_files(folder : str, pattern : Union[str, list[str]] = None, extension : Union[str, list[str]] = None, newer_than_seconds : int = None, recursive : bool = False) -> list[str]:

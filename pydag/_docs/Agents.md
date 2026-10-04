@@ -13,32 +13,6 @@
 
 ## `Agent` (in `pydag\agents\Agent.py`)
 
-`agent.release(stop_when_idle=True)` installs elements, starts auto-start services,
-and waits until no registered service reports `ServiceState.RUNNING`. It then calls
-`terminate()` to stop services and uninstall all elements, including buffers and
-service-owned nodes. States are checked every 0.1 seconds after startup completes.
-With `blocking=False`, this monitoring runs in a background thread.
-
-An agent with no running services after startup terminates immediately. Services
-with `auto_start=False`, completed services, and services in an error state do not
-keep the agent alive. Any service still reporting `RUNNING`, including persistence
-services, keeps it alive. Services must update their state when their work finishes.
-Manual `terminate()` remains available, and the default `stop_when_idle=False`
-preserves the behavior of waiting for manual termination.
-
-```python
-agent = Agent()
-
-# Add services and buffers here.
-...
-
-
-# Start the agent and wait for all services to finish.
-agent.release(stop_when_idle=True)
-
-
-```
-
 `Agent` class for managing a multi-component application system.
 The `Agent` serves as the central orchestrator for managing Buffers, Nodes and Services.
 It handles the lifecycle of these components including installation, initialization, connection,

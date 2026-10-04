@@ -3,8 +3,9 @@ from dataclasses import dataclass, field
 import threading
 from datetime import datetime
 import time
-from typing import TYPE_CHECKING, Optional, Union
+from typing import TYPE_CHECKING, Union
 from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.triggers.cron import CronTrigger
 from apscheduler.schedulers.blocking import BlockingScheduler
 from apscheduler.job import Job
 from loguru import logger
@@ -33,10 +34,9 @@ class ObserverService(Service):
     """abstract base class for Services with ObserverThreads
     """
     
-    thread_type : str = field(default=None, metadata={"description": "type of thread, e.g. MILLI_SECONDS, MICRO_SECONDS, INSTANT, ONLY_ONCE, DAYTIME, DATE, ..."})    
-    observing_time : Union[int|str|list[int]] = field(default=None, metadata={"description": "observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for DAYTIME in %H:%M or %H:%M:%S, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ..., for ThreadType ON_OFF_SECONDS observing_time is expected to be an array with 2 elements"})    
-    week_days : Optional[str] = field(default=None, metadata={"description": "specifies the week days the observer thread should run on, e.g. 'mon, fri, sun', 'mon - thu' or by numbers '0, 2, 4', where Monday = 0 and Sunday = 6"})
-       
+    thread_type : str = field(default=None, metadata={"description": "type of thread, e.g. MILLI_SECONDS, MICRO_SECONDS, INSTANT, ONLY_ONCE, CRON, DATETIME, ..."})    
+    observing_time : Union[int|str|list[int]] = field(default=None, metadata={"description": "observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for CRON * * * * * as cron string, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ..., for ThreadType ON_OFF_SECONDS observing_time is expected to be an array with 2 elements"})    
+      
     def __post_init__(self):
         super().__post_init__()
         self._thread : threading.Thread = None
@@ -80,8 +80,8 @@ class ObserverService(Service):
             case ThreadType.DATETIME.value:
                 self._create_datetime_schedule()
                 
-            case ThreadType.DAYTIME.value:
-                self._create_daytime_schedule()
+            case ThreadType.CRON.value:
+                self._create_cron_schedule()
                 
             case ThreadType.EXPONENTIAL_SECOND.value:
                 self._thread = threading.Thread(target = self._run_exponential_thread, name=name)
@@ -313,26 +313,14 @@ class ObserverService(Service):
         self._scheduler = BackgroundScheduler()
         dt : datetime = TimeUtils.str_to_datetime(self.observing_time, dformat="%Y-%m-%d %H:%M:%S")
         self._scheduled_job = self._scheduler.add_job(self.notify_observers, trigger='date', run_date=dt, id = "Scheduled-Job " + self.id)               
-    
-    def _create_daytime_schedule(self):
+
+    def _create_cron_schedule(self):
         local_tz = datetime.now().astimezone().tzinfo
         self._scheduler = BackgroundScheduler(timezone=local_tz)
-        if self.observing_time.count(":") == 1:
-            dt : datetime = TimeUtils.str_to_datetime(self.observing_time, dformat="%H:%M")
-            hour : int = dt.hour
-            minute : int = dt.minute
-            self._scheduled_job = self._scheduler.add_job(self._daytime_task, trigger='cron', day_of_week=self.week_days, hour=hour, minute=minute, id = "Scheduled-Job " + self.id)         
-        elif self.observing_time.count(":") == 2:
-            dt : datetime = TimeUtils.str_to_datetime(self.observing_time, dformat="%H:%M:%S")
-            hour : int = dt.hour
-            minute : int = dt.minute
-            second : int = dt.second
-            self._scheduled_job = self._scheduler.add_job(self._daytime_task, trigger='cron', day_of_week=self.week_days, hour=hour, minute=minute, second=second, id = "Scheduled-Job " + self.id)
-        else:
-            raise ObserverException("Wrong dateformat in observingtime " + self.observing_time)       
+        self._scheduled_job = self._scheduler.add_job(self._cron_task, trigger=CronTrigger.from_crontab(self.observing_time), id = "Scheduled-Job " + self.id)
     
-    def _daytime_task(self):
-        """ helper task for daytime schedule to set next_time and execute observers
+    def _cron_task(self):
+        """ helper task for cron schedule to set next_time and execute observers
         """
         self.notify_observers()
         dt : datetime = self._scheduled_job.next_run_time
@@ -456,14 +444,14 @@ class ObserverService(Service):
             raise ServiceException(f"thread_type {self.thread_type} is not valid") from e
         # check for matching observing_time to ThreadType
         if isinstance(self.observing_time, str):
-            if not self.thread_type in {ThreadType.DATETIME, ThreadType.DAYTIME}:
-                raise ServiceException(f"observing time must only be a str for {ThreadType.__name__}s {', '.join({ThreadType.DATETIME, ThreadType.DAYTIME})}")
+            if not self.thread_type in {ThreadType.DATETIME, ThreadType.CRON}:
+                raise ServiceException(f"observing time must only be a str for {ThreadType.__name__}s {', '.join({ThreadType.DATETIME, ThreadType.CRON})}")
         if isinstance(self.observing_time, list):
             if not self.thread_type in {ThreadType.ON_OFF_SECONDS}:
                 raise ServiceException(f"observing time must only be a list[int] for {ThreadType.__name__} {ThreadType.ON_OFF_SECONDS}")
-        if self.thread_type in {ThreadType.DATETIME, ThreadType.DAYTIME}:
+        if self.thread_type in {ThreadType.DATETIME, ThreadType.CRON}:
             if not isinstance(self.observing_time, str):
-                raise ServiceException(f"observing time must be a str for {ThreadType.__name__}s {', '.join({ThreadType.DATETIME, ThreadType.DAYTIME})}")
+                raise ServiceException(f"observing time must be a str for {ThreadType.__name__}s {', '.join({ThreadType.DATETIME, ThreadType.CRON})}")
         if self.thread_type in {ThreadType.ON_OFF_SECONDS}:
             if not isinstance(self.observing_time, list):                    
                 raise ServiceException(f"observing time must be a list[int] for {ThreadType.__name__} {ThreadType.ON_OFF_SECONDS}")
