@@ -132,7 +132,8 @@ jobs:
 
       - name: Install Resend CLI
         run: |
-          curl -fsSL https://resend.com/install.sh | bash
+            npm install -g resend-cli
+            resend --version
 
       - name: Send email
         env:
