@@ -32,7 +32,7 @@ jobs:
           if [ -f requirements.txt ]; then
             python -m pip install -r requirements.txt
           elif [ -f pyproject.toml ]; then
-            python -m pip install .
+            python -m pip install .[docs,db,iiot,office,browser,dsp,llm,ocr,cad,sim]
           else
             echo "No requirements.txt or pyproject.toml found."
             exit 1
