@@ -108,7 +108,7 @@ llm = [
   "langchain-chroma",
   "langchain_mistralai",
   "langchain-unstructured",
-  "langchain-tavily<0.2",
+  "langchain-tavily",
   "langchain[huggingface,openai,all]",
   "sentence-transformers",
   "langchain_text_splitters",
