@@ -1,6 +1,10 @@
 import os
 from pydag.agents.Agent import Agent
 from pydag.agents.app.AgentApp import AgentApp
+from pydag.buffers.DictBuffer import DictBuffer
+from pydag.nodes.buffers.CopyDataAction import CopyDataAction
+from pydag.nodes.buffers.FormattedStringAction import FormattedStringAction
+from pydag.nodes.buffers.LinkBufferAction import LinkBufferAction
 from pydag.nodes.documents.CopyFilesAction import CopyFilesAction
 from pydag.nodes.documents.ListFilesAction import ListFilesAction
 from pydag.nodes.utils.JoinTransition import JoinTransition
@@ -72,3 +76,33 @@ def test_statemachine_agent_app2():
     
     aa = AgentApp(agent=ag)
     aa.save(f"{os.path.dirname(__file__)}{os.sep}test_statemachine_agent_app2.yaml")
+    
+    
+def test_statemachine_agent_copy_action():        
+    buf = DictBuffer(index_enabled=False, timestamps_enabled=False)
+    lba = LinkBufferAction()
+    lba.set_buffer(buf)
+    
+    fa = FormattedStringAction(template="Hello, {}")
+    fa.add_parent(lba)
+    
+    ca = CopyDataAction()
+    ca.add_parent(fa)
+    ca.add_parent(lba)
+    
+    pa = PrintAction()
+    pa.add_parent(ca)
+    
+    sm = SimpleStatemachine()
+    sm.add_node(lba)
+    sm.add_node(fa)
+    sm.add_node(ca)
+    sm.add_node(pa)
+    
+    ag = Agent()
+    ag.add_buffer(buf)
+    ag.add_service(sm)
+            
+    aa = AgentApp(agent=ag)
+    aa.save(f"{os.path.dirname(__file__)}{os.sep}test_statemachine_agent_app3.yaml")
+    
