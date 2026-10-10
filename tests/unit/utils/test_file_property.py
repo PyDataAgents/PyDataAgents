@@ -2,7 +2,7 @@ import ctypes
 from ctypes import wintypes
 from datetime import datetime, timezone
 
-datei = r"C:\Users\jhillenb\OneDrive - Steinmeyer Holding GmbH\Produktentwicklung (STA) - Dokumente\5_Versuche (STA)\_archiv\V20151202_Klebeversuche\20170213_Versuchsbericht_Freigabe_Klebstoff.pdf"
+datei = r"C:\\Users\\xx.pdf"
 
 # Gewünschte Zeitpunkte
 erstellt = datetime(2017, 2, 10, 10, 30, 1, tzinfo=timezone.utc)
