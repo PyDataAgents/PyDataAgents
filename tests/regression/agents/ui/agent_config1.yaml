@@ -28,7 +28,6 @@ service_store:
     auto_start: true
     thread_type: MILLI_SECOND
     observing_time: null
-    week_days: null
     buffer_ids:
     - B1
     addresses: []

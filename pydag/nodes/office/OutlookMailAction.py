@@ -27,6 +27,6 @@ class OutlookMailAction(BufferNode, ServiceNode, Action):
         if isinstance(self._service, MSGraphService):
             recipients = self.recipients if isinstance(self.recipients, list) else [self.recipients]
             if self.user:
-                self._service.sendmail(self.user, self.subject, self.body, recipients)
+                self._service.send_mail(self.user, self.subject, self.body, recipients)
             else:
                 self._service.me_sendmail(self.subject, self.body, recipients)

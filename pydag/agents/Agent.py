@@ -27,7 +27,7 @@ class Agent():
     It handles the lifecycle of these components including installation, initialization, connection,
     and termination. The `Agent` supports optional features such as persistence, REST API exposure,
     and configurable startup behavior.
-    
+
     Args:
         id (str): Unique identifier for the `Agent` application. Auto-generated if not provided.
         load_on_install (bool): If True, all `AgentElements` are set to load_on_install=True. Defaults to False.
@@ -44,27 +44,29 @@ class Agent():
     Returns:
         _type_: _description_
     """
-    
+
     id : str = field(default_factory=lambda: str(uuid.uuid4()), metadata = {"description": "unique identifier of Agent"})
-    description : str = field(default=None, metadata={"description": "application/agent description"})    
+    description : str = field(default=None, metadata={"description": "application/agent description"})
     load_on_install : bool = field(default=False, metadata={"description": "if True, all AgentElements are set to load_on_install = True"})
     with_persistence : bool = field(default=False, metadata={"description": "if True, an AgentPersistService is created by default to contuinously save the AgentElements in a local files"})
     save_folder : str = field(default=AgentKeywords.SAVE_FOLDER, metadata={"description": "folder to save the AgentElements in local files, if None, a default folder is created in the current working directory"})
-        
+
     buffer_store : dict[str, Buffer] = field(default_factory=dict, metadata={"description": "dictionary of Buffers in the Agent"})
     service_store : dict[str, Service] = field(default_factory=dict, metadata={"description": "dictionary of Services in the Agent"})
 
     def __post_init__(self):
-        """ initialize `Agent` instance after dataclass initialization.        
+        """ initialize `Agent` instance after dataclass initialization.
         """
         self._is_running = False
         self._stop_event = threading.Event()
-    
+        self._termination_lock = threading.Lock()
+        self._service_monitor : threading.Thread | None = None
+
     def _install_elements(self):
         """ install all `Node`s, `Buffer`s, and `Service`s in the `Agent`.
-        
-        iterates over each element and calls its install method with the `Agent` instance. 
-        
+
+        iterates over each element and calls its install method with the `Agent` instance.
+
         Raises:
             AgentElementException: if a `AgentElement` could not be installed
         """
@@ -74,7 +76,7 @@ class Agent():
             from ..services.ThreadType import ThreadType
             aps = AgentPersistService(thread_type=ThreadType.SECOND.value, observing_time=3600)
             self.add_service(aps)
-            
+
         # iterating over a list of dictionary items, in case of modification on the dictionary aoccurs during installs
         for buffer in list(self.buffer_store.values()):
             try:
@@ -90,10 +92,10 @@ class Agent():
                     service.load_on_install = True
             except AgentElementException as e:
                 logger.error(e)
-                    
+
     def _uninstall_elements(self):
         """ uninstall all `Node`s, `Buffer`s, and `Service`s from the `Agent`.
-        
+
         iterates over each element and calls its uninstall method.
         """
         # iterating over a list of dictionary items, in case of modification on the dictionary aoccurs during uninstalls
@@ -101,50 +103,50 @@ class Agent():
             buffer.uninstall(self)
         for service in list(self.service_store.values()):
             service.uninstall(self)
-    
+
     def add_buffer(self, buffer : Buffer):
         """Add a `Buffer` to the `Agent`'s buffer store.
-        
+
         Args:
             buffer (Buffer): the Buffer instance to add.
         """
         if buffer.id in self.buffer_store:
-            logger.warning(f"A {buffer.__class__.__name__} with id='{buffer.id}' already exists in {self.__class__.__name__}'s buffer_store and is overwritten!")        
+            logger.warning(f"A {buffer.__class__.__name__} with id='{buffer.id}' already exists in {self.__class__.__name__}'s buffer_store and is overwritten!")
         self.buffer_store[buffer.id] = buffer
         # in order to make duplicate buffers and their ids available in agent for later elements or acces (in scripts), we install them right away
         if len(buffer.duplicate_ids) > 0:
             buffer.install(self)
-        
+
     def add_service(self, service : Service):
         """Add a Service to the Agent's service store.
-        
+
         Args:
             service (Service): The Service instance to add.
         """
         if service.id in self.service_store:
             logger.warning(f"A {service.__class__.__name__} with id='{service.id}' already exists in {self.__class__.__name__}'s service_store and is overwritten!")
         self.service_store[service.id] = service
-           
+
     def config_options(self, with_descriptions = False) -> dict:
         """ get the configuration options for the whole `Agent`.
-        
+
         Args:
             with_descriptions (bool, optional): Whether to include descriptions. Defaults to False.
-        
+
         Returns:
             dict: Configuration options dictionary.
         """
         return ClassUtils.config_options(self, with_descriptions)
-        
+
     def _stop_services(self):
         """ Stop all `Service`s in the `Agent`.
         """
         for service in self.service_store.values():
-            service.stop()          
-                
+            service.stop()
+
     def _start_services(self):
         """ Start all `Service`s in the `Agent`
-        
+
         Raises:
             ServiceException: if a `Service` could not be startedf
         """
@@ -154,41 +156,68 @@ class Agent():
                     service.start()
                 except AgentElementException as e:
                     logger.error(e)
-    
-    def release(self, blocking : bool = False):
+
+    def release(self, blocking : bool = True, stop_when_idle : bool = False):
         """Release the `Agent` for operation.
-        
+
         Installs all elements and starts services. If blocking is True,
         waits until the stop event is set (typically by calling terminate()).
-        
+
         Args:
             blocking (bool, optional): Whether to block until Agent is terminated. Defaults to True.
-            
+            stop_when_idle (bool, optional): Terminate when no registered service reports
+                RUNNING after startup. Checks every 0.1 seconds, in a background thread
+                if blocking is False. Defaults to False. An empty agent terminates immediately.
+
         Raises:
             ServiceException: if a `Service` could not be started
             AgentElementException: if a `AgentElement` could not be installed
         """
+        if self._service_monitor is not None and self._stop_event.is_set():
+            self._service_monitor.join()
+            self._service_monitor = None
         self._install_elements()
-            
+
         self._start_services()
-        
+
         self._stop_event.clear()
         self._is_running = True
         logger.info(f"Started {self.__class__.__name__} application (id='{self.id}')")
-        if blocking:
+        if stop_when_idle:
+            if blocking:
+                self._wait_for_services()
+            else:
+                self._service_monitor = threading.Thread(
+                    target=self._wait_for_services, daemon=True,
+                    name=f"{self.id}-service-monitor")
+                self._service_monitor.start()
+        elif blocking:
             self._stop_event.wait()  # blocks efficiently until the event is set (for example by terminate)
-                
+
+    def _wait_for_services(self):
+        """Terminate once all services leave RUNNING, or exit on manual termination."""
+        while not self._stop_event.is_set():
+            if not any(service.get_state() == ServiceState.RUNNING
+                       for service in list(self.service_store.values())):
+                self.terminate()
+                return
+            if self._stop_event.wait(0.1):
+                return
+
     def terminate(self):
         """ Terminate the `Agent`.
-        
+
         Stops all services and uninstalls elements.
         Signals the stop event to unblock any waiting release() call.
         """
-        self._stop_services()
-        self._uninstall_elements()
-        self._is_running = False
-        self._stop_event.set()
-        
+        with self._termination_lock:
+            if self._stop_event.is_set():
+                return
+            self._stop_services()
+            self._uninstall_elements()
+            self._is_running = False
+            self._stop_event.set()
+
     def get_buffer(self, id : str) -> Buffer:
         """ return the `Buffer` specified by `id`, if the specified `Buffer` is not found, the method returns `None
 
@@ -199,20 +228,20 @@ class Agent():
             Buffer: `Buffer` instance
         """
         if id in self.buffer_store:
-            return self.buffer_store[id]    
+            return self.buffer_store[id]
         else:
             logger.error(f"No Buffer with id={id} was found")
             return None
-        
+
     def get_service(self, id : str) -> Service:
         """ return the `Service` specified by `id`
         """
         if id in self.service_store:
-            return self.service_store[id]    
+            return self.service_store[id]
         else:
             logger.error("No Service with id=" + id + " was found")
             return None
-        
+
     def get_services(self, type : Type) -> list[Service]:
         """returns all services of a specified type/class
 
@@ -227,17 +256,17 @@ class Agent():
             if isinstance(service, type):
                 services.append(service)
         return services
-           
+
     def get_element(self, id : str) -> AgentElement:
         """Return the `AgentElement` with the specified `id`.
-        """        
+        """
         if id in self.buffer_store:
             return self.buffer_store[id]
         elif id in self.service_store:
             return self.service_store[id]
         else:
             return self._get_deep_element(id)
-            
+
     def get_node(self, id : str, service_id : str = None) -> Node:
         """Return the `Node` with the specified `id`.
 
@@ -260,16 +289,16 @@ class Agent():
                     if id in service.nodes:
                         return service.nodes[id]
                     else:
-                        logger.error(f"specified {Node.cname()} with id={id} was not found in  with id={service_id}")                        
+                        logger.error(f"specified {Node.cname()} with id={id} was not found in  with id={service_id}")
                 else:
-                    logger.error(f"specified Service is not of type {StatemachineService.cname()}")     
+                    logger.error(f"specified Service is not of type {StatemachineService.cname()}")
                     return None
             else:
                 logger.error(f"no Service with id={service_id} was found!")
                 return None
         else:
             node : Node = None
-            for service in self.service_store.values():            
+            for service in self.service_store.values():
                 if isinstance(service, StatemachineService):
                     if id in service.nodes:
                         node =  service.nodes[id]
@@ -278,15 +307,15 @@ class Agent():
             else:
                 logger.error(f"no {Node.cname()} with id={id} was found!")
                 return None
-    
+
     def edit_element(self, id : str, config_options : dict[str, Any]):
-        """ edits the `AgentElement` specified by id with the given `config_options` 
+        """ edits the `AgentElement` specified by id with the given `config_options`
         and correctly stops / reinstalls / starts associated `AgentElement`'s
-        
+
         Args:
-            id: 
+            id:
             config_options:
-            
+
         """
         agent_element : AgentElement = self.get_element(id)
         if agent_element:
@@ -294,9 +323,9 @@ class Agent():
             from ..services.Service import Service
             services_for_restart : list[Service] = []
             elements_for_reinstall : list[AgentElement] = []
-            elements_for_reinstall.append(agent_element)                
+            elements_for_reinstall.append(agent_element)
             if isinstance(agent_element, Buffer):
-                for _, service in self.service_store.items():                    
+                for _, service in self.service_store.items():
                     if service.contains_element(id):
                         services_for_restart.append(service)
                     if isinstance(service, StatemachineService):
@@ -305,7 +334,7 @@ class Agent():
                                 elements_for_reinstall.append(node)
                                 services_for_restart.append(service)
             elif isinstance(agent_element, Service):
-                services_for_restart.append(agent_element)                
+                services_for_restart.append(agent_element)
             elif isinstance(agent_element, Node):
                 for _, service in self.service_store.items():
                     if isinstance(service, StatemachineService):
@@ -323,30 +352,30 @@ class Agent():
                 for _, buffer in self.buffer_store.items():
                     if buffer.contains_element(id):
                         elements_for_reinstall.append(buffer)
-            
+
             # stop all required services
             for service in services_for_restart:
                 if service.get_state() == ServiceState.RUNNING:
                     service.stop()
-                    
+
             # uninstall all required elements
             for element in  elements_for_reinstall:
                 element.uninstall(self)
-                
+
             # set new properties
             ClassUtils.set_properties(agent_element, config_options)
-            
+
             # install all required elements
             for element in elements_for_reinstall:
                 element.install(self)
-                
+
             # restart required services
             for service in services_for_restart:
                 if service.get_state() == AgentElementState.INSTALLED:
                     service.start()
         else:
-            raise AgentException(f"Could not find any {AgentElement.__name__} with id={id} in {Agent.__name__}")                
-    
+            raise AgentException(f"Could not find any {AgentElement.__name__} with id={id} in {Agent.__name__}")
+
     def _get_deep_element(self, id : str) -> AgentElement:
         """checks for nested `AgentElement`s
 
@@ -366,14 +395,14 @@ class Agent():
             if isinstance(service, StatemachineService):
                 for node in service.nodes.values():
                     return Agent._recursive_element_search(node, id)
-        
+
         for buffer in self.buffer_store.values():
             for attr_name, attr_value in vars(buffer).items():
                 #print(f"{attr_name}: {type(attr_value)}")
                 if isinstance(attr_value, AgentElement):
                     return Agent._recursive_element_search(attr_value, id)
         return None
-    
+
     @staticmethod
     def _recursive_element_search(root_element : AgentElement, id : str) -> AgentElement:
         if root_element.id == id:
@@ -384,10 +413,10 @@ class Agent():
                     if attr_value.id == id:
                         return attr_value
                     return Agent._recursive_element_search(attr_value, id)
-        
+
     def is_running(self) -> bool:
         """Check if the Agent is currently running.
-        
+
         Returns:
             bool: True if the Agent is running, False otherwise.
         """

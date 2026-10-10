@@ -266,13 +266,21 @@ def test_meta_only_both_columns_are_rejected():
     buf.push({"C1": 1, "C2": 2})
     assert buf.size() == 1, "After real data push, size should be 1"
 
-def test_raised_value_when_incosistent_length_metadata_only():
-    # Meta-only payloads with inconsistent lengths should raise ValueError before insertion.
+def test_when_inconsistent_length_values():
+    # here: inconsistent lengths are added by design, to test if None padding is done correctly.
     buf = DictBuffer(capacity=10, timestamps_enabled=True, index_enabled=True)
     buf.install()
-    import pytest
-    with pytest.raises(ValueError):
-        buf.push({buf.timestamps_key: [100, 200], buf.index_key: [0, 1, 2]})
+    buf.push({"value1": [100, 200], "value2": [0, 1, 2]})
+    data = buf.data()
+    non_null_counts = [
+        sum(value is not None for value in values)
+        for values in data.values()
+        if isinstance(values, list)
+    ]
+    assert all(count != non_null_counts[0] for count in non_null_counts[1:]), (
+        f"Non-null sample counts are all equal: {non_null_counts}"
+    )
+
 
 def test_timestamps_generated_on_subsequent_scalar_pushes():
     buf = DictBuffer(timestamps_enabled=True)

@@ -84,8 +84,17 @@ services = agent.service_store    # get a reference to all services stored in a 
 
 agent.release() # starts an agent application and blocks until finished (runs forever)
 
-# alternative
+# alternative 1: non-blocking agent call
 agent.release(blocking=False) # non-blocking call
+
+# alternative 2: terminate and clean up once no service is running
+agent.release(stop_when_idle=True)
+
+# alternative 3: the same automatic cleanup in the background
+agent.release(blocking=False, stop_when_idle=True)
+
+# terminate the agent if required (e.g. from another thread)
+agent.terminate() # terminates the agent and stops all services
 
 ```
 
@@ -352,6 +361,41 @@ There are the following specialized `Node`s for specific functionalities:
 - `ServiceNode`: base node type, that provides access to `Service`s
 - `TransformNode`: ...
 - `LearningNode`: ...
+
+To create a `StatemachineService` with `Action`s and `Transition`s, the following code snippet can be used as a template:
+
+```python
+
+# create an agent (as mentioned above)
+agent = Agent(...)
+
+# create a statemachine service
+service = SimpleStatemachine()
+
+a1 = StartAction()
+a2 = CountAction()
+a3 = StopAction()
+a1.add_child(a2)
+a2.add_child(a3)
+
+service.add_node(a1)
+service.add_node(a2)
+service.add_node(a3)
+
+# Force ONLY_ONCE execution semantics
+service.thread_type = ThreadType.ONLY_ONCE.value
+service.install()
+
+# start the statemachine service (or releasing an Agent will start the Statemachines as well)
+service.start()
+
+
+# alternative: release the agent
+agent.add_service(service)
+agent.release()
+
+
+```
 
 ## The use of coding assistants
 You should use coding assistants to support you in your development! Everything else is inefficient as long as you can't find you name in a list of the best programmers on the planet.

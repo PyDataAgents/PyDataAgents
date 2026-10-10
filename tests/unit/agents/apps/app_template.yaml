@@ -7,7 +7,6 @@ color_schema: {}
 agent:
   id: G1
   description: null
-  create_config: false
   load_on_install: false
   with_persistence: false
   buffer_store:

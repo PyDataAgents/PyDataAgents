@@ -1,0 +1,148 @@
+name: Check Python Package Updates
+
+on:
+  schedule:
+    # GitHub Actions uses UTC.
+    # 20:00 UTC = 21:00 CET (winter)
+    - cron: "0 20 * * 5"
+
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check-updates:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Install project dependencies
+        shell: bash
+        run: |
+          python -m pip install --upgrade pip
+
+          if [ -f requirements.txt ]; then
+            python -m pip install -r requirements.txt
+          elif [ -f pyproject.toml ]; then
+            python -m pip install .[ui,docs,db,iiot,office,browser,dsp,llm,ocr,sim,sftp]
+          else
+            echo "No requirements.txt or pyproject.toml found."
+            exit 1
+          fi
+
+      - name: Find outdated packages
+        shell: bash
+        run: |
+          python -m pip list --outdated --format=json > outdated.json
+
+          echo "Outdated packages:"
+          cat outdated.json
+
+      - name: Create email body
+        shell: bash
+        run: |
+          python <<'PY'
+          import json
+          import html
+          import os
+
+          with open("outdated.json") as f:
+              packages = json.load(f)
+
+          repository = os.environ["GITHUB_REPOSITORY"]
+          server = os.environ["GITHUB_SERVER_URL"]
+          run_id = os.environ["GITHUB_RUN_ID"]
+
+          if packages:
+              rows = ""
+
+              for package in packages:
+                  rows += f"""
+                  <tr>
+                    <td>{html.escape(package["name"])}</td>
+                    <td>{html.escape(package["version"])}</td>
+                    <td>{html.escape(package["latest_version"])}</td>
+                  </tr>
+                  """
+
+              status = f"""
+              <p>
+                <strong>{len(packages)} package(s)</strong>
+                have updates available.
+              </p>
+
+              <table
+                cellpadding="8"
+                cellspacing="0"
+                border="1"
+                style="border-collapse: collapse;"
+              >
+                <thead>
+                  <tr>
+                    <th>Package</th>
+                    <th>Installed</th>
+                    <th>Latest</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {rows}
+                </tbody>
+              </table>
+              """
+          else:
+              status = """
+              <p>
+                ✅ All Python packages are up to date.
+              </p>
+              """
+
+          body = f"""
+          <!doctype html>
+          <html>
+            <body>
+              <h2>Python Dependency Update Report</h2>
+
+              <p>
+                Repository:
+                <strong>{html.escape(repository)}</strong>
+              </p>
+
+              {status}
+
+              <p>
+                <a href="{server}/{repository}/actions/runs/{run_id}">
+                  View workflow run
+                </a>
+              </p>
+            </body>
+          </html>
+          """
+
+          with open("email.html", "w") as f:
+              f.write(body)
+          PY
+
+      - name: Install Resend CLI
+        run: |
+            npm install -g resend-cli
+            resend --version
+
+      - name: Send email
+        env:
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          EMAIL_TO: ${{ secrets.EMAIL_TO }}
+          EMAIL_FROM: ${{ secrets.EMAIL_FROM }}
+        run: |
+          resend emails send \
+            --from "$EMAIL_FROM" \
+            --to "$EMAIL_TO" \
+            --subject "Python package updates — ${{ github.repository }}" \
+            --html-file email.html

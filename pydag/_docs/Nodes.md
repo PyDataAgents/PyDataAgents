@@ -1,4 +1,4 @@
-# Actions and Transitions Documentation
+# Nodes Documentation
 
 ## Summary
 
@@ -9,6 +9,7 @@
 | [`BufferNode`](#buffernode-in-pydagnodesbuffernodepy) |  | ![BufferNode](element_icons/BufferNode.png)
 | [`LearningNode`](#learningnode-in-pydagnodeslearningnodepy) | LearningNode is a base class for elements that require a learning step in their pipeline execution.It extends the BufferNode class and provides additional functionality specific to learning tasks. | ![LearningNode](element_icons/LearningNode.png)
 | [`Node`](#node-in-pydagnodesnodepy) |  | ![Node](element_icons/Node.png)
+| [`ObserverTriggerAction`](#observertriggeraction-in-pydagnodesobservertriggeractionpy) | An `TriggerAction`, that connects to a `ObserverService` and executes the `Observer` notification everytime thetrigger event occurs. This `Node` does not define `start_trigger`, but rather expects being triggered externally from application or for example REST API. | ![ObserverTriggerAction](element_icons/ObserverTriggerAction.png)
 | [`ServiceNode`](#servicenode-in-pydagnodesservicenodepy) | A class representing a service node in a state machine.Inherits from Node and adds functionality specific to service nodes. | ![ServiceNode](element_icons/ServiceNode.png)
 | [`Transition`](#transition-in-pydagnodestransitionpy) | A `Transition` `Node` that defines conditions for state transitions in a state machine.     | ![Transition](element_icons/Transition.png)
 | [`TriggerAction`](#triggeraction-in-pydagnodestriggeractionpy) | Abstract `Action` `Node`that defines the interface for `Node`s with trigger logic, that are not executed directly within a `StatemachineService`,but are rather started from external events and trigger the execution `StatemachineService`. | ![TriggerAction](element_icons/TriggerAction.png)
@@ -39,6 +40,7 @@
 | [`CopyFilesAction`](#copyfilesaction-in-pydagnodesdocumentscopyfilesactionpy) |  | ![CopyFilesAction](element_icons/CopyFilesAction.png)
 | [`DecompressAction`](#decompressaction-in-pydagnodesdocumentsdecompressactionpy) | `Action` that decompresses the specified `source_file` under the new filepath `target_dir`         | ![DecompressAction](element_icons/DecompressAction.png)
 | [`DocxTemplateAction`](#docxtemplateaction-in-pydagnodesdocumentsdocxtemplateactionpy) | `Action` for writing data to DOCX template document.buffers of parent elements can be used to populate the docx file, if `buffer_id` or `set_buffer(...)` is specified then only this buffer is used | ![DocxTemplateAction](element_icons/DocxTemplateAction.png)
+| [`FileTriggerAction`](#filetriggeraction-in-pydagnodesdocumentsfiletriggeractionpy) |  | ![FileTriggerAction](element_icons/FileTriggerAction.png)
 | [`HTMLFileAction`](#htmlfileaction-in-pydagnodesdocumentshtmlfileactionpy) |  | ![HTMLFileAction](element_icons/HTMLFileAction.png)
 | [`HTMLTableAction`](#htmltableaction-in-pydagnodesdocumentshtmltableactionpy) | This `BufferNode` creates a HTML Table string based on the parent data input to this `Node`.By default it outputs the HTML to a key named 'html' for child `Node`s to consume. | ![HTMLTableAction](element_icons/HTMLTableAction.png)
 | [`ICalAction`](#icalaction-in-pydagnodesdocumentsicalactionpy) |  | ![ICalAction](element_icons/ICalAction.png)
@@ -46,7 +48,6 @@
 | [`MoveFilesAction`](#movefilesaction-in-pydagnodesdocumentsmovefilesactionpy) | `Action` that moves files to a new `target_folder`<br>this `Action` either needs a parent `Node` with a `ListBuffer` with filepaths or a reference to a `Buffer` via `buffer_id` or its `buffer`variableRaises:    NodeException: if folder does not exist or wrong `Buffer` is provided | ![MoveFilesAction](element_icons/MoveFilesAction.png)
 | [`PDFReadFormAction`](#pdfreadformaction-in-pydagnodesdocumentspdfreadformactionpy) | Extract context-rich AcroForm fields from PDF files using PyMuPDF. | ![PDFReadFormAction](element_icons/PDFReadFormAction.png)
 | [`PDFWriteFormAction`](#pdfwriteformaction-in-pydagnodesdocumentspdfwriteformactionpy) | Write LLM- or user-provided values into PDF AcroForm fields using PyMuPDF. | ![PDFWriteFormAction](element_icons/PDFWriteFormAction.png)
-| [`ParseFileNameAction`](#parsefilenameaction-in-pydagnodesdocumentsparsefilenameactionpy) | An `Action` that splits incoming filenames by a delimiter into separate output columns. | ![ParseFileNameAction](element_icons/ParseFileNameAction.png)
 | [`PlotlifyAction`](#plotlifyaction-in-pydagnodesdocumentsplotlifyactionpy) | `Action` that generates a plotly file based on the data and layout specified and extracted from the specified buffer or its parents `Buffer`s.     | ![PlotlifyAction](element_icons/PlotlifyAction.png)
 | [`ReadCsvAction`](#readcsvaction-in-pydagnodesdocumentsreadcsvactionpy) |  | ![ReadCsvAction](element_icons/ReadCsvAction.png)
 | [`ReadExcelRangeAction`](#readexcelrangeaction-in-pydagnodesdocumentsreadexcelrangeactionpy) | This `Action` reads data from specified workbook, worksheet and rangeArgs:    BufferNode (_type_): _description_    Action (_type_): _description_Raises:    NodeException: _description_ | ![ReadExcelRangeAction](element_icons/ReadExcelRangeAction.png)
@@ -56,6 +57,7 @@
 | [`ReadNpzAction`](#readnpzaction-in-pydagnodesdocumentsreadnpzactionpy) |  | ![ReadNpzAction](element_icons/ReadNpzAction.png)
 | [`ReadPDFFormAction`](#readpdfformaction-in-pydagnodesdocumentsreadpdfformactionpy) | `Action` that extracts AcroForm fields and text from PDFs.Limitation:This action only extracts native PDF AcroForm data. PDFs without AcroForm fieldsreturn an empty `fields` list. | ![ReadPDFFormAction](element_icons/ReadPDFFormAction.png)
 | [`ReadXMLAction`](#readxmlaction-in-pydagnodesdocumentsreadxmlactionpy) |  | ![ReadXMLAction](element_icons/ReadXMLAction.png)
+| [`WriteJsonAction`](#writejsonaction-in-pydagnodesdocumentswritejsonactionpy) |  | ![WriteJsonAction](element_icons/WriteJsonAction.png)
 | [`WritePDFFormAction`](#writepdfformaction-in-pydagnodesdocumentswritepdfformactionpy) | `Action` that writes form values into parent-provided PDF files. | ![WritePDFFormAction](element_icons/WritePDFFormAction.png)
 | [`CNN1DAutoencoder`](#cnn1dautoencoder-in-pydagnodesfeatureextractioncnn1dautoencoderpy) | This `DataElement` represents a time series feature extraction model using a 1D CNN Autoencoder. | ![CNN1DAutoencoder](element_icons/CNN1DAutoencoder.png)
 | [`ChronosExtractor`](#chronosextractor-in-pydagnodesfeatureextractionchronosextractorpy) | Chronos Extractor for time series data. Returns 384-dimensional embeddings for each input time series sample using a pretrained Chronos model. | ![ChronosExtractor](element_icons/ChronosExtractor.png)
@@ -69,15 +71,17 @@
 | [`AnonymousPromptAction`](#anonymouspromptaction-in-pydagnodesllmanonymouspromptactionpy) | `BufferNode` `Action` for anonymizing prompts by hashing sensitive information like emails, phone numbers, urls, bank details, addresses and names.The hashing is done with a salt to ensure that the same input will always produce the same output, but different inputs will produce different outputs.This allows for consistent anonymization while preventing reverse engineering of the original data.This class requires the spacy model "de_core_news_lg" to be installed for entity recognition.Download with: python -m spacy download de_core_news_lg  | ![AnonymousPromptAction](element_icons/AnonymousPromptAction.png)
 | [`HuggingFaceAction`](#huggingfaceaction-in-pydagnodesllmhuggingfaceactionpy) |  | ![HuggingFaceAction](element_icons/HuggingFaceAction.png)
 | [`LLMChatAction`](#llmchataction-in-pydagnodesllmllmchatactionpy) | `Action` to chat with a `RAGService` and store the response in its `Buffer`.Usage modes:1. Chat-Only: (default) `RAGService` with `use_rag_context=False`, only `question`.2. Chat-with-RAG-context: `RAGService` with `question`, retrieval enabled.3. Chat-with-local-context: `RAGService` with `question` + `input_context`, `use_rag_context=False`.4. Full-mode-augment: `question` + `input_context` + retrieval enabled, no strict structure enforcement.5. Full-mode-template_fill: same as full augment plus strict structure validation.`instruction_key` and `instruction_value` are used for promptinstructions: the resolved value is passed to `RAGService.chat` as`instruction` and rendered in the prompt's `Instruction:` section. Use`input_context_keys` and `input_context_value` for runtime facts/data thatshould be rendered in `Local Input Context:`.Optional file context can be supplied via `context_files_key` or`context_files_value`. V1 accepts external URLs, local file URLs, localpaths (absolute or relative to the current working directory), data URIs,plain base64 strings, raw bytes, or lists of those values. File inputs aresupported only for OPENAI and AZURE model providers. OLLAMA file processingis not implemented yet; supplying files with OLLAMA emits a warning andcontinues text-only. | ![LLMChatAction](element_icons/LLMChatAction.png)
-| [`LLMOCRAction`](#llmocraction-in-pydagnodesllmllmocractionpy) | `Action` to retrieve text from an image or PDF and store the extracted text in its `Buffer`.The parent Buffer Node is expected to provide file paths to images or PDFs.The allowed input formats for the file paths are:- A fully qualified file path as a string- an image as a Base64-encoded data URL The Mistral OCR-3 model is used to extract text from the images or PDFs.For more information about the Mistral OCR-3 model: https://mistral.ai/news/mistral-ocr-3".The output has the following format:{    "documents": <String of extracted text pages creatred from the contents of the origial OCRPageObject returned by Mistral>,    "filepath": <file path for each processed input>}Where the original OCRPageObject has the following format:    {    "pages": [ # The content of each page        {        "index": int, # The index of the corresponding page        "markdown": str, # The main output and raw markdown content        "images": list, # Image information when images are extracted        "tables": list, # Table information when using `table_format=html`        "hyperlinks": list, # Hyperlinks detected        "header": str|null, # Header content when using `extract_header=True`        "footer": str|null, # Footer content when using `extract_footer=True`        "dimensions": dict # The dimensions of the page        }    ],    "model": str, # The model used for the OCR    "document_annotation": dict|null, # Document annotation information when used, visit the Annotations documentation for more information    "usage_info": dict # Usage information    }See https://docs.mistral.ai/capabilities/document_ai/basic_ocr for more details. | ![LLMOCRAction](element_icons/LLMOCRAction.png)
+| [`LLMOCRAction`](#llmocraction-in-pydagnodesllmllmocractionpy) | `Action` to retrieve text from an image or PDF and store the extracted text in its `Buffer`.The parent Buffer Node is expected to provide file paths to images or PDFs.The allowed input formats for the file paths are:- A fully qualified file path as a string- an image/pdf as a Base64-encoded data URL depending on the model providers, the functionality is implemented in different ways:- Mistral:    The Mistral OCR-3 model is used to extract text from the images or PDFs.    For more information about the Mistral OCR-3 model: https://mistral.ai/news/mistral-ocr-3".    The output has the following format:    {        "documents": <String of extracted text pages creatred from the contents of the origial OCRPageObject returned by Mistral>,        "filepath": <file path for each processed input>    }    Where the original OCRPageObject has the following format:        {        "pages": [ # The content of each page            {            "index": int, # The index of the corresponding page            "markdown": str, # The main output and raw markdown content            "images": list, # Image information when images are extracted            "tables": list, # Table information when using `table_format=html`            "hyperlinks": list, # Hyperlinks detected            "header": str|null, # Header content when using `extract_header=True`            "footer": str|null, # Footer content when using `extract_footer=True`            "dimensions": dict # The dimensions of the page            }        ],        "model": str, # The model used for the OCR        "document_annotation": dict|null, # Document annotation information when used, visit the Annotations documentation for more information        "usage_info": dict # Usage information        }    See https://docs.mistral.ai/capabilities/document_ai/basic_ocr for more details.- Ollama:    Uses the chat api of the Ollama Client- OpenAI: | ![LLMOCRAction](element_icons/LLMOCRAction.png)
 | [`LLMScriptElement`](#llmscriptelement-in-pydagnodesllmllmscriptelementpy) | `DataElement` to generate Code for data processing using LLM on a specified input     | ![LLMScriptElement](element_icons/LLMScriptElement.png)
+| [`OutlookMailAction`](#outlookmailaction-in-pydagnodesofficeoutlookmailactionpy) |  | ![OutlookMailAction](element_icons/OutlookMailAction.png)
+| [`OutlookMailTriggerAction`](#outlookmailtriggeraction-in-pydagnodesofficeoutlookmailtriggeractionpy) |  | ![OutlookMailTriggerAction](element_icons/OutlookMailTriggerAction.png)
+| [`OutlookMeetingAction`](#outlookmeetingaction-in-pydagnodesofficeoutlookmeetingactionpy) |  | ![OutlookMeetingAction](element_icons/OutlookMeetingAction.png)
 | [`FFTTransform`](#ffttransform-in-pydagnodespreprocessingfrequencyffttransformpy) |  | ![FFTTransform](element_icons/FFTTransform.png)
 | [`ZScore`](#zscore-in-pydagnodespreprocessingstatisticszscorepy) |  | ![ZScore](element_icons/ZScore.png)
 | [`TrendWindowNode`](#trendwindownode-in-pydagnodespreprocessingwindowingtrendwindownodepy) | This `BufferNode` collects windowed data of the linked parents of specified size `n` with the current timestamp as key prefix to the original key.Whenever it is executed it generates a new window to keep (up to `max_windows`). If the maximum number of windows are reached, it discards the one closest to any other window, based on timestamp.Base Classes:    BufferNode (_type_): _description_    Action (_type_): _description_ | ![TrendWindowNode](element_icons/TrendWindowNode.png)
 | [`RegressionTransform`](#regressiontransform-in-pydagnodesregressionregressiontransformpy) | Code Service to do Regression on Inputs     | ![RegressionTransform](element_icons/RegressionTransform.png)
 | [`ScriptAction`](#scriptaction-in-pydagnodesscriptscriptactionpy) | `Action` for executing a custom script to process data from the parents' `Buffer`s and to store the processed data back into this `Buffer`.<br>The script must be a valid Python code snippet that runs properly.<br>The function takes the current buffer data and injects data from it by the specified `input_keys`.<br>The same way the `Action`returns data by the specified `output_keys` back to its `Buffer`.<br>Note that the script is executed in its own local scope, so variables defined in the script do not interfere with variables outside the script.<br>Also note that all output variables should be converted to primitives (e.g. int, float, str, list, dict) or list of primitives inside the script. Do not leave them as numpy arrays or dataframes. | ![ScriptAction](element_icons/ScriptAction.png)
-| [`FileTriggerAction`](#filetriggeraction-in-pydagnodestriggersfiletriggeractionpy) |  | ![FileTriggerAction](element_icons/FileTriggerAction.png)
-| [`ObserverTriggerAction`](#observertriggeraction-in-pydagnodestriggersobservertriggeractionpy) | A `TriggerAction`, that connects to a `ObserverService` and executes the `Observer` notification everytime thetrigger event occurs. This `Node` does not define `start_trigger`, but rather expects being triggered externally from application or for example REST API. | ![ObserverTriggerAction](element_icons/ObserverTriggerAction.png)
+| [`SFTPAction`](#sftpaction-in-pydagnodessftpsftpactionpy) | `Action` that puts a local file on a remote SFTP server with Basic Authentification.This `BufferNode` requires two input_keys, LOCAL_FILE must be specified before REMOTE_FILE.For Example:```pythonsa = SFTPAction(input_keys=["localpath", "remotepath"], ...)``` | ![SFTPAction](element_icons/SFTPAction.png)
 | [`ConfigureElementAction`](#configureelementaction-in-pydagnodesutilsconfigureelementactionpy) | This `Action` configures a `AgentElement` property by the provided `element_id` and name of the `option`, which is the class' property<br>the new property value is derived from the `Node`'s `buffer`Args:    AgentNode (_type_): inherits from class `AgentNode`    BufferNode (_type_): inherits from class `BufferNode`    Action (_type_): inherits the `Action` interfaceRaises:    StatemachineException: if an error occurs during execute | ![ConfigureElementAction](element_icons/ConfigureElementAction.png)
 | [`CountAction`](#countaction-in-pydagnodesutilscountactionpy) | Action that counts the number of times it has been called. | ![CountAction](element_icons/CountAction.png)
 | [`CountTransition`](#counttransition-in-pydagnodesutilscounttransitionpy) | A transition that counts the number of times it has been triggered. | ![CountTransition](element_icons/CountTransition.png)
@@ -91,6 +95,7 @@
 | [`PrintBufferAction`](#printbufferaction-in-pydagnodesutilsprintbufferactionpy) | utility `Action` to print the parents' resultsArgs:    BufferNode (_type_): _description_    Action (_type_): _description_ | ![PrintBufferAction](element_icons/PrintBufferAction.png)
 | [`SleepAction`](#sleepaction-in-pydagnodesutilssleepactionpy) | An action that sleeps for a specified number of seconds. | ![SleepAction](element_icons/SleepAction.png)
 | [`SleepUntilAction`](#sleepuntilaction-in-pydagnodesutilssleepuntilactionpy) | An action that sleeps until the specified daytime. | ![SleepUntilAction](element_icons/SleepUntilAction.png)
+| [`SplitStringAction`](#splitstringaction-in-pydagnodesutilssplitstringactionpy) | An `Action` that splits incoming filenames by a delimiter into separate output columns. | ![SplitStringAction](element_icons/SplitStringAction.png)
 | [`StartAction`](#startaction-in-pydagnodesutilsstartactionpy) | An action that starts the state machine. | ![StartAction](element_icons/StartAction.png)
 | [`StopAction`](#stopaction-in-pydagnodesutilsstopactionpy) | An action that stops the state machine. | ![StopAction](element_icons/StopAction.png)
 | [`TrueTransition`](#truetransition-in-pydagnodesutilstruetransitionpy) | A transition that always returns True.This is used to test the statemachine without any conditions. | ![TrueTransition](element_icons/TrueTransition.png)
@@ -244,6 +249,31 @@ node = Node(
 	id="<string>",
 	load_on_install=False,
 	child_ids='list()'
+)
+```
+
+[Go to Summary](#summary)
+## `ObserverTriggerAction` (in `pydag\nodes\ObserverTriggerAction.py`)
+
+An `TriggerAction`, that connects to a `ObserverService` and executes the `Observer` notification everytime the
+trigger event occurs. This `Node` does not define `start_trigger`, but rather expects being triggered externally from application or for example REST API.
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
+| `service_id` | `str` | `"<string>"` | ID of the service |
+| `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
+| `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
+
+
+```python
+# Example usage of `ObserverTriggerAction`
+from pydag.nodes.ObserverTriggerAction import ObserverTriggerAction  # Adjust import if needed
+
+observer_trigger_action = ObserverTriggerAction(
+	child_ids='list()',
+	service_id="<string>",
+	id="<string>",
+	load_on_install=False
 )
 ```
 
@@ -1410,6 +1440,55 @@ docx_template_action = DocxTemplateAction(
 ```
 
 [Go to Summary](#summary)
+## `FileTriggerAction` (in `pydag\nodes\documents\FileTriggerAction.py`)
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
+| `buffer_id` | `str` | `"<string>"` | unique ID of the buffer |
+| `persistent` | `bool` | `True` | specifies whether data is removed (False) from parent or not (True) |
+| `n` | `int` | `0` | specifies how much data is retrieved from parent buffer. Default 0 -> all data |
+| `input_keys` | `list[str] | list[int] | str` | `'list()'` | list of input key names used to extract data from parent buffers. input_keys can also be a list of integers for indices or a Python-style slice string (e.g. '-1' for last index, '1:3' or '0:5:2' for start:stop:step exclusive indexing), or a type selector ('type:string' for text-like values, 'type:number' for numeric and bool values). Duplicates are removed while preserving first-match order. If empty, all parent keys are returned |
+| `ignore_keys` | `list[str]` | `'list()'` | list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys |
+| `ignore_empty_parents` | `bool` | `True` | if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True) |
+| `service_id` | `str` | `"<string>"` | ID of the service |
+| `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
+| `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
+| `folder` | `str` | `"path/to/folder"` | folder to wach for file events |
+| `recursive` | `bool` | `False` | listen to events in subfolders as well |
+| `create_events` | `bool` | `True` | listen to create events |
+| `modified_events` | `bool` | `False` | listen to modified events |
+| `moved_events` | `bool` | `False` | listen to moved events |
+| `delete_events` | `bool` | `False` | listen to delete events |
+| `output_keys` | `list[str]` | `"lambda: ['filepaths']()"` | default output key |
+
+
+```python
+# Example usage of `FileTriggerAction`
+from pydag.nodes.documents.FileTriggerAction import FileTriggerAction  # Adjust import if needed
+
+file_trigger_action = FileTriggerAction(
+	child_ids='list()',
+	buffer_id="<string>",
+	persistent=True,
+	n=0,
+	input_keys='list()',
+	ignore_keys='list()',
+	ignore_empty_parents=True,
+	service_id="<string>",
+	id="<string>",
+	load_on_install=False,
+	folder="path/to/folder",
+	recursive=False,
+	create_events=True,
+	modified_events=False,
+	moved_events=False,
+	delete_events=False,
+	output_keys="lambda: ['filepaths']()"
+)
+```
+
+[Go to Summary](#summary)
 ## `HTMLFileAction` (in `pydag\nodes\documents\HTMLFileAction.py`)
 
 | Field | Type | Default | Description |
@@ -1726,46 +1805,6 @@ p_d_f_write_form_action = PDFWriteFormAction(
 	flatten=False,
 	strict_unknown_fields=True,
 	require_pdf_extension=True
-)
-```
-
-[Go to Summary](#summary)
-## `ParseFileNameAction` (in `pydag\nodes\documents\ParseFileNameAction.py`)
-
-An `Action` that splits incoming filenames by a delimiter into separate output columns.
-| Field | Type | Default | Description |
-|-------|------|---------|-------------|
-| `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
-| `buffer_id` | `str` | `"<string>"` | unique ID of the buffer |
-| `persistent` | `bool` | `True` | specifies whether data is removed (False) from parent or not (True) |
-| `n` | `int` | `0` | specifies how much data is retrieved from parent buffer. Default 0 -> all data |
-| `input_keys` | `list[str] | list[int] | str` | `'list()'` | list of input key names used to extract data from parent buffers. input_keys can also be a list of integers for indices or a Python-style slice string (e.g. '-1' for last index, '1:3' or '0:5:2' for start:stop:step exclusive indexing), or a type selector ('type:string' for text-like values, 'type:number' for numeric and bool values). Duplicates are removed while preserving first-match order. If empty, all parent keys are returned |
-| `output_keys` | `list[str]` | `'list()'` | optional explicit output key names written by this node. output_keys are literal names only and do not support selector syntax. If empty, the node uses its default output naming |
-| `ignore_keys` | `list[str]` | `'list()'` | list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys |
-| `ignore_empty_parents` | `bool` | `True` | if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True) |
-| `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
-| `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
-| `delimiter` | `str` | `'_'` | delimiter used to split the incoming filename into separate fields |
-| `parsing_functions` | `list[str]` | `'list()'` | optional per-output parsing functions to apply after splitting |
-
-
-```python
-# Example usage of `ParseFileNameAction`
-from pydag.nodes.documents.ParseFileNameAction import ParseFileNameAction  # Adjust import if needed
-
-parse_file_name_action = ParseFileNameAction(
-	child_ids='list()',
-	buffer_id="<string>",
-	persistent=True,
-	n=0,
-	input_keys='list()',
-	output_keys='list()',
-	ignore_keys='list()',
-	ignore_empty_parents=True,
-	id="<string>",
-	load_on_install=False,
-	delimiter='_',
-	parsing_functions='list()'
 )
 ```
 
@@ -2161,6 +2200,47 @@ read_x_m_l_action = ReadXMLAction(
 	load_on_install=False,
 	file_path="path/to/file.txt",
 	xpath="<string>"
+)
+```
+
+[Go to Summary](#summary)
+## `WriteJsonAction` (in `pydag\nodes\documents\WriteJsonAction.py`)
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
+| `buffer_id` | `str` | `"<string>"` | unique ID of the buffer |
+| `persistent` | `bool` | `True` | specifies whether data is removed (False) from parent or not (True) |
+| `n` | `int` | `0` | specifies how much data is retrieved from parent buffer. Default 0 -> all data |
+| `input_keys` | `list[str] | list[int] | str` | `'list()'` | list of input key names used to extract data from parent buffers. input_keys can also be a list of integers for indices or a Python-style slice string (e.g. '-1' for last index, '1:3' or '0:5:2' for start:stop:step exclusive indexing), or a type selector ('type:string' for text-like values, 'type:number' for numeric and bool values). Duplicates are removed while preserving first-match order. If empty, all parent keys are returned |
+| `output_keys` | `list[str]` | `'list()'` | optional explicit output key names written by this node. output_keys are literal names only and do not support selector syntax. If empty, the node uses its default output naming |
+| `ignore_keys` | `list[str]` | `'list()'` | list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys |
+| `ignore_empty_parents` | `bool` | `True` | if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True) |
+| `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
+| `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
+| `file_path` | `str` | `"path/to/file.txt"` | path to the json file to write the data to |
+| `file_path_key` | `str` | `"path/to/file.txt"` | specifies a key for the file_path to look within parent data |
+| `encoding` | `str` | `'utf-8'` | name of the file encoding to use, e.g. utf-8 (default), utf-16, ... |
+
+
+```python
+# Example usage of `WriteJsonAction`
+from pydag.nodes.documents.WriteJsonAction import WriteJsonAction  # Adjust import if needed
+
+write_json_action = WriteJsonAction(
+	child_ids='list()',
+	buffer_id="<string>",
+	persistent=True,
+	n=0,
+	input_keys='list()',
+	output_keys='list()',
+	ignore_keys='list()',
+	ignore_empty_parents=True,
+	id="<string>",
+	load_on_install=False,
+	file_path="path/to/file.txt",
+	file_path_key="path/to/file.txt",
+	encoding='utf-8'
 )
 ```
 
@@ -2856,34 +2936,43 @@ l_l_m_chat_action = LLMChatAction(
 The parent Buffer Node is expected to provide file paths to images or PDFs.
 The allowed input formats for the file paths are:
 - A fully qualified file path as a string
-- an image as a Base64-encoded data URL 
-The Mistral OCR-3 model is used to extract text from the images or PDFs.
-For more information about the Mistral OCR-3 model: https://mistral.ai/news/mistral-ocr-3".
+- an image/pdf as a Base64-encoded data URL 
 
-The output has the following format:
-{
-    "documents": <String of extracted text pages creatred from the contents of the origial OCRPageObject returned by Mistral>,
-    "filepath": <file path for each processed input>
-}
-Where the original OCRPageObject has the following format:
+depending on the model providers, the functionality is implemented in different ways:
+
+- Mistral:
+    The Mistral OCR-3 model is used to extract text from the images or PDFs.
+    For more information about the Mistral OCR-3 model: https://mistral.ai/news/mistral-ocr-3".
+
+    The output has the following format:
     {
-    "pages": [ # The content of each page
-        {
-        "index": int, # The index of the corresponding page
-        "markdown": str, # The main output and raw markdown content
-        "images": list, # Image information when images are extracted
-        "tables": list, # Table information when using `table_format=html`
-        "hyperlinks": list, # Hyperlinks detected
-        "header": str|null, # Header content when using `extract_header=True`
-        "footer": str|null, # Footer content when using `extract_footer=True`
-        "dimensions": dict # The dimensions of the page
-        }
-    ],
-    "model": str, # The model used for the OCR
-    "document_annotation": dict|null, # Document annotation information when used, visit the Annotations documentation for more information
-    "usage_info": dict # Usage information
+        "documents": <String of extracted text pages creatred from the contents of the origial OCRPageObject returned by Mistral>,
+        "filepath": <file path for each processed input>
     }
-See https://docs.mistral.ai/capabilities/document_ai/basic_ocr for more details.
+    Where the original OCRPageObject has the following format:
+        {
+        "pages": [ # The content of each page
+            {
+            "index": int, # The index of the corresponding page
+            "markdown": str, # The main output and raw markdown content
+            "images": list, # Image information when images are extracted
+            "tables": list, # Table information when using `table_format=html`
+            "hyperlinks": list, # Hyperlinks detected
+            "header": str|null, # Header content when using `extract_header=True`
+            "footer": str|null, # Footer content when using `extract_footer=True`
+            "dimensions": dict # The dimensions of the page
+            }
+        ],
+        "model": str, # The model used for the OCR
+        "document_annotation": dict|null, # Document annotation information when used, visit the Annotations documentation for more information
+        "usage_info": dict # Usage information
+        }
+    See https://docs.mistral.ai/capabilities/document_ai/basic_ocr for more details.
+
+- Ollama:
+    Uses the chat api of the Ollama Client
+
+- OpenAI:
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
@@ -2896,9 +2985,11 @@ See https://docs.mistral.ai/capabilities/document_ai/basic_ocr for more details.
 | `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `api_key` | `str` | `"<string>"` | a mistral ai api key |
-| `output_keys` | `list[str]` | `"lambda: ['documents', 'filepath']()"` |  |
+| `output_keys` | `list[str]` | `"lambda: ['content', 'filepath']()"` |  |
+| `model_provider` | `str` | `'ModelProvider.MISTRAL.value'` |  |
 | `model` | `str` | `'mistral-ocr-latest'` | Mistral OCR model name |
 | `include_image_base64` | `bool` | `False` | Whether OCR page payloads should include embedded base64 images |
+| `endpoint` | `str` | `"<string>"` | endpoint for the model provider, if it has to be specified, e.g. OLLAMA |
 
 
 ```python
@@ -2916,9 +3007,11 @@ l_l_m_o_c_r_action = LLMOCRAction(
 	id="<string>",
 	load_on_install=False,
 	api_key="<string>",
-	output_keys="lambda: ['documents', 'filepath']()",
+	output_keys="lambda: ['content', 'filepath']()",
+	model_provider='ModelProvider.MISTRAL.value',
 	model='mistral-ocr-latest',
-	include_image_base64=False
+	include_image_base64=False,
+	endpoint="<string>"
 )
 ```
 
@@ -2972,6 +3065,125 @@ l_l_m_script_element = LLMScriptElement(
 	system_message='SYS_PYTHON_EXPERT',
 	human_msg="<string>",
 	service_id="<string>"
+)
+```
+
+[Go to Summary](#summary)
+## `OutlookMailAction` (in `pydag\nodes\office\OutlookMailAction.py`)
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
+| `buffer_id` | `str` | `"<string>"` | unique ID of the buffer |
+| `persistent` | `bool` | `True` | specifies whether data is removed (False) from parent or not (True) |
+| `n` | `int` | `0` | specifies how much data is retrieved from parent buffer. Default 0 -> all data |
+| `input_keys` | `list[str] | list[int] | str` | `'list()'` | list of input key names used to extract data from parent buffers. input_keys can also be a list of integers for indices or a Python-style slice string (e.g. '-1' for last index, '1:3' or '0:5:2' for start:stop:step exclusive indexing), or a type selector ('type:string' for text-like values, 'type:number' for numeric and bool values). Duplicates are removed while preserving first-match order. If empty, all parent keys are returned |
+| `output_keys` | `list[str]` | `'list()'` | optional explicit output key names written by this node. output_keys are literal names only and do not support selector syntax. If empty, the node uses its default output naming |
+| `ignore_keys` | `list[str]` | `'list()'` | list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys |
+| `ignore_empty_parents` | `bool` | `True` | if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True) |
+| `service_id` | `str` | `"<string>"` | ID of the service |
+| `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
+| `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
+| `user` | `str` | `"<string>"` | user mail or id of the account that shall send the mail |
+| `recipients` | `str | list[str]` | `'list[str]()'` | mail address of the recipient |
+| `subject` | `str` | `"<string>"` | subject of the mail |
+| `body` | `str` | `"<string>"` | body of the mail |
+
+
+```python
+# Example usage of `OutlookMailAction`
+from pydag.nodes.office.OutlookMailAction import OutlookMailAction  # Adjust import if needed
+
+outlook_mail_action = OutlookMailAction(
+	child_ids='list()',
+	buffer_id="<string>",
+	persistent=True,
+	n=0,
+	input_keys='list()',
+	output_keys='list()',
+	ignore_keys='list()',
+	ignore_empty_parents=True,
+	service_id="<string>",
+	id="<string>",
+	load_on_install=False,
+	user="<string>",
+	recipients='list[str]()',
+	subject="<string>",
+	body="<string>"
+)
+```
+
+[Go to Summary](#summary)
+## `OutlookMailTriggerAction` (in `pydag\nodes\office\OutlookMailTriggerAction.py`)
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
+| `buffer_id` | `str` | `"<string>"` | unique ID of the buffer |
+| `persistent` | `bool` | `True` | specifies whether data is removed (False) from parent or not (True) |
+| `n` | `int` | `0` | specifies how much data is retrieved from parent buffer. Default 0 -> all data |
+| `input_keys` | `list[str] | list[int] | str` | `'list()'` | list of input key names used to extract data from parent buffers. input_keys can also be a list of integers for indices or a Python-style slice string (e.g. '-1' for last index, '1:3' or '0:5:2' for start:stop:step exclusive indexing), or a type selector ('type:string' for text-like values, 'type:number' for numeric and bool values). Duplicates are removed while preserving first-match order. If empty, all parent keys are returned |
+| `output_keys` | `list[str]` | `'list()'` | optional explicit output key names written by this node. output_keys are literal names only and do not support selector syntax. If empty, the node uses its default output naming |
+| `ignore_keys` | `list[str]` | `'list()'` | list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys |
+| `ignore_empty_parents` | `bool` | `True` | if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True) |
+| `service_id` | `str` | `"<string>"` | ID of the service |
+| `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
+| `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
+
+
+```python
+# Example usage of `OutlookMailTriggerAction`
+from pydag.nodes.office.OutlookMailTriggerAction import OutlookMailTriggerAction  # Adjust import if needed
+
+outlook_mail_trigger_action = OutlookMailTriggerAction(
+	child_ids='list()',
+	buffer_id="<string>",
+	persistent=True,
+	n=0,
+	input_keys='list()',
+	output_keys='list()',
+	ignore_keys='list()',
+	ignore_empty_parents=True,
+	service_id="<string>",
+	id="<string>",
+	load_on_install=False
+)
+```
+
+[Go to Summary](#summary)
+## `OutlookMeetingAction` (in `pydag\nodes\office\OutlookMeetingAction.py`)
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
+| `buffer_id` | `str` | `"<string>"` | unique ID of the buffer |
+| `persistent` | `bool` | `True` | specifies whether data is removed (False) from parent or not (True) |
+| `n` | `int` | `0` | specifies how much data is retrieved from parent buffer. Default 0 -> all data |
+| `input_keys` | `list[str] | list[int] | str` | `'list()'` | list of input key names used to extract data from parent buffers. input_keys can also be a list of integers for indices or a Python-style slice string (e.g. '-1' for last index, '1:3' or '0:5:2' for start:stop:step exclusive indexing), or a type selector ('type:string' for text-like values, 'type:number' for numeric and bool values). Duplicates are removed while preserving first-match order. If empty, all parent keys are returned |
+| `output_keys` | `list[str]` | `'list()'` | optional explicit output key names written by this node. output_keys are literal names only and do not support selector syntax. If empty, the node uses its default output naming |
+| `ignore_keys` | `list[str]` | `'list()'` | list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys |
+| `ignore_empty_parents` | `bool` | `True` | if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True) |
+| `service_id` | `str` | `"<string>"` | ID of the service |
+| `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
+| `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
+
+
+```python
+# Example usage of `OutlookMeetingAction`
+from pydag.nodes.office.OutlookMeetingAction import OutlookMeetingAction  # Adjust import if needed
+
+outlook_meeting_action = OutlookMeetingAction(
+	child_ids='list()',
+	buffer_id="<string>",
+	persistent=True,
+	n=0,
+	input_keys='list()',
+	output_keys='list()',
+	ignore_keys='list()',
+	ignore_empty_parents=True,
+	service_id="<string>",
+	id="<string>",
+	load_on_install=False
 )
 ```
 
@@ -3191,8 +3403,16 @@ script_action = ScriptAction(
 ```
 
 [Go to Summary](#summary)
-## `FileTriggerAction` (in `pydag\nodes\triggers\FileTriggerAction.py`)
+## `SFTPAction` (in `pydag\nodes\sftp\SFTPAction.py`)
 
+`Action` that puts a local file on a remote SFTP server with Basic Authentification.
+
+This `BufferNode` requires two input_keys, LOCAL_FILE must be specified before REMOTE_FILE.
+
+For Example:
+```python
+sa = SFTPAction(input_keys=["localpath", "remotepath"], ...)
+```
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
@@ -3200,67 +3420,34 @@ script_action = ScriptAction(
 | `persistent` | `bool` | `True` | specifies whether data is removed (False) from parent or not (True) |
 | `n` | `int` | `0` | specifies how much data is retrieved from parent buffer. Default 0 -> all data |
 | `input_keys` | `list[str] | list[int] | str` | `'list()'` | list of input key names used to extract data from parent buffers. input_keys can also be a list of integers for indices or a Python-style slice string (e.g. '-1' for last index, '1:3' or '0:5:2' for start:stop:step exclusive indexing), or a type selector ('type:string' for text-like values, 'type:number' for numeric and bool values). Duplicates are removed while preserving first-match order. If empty, all parent keys are returned |
+| `output_keys` | `list[str]` | `'list()'` | optional explicit output key names written by this node. output_keys are literal names only and do not support selector syntax. If empty, the node uses its default output naming |
 | `ignore_keys` | `list[str]` | `'list()'` | list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys |
 | `ignore_empty_parents` | `bool` | `True` | if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True) |
-| `service_id` | `str` | `"<string>"` | ID of the service |
 | `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
-| `folder` | `str` | `"path/to/folder"` | folder to wach for file events |
-| `recursive` | `bool` | `False` | listen to events in subfolders as well |
-| `create_events` | `bool` | `True` | listen to create events |
-| `modified_events` | `bool` | `False` | listen to modified events |
-| `moved_events` | `bool` | `False` | listen to moved events |
-| `delete_events` | `bool` | `False` | listen to delete events |
-| `output_keys` | `list[str]` | `"lambda: ['filepaths']()"` | default output key |
+| `host` | `str` | `"<string>"` |  |
+| `user` | `str` | `"<string>"` |  |
+| `password` | `str` | `"<string>"` |  |
 
 
 ```python
-# Example usage of `FileTriggerAction`
-from pydag.nodes.triggers.FileTriggerAction import FileTriggerAction  # Adjust import if needed
+# Example usage of `SFTPAction`
+from pydag.nodes.sftp.SFTPAction import SFTPAction  # Adjust import if needed
 
-file_trigger_action = FileTriggerAction(
+s_f_t_p_action = SFTPAction(
 	child_ids='list()',
 	buffer_id="<string>",
 	persistent=True,
 	n=0,
 	input_keys='list()',
+	output_keys='list()',
 	ignore_keys='list()',
 	ignore_empty_parents=True,
-	service_id="<string>",
 	id="<string>",
 	load_on_install=False,
-	folder="path/to/folder",
-	recursive=False,
-	create_events=True,
-	modified_events=False,
-	moved_events=False,
-	delete_events=False,
-	output_keys="lambda: ['filepaths']()"
-)
-```
-
-[Go to Summary](#summary)
-## `ObserverTriggerAction` (in `pydag\nodes\triggers\ObserverTriggerAction.py`)
-
-A `TriggerAction`, that connects to a `ObserverService` and executes the `Observer` notification everytime the
-trigger event occurs. This `Node` does not define `start_trigger`, but rather expects being triggered externally from application or for example REST API.
-| Field | Type | Default | Description |
-|-------|------|---------|-------------|
-| `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
-| `service_id` | `str` | `"<string>"` | ID of the service |
-| `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
-| `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
-
-
-```python
-# Example usage of `ObserverTriggerAction`
-from pydag.nodes.triggers.ObserverTriggerAction import ObserverTriggerAction  # Adjust import if needed
-
-observer_trigger_action = ObserverTriggerAction(
-	child_ids='list()',
-	service_id="<string>",
-	id="<string>",
-	load_on_install=False
+	host="<string>",
+	user="<string>",
+	password="<string>"
 )
 ```
 
@@ -3682,6 +3869,46 @@ sleep_until_action = SleepUntilAction(
 	id="<string>",
 	load_on_install=False,
 	daytime="<string>"
+)
+```
+
+[Go to Summary](#summary)
+## `SplitStringAction` (in `pydag\nodes\utils\SplitStringAction.py`)
+
+An `Action` that splits incoming filenames by a delimiter into separate output columns.
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `child_ids` | `list[str]` | `'list()'` | List of child node IDs |
+| `buffer_id` | `str` | `"<string>"` | unique ID of the buffer |
+| `persistent` | `bool` | `True` | specifies whether data is removed (False) from parent or not (True) |
+| `n` | `int` | `0` | specifies how much data is retrieved from parent buffer. Default 0 -> all data |
+| `input_keys` | `list[str] | list[int] | str` | `'list()'` | list of input key names used to extract data from parent buffers. input_keys can also be a list of integers for indices or a Python-style slice string (e.g. '-1' for last index, '1:3' or '0:5:2' for start:stop:step exclusive indexing), or a type selector ('type:string' for text-like values, 'type:number' for numeric and bool values). Duplicates are removed while preserving first-match order. If empty, all parent keys are returned |
+| `output_keys` | `list[str]` | `'list()'` | optional explicit output key names written by this node. output_keys are literal names only and do not support selector syntax. If empty, the node uses its default output naming |
+| `ignore_keys` | `list[str]` | `'list()'` | list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys |
+| `ignore_empty_parents` | `bool` | `True` | if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True) |
+| `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
+| `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
+| `delimiter` | `str` | `'_'` | delimiter used to split the incoming filename into separate fields |
+| `parsing_functions` | `list[str]` | `'list()'` | optional per-output parsing functions to apply after splitting |
+
+
+```python
+# Example usage of `SplitStringAction`
+from pydag.nodes.utils.SplitStringAction import SplitStringAction  # Adjust import if needed
+
+split_string_action = SplitStringAction(
+	child_ids='list()',
+	buffer_id="<string>",
+	persistent=True,
+	n=0,
+	input_keys='list()',
+	output_keys='list()',
+	ignore_keys='list()',
+	ignore_empty_parents=True,
+	id="<string>",
+	load_on_install=False,
+	delimiter='_',
+	parsing_functions='list()'
 )
 ```
 

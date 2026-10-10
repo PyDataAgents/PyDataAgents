@@ -58,7 +58,7 @@ class MappingRestartService(ObserverService):
         ObserverService (Service): parent class
     """
 
-    thread_type : str = field(default=ThreadType.SECOND, metadata={"description": "type of thread, e.g. MILLI_SECONDS, MICRO_SECONDS, INSTANT, ONLY_ONCE, DAYTIME, DATE, ..."})    
+    thread_type : str = field(default=ThreadType.SECOND, metadata={"description": "type of thread, e.g. MILLI_SECONDS, MICRO_SECONDS, INSTANT, ONLY_ONCE, CRON, DATETIME, ..."})    
     observing_time : Union[int|str] = field(default=10, metadata={"description": "interval of seconds for restarts attempts"})
     max_restart_attempts : int = field(default=3, metadata={"description": "number of consecutive restarts attempts before omitting the mapping service from restart attempts"})
     

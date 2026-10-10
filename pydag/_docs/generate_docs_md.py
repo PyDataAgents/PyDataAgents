@@ -3,9 +3,8 @@ from pydag.agents.Agent import Agent
 from pydag.agents.AgentElement import AgentElement
 from pydag.agents.app.AgentApp import AgentApp
 from pydag.buffers.Buffer import Buffer
+from pydag.nodes.Node import Node
 from pydag.services.Service import Service
-from pydag.nodes.Action import Action
-from pydag.nodes.Transition import Transition
 from pydag.utils.DocUtils import generate_docs_for_type
 
 
@@ -22,4 +21,4 @@ if __name__ == "__main__":
     generate_docs_for_type(Service.__name__ + "s", AgentElement.__name__, Path("pydag\\services"), Path("pydag\\_docs\\"), with_images=True)
     
     # find Nodes
-    generate_docs_for_type(Action.__name__ + "s and " + Transition.__name__ +  "s", AgentElement.__name__, Path("pydag\\nodes"), Path("pydag\\_docs\\"), with_images=True)
+    generate_docs_for_type(Node.__name__ + "s", AgentElement.__name__, Path("pydag\\nodes"), Path("pydag\\_docs\\"), with_images=True)

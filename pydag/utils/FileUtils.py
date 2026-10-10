@@ -1,3 +1,4 @@
+import datetime
 import os
 from pathlib import Path
 import platform
@@ -75,6 +76,19 @@ class FileUtils:
                 return False
         else:
             logger.error("File " + file_path + " does not exist")
+            return False
+    
+    @staticmethod
+    def delete_dir(folder_path : str) -> bool:
+        if FileUtils.exists_folder(folder_path):
+            try:
+                shutil.rmtree(folder_path)
+                return True
+            except Exception as e:
+                logger.error(f"Error deleting directory {folder_path}: {e}")
+                return False
+        else:
+            logger.error("Folder " + folder_path + " does not exist")
             return False
       
     @staticmethod  
@@ -326,3 +340,90 @@ class FileUtils:
             bool: true/false
         """
         return shutil.which(program) is not None
+    
+    @staticmethod
+    def set_access_datetime(file_path : str, dt : datetime) -> bool:
+        """ sets the access date of a file to the specified timestamp
+
+        Args:
+            file_path (str): path to the file
+            dt (datetime): datetime object representing the desired access date
+    
+        Returns:
+            bool: true if successful, false otherwise
+        """
+        if FileUtils.exists_file(file_path):
+            try:
+                timestamp = dt.timestamp()
+                os.utime(file_path, (timestamp, os.path.getmtime(file_path)))
+                return True
+            except Exception as e:
+                logger.error(f"Error setting access date for {file_path}: {e}")
+                return False
+        else:
+            logger.error("File " + file_path + " does not exist")
+            return False
+    
+    @staticmethod    
+    def set_modified_datetime(file_path : str, dt : datetime) -> bool:
+        """ sets the modified date of a file to the specified timestamp
+
+        Args:
+            file_path (str): path to the file
+            dt (datetime): datetime object representing the desired modified date
+    
+        Returns:
+            bool: true if successful, false otherwise
+        """
+        if FileUtils.exists_file(file_path):
+            try:
+                timestamp = dt.timestamp()
+                os.utime(file_path, (os.path.getatime(file_path), timestamp))
+                return True
+            except Exception as e:
+                logger.error(f"Error setting modified date for {file_path}: {e}")
+                return False
+        else:
+            logger.error("File " + file_path + " does not exist")
+            return False#
+        
+    @staticmethod
+    def set_created_datetime(file_path : str, dt : datetime) -> bool:
+        """ sets the created date of a file to the specified timestamp
+
+        Args:
+            file_path (str): path to the file
+            dt (datetime): datetime object representing the desired created date
+    
+        Returns:
+            bool: true if successful, false otherwise
+        """
+        if FileUtils.exists_file(file_path):
+            try:
+                timestamp = dt.timestamp()
+                if platform.system() == 'Windows':
+                    import pywintypes
+                    import win32file
+                    import win32con
+
+                    handle = win32file.CreateFile(
+                        file_path,
+                        win32con.GENERIC_WRITE,
+                        0,
+                        None,
+                        win32con.OPEN_EXISTING,
+                        win32con.FILE_ATTRIBUTE_NORMAL,
+                        None
+                    )
+                    win32file.SetFileTime(handle, pywintypes.Time(timestamp), None, None)
+                    handle.close()
+                else:
+                    logger.error("Setting created date is not supported on this OS.")
+                    return False
+                return True
+            except Exception as e:
+                logger.error(f"Error setting created date for {file_path}: {e}")
+                return False
+        else:
+            logger.error("File " + file_path + " does not exist")
+            return False

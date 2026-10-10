@@ -131,7 +131,7 @@ class BufferNode(Node):
         """
         if len(self._parents) > 0:
             data = {}
-            has_buffer_parent : bool = False
+            has_buffer_parent : bool = False            
             for parent in self._parents:
                 if isinstance(parent, BufferNode):
                     has_buffer_parent = True

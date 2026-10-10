@@ -2,69 +2,69 @@
 
 ## Summary
 
-| Class | Description | Icon |
-|-------|-------------|------|
-| [`BrowsingService`](#browsingservice-in-pydagservicesbrowsingservicepy) | `ObserverService` Interface for discovering available data sources and their addresses.<br>new `Services` that allow for discovery of sources and addresses must inherit this class. | ![BrowsingService](element_icons/BrowsingService.png)
-| [`DiscoveryService`](#discoveryservice-in-pydagservicesdiscoveryservicepy) | `Service` Interface for discovering available data sources and their addresses.   <br>new `Service` that allow for discovery of sources and addresses must inherit this class next to `Service`.Args:    ObserverService (_type_): parent class for all Service, provides basic connection management and state handling | ![DiscoveryService](element_icons/DiscoveryService.png)
-| [`MappingService`](#mappingservice-in-pydagservicesmappingservicepy) | A `ObserverService` for mapping `Buffer`s together for reading, writing, subscribing or publishing from sources and sinksRaises:    ServiceException: _description_Returns:    _type_: _description_ | ![MappingService](element_icons/MappingService.png)
-| [`ObserverService`](#observerservice-in-pydagservicesobserverservicepy) | abstract base class for Services with ObserverThreads     | ![ObserverService](element_icons/ObserverService.png)
-| [`PublishService`](#publishservice-in-pydagservicespublishservicepy) |  | ![PublishService](element_icons/PublishService.png)
-| [`ReadService`](#readservice-in-pydagservicesreadservicepy) |  | ![ReadService](element_icons/ReadService.png)
-| [`Service`](#service-in-pydagservicesservicepy) | abstract base class for agent Services     | ![Service](element_icons/Service.png)
-| [`SubscribeService`](#subscribeservice-in-pydagservicessubscribeservicepy) |  | ![SubscribeService](element_icons/SubscribeService.png)
-| [`WriteService`](#writeservice-in-pydagserviceswriteservicepy) |  | ![WriteService](element_icons/WriteService.png)
-| [`AdsService`](#adsservice-in-pydagservicesadsadsservicepy) | `MappingService` for reading and writing data from/to Beckhoff TwinCAT PLCs via ADS (Automation Device Specification).     | ![AdsService](element_icons/AdsService.png)
-| [`AudioService`](#audioservice-in-pydagservicesaudioaudioservicepy) | `SubscribeService` for subscribing to a system's audio input channels (e.g. from a USB microphone) using the `sounddevice` library.     | ![AudioService](element_icons/AudioService.png)
-| [`SolidPDMService`](#solidpdmservice-in-pydagservicescadsolidpdmservicepy) | `Service` for high-level wrapping of SolidWorks PDM Professional COM API.Wraps common vault, file, search, and workflow operations.for help goto:- https://help.solidworks.com/2023/english/api/epdmapi/Welcome-epdmapi.html?utm_source=chatgpt.com- https://github.com/BlueByteSystemsInc/SOLIDWORKS-PDM-API-SDK?utm_source=chatgpt.com- https://www.codestack.net/ | ![SolidPDMService](element_icons/SolidPDMService.png)
-| [`SolidWorksService`](#solidworksservice-in-pydagservicescadsolidworksservicepy) |  | ![SolidWorksService](element_icons/SolidWorksService.png)
-| [`CsvReadService`](#csvreadservice-in-pydagservicescsvcsvreadservicepy) | `MappingService` for reading data from CSV files.     | ![CsvReadService](element_icons/CsvReadService.png)
-| [`CsvWriteService`](#csvwriteservice-in-pydagservicescsvcsvwriteservicepy) | `WriteService` for writing data to CSV files.     | ![CsvWriteService](element_icons/CsvWriteService.png)
-| [`DataModelService`](#datamodelservice-in-pydagservicesdatamodeldatamodelservicepy) | `Service` that enables modeling of data, in terms of script based computations on complex data relationships (e.g. to model machine elements or similar)<br>Model execution / model handlerthis file aggregates a chain of method calls, depending on the dependencies of the methods on dataclass variables.This means that only those methods are executed whose variables have changed.The model handler also registers variable inputs (from outside) and method outputs and then initiates the execution of methods accordingly.<br><br>Example of a model file:```pythonimport pandas as pdfrom pydag.services.datamodel.DataModel import DataModel@dataclassclass SimpleDataModel(DataModel):    a : float = field(default=None, metadata={"description": "variable 1"})    b : float = field(default=None, metadata={"description": "variable 2"})    c : float = field(default=None, metadata={"description": "variable 3", "hidden": True})    t : str = field(default=None, metadata={"description": "text variable 1", "hidden": True})    def method1(self):        self.b = self.a * 2 + 10.0        self.c = self.a + self.c        def method2(self):        self.t = f"Hello World {self.c}"        def method3(self, dms : DataModelService):        df = dms.lookup_table('NAME_OF_TABLE')        values = df.query(f"COL1 > 30 and COL2 <= {self.a}")        self.value = values["COL1"].to_list()[0]    ```<br>The model files always have to inherit from `DataModel`, they are `dataclasses` and all properties should be introduced as `fields`.<br><br>As an additional argument to `DataModel` methods the argument `dms` of type `DataModelService` can be passed, which allows acces to the lookup-tables via dms.lookup_store([Name of the table]) with Pandas Dataframes can be provided in order to lookup values based on model variables | ![DataModelService](element_icons/DataModelService.png)
-| [`MultiModelService`](#multimodelservice-in-pydagservicesdatamodelmultimodelservicepy) | `Service` that allows the management of multiple `Datamodel`s at once, enhancing the `DataModelService` capabilities     | ![MultiModelService](element_icons/MultiModelService.png)
-| [`InfluxDbService`](#influxdbservice-in-pydagservicesdbinfluxdbservicepy) | `MappingService` thats reads or writes to InfluxDB.<br>Address Schema:<br>address = "b=[bucket];m=[measurement];f=[field]" | ![InfluxDbService](element_icons/InfluxDbService.png)
-| [`SQLService`](#sqlservice-in-pydagservicesdbsqlservicepy) |  | ![SQLService](element_icons/SQLService.png)
-| [`CopyFileService`](#copyfileservice-in-pydagservicesdocumentscopyfileservicepy) | `Service`to copy files from one location to another | ![CopyFileService](element_icons/CopyFileService.png)
-| [`DeleteFileService`](#deletefileservice-in-pydagservicesdocumentsdeletefileservicepy) | `Service` to delete files from folders | ![DeleteFileService](element_icons/DeleteFileService.png)
-| [`DocumentTextService`](#documenttextservice-in-pydagservicesdocumentsdocumenttextservicepy) | `MappingService` that retrieves text content from specified files         | ![DocumentTextService](element_icons/DocumentTextService.png)
-| [`DocxService`](#docxservice-in-pydagservicesdocumentsdocxservicepy) | `MappingService` for writing data to DOCX documents.The specified addresses in `write_to_sink` can be used to map data keys from buffer to place holders in word template.If no addresses are specified all buffer keys are directly mapped to the context of the word template | ![DocxService](element_icons/DocxService.png)
-| [`ExcelBufferService`](#excelbufferservice-in-pydagservicesdocumentsexcelbufferservicepy) | `Service` for creating `Buffer`s in `Agent` for each named table found in specified Excel file | ![ExcelBufferService](element_icons/ExcelBufferService.png)
-| [`FileEmbeddingService`](#fileembeddingservice-in-pydagservicesdocumentsfileembeddingservicepy) | File Embedding Service to embed documents from file links into an embedding store. Only text-based documents are embedded.     | ![FileEmbeddingService](element_icons/FileEmbeddingService.png)
-| [`FileTextSearchService`](#filetextsearchservice-in-pydagservicesdocumentsfiletextsearchservicepy) |  | ![FileTextSearchService](element_icons/FileTextSearchService.png)
-| [`FileWatchdogService`](#filewatchdogservice-in-pydagservicesdocumentsfilewatchdogservicepy) |  | ![FileWatchdogService](element_icons/FileWatchdogService.png)
-| [`FolderObserveMailService`](#folderobservemailservice-in-pydagservicesdocumentsfolderobservemailservicepy) | `Service` to observe a folder for new files and alert by mail on events. | ![FolderObserveMailService](element_icons/FolderObserveMailService.png)
-| [`NpzService`](#npzservice-in-pydagservicesdocumentsnpzservicepy) | `MappingService` that retrieves data from a *.npz numpy file         | ![NpzService](element_icons/NpzService.png)
-| [`Backup`](#backup-in-pydagservicesdocumentsrollingbackupservicepy) |  | ![Backup](element_icons/Backup.png)
-| [`RollingBackupService`](#rollingbackupservice-in-pydagservicesdocumentsrollingbackupservicepy) |  | ![RollingBackupService](element_icons/RollingBackupService.png)
-| [`HttpService`](#httpservice-in-pydagserviceshttphttpservicepy) | `MappingService` for reading and writing data from/to http endpoints     | ![HttpService](element_icons/HttpService.png)
-| [`LLMSQLService`](#llmsqlservice-in-pydagservicesllmllmsqlservicepy) | Service to interact with SQL databases.Taken in parts from https://python.langchain.com/docs/tutorials/sql_qa/ | ![LLMSQLService](element_icons/LLMSQLService.png)
-| [`LLMService`](#llmservice-in-pydagservicesllmllmservicepy) | `Service` for chat based LLM interaction.Internet context uses Tavily and requires a Tavily API key configured as`tavily_api_key` or the `TAVILY_API_KEY` environment variable.File inputs use `context_files` and may be URLs, file URLs, local paths(absolute or relative to the current working directory), data URIs, base64strings, bytes, or lists. OPENAI and AZURE send them to the model; OLLAMAwarns and continues text-only. | ![LLMService](element_icons/LLMService.png)
-| [`LLMToolService`](#llmtoolservice-in-pydagservicesllmllmtoolservicepy) |  | ![LLMToolService](element_icons/LLMToolService.png)
-| [`RAGService`](#ragservice-in-pydagservicesllmragservicepy) | Retrieval Augmented Generation (RAG) Service for document based LLM knowledge retrieval in chat form.Optional per-call file context is accepted through `chat(..., context_files=...)`.External URLs, local file URLs, local paths absolute or relative to thecurrent working directory, data URIs, plain base64 strings, raw bytes, orlists of those values are accepted. File inputs are supported only forOPENAI and AZURE. OLLAMA file handling is not implemented yet; supplyingfiles with OLLAMA emits a warning and continues text-only. | ![RAGService](element_icons/RAGService.png)
-| [`MQTTService`](#mqttservice-in-pydagservicesmqttmqttservicepy) | `MappingService` for subscribing or writing data from/to MQTT topics.     | ![MQTTService](element_icons/MQTTService.png)
-| [`MSGraphService`](#msgraphservice-in-pydagservicesofficemsgraphservicepy) | `Service` that provieds functionalities to access Microsoft Graph API     | ![MSGraphService](element_icons/MSGraphService.png)
-| [`OpcUaService`](#opcuaservice-in-pydagservicesopcuaopcuaservicepy) | `MappingService` for reading and writing data from/to OPC UA servers.     | ![OpcUaService](element_icons/OpcUaService.png)
-| [`DashPlotService`](#dashplotservice-in-pydagservicesplotdashplotservicepy) |  | ![DashPlotService](element_icons/DashPlotService.png)
-| [`PlotlifyService`](#plotlifyservice-in-pydagservicesplotplotlifyservicepy) |  | ![PlotlifyService](element_icons/PlotlifyService.png)
-| [`S7Service`](#s7service-in-pydagservicess7s7servicepy) | `MappingService`reading from and writing to S7 PLCs.     | ![S7Service](element_icons/S7Service.png)
-| [`SAPNetWeaverRFCService`](#sapnetweaverrfcservice-in-pydagservicessapsapnetweaverrfcservicepy) |  | ![SAPNetWeaverRFCService](element_icons/SAPNetWeaverRFCService.png)
-| [`SAPODataService`](#sapodataservice-in-pydagservicessapsapodataservicepy) |  | ![SAPODataService](element_icons/SAPODataService.png)
-| [`ByteStreamService`](#bytestreamservice-in-pydagservicessocketbytestreamservicepy) | `MappingService` to read and write byte streams from/to a socket connection.<br>The service can be configured with different byte schemas for connecting, disconnecting,sending, and receiving data.<br>The bytescheams are defined as a string of data types, e.g. "Bhf5s" -> uint8, int16, float32, string of length 5<br>The addresses in read_from_source and write_to_sink are used to specify the buffer keys to read from or write to.<br>e.g. addresses = ["B1", "B3", "SENSOR1"]<br>The length of the addresses list must not match the number of buffers passed, all buffers are being searched for the keys in addresses.But it has to match the number of elements in the schema used for reading or writing. Omiting schema fields can be done by specifying None in the addresses list.<br>For Example:<br>schema = "BfI" -> addresses = ["ID1", None, "ID3"] | ![ByteStreamService](element_icons/ByteStreamService.png)
-| [`SerialService`](#serialservice-in-pydagservicessocketserialservicepy) | `ByteStreamService` for serial communication using pySerial.     | ![SerialService](element_icons/SerialService.png)
-| [`TCPClientService`](#tcpclientservice-in-pydagservicessockettcpclientservicepy) |  | ![TCPClientService](element_icons/TCPClientService.png)
-| [`WebSocketService`](#websocketservice-in-pydagservicessocketwebsocketservicepy) | `MappingService` for subscribing and writing data from/to WebSocket endpoints.     | ![WebSocketService](element_icons/WebSocketService.png)
-| [`VSEService`](#vseservice-in-pydagservicessocketifmvsevseservicepy) |  | ![VSEService](element_icons/VSEService.png)
-| [`SFCService`](#sfcservice-in-pydagservicesstatemachinesfcservicepy) |  | ![SFCService](element_icons/SFCService.png)
-| [`SimpleStatemachine`](#simplestatemachine-in-pydagservicesstatemachinesimplestatemachinepy) |  | ![SimpleStatemachine](element_icons/SimpleStatemachine.png)
-| [`StatemachineService`](#statemachineservice-in-pydagservicesstatemachinestatemachineservicepy) | abstract `ObserverService` class for Statemachines     | ![StatemachineService](element_icons/StatemachineService.png)
-| [`TaskRunnerService`](#taskrunnerservice-in-pydagservicestaskstaskrunnerservicepy) | A Service for running conventional callables and Action/BufferNode steps in one sequence. | ![TaskRunnerService](element_icons/TaskRunnerService.png)
-| [`AgentPersistService`](#agentpersistservice-in-pydagservicesutilsagentpersistservicepy) | `ObserverService` for continuously persisting `AgentElement` configurations to filesystem     | ![AgentPersistService](element_icons/AgentPersistService.png)
-| [`MappingRestartService`](#mappingrestartservice-in-pydagservicesutilsmappingrestartservicepy) | An `ObserverService` that attempts restarts on failed `MappingService`'sArgs:    ObserverService (Service): parent class | ![MappingRestartService](element_icons/MappingRestartService.png)
-| [`WebcamService`](#webcamservice-in-pydagservicesvisionwebcamservicepy) | An `MappingService` that captures webcam video feed into a `Buffer`     | ![WebcamService](element_icons/WebcamService.png)
-| [`WebcamVideoRollbackService`](#webcamvideorollbackservice-in-pydagservicesvisionwebcamvideorollbackservicepy) | A `Service` that captures webcam video feed into video files on filesystem for x secondsand continuously creates new files,additionally only the y last files are being kept before being deleted | ![WebcamVideoRollbackService](element_icons/WebcamVideoRollbackService.png)
-| [`BrowserAutomationService`](#browserautomationservice-in-pydagserviceswebbrowserbrowserautomationservicepy) |  | ![BrowserAutomationService](element_icons/BrowserAutomationService.png)
-| [`HttpFileService`](#httpfileservice-in-pydagserviceswebserverhttpfileservicepy) | A `Service` that provides a webserver hosting documents from `folder_path` under localhost:{`port`}Args:    Service (_type_): _description_ | ![HttpFileService](element_icons/HttpFileService.png)
-| [`HttpHTMLService`](#httphtmlservice-in-pydagserviceswebserverhttphtmlservicepy) | `Service` that provides a HTML Server that hosts the specified html content             | ![HttpHTMLService](element_icons/HttpHTMLService.png)
-| [`WebService`](#webservice-in-pydagserviceswebserverwebservicepy) |  | ![WebService](element_icons/WebService.png)
+| Class | Description |
+|-------|-------------|
+| [`BrowsingService`](#browsingservice-in-pydagservicesbrowsingservicepy) | `ObserverService` Interface for discovering available data sources and their addresses.<br>new `Services` that allow for discovery of sources and addresses must inherit this class. |
+| [`DiscoveryService`](#discoveryservice-in-pydagservicesdiscoveryservicepy) | `Service` Interface for discovering available data sources and their addresses.   <br>new `Service` that allow for discovery of sources and addresses must inherit this class next to `Service`.Args:    ObserverService (_type_): parent class for all Service, provides basic connection management and state handling |
+| [`MappingService`](#mappingservice-in-pydagservicesmappingservicepy) | A `ObserverService` for mapping `Buffer`s together for reading, writing, subscribing or publishing from sources and sinksRaises:    ServiceException: _description_Returns:    _type_: _description_ |
+| [`ObserverService`](#observerservice-in-pydagservicesobserverservicepy) | abstract base class for Services with ObserverThreads     |
+| [`PublishService`](#publishservice-in-pydagservicespublishservicepy) |  |
+| [`ReadService`](#readservice-in-pydagservicesreadservicepy) |  |
+| [`Service`](#service-in-pydagservicesservicepy) | abstract base class for agent Services     |
+| [`SubscribeService`](#subscribeservice-in-pydagservicessubscribeservicepy) |  |
+| [`WriteService`](#writeservice-in-pydagserviceswriteservicepy) |  |
+| [`AdsService`](#adsservice-in-pydagservicesadsadsservicepy) | `MappingService` for reading and writing data from/to Beckhoff TwinCAT PLCs via ADS (Automation Device Specification).     |
+| [`AudioService`](#audioservice-in-pydagservicesaudioaudioservicepy) | `SubscribeService` for subscribing to a system's audio input channels (e.g. from a USB microphone) using the `sounddevice` library.     |
+| [`SolidPDMService`](#solidpdmservice-in-pydagservicescadsolidpdmservicepy) | `Service` for high-level wrapping of SolidWorks PDM Professional COM API.Wraps common vault, file, search, and workflow operations.for help goto:- https://help.solidworks.com/2023/english/api/epdmapi/Welcome-epdmapi.html?utm_source=chatgpt.com- https://github.com/BlueByteSystemsInc/SOLIDWORKS-PDM-API-SDK?utm_source=chatgpt.com- https://www.codestack.net/ |
+| [`SolidWorksService`](#solidworksservice-in-pydagservicescadsolidworksservicepy) |  |
+| [`CsvReadService`](#csvreadservice-in-pydagservicescsvcsvreadservicepy) | `MappingService` for reading data from CSV files.     |
+| [`CsvWriteService`](#csvwriteservice-in-pydagservicescsvcsvwriteservicepy) | `WriteService` for writing data to CSV files.     |
+| [`DataModelService`](#datamodelservice-in-pydagservicesdatamodeldatamodelservicepy) | `Service` that enables modeling of data, in terms of script based computations on complex data relationships (e.g. to model machine elements or similar)<br>Model execution / model handlerthis file aggregates a chain of method calls, depending on the dependencies of the methods on dataclass variables.This means that only those methods are executed whose variables have changed.The model handler also registers variable inputs (from outside) and method outputs and then initiates the execution of methods accordingly.<br><br>Example of a model file:```pythonimport pandas as pdfrom pydag.services.datamodel.DataModel import DataModel@dataclassclass SimpleDataModel(DataModel):    a : float = field(default=None, metadata={"description": "variable 1"})    b : float = field(default=None, metadata={"description": "variable 2"})    c : float = field(default=None, metadata={"description": "variable 3", "hidden": True})    t : str = field(default=None, metadata={"description": "text variable 1", "hidden": True})    def method1(self):        self.b = self.a * 2 + 10.0        self.c = self.a + self.c        def method2(self):        self.t = f"Hello World {self.c}"        def method3(self, dms : DataModelService):        df = dms.lookup_table('NAME_OF_TABLE')        values = df.query(f"COL1 > 30 and COL2 <= {self.a}")        self.value = values["COL1"].to_list()[0]    ```<br>The model files always have to inherit from `DataModel`, they are `dataclasses` and all properties should be introduced as `fields`.<br><br>As an additional argument to `DataModel` methods the argument `dms` of type `DataModelService` can be passed, which allows acces to the lookup-tables via dms.lookup_store([Name of the table]) with Pandas Dataframes can be provided in order to lookup values based on model variables |
+| [`MultiModelService`](#multimodelservice-in-pydagservicesdatamodelmultimodelservicepy) | `Service` that allows the management of multiple `Datamodel`s at once, enhancing the `DataModelService` capabilities     |
+| [`InfluxDbService`](#influxdbservice-in-pydagservicesdbinfluxdbservicepy) | `MappingService` thats reads or writes to InfluxDB.<br>Address Schema:<br>address = "b=[bucket];m=[measurement];f=[field]" |
+| [`SQLService`](#sqlservice-in-pydagservicesdbsqlservicepy) |  |
+| [`CopyFileService`](#copyfileservice-in-pydagservicesdocumentscopyfileservicepy) | `Service`to copy files from one location to another |
+| [`DeleteFileService`](#deletefileservice-in-pydagservicesdocumentsdeletefileservicepy) | `Service` to delete files from folders |
+| [`DocumentTextService`](#documenttextservice-in-pydagservicesdocumentsdocumenttextservicepy) | `MappingService` that retrieves text content from specified files         |
+| [`DocxService`](#docxservice-in-pydagservicesdocumentsdocxservicepy) | `MappingService` for writing data to DOCX documents.The specified addresses in `write_to_sink` can be used to map data keys from buffer to place holders in word template.If no addresses are specified all buffer keys are directly mapped to the context of the word template |
+| [`ExcelBufferService`](#excelbufferservice-in-pydagservicesdocumentsexcelbufferservicepy) | `Service` for creating `Buffer`s in `Agent` for each named table found in specified Excel file |
+| [`FileEmbeddingService`](#fileembeddingservice-in-pydagservicesdocumentsfileembeddingservicepy) | File Embedding Service to embed documents from file links into an embedding store. Only text-based documents are embedded.     |
+| [`FileTextSearchService`](#filetextsearchservice-in-pydagservicesdocumentsfiletextsearchservicepy) |  |
+| [`FileWatchdogService`](#filewatchdogservice-in-pydagservicesdocumentsfilewatchdogservicepy) |  |
+| [`FolderObserveMailService`](#folderobservemailservice-in-pydagservicesdocumentsfolderobservemailservicepy) | `Service` to observe a folder for new files and alert by mail on events. |
+| [`NpzService`](#npzservice-in-pydagservicesdocumentsnpzservicepy) | `MappingService` that retrieves data from a *.npz numpy file         |
+| [`Backup`](#backup-in-pydagservicesdocumentsrollingbackupservicepy) |  |
+| [`RollingBackupService`](#rollingbackupservice-in-pydagservicesdocumentsrollingbackupservicepy) |  |
+| [`HttpService`](#httpservice-in-pydagserviceshttphttpservicepy) | `MappingService` for reading and writing data from/to http endpoints     |
+| [`LLMSQLService`](#llmsqlservice-in-pydagservicesllmllmsqlservicepy) | Service to interact with SQL databases.Taken in parts from https://python.langchain.com/docs/tutorials/sql_qa/ |
+| [`LLMService`](#llmservice-in-pydagservicesllmllmservicepy) | `Service` for chat based LLM interaction.Internet context uses Tavily and requires a Tavily API key configured as`tavily_api_key` or the `TAVILY_API_KEY` environment variable.File inputs use `context_files` and may be URLs, file URLs, local paths(absolute or relative to the current working directory), data URIs, base64strings, bytes, or lists. OPENAI and AZURE send them to the model; OLLAMAwarns and continues text-only. |
+| [`LLMToolService`](#llmtoolservice-in-pydagservicesllmllmtoolservicepy) |  |
+| [`RAGService`](#ragservice-in-pydagservicesllmragservicepy) | Retrieval Augmented Generation (RAG) Service for document based LLM knowledge retrieval in chat form.Optional per-call file context is accepted through `chat(..., context_files=...)`.External URLs, local file URLs, local paths absolute or relative to thecurrent working directory, data URIs, plain base64 strings, raw bytes, orlists of those values are accepted. File inputs are supported only forOPENAI and AZURE. OLLAMA file handling is not implemented yet; supplyingfiles with OLLAMA emits a warning and continues text-only. |
+| [`MQTTService`](#mqttservice-in-pydagservicesmqttmqttservicepy) | `MappingService` for subscribing or writing data from/to MQTT topics.     |
+| [`MSGraphService`](#msgraphservice-in-pydagservicesofficemsgraphservicepy) | `Service` that provieds functionalities to access Microsoft Graph API     |
+| [`OpcUaService`](#opcuaservice-in-pydagservicesopcuaopcuaservicepy) | `MappingService` for reading and writing data from/to OPC UA servers.     |
+| [`DashPlotService`](#dashplotservice-in-pydagservicesplotdashplotservicepy) |  |
+| [`PlotlifyService`](#plotlifyservice-in-pydagservicesplotplotlifyservicepy) |  |
+| [`S7Service`](#s7service-in-pydagservicess7s7servicepy) | `MappingService`reading from and writing to S7 PLCs.     |
+| [`SAPNetWeaverRFCService`](#sapnetweaverrfcservice-in-pydagservicessapsapnetweaverrfcservicepy) |  |
+| [`SAPODataService`](#sapodataservice-in-pydagservicessapsapodataservicepy) |  |
+| [`ByteStreamService`](#bytestreamservice-in-pydagservicessocketbytestreamservicepy) | `MappingService` to read and write byte streams from/to a socket connection.<br>The service can be configured with different byte schemas for connecting, disconnecting,sending, and receiving data.<br>The bytescheams are defined as a string of data types, e.g. "Bhf5s" -> uint8, int16, float32, string of length 5<br>The addresses in read_from_source and write_to_sink are used to specify the buffer keys to read from or write to.<br>e.g. addresses = ["B1", "B3", "SENSOR1"]<br>The length of the addresses list must not match the number of buffers passed, all buffers are being searched for the keys in addresses.But it has to match the number of elements in the schema used for reading or writing. Omiting schema fields can be done by specifying None in the addresses list.<br>For Example:<br>schema = "BfI" -> addresses = ["ID1", None, "ID3"] |
+| [`SerialService`](#serialservice-in-pydagservicessocketserialservicepy) | `ByteStreamService` for serial communication using pySerial.     |
+| [`TCPClientService`](#tcpclientservice-in-pydagservicessockettcpclientservicepy) |  |
+| [`WebSocketService`](#websocketservice-in-pydagservicessocketwebsocketservicepy) | `MappingService` for subscribing and writing data from/to WebSocket endpoints.     |
+| [`VSEService`](#vseservice-in-pydagservicessocketifmvsevseservicepy) |  |
+| [`SFCService`](#sfcservice-in-pydagservicesstatemachinesfcservicepy) |  |
+| [`SimpleStatemachine`](#simplestatemachine-in-pydagservicesstatemachinesimplestatemachinepy) |  |
+| [`StatemachineService`](#statemachineservice-in-pydagservicesstatemachinestatemachineservicepy) | abstract `ObserverService` class for Statemachines     |
+| [`TaskRunnerService`](#taskrunnerservice-in-pydagservicestaskstaskrunnerservicepy) | A Service for running conventional callables and Action/BufferNode steps in one sequence. |
+| [`AgentPersistService`](#agentpersistservice-in-pydagservicesutilsagentpersistservicepy) | `ObserverService` for continuously persisting `AgentElement` configurations to filesystem     |
+| [`MappingRestartService`](#mappingrestartservice-in-pydagservicesutilsmappingrestartservicepy) | An `ObserverService` that attempts restarts on failed `MappingService`'sArgs:    ObserverService (Service): parent class |
+| [`WebcamService`](#webcamservice-in-pydagservicesvisionwebcamservicepy) | An `MappingService` that captures webcam video feed into a `Buffer`     |
+| [`WebcamVideoRollbackService`](#webcamvideorollbackservice-in-pydagservicesvisionwebcamvideorollbackservicepy) | A `Service` that captures webcam video feed into video files on filesystem for x secondsand continuously creates new files,additionally only the y last files are being kept before being deleted |
+| [`BrowserAutomationService`](#browserautomationservice-in-pydagserviceswebbrowserbrowserautomationservicepy) |  |
+| [`HttpFileService`](#httpfileservice-in-pydagserviceswebserverhttpfileservicepy) | A `Service` that provides a webserver hosting documents from `folder_path` under localhost:{`port`}Args:    Service (_type_): _description_ |
+| [`HttpHTMLService`](#httphtmlservice-in-pydagserviceswebserverhttphtmlservicepy) | `Service` that provides a HTML Server that hosts the specified html content             |
+| [`WebService`](#webservice-in-pydagserviceswebserverwebservicepy) |  |
 
 
 
@@ -75,9 +75,8 @@
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `auto_start` | `bool` | `True` | specifies whether to start the mapping with agent start |
-| `thread_type` | `str` | `"<string>"` | type of thread, e.g. MILLI_SECONDS, MICRO_SECONDS, INSTANT, ONLY_ONCE, DAYTIME, DATE, ... |
-| `observing_time` | `Union[int | str]` | `"<string>"` | observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for DAYTIME in %H:%M or %H:%M:%S, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ... |
-| `week_days` | `Optional[str]` | `"<string>"` | specifies the week days the observer thread should run on, e.g. 'mon, fri, sun', 'mon - thu' or by numbers '0, 2, 4', where Monday = 0 and Sunday = 6 |
+| `thread_type` | `str` | `"<string>"` | type of thread, e.g. MILLI_SECONDS, MICRO_SECONDS, INSTANT, ONLY_ONCE, CRON, DATETIME, ... |
+| `observing_time` | `Union[int | str | list[int]]` | `"<string>"` | observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for CRON * * * * * as cron string, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ..., for ThreadType ON_OFF_SECONDS observing_time is expected to be an array with 2 elements |
 | `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 
@@ -90,7 +89,6 @@ browsing_service = BrowsingService(
 	auto_start=True,
 	thread_type="<string>",
 	observing_time="<string>",
-	week_days="<string>",
 	id="<string>",
 	load_on_install=False
 )
@@ -107,9 +105,8 @@ Args:
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `auto_start` | `bool` | `True` | specifies whether to start the mapping with agent start |
-| `thread_type` | `str` | `"<string>"` | type of thread, e.g. MILLI_SECONDS, MICRO_SECONDS, INSTANT, ONLY_ONCE, DAYTIME, DATE, ... |
-| `observing_time` | `Union[int | str]` | `"<string>"` | observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for DAYTIME in %H:%M or %H:%M:%S, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ... |
-| `week_days` | `Optional[str]` | `"<string>"` | specifies the week days the observer thread should run on, e.g. 'mon, fri, sun', 'mon - thu' or by numbers '0, 2, 4', where Monday = 0 and Sunday = 6 |
+| `thread_type` | `str` | `"<string>"` | type of thread, e.g. MILLI_SECONDS, MICRO_SECONDS, INSTANT, ONLY_ONCE, CRON, DATETIME, ... |
+| `observing_time` | `Union[int | str | list[int]]` | `"<string>"` | observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for CRON * * * * * as cron string, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ..., for ThreadType ON_OFF_SECONDS observing_time is expected to be an array with 2 elements |
 | `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 
@@ -122,7 +119,6 @@ discovery_service = DiscoveryService(
 	auto_start=True,
 	thread_type="<string>",
 	observing_time="<string>",
-	week_days="<string>",
 	id="<string>",
 	load_on_install=False
 )
@@ -141,9 +137,8 @@ Returns:
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `auto_start` | `bool` | `True` | specifies whether to start the mapping with agent start |
-| `thread_type` | `str` | `"<string>"` | type of thread, e.g. MILLI_SECONDS, MICRO_SECONDS, INSTANT, ONLY_ONCE, DAYTIME, DATE, ... |
-| `observing_time` | `Union[int | str]` | `"<string>"` | observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for DAYTIME in %H:%M or %H:%M:%S, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ... |
-| `week_days` | `Optional[str]` | `"<string>"` | specifies the week days the observer thread should run on, e.g. 'mon, fri, sun', 'mon - thu' or by numbers '0, 2, 4', where Monday = 0 and Sunday = 6 |
+| `thread_type` | `str` | `"<string>"` | type of thread, e.g. MILLI_SECONDS, MICRO_SECONDS, INSTANT, ONLY_ONCE, CRON, DATETIME, ... |
+| `observing_time` | `Union[int | str | list[int]]` | `"<string>"` | observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for CRON * * * * * as cron string, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ..., for ThreadType ON_OFF_SECONDS observing_time is expected to be an array with 2 elements |
 | `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `buffer_ids` | `list[str]` | `'list()'` | list of buffer ids to map from |
@@ -161,7 +156,6 @@ mapping_service = MappingService(
 	auto_start=True,
 	thread_type="<string>",
 	observing_time="<string>",
-	week_days="<string>",
 	id="<string>",
 	load_on_install=False,
 	buffer_ids='list()',
@@ -182,9 +176,8 @@ abstract base class for Services with ObserverThreads
 | `auto_start` | `bool` | `True` | specifies whether to start the mapping with agent start |
 | `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
-| `thread_type` | `str` | `"<string>"` | type of thread, e.g. MILLI_SECONDS, MICRO_SECONDS, INSTANT, ONLY_ONCE, DAYTIME, DATE, ... |
-| `observing_time` | `Union[int | str]` | `"<string>"` | observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for DAYTIME in %H:%M or %H:%M:%S, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ... |
-| `week_days` | `Optional[str]` | `"<string>"` | specifies the week days the observer thread should run on, e.g. 'mon, fri, sun', 'mon - thu' or by numbers '0, 2, 4', where Monday = 0 and Sunday = 6 |
+| `thread_type` | `str` | `"<string>"` | type of thread, e.g. MILLI_SECONDS, MICRO_SECONDS, INSTANT, ONLY_ONCE, CRON, DATETIME, ... |
+| `observing_time` | `Union[int | str | list[int]]` | `"<string>"` | observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for CRON * * * * * as cron string, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ..., for ThreadType ON_OFF_SECONDS observing_time is expected to be an array with 2 elements |
 
 
 ```python
@@ -196,8 +189,7 @@ observer_service = ObserverService(
 	id="<string>",
 	load_on_install=False,
 	thread_type="<string>",
-	observing_time="<string>",
-	week_days="<string>"
+	observing_time="<string>"
 )
 ```
 
@@ -207,9 +199,8 @@ observer_service = ObserverService(
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `auto_start` | `bool` | `True` | specifies whether to start the mapping with agent start |
-| `thread_type` | `str` | `"<string>"` | type of thread, e.g. MILLI_SECONDS, MICRO_SECONDS, INSTANT, ONLY_ONCE, DAYTIME, DATE, ... |
-| `observing_time` | `Union[int | str]` | `"<string>"` | observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for DAYTIME in %H:%M or %H:%M:%S, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ... |
-| `week_days` | `Optional[str]` | `"<string>"` | specifies the week days the observer thread should run on, e.g. 'mon, fri, sun', 'mon - thu' or by numbers '0, 2, 4', where Monday = 0 and Sunday = 6 |
+| `thread_type` | `str` | `"<string>"` | type of thread, e.g. MILLI_SECONDS, MICRO_SECONDS, INSTANT, ONLY_ONCE, CRON, DATETIME, ... |
+| `observing_time` | `Union[int | str | list[int]]` | `"<string>"` | observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for CRON * * * * * as cron string, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ..., for ThreadType ON_OFF_SECONDS observing_time is expected to be an array with 2 elements |
 | `buffer_ids` | `list[str]` | `'list()'` | list of buffer ids to map from |
 | `addresses` | `list[str]` | `'list()'` | list of addresses to read/subscribe from or write/publish to |
 | `mapping_type` | `str` | `"<string>"` | type of mapping, e.g. READ, WRITE, SUB or PUB |
@@ -227,7 +218,6 @@ publish_service = PublishService(
 	auto_start=True,
 	thread_type="<string>",
 	observing_time="<string>",
-	week_days="<string>",
 	buffer_ids='list()',
 	addresses='list()',
 	mapping_type="<string>",
@@ -244,9 +234,8 @@ publish_service = PublishService(
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `auto_start` | `bool` | `True` | specifies whether to start the mapping with agent start |
-| `thread_type` | `str` | `"<string>"` | type of thread, e.g. MILLI_SECONDS, MICRO_SECONDS, INSTANT, ONLY_ONCE, DAYTIME, DATE, ... |
-| `observing_time` | `Union[int | str]` | `"<string>"` | observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for DAYTIME in %H:%M or %H:%M:%S, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ... |
-| `week_days` | `Optional[str]` | `"<string>"` | specifies the week days the observer thread should run on, e.g. 'mon, fri, sun', 'mon - thu' or by numbers '0, 2, 4', where Monday = 0 and Sunday = 6 |
+| `thread_type` | `str` | `"<string>"` | type of thread, e.g. MILLI_SECONDS, MICRO_SECONDS, INSTANT, ONLY_ONCE, CRON, DATETIME, ... |
+| `observing_time` | `Union[int | str | list[int]]` | `"<string>"` | observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for CRON * * * * * as cron string, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ..., for ThreadType ON_OFF_SECONDS observing_time is expected to be an array with 2 elements |
 | `buffer_ids` | `list[str]` | `'list()'` | list of buffer ids to map from |
 | `addresses` | `list[str]` | `'list()'` | list of addresses to read/subscribe from or write/publish to |
 | `mapping_type` | `str` | `"<string>"` | type of mapping, e.g. READ, WRITE, SUB or PUB |
@@ -264,7 +253,6 @@ read_service = ReadService(
 	auto_start=True,
 	thread_type="<string>",
 	observing_time="<string>",
-	week_days="<string>",
 	buffer_ids='list()',
 	addresses='list()',
 	mapping_type="<string>",
@@ -304,9 +292,8 @@ service = Service(
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `auto_start` | `bool` | `True` | specifies whether to start the mapping with agent start |
-| `thread_type` | `str` | `"<string>"` | type of thread, e.g. MILLI_SECONDS, MICRO_SECONDS, INSTANT, ONLY_ONCE, DAYTIME, DATE, ... |
-| `observing_time` | `Union[int | str]` | `"<string>"` | observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for DAYTIME in %H:%M or %H:%M:%S, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ... |
-| `week_days` | `Optional[str]` | `"<string>"` | specifies the week days the observer thread should run on, e.g. 'mon, fri, sun', 'mon - thu' or by numbers '0, 2, 4', where Monday = 0 and Sunday = 6 |
+| `thread_type` | `str` | `"<string>"` | type of thread, e.g. MILLI_SECONDS, MICRO_SECONDS, INSTANT, ONLY_ONCE, CRON, DATETIME, ... |
+| `observing_time` | `Union[int | str | list[int]]` | `"<string>"` | observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for CRON * * * * * as cron string, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ..., for ThreadType ON_OFF_SECONDS observing_time is expected to be an array with 2 elements |
 | `buffer_ids` | `list[str]` | `'list()'` | list of buffer ids to map from |
 | `addresses` | `list[str]` | `'list()'` | list of addresses to read/subscribe from or write/publish to |
 | `mapping_type` | `str` | `"<string>"` | type of mapping, e.g. READ, WRITE, SUB or PUB |
@@ -324,7 +311,6 @@ subscribe_service = SubscribeService(
 	auto_start=True,
 	thread_type="<string>",
 	observing_time="<string>",
-	week_days="<string>",
 	buffer_ids='list()',
 	addresses='list()',
 	mapping_type="<string>",
@@ -341,9 +327,8 @@ subscribe_service = SubscribeService(
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `auto_start` | `bool` | `True` | specifies whether to start the mapping with agent start |
-| `thread_type` | `str` | `"<string>"` | type of thread, e.g. MILLI_SECONDS, MICRO_SECONDS, INSTANT, ONLY_ONCE, DAYTIME, DATE, ... |
-| `observing_time` | `Union[int | str]` | `"<string>"` | observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for DAYTIME in %H:%M or %H:%M:%S, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ... |
-| `week_days` | `Optional[str]` | `"<string>"` | specifies the week days the observer thread should run on, e.g. 'mon, fri, sun', 'mon - thu' or by numbers '0, 2, 4', where Monday = 0 and Sunday = 6 |
+| `thread_type` | `str` | `"<string>"` | type of thread, e.g. MILLI_SECONDS, MICRO_SECONDS, INSTANT, ONLY_ONCE, CRON, DATETIME, ... |
+| `observing_time` | `Union[int | str | list[int]]` | `"<string>"` | observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for CRON * * * * * as cron string, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ..., for ThreadType ON_OFF_SECONDS observing_time is expected to be an array with 2 elements |
 | `buffer_ids` | `list[str]` | `'list()'` | list of buffer ids to map from |
 | `addresses` | `list[str]` | `'list()'` | list of addresses to read/subscribe from or write/publish to |
 | `mapping_type` | `str` | `"<string>"` | type of mapping, e.g. READ, WRITE, SUB or PUB |
@@ -361,7 +346,6 @@ write_service = WriteService(
 	auto_start=True,
 	thread_type="<string>",
 	observing_time="<string>",
-	week_days="<string>",
 	buffer_ids='list()',
 	addresses='list()',
 	mapping_type="<string>",
@@ -380,9 +364,8 @@ write_service = WriteService(
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `auto_start` | `bool` | `True` | specifies whether to start the mapping with agent start |
-| `thread_type` | `str` | `"<string>"` | type of thread, e.g. MILLI_SECONDS, MICRO_SECONDS, INSTANT, ONLY_ONCE, DAYTIME, DATE, ... |
-| `observing_time` | `Union[int | str]` | `"<string>"` | observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for DAYTIME in %H:%M or %H:%M:%S, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ... |
-| `week_days` | `Optional[str]` | `"<string>"` | specifies the week days the observer thread should run on, e.g. 'mon, fri, sun', 'mon - thu' or by numbers '0, 2, 4', where Monday = 0 and Sunday = 6 |
+| `thread_type` | `str` | `"<string>"` | type of thread, e.g. MILLI_SECONDS, MICRO_SECONDS, INSTANT, ONLY_ONCE, CRON, DATETIME, ... |
+| `observing_time` | `Union[int | str | list[int]]` | `"<string>"` | observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for CRON * * * * * as cron string, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ..., for ThreadType ON_OFF_SECONDS observing_time is expected to be an array with 2 elements |
 | `buffer_ids` | `list[str]` | `'list()'` | list of buffer ids to map from |
 | `addresses` | `list[str]` | `'list()'` | list of addresses to read/subscribe from or write/publish to |
 | `mapping_type` | `str` | `"<string>"` | type of mapping, e.g. READ, WRITE, SUB or PUB |
@@ -403,7 +386,6 @@ ads_service = AdsService(
 	auto_start=True,
 	thread_type="<string>",
 	observing_time="<string>",
-	week_days="<string>",
 	buffer_ids='list()',
 	addresses='list()',
 	mapping_type="<string>",
@@ -425,9 +407,8 @@ ads_service = AdsService(
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `auto_start` | `bool` | `True` | specifies whether to start the mapping with agent start |
-| `thread_type` | `str` | `"<string>"` | type of thread, e.g. MILLI_SECONDS, MICRO_SECONDS, INSTANT, ONLY_ONCE, DAYTIME, DATE, ... |
-| `observing_time` | `Union[int | str]` | `"<string>"` | observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for DAYTIME in %H:%M or %H:%M:%S, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ... |
-| `week_days` | `Optional[str]` | `"<string>"` | specifies the week days the observer thread should run on, e.g. 'mon, fri, sun', 'mon - thu' or by numbers '0, 2, 4', where Monday = 0 and Sunday = 6 |
+| `thread_type` | `str` | `"<string>"` | type of thread, e.g. MILLI_SECONDS, MICRO_SECONDS, INSTANT, ONLY_ONCE, CRON, DATETIME, ... |
+| `observing_time` | `Union[int | str | list[int]]` | `"<string>"` | observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for CRON * * * * * as cron string, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ..., for ThreadType ON_OFF_SECONDS observing_time is expected to be an array with 2 elements |
 | `buffer_ids` | `list[str]` | `'list()'` | list of buffer ids to map from |
 | `addresses` | `list[str]` | `'list()'` | list of addresses to read/subscribe from or write/publish to |
 | `mapping_type` | `str` | `"<string>"` | type of mapping, e.g. READ, WRITE, SUB or PUB |
@@ -447,7 +428,6 @@ audio_service = AudioService(
 	auto_start=True,
 	thread_type="<string>",
 	observing_time="<string>",
-	week_days="<string>",
 	buffer_ids='list()',
 	addresses='list()',
 	mapping_type="<string>",
@@ -523,9 +503,8 @@ solid_works_service = SolidWorksService(
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `auto_start` | `bool` | `True` | specifies whether to start the mapping with agent start |
-| `thread_type` | `str` | `"<string>"` | type of thread, e.g. MILLI_SECONDS, MICRO_SECONDS, INSTANT, ONLY_ONCE, DAYTIME, DATE, ... |
-| `observing_time` | `Union[int | str]` | `"<string>"` | observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for DAYTIME in %H:%M or %H:%M:%S, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ... |
-| `week_days` | `Optional[str]` | `"<string>"` | specifies the week days the observer thread should run on, e.g. 'mon, fri, sun', 'mon - thu' or by numbers '0, 2, 4', where Monday = 0 and Sunday = 6 |
+| `thread_type` | `str` | `"<string>"` | type of thread, e.g. MILLI_SECONDS, MICRO_SECONDS, INSTANT, ONLY_ONCE, CRON, DATETIME, ... |
+| `observing_time` | `Union[int | str | list[int]]` | `"<string>"` | observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for CRON * * * * * as cron string, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ..., for ThreadType ON_OFF_SECONDS observing_time is expected to be an array with 2 elements |
 | `buffer_ids` | `list[str]` | `'list()'` | list of buffer ids to map from |
 | `addresses` | `list[str]` | `'list()'` | list of addresses to read/subscribe from or write/publish to |
 | `mapping_type` | `str` | `"<string>"` | type of mapping, e.g. READ, WRITE, SUB or PUB |
@@ -550,7 +529,6 @@ csv_read_service = CsvReadService(
 	auto_start=True,
 	thread_type="<string>",
 	observing_time="<string>",
-	week_days="<string>",
 	buffer_ids='list()',
 	addresses='list()',
 	mapping_type="<string>",
@@ -576,9 +554,8 @@ csv_read_service = CsvReadService(
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `auto_start` | `bool` | `True` | specifies whether to start the mapping with agent start |
-| `thread_type` | `str` | `"<string>"` | type of thread, e.g. MILLI_SECONDS, MICRO_SECONDS, INSTANT, ONLY_ONCE, DAYTIME, DATE, ... |
-| `observing_time` | `Union[int | str]` | `"<string>"` | observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for DAYTIME in %H:%M or %H:%M:%S, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ... |
-| `week_days` | `Optional[str]` | `"<string>"` | specifies the week days the observer thread should run on, e.g. 'mon, fri, sun', 'mon - thu' or by numbers '0, 2, 4', where Monday = 0 and Sunday = 6 |
+| `thread_type` | `str` | `"<string>"` | type of thread, e.g. MILLI_SECONDS, MICRO_SECONDS, INSTANT, ONLY_ONCE, CRON, DATETIME, ... |
+| `observing_time` | `Union[int | str | list[int]]` | `"<string>"` | observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for CRON * * * * * as cron string, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ..., for ThreadType ON_OFF_SECONDS observing_time is expected to be an array with 2 elements |
 | `buffer_ids` | `list[str]` | `'list()'` | list of buffer ids to map from |
 | `addresses` | `list[str]` | `'list()'` | list of addresses to read/subscribe from or write/publish to |
 | `mapping_type` | `str` | `"<string>"` | type of mapping, e.g. READ, WRITE, SUB or PUB |
@@ -593,6 +570,7 @@ csv_read_service = CsvReadService(
 | `delimiter` | `str` | `';'` | delimiter to use for column separation |
 | `decimal_precision` | `int` | `3` | maximum decimal precision of numeric values |
 | `file_prefix_format` | `str` | `"path/to/file.txt"` | format of the timestamp prefix, if None then a unixtimestamp is used, otherwise formats like '%Y%m%d' can be specified |
+| `timeout` | `int` | `1` | specifies the timeout in seconds, representing an idle time, after which a file is being closed for inactivity |
 
 
 ```python
@@ -603,7 +581,6 @@ csv_write_service = CsvWriteService(
 	auto_start=True,
 	thread_type="<string>",
 	observing_time="<string>",
-	week_days="<string>",
 	buffer_ids='list()',
 	addresses='list()',
 	mapping_type="<string>",
@@ -617,7 +594,8 @@ csv_write_service = CsvWriteService(
 	max_samples=1000000,
 	delimiter=';',
 	decimal_precision=3,
-	file_prefix_format="path/to/file.txt"
+	file_prefix_format="path/to/file.txt",
+	timeout=1
 )
 ```
 
@@ -718,9 +696,8 @@ multi_model_service = MultiModelService(
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `auto_start` | `bool` | `True` | specifies whether to start the mapping with agent start |
-| `thread_type` | `str` | `"<string>"` | type of thread, e.g. MILLI_SECONDS, MICRO_SECONDS, INSTANT, ONLY_ONCE, DAYTIME, DATE, ... |
-| `observing_time` | `Union[int | str]` | `"<string>"` | observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for DAYTIME in %H:%M or %H:%M:%S, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ... |
-| `week_days` | `Optional[str]` | `"<string>"` | specifies the week days the observer thread should run on, e.g. 'mon, fri, sun', 'mon - thu' or by numbers '0, 2, 4', where Monday = 0 and Sunday = 6 |
+| `thread_type` | `str` | `"<string>"` | type of thread, e.g. MILLI_SECONDS, MICRO_SECONDS, INSTANT, ONLY_ONCE, CRON, DATETIME, ... |
+| `observing_time` | `Union[int | str | list[int]]` | `"<string>"` | observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for CRON * * * * * as cron string, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ..., for ThreadType ON_OFF_SECONDS observing_time is expected to be an array with 2 elements |
 | `buffer_ids` | `list[str]` | `'list()'` | list of buffer ids to map from |
 | `addresses` | `list[str]` | `'list()'` | list of addresses to read/subscribe from or write/publish to |
 | `mapping_type` | `str` | `"<string>"` | type of mapping, e.g. READ, WRITE, SUB or PUB |
@@ -741,7 +718,6 @@ influx_db_service = InfluxDbService(
 	auto_start=True,
 	thread_type="<string>",
 	observing_time="<string>",
-	week_days="<string>",
 	buffer_ids='list()',
 	addresses='list()',
 	mapping_type="<string>",
@@ -761,9 +737,8 @@ influx_db_service = InfluxDbService(
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `auto_start` | `bool` | `True` | specifies whether to start the mapping with agent start |
-| `thread_type` | `str` | `"<string>"` | type of thread, e.g. MILLI_SECONDS, MICRO_SECONDS, INSTANT, ONLY_ONCE, DAYTIME, DATE, ... |
-| `observing_time` | `Union[int | str]` | `"<string>"` | observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for DAYTIME in %H:%M or %H:%M:%S, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ... |
-| `week_days` | `Optional[str]` | `"<string>"` | specifies the week days the observer thread should run on, e.g. 'mon, fri, sun', 'mon - thu' or by numbers '0, 2, 4', where Monday = 0 and Sunday = 6 |
+| `thread_type` | `str` | `"<string>"` | type of thread, e.g. MILLI_SECONDS, MICRO_SECONDS, INSTANT, ONLY_ONCE, CRON, DATETIME, ... |
+| `observing_time` | `Union[int | str | list[int]]` | `"<string>"` | observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for CRON * * * * * as cron string, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ..., for ThreadType ON_OFF_SECONDS observing_time is expected to be an array with 2 elements |
 | `buffer_ids` | `list[str]` | `'list()'` | list of buffer ids to map from |
 | `addresses` | `list[str]` | `'list()'` | list of addresses to read/subscribe from or write/publish to |
 | `mapping_type` | `str` | `"<string>"` | type of mapping, e.g. READ, WRITE, SUB or PUB |
@@ -782,7 +757,6 @@ s_q_l_service = SQLService(
 	auto_start=True,
 	thread_type="<string>",
 	observing_time="<string>",
-	week_days="<string>",
 	buffer_ids='list()',
 	addresses='list()',
 	mapping_type="<string>",
@@ -801,7 +775,6 @@ s_q_l_service = SQLService(
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `auto_start` | `bool` | `True` | specifies whether to start the mapping with agent start |
-| `week_days` | `Optional[str]` | `"<string>"` | specifies the week days the observer thread should run on, e.g. 'mon, fri, sun', 'mon - thu' or by numbers '0, 2, 4', where Monday = 0 and Sunday = 6 |
 | `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `source_folders` | `list[str]` | `'list()'` | List of source folders to copy files from. |
@@ -818,7 +791,6 @@ from pydag.services.documents.CopyFileService import CopyFileService  # Adjust i
 
 copy_file_service = CopyFileService(
 	auto_start=True,
-	week_days="<string>",
 	id="<string>",
 	load_on_install=False,
 	source_folders='list()',
@@ -837,7 +809,6 @@ copy_file_service = CopyFileService(
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `auto_start` | `bool` | `True` | specifies whether to start the mapping with agent start |
-| `week_days` | `Optional[str]` | `"<string>"` | specifies the week days the observer thread should run on, e.g. 'mon, fri, sun', 'mon - thu' or by numbers '0, 2, 4', where Monday = 0 and Sunday = 6 |
 | `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `folders` | `list[str]` | `'list()'` | List of folders to delete files from. |
@@ -852,7 +823,6 @@ from pydag.services.documents.DeleteFileService import DeleteFileService  # Adju
 
 delete_file_service = DeleteFileService(
 	auto_start=True,
-	week_days="<string>",
 	id="<string>",
 	load_on_install=False,
 	folders='list()',
@@ -871,9 +841,8 @@ delete_file_service = DeleteFileService(
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `auto_start` | `bool` | `True` | specifies whether to start the mapping with agent start |
-| `thread_type` | `str` | `"<string>"` | type of thread, e.g. MILLI_SECONDS, MICRO_SECONDS, INSTANT, ONLY_ONCE, DAYTIME, DATE, ... |
-| `observing_time` | `Union[int | str]` | `"<string>"` | observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for DAYTIME in %H:%M or %H:%M:%S, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ... |
-| `week_days` | `Optional[str]` | `"<string>"` | specifies the week days the observer thread should run on, e.g. 'mon, fri, sun', 'mon - thu' or by numbers '0, 2, 4', where Monday = 0 and Sunday = 6 |
+| `thread_type` | `str` | `"<string>"` | type of thread, e.g. MILLI_SECONDS, MICRO_SECONDS, INSTANT, ONLY_ONCE, CRON, DATETIME, ... |
+| `observing_time` | `Union[int | str | list[int]]` | `"<string>"` | observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for CRON * * * * * as cron string, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ..., for ThreadType ON_OFF_SECONDS observing_time is expected to be an array with 2 elements |
 | `buffer_ids` | `list[str]` | `'list()'` | list of buffer ids to map from |
 | `addresses` | `list[str]` | `'list()'` | list of addresses to read/subscribe from or write/publish to |
 | `mapping_type` | `str` | `"<string>"` | type of mapping, e.g. READ, WRITE, SUB or PUB |
@@ -892,7 +861,6 @@ document_text_service = DocumentTextService(
 	auto_start=True,
 	thread_type="<string>",
 	observing_time="<string>",
-	week_days="<string>",
 	buffer_ids='list()',
 	addresses='list()',
 	mapping_type="<string>",
@@ -914,9 +882,8 @@ If no addresses are specified all buffer keys are directly mapped to the context
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `auto_start` | `bool` | `True` | specifies whether to start the mapping with agent start |
-| `thread_type` | `str` | `"<string>"` | type of thread, e.g. MILLI_SECONDS, MICRO_SECONDS, INSTANT, ONLY_ONCE, DAYTIME, DATE, ... |
-| `observing_time` | `Union[int | str]` | `"<string>"` | observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for DAYTIME in %H:%M or %H:%M:%S, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ... |
-| `week_days` | `Optional[str]` | `"<string>"` | specifies the week days the observer thread should run on, e.g. 'mon, fri, sun', 'mon - thu' or by numbers '0, 2, 4', where Monday = 0 and Sunday = 6 |
+| `thread_type` | `str` | `"<string>"` | type of thread, e.g. MILLI_SECONDS, MICRO_SECONDS, INSTANT, ONLY_ONCE, CRON, DATETIME, ... |
+| `observing_time` | `Union[int | str | list[int]]` | `"<string>"` | observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for CRON * * * * * as cron string, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ..., for ThreadType ON_OFF_SECONDS observing_time is expected to be an array with 2 elements |
 | `buffer_ids` | `list[str]` | `'list()'` | list of buffer ids to map from |
 | `addresses` | `list[str]` | `'list()'` | list of addresses to read/subscribe from or write/publish to |
 | `mapping_type` | `str` | `"<string>"` | type of mapping, e.g. READ, WRITE, SUB or PUB |
@@ -936,7 +903,6 @@ docx_service = DocxService(
 	auto_start=True,
 	thread_type="<string>",
 	observing_time="<string>",
-	week_days="<string>",
 	buffer_ids='list()',
 	addresses='list()',
 	mapping_type="<string>",
@@ -1057,7 +1023,6 @@ file_watchdog_service = FileWatchdogService(
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `auto_start` | `bool` | `True` | specifies whether to start the mapping with agent start |
-| `week_days` | `Optional[str]` | `"<string>"` | specifies the week days the observer thread should run on, e.g. 'mon, fri, sun', 'mon - thu' or by numbers '0, 2, 4', where Monday = 0 and Sunday = 6 |
 | `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `thread_type` | `str` | `'ThreadType.SECOND.value'` | second precision observerthread |
@@ -1077,7 +1042,6 @@ from pydag.services.documents.FolderObserveMailService import FolderObserveMailS
 
 folder_observe_mail_service = FolderObserveMailService(
 	auto_start=True,
-	week_days="<string>",
 	id="<string>",
 	load_on_install=False,
 	thread_type='ThreadType.SECOND.value',
@@ -1101,9 +1065,8 @@ folder_observe_mail_service = FolderObserveMailService(
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `auto_start` | `bool` | `True` | specifies whether to start the mapping with agent start |
-| `thread_type` | `str` | `"<string>"` | type of thread, e.g. MILLI_SECONDS, MICRO_SECONDS, INSTANT, ONLY_ONCE, DAYTIME, DATE, ... |
-| `observing_time` | `Union[int | str]` | `"<string>"` | observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for DAYTIME in %H:%M or %H:%M:%S, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ... |
-| `week_days` | `Optional[str]` | `"<string>"` | specifies the week days the observer thread should run on, e.g. 'mon, fri, sun', 'mon - thu' or by numbers '0, 2, 4', where Monday = 0 and Sunday = 6 |
+| `thread_type` | `str` | `"<string>"` | type of thread, e.g. MILLI_SECONDS, MICRO_SECONDS, INSTANT, ONLY_ONCE, CRON, DATETIME, ... |
+| `observing_time` | `Union[int | str | list[int]]` | `"<string>"` | observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for CRON * * * * * as cron string, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ..., for ThreadType ON_OFF_SECONDS observing_time is expected to be an array with 2 elements |
 | `buffer_ids` | `list[str]` | `'list()'` | list of buffer ids to map from |
 | `addresses` | `list[str]` | `'list()'` | list of addresses to read/subscribe from or write/publish to |
 | `mapping_type` | `str` | `"<string>"` | type of mapping, e.g. READ, WRITE, SUB or PUB |
@@ -1122,7 +1085,6 @@ npz_service = NpzService(
 	auto_start=True,
 	thread_type="<string>",
 	observing_time="<string>",
-	week_days="<string>",
 	buffer_ids='list()',
 	addresses='list()',
 	mapping_type="<string>",
@@ -1142,7 +1104,7 @@ npz_service = NpzService(
 | `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `path` | `Path` | `"<value>"` |  |
-| `timestamp` | `datetime` | `"2026-08-15T21:25:08Z"  # datetime as ISO string` |  |
+| `timestamp` | `datetime` | `"2026-10-04T15:10:01Z"  # datetime as ISO string` |  |
 
 
 ```python
@@ -1153,7 +1115,7 @@ backup = Backup(
 	id="<string>",
 	load_on_install=False,
 	path="<value>",
-	timestamp="2026-08-15T21:25:08Z"  # datetime as ISO string
+	timestamp="2026-10-04T15:10:01Z"  # datetime as ISO string
 )
 ```
 
@@ -1163,9 +1125,8 @@ backup = Backup(
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `auto_start` | `bool` | `True` | specifies whether to start the mapping with agent start |
-| `thread_type` | `str` | `"<string>"` | type of thread, e.g. MILLI_SECONDS, MICRO_SECONDS, INSTANT, ONLY_ONCE, DAYTIME, DATE, ... |
-| `observing_time` | `Union[int | str]` | `"<string>"` | observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for DAYTIME in %H:%M or %H:%M:%S, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ... |
-| `week_days` | `Optional[str]` | `"<string>"` | specifies the week days the observer thread should run on, e.g. 'mon, fri, sun', 'mon - thu' or by numbers '0, 2, 4', where Monday = 0 and Sunday = 6 |
+| `thread_type` | `str` | `"<string>"` | type of thread, e.g. MILLI_SECONDS, MICRO_SECONDS, INSTANT, ONLY_ONCE, CRON, DATETIME, ... |
+| `observing_time` | `Union[int | str | list[int]]` | `"<string>"` | observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for CRON * * * * * as cron string, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ..., for ThreadType ON_OFF_SECONDS observing_time is expected to be an array with 2 elements |
 | `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `source` | `list[str] | str` | `'list()'` | a list or single folder path or filepath of which backups shall be made |
@@ -1184,7 +1145,6 @@ rolling_backup_service = RollingBackupService(
 	auto_start=True,
 	thread_type="<string>",
 	observing_time="<string>",
-	week_days="<string>",
 	id="<string>",
 	load_on_install=False,
 	source='list()',
@@ -1204,9 +1164,8 @@ rolling_backup_service = RollingBackupService(
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `auto_start` | `bool` | `True` | specifies whether to start the mapping with agent start |
-| `thread_type` | `str` | `"<string>"` | type of thread, e.g. MILLI_SECONDS, MICRO_SECONDS, INSTANT, ONLY_ONCE, DAYTIME, DATE, ... |
-| `observing_time` | `Union[int | str]` | `"<string>"` | observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for DAYTIME in %H:%M or %H:%M:%S, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ... |
-| `week_days` | `Optional[str]` | `"<string>"` | specifies the week days the observer thread should run on, e.g. 'mon, fri, sun', 'mon - thu' or by numbers '0, 2, 4', where Monday = 0 and Sunday = 6 |
+| `thread_type` | `str` | `"<string>"` | type of thread, e.g. MILLI_SECONDS, MICRO_SECONDS, INSTANT, ONLY_ONCE, CRON, DATETIME, ... |
+| `observing_time` | `Union[int | str | list[int]]` | `"<string>"` | observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for CRON * * * * * as cron string, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ..., for ThreadType ON_OFF_SECONDS observing_time is expected to be an array with 2 elements |
 | `buffer_ids` | `list[str]` | `'list()'` | list of buffer ids to map from |
 | `addresses` | `list[str]` | `'list()'` | list of addresses to read/subscribe from or write/publish to |
 | `mapping_type` | `str` | `"<string>"` | type of mapping, e.g. READ, WRITE, SUB or PUB |
@@ -1227,7 +1186,6 @@ http_service = HttpService(
 	auto_start=True,
 	thread_type="<string>",
 	observing_time="<string>",
-	week_days="<string>",
 	buffer_ids='list()',
 	addresses='list()',
 	mapping_type="<string>",
@@ -1426,9 +1384,8 @@ r_a_g_service = RAGService(
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `auto_start` | `bool` | `True` | specifies whether to start the mapping with agent start |
-| `thread_type` | `str` | `"<string>"` | type of thread, e.g. MILLI_SECONDS, MICRO_SECONDS, INSTANT, ONLY_ONCE, DAYTIME, DATE, ... |
-| `observing_time` | `Union[int | str]` | `"<string>"` | observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for DAYTIME in %H:%M or %H:%M:%S, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ... |
-| `week_days` | `Optional[str]` | `"<string>"` | specifies the week days the observer thread should run on, e.g. 'mon, fri, sun', 'mon - thu' or by numbers '0, 2, 4', where Monday = 0 and Sunday = 6 |
+| `thread_type` | `str` | `"<string>"` | type of thread, e.g. MILLI_SECONDS, MICRO_SECONDS, INSTANT, ONLY_ONCE, CRON, DATETIME, ... |
+| `observing_time` | `Union[int | str | list[int]]` | `"<string>"` | observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for CRON * * * * * as cron string, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ..., for ThreadType ON_OFF_SECONDS observing_time is expected to be an array with 2 elements |
 | `buffer_ids` | `list[str]` | `'list()'` | list of buffer ids to map from |
 | `addresses` | `list[str]` | `'list()'` | list of addresses to read/subscribe from or write/publish to |
 | `mapping_type` | `str` | `"<string>"` | type of mapping, e.g. READ, WRITE, SUB or PUB |
@@ -1452,7 +1409,6 @@ m_q_t_t_service = MQTTService(
 	auto_start=True,
 	thread_type="<string>",
 	observing_time="<string>",
-	week_days="<string>",
 	buffer_ids='list()',
 	addresses='list()',
 	mapping_type="<string>",
@@ -1511,9 +1467,8 @@ m_s_graph_service = MSGraphService(
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `auto_start` | `bool` | `True` | specifies whether to start the mapping with agent start |
-| `thread_type` | `str` | `"<string>"` | type of thread, e.g. MILLI_SECONDS, MICRO_SECONDS, INSTANT, ONLY_ONCE, DAYTIME, DATE, ... |
-| `observing_time` | `Union[int | str]` | `"<string>"` | observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for DAYTIME in %H:%M or %H:%M:%S, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ... |
-| `week_days` | `Optional[str]` | `"<string>"` | specifies the week days the observer thread should run on, e.g. 'mon, fri, sun', 'mon - thu' or by numbers '0, 2, 4', where Monday = 0 and Sunday = 6 |
+| `thread_type` | `str` | `"<string>"` | type of thread, e.g. MILLI_SECONDS, MICRO_SECONDS, INSTANT, ONLY_ONCE, CRON, DATETIME, ... |
+| `observing_time` | `Union[int | str | list[int]]` | `"<string>"` | observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for CRON * * * * * as cron string, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ..., for ThreadType ON_OFF_SECONDS observing_time is expected to be an array with 2 elements |
 | `buffer_ids` | `list[str]` | `'list()'` | list of buffer ids to map from |
 | `addresses` | `list[str]` | `'list()'` | list of addresses to read/subscribe from or write/publish to |
 | `mapping_type` | `str` | `"<string>"` | type of mapping, e.g. READ, WRITE, SUB or PUB |
@@ -1532,7 +1487,6 @@ opc_ua_service = OpcUaService(
 	auto_start=True,
 	thread_type="<string>",
 	observing_time="<string>",
-	week_days="<string>",
 	buffer_ids='list()',
 	addresses='list()',
 	mapping_type="<string>",
@@ -1594,9 +1548,8 @@ plotlify_service = PlotlifyService(
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `auto_start` | `bool` | `True` | specifies whether to start the mapping with agent start |
-| `thread_type` | `str` | `"<string>"` | type of thread, e.g. MILLI_SECONDS, MICRO_SECONDS, INSTANT, ONLY_ONCE, DAYTIME, DATE, ... |
-| `observing_time` | `Union[int | str]` | `"<string>"` | observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for DAYTIME in %H:%M or %H:%M:%S, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ... |
-| `week_days` | `Optional[str]` | `"<string>"` | specifies the week days the observer thread should run on, e.g. 'mon, fri, sun', 'mon - thu' or by numbers '0, 2, 4', where Monday = 0 and Sunday = 6 |
+| `thread_type` | `str` | `"<string>"` | type of thread, e.g. MILLI_SECONDS, MICRO_SECONDS, INSTANT, ONLY_ONCE, CRON, DATETIME, ... |
+| `observing_time` | `Union[int | str | list[int]]` | `"<string>"` | observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for CRON * * * * * as cron string, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ..., for ThreadType ON_OFF_SECONDS observing_time is expected to be an array with 2 elements |
 | `buffer_ids` | `list[str]` | `'list()'` | list of buffer ids to map from |
 | `addresses` | `list[str]` | `'list()'` | list of addresses to read/subscribe from or write/publish to |
 | `mapping_type` | `str` | `"<string>"` | type of mapping, e.g. READ, WRITE, SUB or PUB |
@@ -1617,7 +1570,6 @@ s7_service = S7Service(
 	auto_start=True,
 	thread_type="<string>",
 	observing_time="<string>",
-	week_days="<string>",
 	buffer_ids='list()',
 	addresses='list()',
 	mapping_type="<string>",
@@ -1689,9 +1641,8 @@ But it has to match the number of elements in the schema used for reading or wri
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `auto_start` | `bool` | `True` | specifies whether to start the mapping with agent start |
-| `thread_type` | `str` | `"<string>"` | type of thread, e.g. MILLI_SECONDS, MICRO_SECONDS, INSTANT, ONLY_ONCE, DAYTIME, DATE, ... |
-| `observing_time` | `Union[int | str]` | `"<string>"` | observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for DAYTIME in %H:%M or %H:%M:%S, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ... |
-| `week_days` | `Optional[str]` | `"<string>"` | specifies the week days the observer thread should run on, e.g. 'mon, fri, sun', 'mon - thu' or by numbers '0, 2, 4', where Monday = 0 and Sunday = 6 |
+| `thread_type` | `str` | `"<string>"` | type of thread, e.g. MILLI_SECONDS, MICRO_SECONDS, INSTANT, ONLY_ONCE, CRON, DATETIME, ... |
+| `observing_time` | `Union[int | str | list[int]]` | `"<string>"` | observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for CRON * * * * * as cron string, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ..., for ThreadType ON_OFF_SECONDS observing_time is expected to be an array with 2 elements |
 | `buffer_ids` | `list[str]` | `'list()'` | list of buffer ids to map from |
 | `addresses` | `list[str]` | `'list()'` | list of addresses to read/subscribe from or write/publish to |
 | `mapping_type` | `str` | `"<string>"` | type of mapping, e.g. READ, WRITE, SUB or PUB |
@@ -1720,7 +1671,6 @@ byte_stream_service = ByteStreamService(
 	auto_start=True,
 	thread_type="<string>",
 	observing_time="<string>",
-	week_days="<string>",
 	buffer_ids='list()',
 	addresses='list()',
 	mapping_type="<string>",
@@ -1750,9 +1700,8 @@ byte_stream_service = ByteStreamService(
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `auto_start` | `bool` | `True` | specifies whether to start the mapping with agent start |
-| `thread_type` | `str` | `"<string>"` | type of thread, e.g. MILLI_SECONDS, MICRO_SECONDS, INSTANT, ONLY_ONCE, DAYTIME, DATE, ... |
-| `observing_time` | `Union[int | str]` | `"<string>"` | observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for DAYTIME in %H:%M or %H:%M:%S, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ... |
-| `week_days` | `Optional[str]` | `"<string>"` | specifies the week days the observer thread should run on, e.g. 'mon, fri, sun', 'mon - thu' or by numbers '0, 2, 4', where Monday = 0 and Sunday = 6 |
+| `thread_type` | `str` | `"<string>"` | type of thread, e.g. MILLI_SECONDS, MICRO_SECONDS, INSTANT, ONLY_ONCE, CRON, DATETIME, ... |
+| `observing_time` | `Union[int | str | list[int]]` | `"<string>"` | observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for CRON * * * * * as cron string, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ..., for ThreadType ON_OFF_SECONDS observing_time is expected to be an array with 2 elements |
 | `buffer_ids` | `list[str]` | `'list()'` | list of buffer ids to map from |
 | `addresses` | `list[str]` | `'list()'` | list of addresses to read/subscribe from or write/publish to |
 | `mapping_type` | `str` | `"<string>"` | type of mapping, e.g. READ, WRITE, SUB or PUB |
@@ -1784,7 +1733,6 @@ serial_service = SerialService(
 	auto_start=True,
 	thread_type="<string>",
 	observing_time="<string>",
-	week_days="<string>",
 	buffer_ids='list()',
 	addresses='list()',
 	mapping_type="<string>",
@@ -1815,9 +1763,8 @@ serial_service = SerialService(
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `auto_start` | `bool` | `True` | specifies whether to start the mapping with agent start |
-| `thread_type` | `str` | `"<string>"` | type of thread, e.g. MILLI_SECONDS, MICRO_SECONDS, INSTANT, ONLY_ONCE, DAYTIME, DATE, ... |
-| `observing_time` | `Union[int | str]` | `"<string>"` | observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for DAYTIME in %H:%M or %H:%M:%S, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ... |
-| `week_days` | `Optional[str]` | `"<string>"` | specifies the week days the observer thread should run on, e.g. 'mon, fri, sun', 'mon - thu' or by numbers '0, 2, 4', where Monday = 0 and Sunday = 6 |
+| `thread_type` | `str` | `"<string>"` | type of thread, e.g. MILLI_SECONDS, MICRO_SECONDS, INSTANT, ONLY_ONCE, CRON, DATETIME, ... |
+| `observing_time` | `Union[int | str | list[int]]` | `"<string>"` | observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for CRON * * * * * as cron string, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ..., for ThreadType ON_OFF_SECONDS observing_time is expected to be an array with 2 elements |
 | `buffer_ids` | `list[str]` | `'list()'` | list of buffer ids to map from |
 | `addresses` | `list[str]` | `'list()'` | list of addresses to read/subscribe from or write/publish to |
 | `mapping_type` | `str` | `"<string>"` | type of mapping, e.g. READ, WRITE, SUB or PUB |
@@ -1846,7 +1793,6 @@ t_c_p_client_service = TCPClientService(
 	auto_start=True,
 	thread_type="<string>",
 	observing_time="<string>",
-	week_days="<string>",
 	buffer_ids='list()',
 	addresses='list()',
 	mapping_type="<string>",
@@ -1876,9 +1822,8 @@ t_c_p_client_service = TCPClientService(
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `auto_start` | `bool` | `True` | specifies whether to start the mapping with agent start |
-| `thread_type` | `str` | `"<string>"` | type of thread, e.g. MILLI_SECONDS, MICRO_SECONDS, INSTANT, ONLY_ONCE, DAYTIME, DATE, ... |
-| `observing_time` | `Union[int | str]` | `"<string>"` | observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for DAYTIME in %H:%M or %H:%M:%S, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ... |
-| `week_days` | `Optional[str]` | `"<string>"` | specifies the week days the observer thread should run on, e.g. 'mon, fri, sun', 'mon - thu' or by numbers '0, 2, 4', where Monday = 0 and Sunday = 6 |
+| `thread_type` | `str` | `"<string>"` | type of thread, e.g. MILLI_SECONDS, MICRO_SECONDS, INSTANT, ONLY_ONCE, CRON, DATETIME, ... |
+| `observing_time` | `Union[int | str | list[int]]` | `"<string>"` | observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for CRON * * * * * as cron string, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ..., for ThreadType ON_OFF_SECONDS observing_time is expected to be an array with 2 elements |
 | `buffer_ids` | `list[str]` | `'list()'` | list of buffer ids to map from |
 | `addresses` | `list[str]` | `'list()'` | list of addresses to read/subscribe from or write/publish to |
 | `mapping_type` | `str` | `"<string>"` | type of mapping, e.g. READ, WRITE, SUB or PUB |
@@ -1897,7 +1842,6 @@ web_socket_service = WebSocketService(
 	auto_start=True,
 	thread_type="<string>",
 	observing_time="<string>",
-	week_days="<string>",
 	buffer_ids='list()',
 	addresses='list()',
 	mapping_type="<string>",
@@ -1915,9 +1859,8 @@ web_socket_service = WebSocketService(
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `auto_start` | `bool` | `True` | specifies whether to start the mapping with agent start |
-| `thread_type` | `str` | `"<string>"` | type of thread, e.g. MILLI_SECONDS, MICRO_SECONDS, INSTANT, ONLY_ONCE, DAYTIME, DATE, ... |
-| `observing_time` | `Union[int | str]` | `"<string>"` | observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for DAYTIME in %H:%M or %H:%M:%S, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ... |
-| `week_days` | `Optional[str]` | `"<string>"` | specifies the week days the observer thread should run on, e.g. 'mon, fri, sun', 'mon - thu' or by numbers '0, 2, 4', where Monday = 0 and Sunday = 6 |
+| `thread_type` | `str` | `"<string>"` | type of thread, e.g. MILLI_SECONDS, MICRO_SECONDS, INSTANT, ONLY_ONCE, CRON, DATETIME, ... |
+| `observing_time` | `Union[int | str | list[int]]` | `"<string>"` | observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for CRON * * * * * as cron string, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ..., for ThreadType ON_OFF_SECONDS observing_time is expected to be an array with 2 elements |
 | `buffer_ids` | `list[str]` | `'list()'` | list of buffer ids to map from |
 | `addresses` | `list[str]` | `'list()'` | list of addresses to read/subscribe from or write/publish to |
 | `mapping_type` | `str` | `"<string>"` | type of mapping, e.g. READ, WRITE, SUB or PUB |
@@ -1940,7 +1883,6 @@ v_s_e_service = VSEService(
 	auto_start=True,
 	thread_type="<string>",
 	observing_time="<string>",
-	week_days="<string>",
 	buffer_ids='list()',
 	addresses='list()',
 	mapping_type="<string>",
@@ -1962,7 +1904,6 @@ v_s_e_service = VSEService(
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `auto_start` | `bool` | `True` | specifies whether to start the mapping with agent start |
-| `week_days` | `Optional[str]` | `"<string>"` | specifies the week days the observer thread should run on, e.g. 'mon, fri, sun', 'mon - thu' or by numbers '0, 2, 4', where Monday = 0 and Sunday = 6 |
 | `nodes` | `dict[str, Node]` | `'dict[str, Node]()'` | dictionary of nodes in the statemachine service |
 | `thread_type` | `str` | `'ThreadType.INSTANT.value'` | default thread type is INSTANT |
 | `observing_time` | `int` | `0` | observing time that specifies the interval the observer thread should run for |
@@ -1977,7 +1918,6 @@ from pydag.services.statemachine.SFCService import SFCService  # Adjust import i
 
 s_f_c_service = SFCService(
 	auto_start=True,
-	week_days="<string>",
 	nodes='dict[str, Node]()',
 	thread_type='ThreadType.INSTANT.value',
 	observing_time=0,
@@ -1993,7 +1933,6 @@ s_f_c_service = SFCService(
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `auto_start` | `bool` | `True` | specifies whether to start the mapping with agent start |
-| `week_days` | `Optional[str]` | `"<string>"` | specifies the week days the observer thread should run on, e.g. 'mon, fri, sun', 'mon - thu' or by numbers '0, 2, 4', where Monday = 0 and Sunday = 6 |
 | `nodes` | `dict[str, Node]` | `'dict[str, Node]()'` | dictionary of nodes in the statemachine service |
 | `thread_type` | `str` | `'ThreadType.INSTANT.value'` | default thread type is INSTANT |
 | `observing_time` | `int` | `0` | observing time that specifies the interval the observer thread should run for |
@@ -2007,7 +1946,6 @@ from pydag.services.statemachine.SimpleStatemachine import SimpleStatemachine  #
 
 simple_statemachine = SimpleStatemachine(
 	auto_start=True,
-	week_days="<string>",
 	nodes='dict[str, Node]()',
 	thread_type='ThreadType.INSTANT.value',
 	observing_time=0,
@@ -2025,7 +1963,6 @@ abstract `ObserverService` class for Statemachines
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `auto_start` | `bool` | `True` | specifies whether to start the mapping with agent start |
-| `week_days` | `Optional[str]` | `"<string>"` | specifies the week days the observer thread should run on, e.g. 'mon, fri, sun', 'mon - thu' or by numbers '0, 2, 4', where Monday = 0 and Sunday = 6 |
 | `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `nodes` | `dict[str, Node]` | `'dict[str, Node]()'` | dictionary of nodes in the statemachine service |
@@ -2039,7 +1976,6 @@ from pydag.services.statemachine.StatemachineService import StatemachineService 
 
 statemachine_service = StatemachineService(
 	auto_start=True,
-	week_days="<string>",
 	id="<string>",
 	load_on_install=False,
 	nodes='dict[str, Node]()',
@@ -2054,8 +1990,7 @@ statemachine_service = StatemachineService(
 A Service for running conventional callables and Action/BufferNode steps in one sequence.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| `observing_time` | `Union[int | str]` | `"<string>"` | observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for DAYTIME in %H:%M or %H:%M:%S, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ... |
-| `week_days` | `Optional[str]` | `"<string>"` | specifies the week days the observer thread should run on, e.g. 'mon, fri, sun', 'mon - thu' or by numbers '0, 2, 4', where Monday = 0 and Sunday = 6 |
+| `observing_time` | `Union[int | str | list[int]]` | `"<string>"` | observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for CRON * * * * * as cron string, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ..., for ThreadType ON_OFF_SECONDS observing_time is expected to be an array with 2 elements |
 | `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 | `task_files` | `list[str]` | `'list()'` |  |
@@ -2073,7 +2008,6 @@ from pydag.services.tasks.TaskRunnerService import TaskRunnerService  # Adjust i
 
 task_runner_service = TaskRunnerService(
 	observing_time="<string>",
-	week_days="<string>",
 	id="<string>",
 	load_on_install=False,
 	task_files='list()',
@@ -2094,9 +2028,8 @@ task_runner_service = TaskRunnerService(
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `auto_start` | `bool` | `True` | specifies whether to start the mapping with agent start |
-| `thread_type` | `str` | `"<string>"` | type of thread, e.g. MILLI_SECONDS, MICRO_SECONDS, INSTANT, ONLY_ONCE, DAYTIME, DATE, ... |
-| `observing_time` | `Union[int | str]` | `"<string>"` | observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for DAYTIME in %H:%M or %H:%M:%S, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ... |
-| `week_days` | `Optional[str]` | `"<string>"` | specifies the week days the observer thread should run on, e.g. 'mon, fri, sun', 'mon - thu' or by numbers '0, 2, 4', where Monday = 0 and Sunday = 6 |
+| `thread_type` | `str` | `"<string>"` | type of thread, e.g. MILLI_SECONDS, MICRO_SECONDS, INSTANT, ONLY_ONCE, CRON, DATETIME, ... |
+| `observing_time` | `Union[int | str | list[int]]` | `"<string>"` | observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for CRON * * * * * as cron string, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ..., for ThreadType ON_OFF_SECONDS observing_time is expected to be an array with 2 elements |
 | `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 
@@ -2109,7 +2042,6 @@ agent_persist_service = AgentPersistService(
 	auto_start=True,
 	thread_type="<string>",
 	observing_time="<string>",
-	week_days="<string>",
 	id="<string>",
 	load_on_install=False
 )
@@ -2125,10 +2057,9 @@ Args:
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `auto_start` | `bool` | `True` | specifies whether to start the mapping with agent start |
-| `week_days` | `Optional[str]` | `"<string>"` | specifies the week days the observer thread should run on, e.g. 'mon, fri, sun', 'mon - thu' or by numbers '0, 2, 4', where Monday = 0 and Sunday = 6 |
 | `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
-| `thread_type` | `str` | `'ThreadType.SECOND'` | type of thread, e.g. MILLI_SECONDS, MICRO_SECONDS, INSTANT, ONLY_ONCE, DAYTIME, DATE, ... |
+| `thread_type` | `str` | `'ThreadType.SECOND'` | type of thread, e.g. MILLI_SECONDS, MICRO_SECONDS, INSTANT, ONLY_ONCE, CRON, DATETIME, ... |
 | `observing_time` | `Union[int | str]` | `10` | interval of seconds for restarts attempts |
 | `max_restart_attempts` | `int` | `3` | number of consecutive restarts attempts before omitting the mapping service from restart attempts |
 
@@ -2139,7 +2070,6 @@ from pydag.services.utils.MappingRestartService import MappingRestartService  # 
 
 mapping_restart_service = MappingRestartService(
 	auto_start=True,
-	week_days="<string>",
 	id="<string>",
 	load_on_install=False,
 	thread_type='ThreadType.SECOND',
@@ -2156,9 +2086,8 @@ An `MappingService` that captures webcam video feed into a `Buffer`
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `auto_start` | `bool` | `True` | specifies whether to start the mapping with agent start |
-| `thread_type` | `str` | `"<string>"` | type of thread, e.g. MILLI_SECONDS, MICRO_SECONDS, INSTANT, ONLY_ONCE, DAYTIME, DATE, ... |
-| `observing_time` | `Union[int | str]` | `"<string>"` | observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for DAYTIME in %H:%M or %H:%M:%S, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ... |
-| `week_days` | `Optional[str]` | `"<string>"` | specifies the week days the observer thread should run on, e.g. 'mon, fri, sun', 'mon - thu' or by numbers '0, 2, 4', where Monday = 0 and Sunday = 6 |
+| `thread_type` | `str` | `"<string>"` | type of thread, e.g. MILLI_SECONDS, MICRO_SECONDS, INSTANT, ONLY_ONCE, CRON, DATETIME, ... |
+| `observing_time` | `Union[int | str | list[int]]` | `"<string>"` | observing time to apply for this ObserverThread, depending on the thread type, e.g. sampling period for MILLI_SECONDS or MICRO_SECONDS, time of day for CRON * * * * * as cron string, DATETIME dates must be specified in the format %Y-%m-%d %H:%M:%S ..., for ThreadType ON_OFF_SECONDS observing_time is expected to be an array with 2 elements |
 | `buffer_ids` | `list[str]` | `'list()'` | list of buffer ids to map from |
 | `addresses` | `list[str]` | `'list()'` | list of addresses to read/subscribe from or write/publish to |
 | `mapping_type` | `str` | `"<string>"` | type of mapping, e.g. READ, WRITE, SUB or PUB |
@@ -2182,7 +2111,6 @@ webcam_service = WebcamService(
 	auto_start=True,
 	thread_type="<string>",
 	observing_time="<string>",
-	week_days="<string>",
 	buffer_ids='list()',
 	addresses='list()',
 	mapping_type="<string>",
