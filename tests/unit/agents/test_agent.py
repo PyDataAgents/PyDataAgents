@@ -1,9 +1,14 @@
 import os
 import time
 
+import pytest
+
 from pydag.agents.Agent import Agent
+from pydag.agents.AgentException import AgentException
+from pydag.buffers.Buffer import Buffer
 from pydag.buffers.DictBuffer import DictBuffer
 from pydag.nodes.utils.PrintAction import PrintAction
+from pydag.services.Service import Service
 from pydag.services.ThreadType import ThreadType
 from pydag.services.statemachine.SimpleStatemachine import SimpleStatemachine
 
@@ -56,5 +61,18 @@ def test_edit_agent_element2():
     ag.terminate()
     
     assert pa.id == "A11", "wrong id was specififed"
+    
+def test_add_buffer():
+    ag = Agent()    
+    pa = PrintAction(id="A1", message="Test Message")    
+    with pytest.raises(AgentException, match=f"Provided object is not of type {Buffer.__name__}"):
+        ag.add_buffer(pa)
+        
+def test_add_service():
+    ag = Agent()    
+    pa = PrintAction(id="A1", message="Test Message")    
+    with pytest.raises(AgentException, match=f"Provided object is not of type {Service.__name__}"):
+        ag.add_service(pa)
+    
     
     

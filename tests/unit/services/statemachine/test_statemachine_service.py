@@ -1,7 +1,11 @@
 import os
 import time
+
+import pytest
 from pydag.agents.Agent import Agent
 from pydag.agents.app.AgentApp import AgentApp
+from pydag.buffers.DictBuffer import DictBuffer
+from pydag.nodes.Node import Node
 from pydag.nodes.utils.JoinTransition import JoinTransition
 from pydag.services.statemachine.SFCService import SFCService
 from pydag.services.statemachine.StatemachineException import StatemachineException
@@ -285,4 +289,12 @@ def test_060():
     # StartAction inherits Action but doesn't increment count; CountAction increments once
     assert a2.count == 1, f"Expected CountAction to execute once, executed {a2.count} times"
     assert service._thread.is_alive() is False
+    
+def test_add_node():
+    """Test that adding a node class is necessary for add_node"""
+    service = SimpleStatemachine()
+    buf = DictBuffer()
+    with pytest.raises(StatemachineException, match=f"Provided object is not of type {Node.__name__}"):
+        service.add_node(buf)
+        
     

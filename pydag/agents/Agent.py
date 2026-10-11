@@ -110,6 +110,9 @@ class Agent():
         Args:
             buffer (Buffer): the Buffer instance to add.
         """
+        from ..buffers.Buffer import Buffer
+        if not isinstance(buffer, Buffer):
+            raise AgentException(f"Provided object is not of type {Buffer.__name__}")
         if buffer.id in self.buffer_store:
             logger.warning(f"A {buffer.__class__.__name__} with id='{buffer.id}' already exists in {self.__class__.__name__}'s buffer_store and is overwritten!")
         self.buffer_store[buffer.id] = buffer
@@ -123,6 +126,9 @@ class Agent():
         Args:
             service (Service): The Service instance to add.
         """
+        from ..services.Service import Service
+        if not isinstance(service, Service):
+            raise AgentException(f"Provided object is not of type {Service.__name__}")
         if service.id in self.service_store:
             logger.warning(f"A {service.__class__.__name__} with id='{service.id}' already exists in {self.__class__.__name__}'s service_store and is overwritten!")
         self.service_store[service.id] = service

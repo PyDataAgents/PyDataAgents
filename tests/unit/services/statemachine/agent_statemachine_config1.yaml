@@ -7,24 +7,24 @@ dark_mode: true
 color_schema: {}
 with_config: false
 agent:
-  id: 0e27e8a7-4a84-4f0d-9bd7-d0ec659b233d
+  id: cbdee2f2-affc-4522-8219-dc01313fa981
   description: null
   load_on_install: false
   with_persistence: false
   save_folder: .save\
   buffer_store: {}
   service_store:
-    1857d1c0-d4cf-4c78-831a-d5c97fb730f3:
+    7c8de3da-a3a5-4793-bc0d-56462d152c9a:
       type: pydag.services.statemachine.SFCService
-      id: 1857d1c0-d4cf-4c78-831a-d5c97fb730f3
+      id: 7c8de3da-a3a5-4793-bc0d-56462d152c9a
       load_on_install: false
       auto_start: true
       thread_type: INSTANT
       observing_time: 0
       nodes:
-        c5bc67f1-43c2-4310-960b-4d8f306ba48f:
+        129bb011-a7b3-4800-92ca-38cf817deedb:
           type: pydag.nodes.utils.StartAction
-          id: c5bc67f1-43c2-4310-960b-4d8f306ba48f
+          id: 129bb011-a7b3-4800-92ca-38cf817deedb
           load_on_install: false
           child_ids: []
       retry_error_nodes: false
