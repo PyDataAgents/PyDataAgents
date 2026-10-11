@@ -1,6 +1,8 @@
 from pydag.agents.AgentStates import ServiceState
 from pydag.nodes.Action import Action
 from pydag.nodes.utils.FalseTransition import FalseTransition
+from pydag.nodes.utils.PrintAction import PrintAction
+from pydag.nodes.utils.SleepAction import SleepAction
 from pydag.nodes.utils.TrueTransition import TrueTransition
 from pydag.services.ThreadType import ThreadType
 from pydag.services.statemachine.SimpleStatemachine import SimpleStatemachine
@@ -74,3 +76,20 @@ def test_false_transition_stops_current_observer_pass():
     _run_once(service)
 
     assert events == ["before"]
+    
+def test_simple_statemachine_install():
+    ssm = SimpleStatemachine(thread_type=ThreadType.ONLY_ONCE.value)
+    
+    pa1 = PrintAction("pa1", id="pa1", child_ids=["pa2"])
+    pa2 = PrintAction("pa2", id="pa2", child_ids=["sa1"])
+    sa1 = SleepAction(0.5, id="sa1")
+    
+    ssm.add_node(pa1)
+    ssm.add_node(pa2)
+    ssm.add_node(sa1)
+    
+    ssm.install()
+    
+    assert len(sa1.get_parents()) > 0, "SleepAction should have parents after installation"
+    
+    
