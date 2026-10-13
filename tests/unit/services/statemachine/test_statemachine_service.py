@@ -297,4 +297,15 @@ def test_add_node():
     with pytest.raises(StatemachineException, match=f"Provided object is not of type {Node.__name__}"):
         service.add_node(buf)
         
+def test_statemachine_child_ids():
+    """Test that child IDs are correctly assigned and retrieved."""
+    service = SimpleStatemachine()
     
+    a1 = StartAction(id="SA1", child_ids=["CA1"])
+    a2 = CountAction(id="CA1")
+    
+    service.add_node(a1)
+    service.add_node(a2)
+        
+    service.install()
+    assert len(a1.get_parents()) == 1
