@@ -308,4 +308,5 @@ def test_statemachine_child_ids():
     service.add_node(a2)
         
     service.install()
-    assert len(a1.get_parents()) == 1
+    assert len(a2.get_parents()) == 1
+    assert len(a1.get_children()) == 1
