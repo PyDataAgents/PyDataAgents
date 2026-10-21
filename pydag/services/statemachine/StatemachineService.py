@@ -9,7 +9,7 @@ from ...nodes.TriggerAction import TriggerAction
 from ...utils.FileUtils import FileUtils
 from ...services.ThreadType import ThreadType
 from ..ObserverService import ObserverService
-from ..ServiceException import ServiceException
+from .StatemachineException import StatemachineException
 from ...nodes.Node import Node
 
 if TYPE_CHECKING:
@@ -50,6 +50,8 @@ class StatemachineService(ObserverService):
         Raises:
             logger.warning: If a node with the same ID already exists.
         """
+        if not isinstance(node, Node):
+            raise StatemachineException(f"Provided object is not of type {Node.__name__}")
         if node.id in self.nodes:
             logger.warning(Node.cname() + " with id=" + node.id + " was already added and will not be added again")
         else:
@@ -72,11 +74,11 @@ class StatemachineService(ObserverService):
         """
         for node in self.nodes.values():
             for child_id in node.child_ids:
-                if not node.has_child(child_id):
-                    if child_id in self.nodes:
+                if child_id in self.nodes:
+                    if not node.has_child(child_id):
                         node.add_child(self.nodes[child_id])
-                    else:
-                        raise ServiceException(f"Child node with ID {child_id} not found for node {node.id}.")
+                else:
+                    raise StatemachineException(f"Child node with ID {child_id} not found in nodes.")
         
     def node_by_id(self, id : str) -> Node:
         """

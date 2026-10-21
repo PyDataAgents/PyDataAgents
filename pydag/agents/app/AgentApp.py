@@ -90,7 +90,7 @@ class AgentApp():
             pages_paths = [f"http://{self.host}:{self.port}{page.path}" for page in self.ui_pages]
             pages_str = "\n".join(pages_paths)
             logger.info("Available NiceGui Pages:\n" + pages_str)
-            self.agent.release(blocking=False)        
+            self.agent.release(blocking=False)
             if self.with_api:
                 multiprocessing.freeze_support()  # For Windows support
                 ui.run_with(self._app, dark=self.dark_mode, title=self.__class__.__name__ + " UI")

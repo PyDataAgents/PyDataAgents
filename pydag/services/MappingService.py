@@ -135,21 +135,25 @@ class MappingService(ObserverService):
     def _on_stop(self):
         super()._on_stop()
             
-    def set_buffers(self, buffers : dict[str, 'Buffer']):
+    def set_buffers(self, buffers : dict[str, Buffer]):
         """ set the `Buffer`s of this `MappingService`
 
         Args:
             buffers (dict[str, Buffer]): dictionary of `Buffer`s
         """
+        if not all(isinstance(value, Buffer) for value in buffers.values()):
+            raise ServiceException(f"All values in the buffers dictionary must be instances of {Buffer.__name__}.")
         self._buffers = buffers
         self.buffer_ids = buffers.keys()
         
-    def add_buffer(self, buffer : 'Buffer'):
+    def add_buffer(self, buffer : Buffer):
         """ add a `Buffer` to this `MappingService`
 
         Args:
             buffer (Buffer): instance of `Buffer`
         """
+        if not isinstance(buffer, Buffer):
+            raise ServiceException(f"Provided object is not of type {Buffer.__name__}")
         self._buffers[buffer.id] = buffer
         if buffer.id not in self.buffer_ids:
             self.buffer_ids.append(buffer.id)
