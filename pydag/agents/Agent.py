@@ -197,14 +197,13 @@ class Agent():
                     target=self._wait_for_services, daemon=True,
                     name=f"{self.id}-service-monitor")
                 self._service_monitor.start()
-        elif blocking:
+        elif blocking:            
             self._stop_event.wait()  # blocks efficiently until the event is set (for example by terminate)
 
     def _wait_for_services(self):
         """Terminate once all services leave RUNNING, or exit on manual termination."""
         while not self._stop_event.is_set():
-            if not any(service.get_state() == ServiceState.RUNNING
-                       for service in list(self.service_store.values())):
+            if not any(service.get_state() == ServiceState.RUNNING for service in list(self.service_store.values())):
                 self.terminate()
                 return
             if self._stop_event.wait(0.1):
