@@ -9,7 +9,7 @@ description = "An IIoT framework for reading and writing from sources/sinks."
 readme = "README.md"
 requires-python = ">=3.11"
 license = { file = "LICENSE" }
-keywords = ["IIoT", "Industrial Datalogging", "software robots", "data agents"]
+keywords = ["IIoT", "Industrial Datalogging", "software robots", "data agents", "automation workflows"]
 authors = [
   { name = "Jonas Hillenbrand", email = "hillenbrandjonas@hotmail.com" },
   { name = "2Obe", email = "twoobe.mail@gmail.com" }
@@ -29,6 +29,7 @@ dependencies = [
     "APScheduler",
     "pwdlib", 
     "pwdlib[argon2]",
+    "quickjs",
 ]
 
 [project.optional-dependencies]

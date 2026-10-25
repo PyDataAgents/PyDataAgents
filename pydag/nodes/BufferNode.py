@@ -20,6 +20,27 @@ SLICE_PATTERN = re.compile(r"^\s*(-?\d*)\s*:\s*(-?\d*)\s*(?::\s*(-?\d*)\s*)?$")
 
 @dataclass
 class BufferNode(Node):
+    """`Node` that stores data in a buffer and retrieves data from parent buffers.
+
+    On installation, this node links to the buffer identified by ``buffer_id``
+    or creates a new buffer. Data can be added to its buffer with
+    :meth:`add_data`. When retrieving parent data, the node combines data from
+    its ``BufferNode`` parents and can filter keys by name, integer index,
+    Python-style index or slice, or value type. ``ignore_keys`` are excluded
+    after selection, and the result can optionally be returned by rows.
+
+    Attributes:
+        buffer_id: ID of the buffer linked to this node; a buffer is created
+            when no ID is supplied.
+        persistent: Whether retrieved data is retained in the parent buffer.
+        n: Amount of data to retrieve from each parent buffer; zero means all.
+        input_keys: Key names, integer indices, or a selector string used to
+            filter parent data. An empty value selects all keys.
+        output_keys: Optional explicit output key names.
+        ignore_keys: Keys removed from the retrieved data.
+        ignore_empty_parents: Whether empty parent data is accepted without
+            raising a ``NodeException``.
+    """
     
     buffer_id : str = field(default=None, metadata={"description": "unique ID of the buffer"})
     persistent : bool = field(default=True, metadata={"description": "specifies whether data is removed (False) from parent or not (True)"})
@@ -99,6 +120,26 @@ class BufferNode(Node):
             Buffer: `Buffer` instance
         """
         return self._buffer
+    
+    def get_data(self, by_rows : bool = False, n : int = 0, persistent : bool = True) -> dict | list:
+        """
+        Retrieve data from this node's buffer.
+
+        Args:
+            by_rows (bool): If True, return the data as a list of rows; otherwise,
+                return it as a dictionary of columns.
+            n (int): Number of records to retrieve. The buffer determines how
+                values such as zero are interpreted.
+            persistent (bool): Whether to retrieve persistent buffer data.
+
+        Returns:
+            dict | list: Buffer data as columns, or as rows when ``by_rows`` is True.
+        """
+        data : dict = self._buffer.data(n = n, persistent = persistent)                    
+        if by_rows:
+            return DataUtils.dict_to_list(data)
+        else:
+            return data
         
     def get_parent_data(self, by_rows : bool = False) -> dict | list:
         """ Retrieve data from parent node buffers.
