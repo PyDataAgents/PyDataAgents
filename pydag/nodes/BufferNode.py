@@ -1,6 +1,7 @@
 from dataclasses import dataclass, field
 import re
 from typing import TYPE_CHECKING, Any
+import uuid
 from loguru import logger
 
 from ..utils.DataUtils import DataUtils
@@ -63,7 +64,18 @@ class BufferNode(Node):
         Raises:
             StatemachineException: throws an `Exception` if no `buffer` with the specified `buffer_id` can be found in `agent`
         """
-        # check buffer installation
+        self._create_default_buffer(agent)
+    
+    def _create_default_buffer(self, agent : 'Agent' = None, capacity : int = AgentKeywords.INFINITE_CAPACITY, timestamps_enabled : bool = True, index_enabled : bool = True):
+        """ 
+        this method creates a default `Buffer` instance for this `BufferNode` if no `buffer_id` was specified or if the specified `buffer_id` does not exist in the given `agent`
+        
+        Args:   
+            agent (Agent, optional): agent instance. Defaults to None.
+            capacity (int, optional): capacity of the buffer. Defaults to AgentKeywords.INFINITE_CAPACITY
+            timestamps_enabled (bool, optional): whether timestamps are enabled in the buffer. Defaults to True.
+            index_enabled (bool, optional): whether index is enabled in the buffer. Defaults to True.
+        """
         if self._buffer is None:
             if agent is not None:
                 if self.buffer_id is not None:
@@ -72,26 +84,26 @@ class BufferNode(Node):
                     else:
                         self._buffer = DictBuffer(
                                                     id=self.buffer_id,
-                                                    capacity=AgentKeywords.INFINITE_CAPACITY,
-                                                    timestamps_enabled=True,
-                                                    index_enabled=True
+                                                    capacity=capacity,
+                                                    timestamps_enabled=timestamps_enabled,
+                                                    index_enabled=index_enabled
                                                 )
                         agent.add_buffer(self._buffer)
                 else:
                     self._buffer = DictBuffer(
                                                 id=self.id + "-BUFFER",
-                                                capacity=AgentKeywords.INFINITE_CAPACITY,
-                                                timestamps_enabled=True,
-                                                index_enabled=True
+                                                capacity=capacity,
+                                                timestamps_enabled=timestamps_enabled,
+                                                index_enabled=index_enabled
                                             )
                     self.buffer_id = self._buffer.id
                     agent.add_buffer(self._buffer)
             else:
                 self._buffer = DictBuffer(
                     id=self.id + "-BUFFER",
-                    capacity=AgentKeywords.INFINITE_CAPACITY,
-                    timestamps_enabled=True,
-                    index_enabled=True
+                    capacity=capacity,
+                    timestamps_enabled=timestamps_enabled,
+                    index_enabled=index_enabled
                 )
                 self.buffer_id = self._buffer.id            
             self._buffer.install(agent)
@@ -100,7 +112,7 @@ class BufferNode(Node):
         
     def _on_uninstall(self, agent : 'Agent' = None):
         self._buffer : Buffer = None
-        
+            
     def set_buffer(self, buffer : Buffer):
         """
         method to set the buffer and the `Node`'s `buffer_id`
