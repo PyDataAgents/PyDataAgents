@@ -70,6 +70,37 @@ one selected child. It returns an empty list before evaluation. The scheduler
 executes that child; calling `check()` alone does not execute it. Ordinary
 transitions continue to return all their children from `get_next_children()`.
 
+## `XLookupAction` (in `pydag\nodes\buffers\XLookupAction.py`)
+
+`XLookupAction` converts parent data to a DataFrame and looks up each value in
+`lookup_values` against `lookup_column`, returning values from `return_column`.
+It uses exact matching and the first match; unmatched values become `None` by
+default or the configured `not_found_value`.
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `lookup_values` | `list[Any]` | `[]` | Values to look up |
+| `lookup_column` | `str` | `None` | Parent-data column searched for each lookup value |
+| `return_column` | `str` | `None` | Parent-data column providing the matched result |
+| `not_found_value` | `Any` | `None` | Value to use when a lookup value has no match |
+
+```python
+from pydag.nodes.buffers.XLookupAction import XLookupAction
+
+lookup = XLookupAction(
+    lookup_values=["P-001", "P-999"],
+    lookup_column="catalog_id",
+    return_column="product_name",
+    not_found_value="Unknown",
+)
+lookup.add_parent(source_node)
+lookup.install()
+lookup.execute()
+```
+
+The node writes the results to its own buffer under the `return_column` name.
+This corresponds to exact-match XLOOKUP/XVERWEIS with first-to-last search.
+
 ## Summary
 
 | Class | Description | Icon |
@@ -94,6 +125,7 @@ transitions continue to return all their children from `get_next_children()`.
 | [`CopyBufferAction`](#copybufferaction-in-pydagnodesbufferscopybufferactionpy) | `Action` that copies the entire parent buffer to this `Node`'s `Buffer` whenever executed.The copy procedure makes a deep of all the parent's `Buffer` elements | ![CopyBufferAction](element_icons/CopyBufferAction.png)
 | [`CopyDataAction`](#copydataaction-in-pydagnodesbufferscopydataactionpy) | `Action` that makes a copy of the data in all parent `Buffer`s found amongst this `Node`s parents.If this `Node`'s parents contains more than one `BufferNode`, all data is merged and copied.Before this `Node`s `Buffer` is filled, all other elements are cleared. | ![CopyDataAction](element_icons/CopyDataAction.png)
 | [`DataFrameFilterAction`](#dataframefilteraction-in-pydagnodesbuffersdataframefilteractionpy) |  | ![DataFrameFilterAction](element_icons/DataFrameFilterAction.png)
+| [`XLookupAction`](#xlookupaction-in-pydagnodesbuffersxlookupactionpy) | Adds an exact-match lookup result column to parent buffer data. |
 | [`DataToBuffersAction`](#datatobuffersaction-in-pydagnodesbuffersdatatobuffersactionpy) | `Action` that copies data of the `Buffer` specified via `buffer_id` or found in the first `BufferNode` found amongst this `Node`s parents to all the buffers specified via `buffer_ids`.If this `Node`'s parents contain more than one `BufferNode`, only the first is respected. | ![DataToBuffersAction](element_icons/DataToBuffersAction.png)
 | [`FormatBufferColumnAction`](#formatbuffercolumnaction-in-pydagnodesbuffersformatbuffercolumnactionpy) |  | ![FormatBufferColumnAction](element_icons/FormatBufferColumnAction.png)
 | [`FormattedStringAction`](#formattedstringaction-in-pydagnodesbuffersformattedstringactionpy) | `Action` to compose a formatted string and store it in this `Action`'s bufferusing its parent's buffer to create the new string | ![FormattedStringAction](element_icons/FormattedStringAction.png)
