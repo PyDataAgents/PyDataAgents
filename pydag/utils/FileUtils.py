@@ -435,7 +435,6 @@ class FileUtils:
             try:
                 timestamp = dt.timestamp()
                 if platform.system() == 'Windows':
-                    import pywintypes
                     import win32file
                     import win32con
 
@@ -448,7 +447,7 @@ class FileUtils:
                         win32con.FILE_ATTRIBUTE_NORMAL,
                         None
                     )
-                    win32file.SetFileTime(handle, pywintypes.Time(timestamp), None, None)
+                    win32file.SetFileTime(handle, dt, None, None)
                     handle.close()
                 else:
                     logger.error("Setting created date is not supported on this OS.")
