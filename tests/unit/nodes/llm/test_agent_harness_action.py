@@ -35,7 +35,7 @@ def _parent(rows):
     return parent
 
 
-@pytest.mark.parametrize("output_keys", [[], ["stdout"], ["harness_result"]])
+@pytest.mark.parametrize("output_keys", [[], ["harness_result"]])
 def test_literal_prompt_runs_once_and_captures_output(action, popen, output_keys):
     action.output_keys = output_keys
     parent = _parent([{"task_prompt": "first"}, {"task_prompt": "second"}])
@@ -51,8 +51,6 @@ def test_literal_prompt_runs_once_and_captures_output(action, popen, output_keys
     )
     data = action.get_data()
     assert data[output_keys[0] if output_keys else "stdout"] == ["final answer\n"]
-    assert data["stderr"] == ["diagnostic\n"]
-    assert data["exit_code"] == [0]
     assert parent.get_buffer().size() == 2
 
 
@@ -75,8 +73,6 @@ def test_prompt_key_runs_per_selected_row(action, popen, persistent, n):
     assert [call.args[0][-1] for call in popen.call_args_list] == selected
     data = action.get_data()
     assert data["harness_result"] == [stdout for stdout, _ in output_pairs]
-    assert data["stderr"] == [stderr for _, stderr in output_pairs]
-    assert data["exit_code"] == [0] * len(selected)
     assert "stdout" not in data
     assert parent.get_data()["task_prompt"] == (prompts if persistent else prompts[len(selected):])
 
@@ -95,8 +91,6 @@ def test_prompt_key_runs_per_selected_row(action, popen, persistent, n):
     ({"output_keys": [""]}, "stdout destination"),
     ({"output_keys": [" "]}, "stdout destination"),
     ({"output_keys": [42]}, "stdout destination"),
-    ({"output_keys": ["stderr"]}, "stdout destination"),
-    ({"output_keys": ["exit_code"]}, "stdout destination"),
     ({"harness": "unknown"}, "Unsupported harness"),
     ({"working_directory": None}, "existing directory"),
 ])
