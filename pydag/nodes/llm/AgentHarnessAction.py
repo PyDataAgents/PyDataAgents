@@ -76,7 +76,7 @@ class AgentHarnessAction(BufferNode, Action):
                     stdout, stderr = process.communicate()
             except OSError as exc:
                 raise NodeException(f"Could not execute harness '{self.harness}': {exc}") from exc
-            self.add_data({stdout_key: stdout, "stderr": stderr, "exit_code": process.returncode})
+            self.add_data({stdout_key: stdout})
 
     @staticmethod
     def _validate_prompt(prompt: str) -> None:
