@@ -18,7 +18,6 @@ def popen(monkeypatch):
     process = mock.return_value
     process.__enter__.return_value = process
     process.communicate.return_value = ("final answer\n", "diagnostic\n")
-    process.returncode = 0
     monkeypatch.setattr("pydag.nodes.llm.AgentHarnessAction.subprocess.Popen", mock)
     return mock
 
@@ -51,8 +50,9 @@ def test_literal_prompt_runs_once_and_captures_output(action, popen, output_keys
     )
     data = action.get_data()
     assert data[output_keys[0] if output_keys else "stdout"] == ["final answer\n"]
-    assert data["stderr"] == ["diagnostic\n"]
-    assert data["exit_code"] == [0]
+    assert set(data) == {output_keys[0] if output_keys else "stdout", "timestamps", "index"}
+    popen.return_value.communicate.assert_called_once_with()
+    popen.return_value.__exit__.assert_called_once()
     assert parent.get_buffer().size() == 2
 
 
@@ -67,16 +67,14 @@ def test_prompt_key_runs_per_selected_row(action, popen, persistent, n):
     action.output_keys = ["harness_result"]
     action.n, action.persistent = n, persistent
     selected = prompts[:n or None]
-    output_pairs = [(f"{prompt} answer\n", f"{prompt} diagnostic\n") for prompt in selected]
-    popen.return_value.communicate.side_effect = output_pairs
+    answers = [f"{prompt} answer\n" for prompt in selected]
+    popen.return_value.communicate.side_effect = [(answer, "") for answer in answers]
     action.install()
     action.execute()
 
     assert [call.args[0][-1] for call in popen.call_args_list] == selected
     data = action.get_data()
-    assert data["harness_result"] == [stdout for stdout, _ in output_pairs]
-    assert data["stderr"] == [stderr for _, stderr in output_pairs]
-    assert data["exit_code"] == [0] * len(selected)
+    assert data["harness_result"] == answers
     assert "stdout" not in data
     assert parent.get_data()["task_prompt"] == (prompts if persistent else prompts[len(selected):])
 
@@ -153,15 +151,6 @@ def test_parent_input_validation_does_not_launch_harness(action, popen, rows, in
         action.execute()
     popen.assert_not_called()
     assert action.get_buffer().size() == 0
-
-
-def test_nonzero_exit_code_is_captured(action, popen):
-    popen.return_value.returncode = 1
-    action.install()
-    action.execute()
-    assert action.get_data()["exit_code"] == [1]
-    popen.return_value.communicate.assert_called_once_with()
-    popen.return_value.__exit__.assert_called_once()
 
 
 def test_launch_failure_has_clear_error(action, popen):

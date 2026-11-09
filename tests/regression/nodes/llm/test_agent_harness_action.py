@@ -17,5 +17,4 @@ def test_live_codex_uses_parent_prompt(tmp_path):
     action.execute()
 
     data = action.get_data()
-    assert data["exit_code"] == [0], data["stderr"]
     assert data["harness_result"][0].strip() == "harness-ok"
