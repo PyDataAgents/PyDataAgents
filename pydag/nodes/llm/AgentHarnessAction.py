@@ -15,7 +15,11 @@ class SupportedHarnessCLI(str, enum.Enum):
 
 @dataclass
 class AgentHarnessAction(BufferNode, Action):
-    """Execute a literal prompt once, or a parent-buffer ``prompt_key`` per row.
+    """Execute a literal prompt once, or key-based inputs per parent-buffer row.
+
+    ``instruction`` defaults to an empty string; alternatively, ``instruction_key``
+    supplies instructions per row. Non-empty instructions are prepended under an
+    ``Instruction:`` section, followed by the ``Prompt:`` section.
 
     Only Codex is supported. Install the CLI separately, make ``codex`` available
     on PATH, and configure authentication for the account running the DataAgent.
@@ -30,9 +34,11 @@ class AgentHarnessAction(BufferNode, Action):
     """
 
     harness : str = field(default=SupportedHarnessCLI.CODEX.value, metadata={"description": "agent harness to execute"})
-    prompt : str = field(default=None, metadata={"description": "literal prompt to execute once; mutually exclusive with prompt_key"})
+    prompt : str = field(default=None, metadata={"description": "literal prompt to execute once, or per row when instruction_key is configured; mutually exclusive with prompt_key"})
     working_directory : str = field(default=None, metadata={"description": "existing, accessible working directory for the agent harness process"})
     prompt_key : str = field(default=None, metadata={"description": "parent-buffer key containing a non-empty string prompt per row; mutually exclusive with prompt"})
+    instruction : str = field(default="", metadata={"description": "literal instructions for answer rules, format, style, constraints, and priorities; defaults to empty; mutually exclusive with instruction_key when non-empty"})
+    instruction_key : str = field(default=None, metadata={"description": "parent-buffer key containing string instructions per row; mutually exclusive with non-empty instruction"})
     output_keys : list[str] = field(default_factory=list, metadata={"description": "optional single final-answer destination key; empty defaults to stdout; stderr and exit_code are reserved"})
     
     def _on_install(self, agent : Agent = None):
@@ -42,6 +48,13 @@ class AgentHarnessAction(BufferNode, Action):
             self._validate_prompt(self.prompt)
         if self.prompt_key is not None and (not isinstance(self.prompt_key, str) or not self.prompt_key.strip()):
             raise NodeException("prompt_key must be a non-empty string")
+        if not isinstance(self.instruction, str):
+            raise NodeException("instruction must be a string")
+        if self.instruction_key is not None:
+            if self.instruction:
+                raise NodeException("Configure either instruction or instruction_key, not both")
+            if not isinstance(self.instruction_key, str) or not self.instruction_key.strip():
+                raise NodeException("instruction_key must be a non-empty string")
         if not isinstance(self.output_keys, list) or len(self.output_keys) > 1:
             raise NodeException("output_keys must be empty or contain one stdout destination key")
         if self.output_keys:
@@ -59,15 +72,18 @@ class AgentHarnessAction(BufferNode, Action):
         super()._on_install(agent)
     
     def _on_execute(self):
-        prompts = [self.prompt]
-        if self.prompt_key is not None:
-            prompts = []
-            for row in self.get_parent_data(by_rows=True):
-                if self.prompt_key not in row:
-                    raise NodeException(f"Missing configured prompt_key '{self.prompt_key}' in parent data")
-                prompts.append(row[self.prompt_key])
-        for prompt in prompts:
+        rows = self.get_parent_data(by_rows=True) if self.prompt_key is not None or self.instruction_key is not None else [{}]
+        prompts = []
+        for row in rows:
+            for key, name in ((self.prompt_key, "prompt_key"), (self.instruction_key, "instruction_key")):
+                if key is not None and key not in row:
+                    raise NodeException(f"Missing configured {name} '{key}' in parent data")
+            prompt = row[self.prompt_key] if self.prompt_key is not None else self.prompt
+            instruction = row[self.instruction_key] if self.instruction_key is not None else self.instruction
             self._validate_prompt(prompt)
+            if not isinstance(instruction, str):
+                raise NodeException("instruction must be a string")
+            prompts.append(f"Instruction:\n{instruction}\n\nPrompt:\n{prompt}" if instruction else prompt)
 
         stdout_key = self.output_keys[0] if self.output_keys else "stdout"
         for prompt in prompts:

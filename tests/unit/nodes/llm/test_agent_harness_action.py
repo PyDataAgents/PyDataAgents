@@ -85,6 +85,12 @@ def test_prompt_key_runs_per_selected_row(action, popen, persistent, n):
     ({"prompt": 42}, "prompt must be"),
     ({"prompt": None, "prompt_key": " "}, "prompt_key must be"),
     ({"prompt": None, "prompt_key": 42}, "prompt_key must be"),
+    ({"instruction": "rules", "instruction_key": "rules"}, "either instruction or instruction_key"),
+    ({"instruction": None}, "instruction must be"),
+    ({"instruction": 42}, "instruction must be"),
+    ({"instruction_key": ""}, "instruction_key must be"),
+    ({"instruction_key": " "}, "instruction_key must be"),
+    ({"instruction_key": 42}, "instruction_key must be"),
     ({"output_keys": ["a", "b"]}, "output_keys must be"),
     ({"output_keys": "result"}, "output_keys must be"),
     ({"output_keys": None}, "output_keys must be"),
@@ -157,4 +163,69 @@ def test_launch_failure_has_clear_error(action, popen):
     popen.side_effect = FileNotFoundError("executable disappeared")
     with pytest.raises(NodeException, match="Could not execute harness 'codex'"):
         action.execute()
+    assert action.get_buffer().size() == 0
+
+
+@pytest.mark.parametrize("instruction", ["", "Answer in JSON.\nBe concise."])
+@pytest.mark.parametrize("keyed_prompt", [False, True])
+def test_literal_instruction(action, popen, instruction, keyed_prompt):
+    action.instruction = instruction
+    prompts = ["first", "second"] if keyed_prompt else [action.prompt]
+    if keyed_prompt:
+        action.prompt, action.prompt_key = None, "task"
+        action.add_parent(_parent([{"task": prompt} for prompt in prompts]))
+    action.install()
+    action.execute()
+
+    assert [call.args[0][-1] for call in popen.call_args_list] == [
+        f"Instruction:\n{instruction}\n\nPrompt:\n{prompt}" if instruction else prompt
+        for prompt in prompts
+    ]
+
+
+@pytest.mark.parametrize("keyed_prompt", [False, True])
+@pytest.mark.parametrize("persistent", [False, True])
+@pytest.mark.parametrize("n", [0, 2])
+def test_instruction_key_uses_same_selected_rows(action, popen, keyed_prompt, persistent, n):
+    rows = [
+        {"task": "first", "rules": "Be concise."},
+        {"task": "second", "rules": ""},
+        {"task": "third", "rules": "Answer in JSON."},
+    ]
+    parent = _parent(rows)
+    action.add_parent(parent)
+    action.instruction_key = "rules"
+    action.input_keys = ["task", "rules"]
+    action.n, action.persistent = n, persistent
+    if keyed_prompt:
+        action.prompt, action.prompt_key = None, "task"
+    action.install()
+    action.execute()
+
+    expected = []
+    for row in rows[:n or None]:
+        prompt = row["task"] if keyed_prompt else action.prompt
+        expected.append(f"Instruction:\n{row['rules']}\n\nPrompt:\n{prompt}" if row["rules"] else prompt)
+    assert [call.args[0][-1] for call in popen.call_args_list] == expected
+    assert action.get_data()["stdout"] == ["final answer\n"] * len(expected)
+    assert parent.get_buffer().size() == (len(rows) if persistent else len(rows) - len(expected))
+
+
+@pytest.mark.parametrize("rows, input_keys, message", [
+    (None, [], "No parent"),
+    ([], [], None),
+    ([{"other": "value"}], [], "Missing configured instruction_key"),
+    ([{"rules": "valid", "other": "value"}], ["other"], "Missing configured instruction_key"),
+    ([{"rules": "valid"}, {"rules": 42}], [], "instruction must be"),
+    ([{"rules": None}], [], "instruction must be"),
+])
+def test_invalid_instruction_rows_do_not_launch_harness(action, popen, rows, input_keys, message):
+    action.instruction_key = "rules"
+    action.input_keys = input_keys
+    if rows is not None:
+        action.add_parent(_parent(rows))
+    action.install()
+    with pytest.raises(NodeException, match=message) if message else nullcontext():
+        action.execute()
+    popen.assert_not_called()
     assert action.get_buffer().size() == 0

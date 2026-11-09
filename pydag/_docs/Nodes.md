@@ -2918,15 +2918,21 @@ by the public `install()` method).
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `harness` | `str` | `"codex"` | CLI harness; currently only Codex is supported. |
-| `prompt` | `str` | `None` | Non-empty literal prompt; executed once per `execute()` call, regardless of parent rows. |
+| `prompt` | `str` | `None` | Non-empty literal prompt; executed once unless `instruction_key` selects parent rows. |
 | `prompt_key` | `str` | `None` | Literal parent-buffer key containing a non-empty string prompt; one invocation per selected row. Configure exactly one of `prompt` or `prompt_key`. |
+| `instruction` | `str` | `""` | Fixed instructions for answer rules, format, style, constraints, and priorities. Non-empty values are mutually exclusive with `instruction_key`. |
+| `instruction_key` | `str` | `None` | Parent-buffer key containing string instructions per selected row; empty strings are allowed. |
 | `working_directory` | `str` | `None` | Required existing, accessible directory for the CLI process. |
 | `output_keys` | `list[str]` | `[]` | Optional single literal stdout destination; empty means `stdout`. Empty/blank names and `stderr`/`exit_code` are rejected. |
 
-Key-based prompts use the inherited `input_keys`, `ignore_keys`, `n`, and
+Key-based prompts and instructions use the inherited `input_keys`, `ignore_keys`, `n`, and
 `persistent` controls. Missing parent data, missing keys, and empty/non-string
 prompts raise `NodeException` before any harness is launched. Prompt keys must
-remain available after input filtering. Literal prompts do not read parent data.
+remain available after input filtering, as must instruction keys. Non-string
+instructions also raise `NodeException` before any harness is launched. With
+literal inputs only, parent data is not read. Non-empty instructions are prepended
+as `Instruction:\n{instruction}\n\nPrompt:\n{prompt}`; empty instructions leave
+the prompt unchanged.
 
 Each invocation appends one result row with stdout, `stderr`, and `exit_code`.
 Stdout preserves the raw JSONL event stream from `codex exec --json`, including
@@ -2943,6 +2949,7 @@ parent.add_data({"task_prompt": "Analyze the latest machine log and write a main
 
 action = AgentHarnessAction(
     prompt_key="task_prompt",
+    instruction="Be concise and include recommended next steps.",
     output_keys=["harness_result"],
     working_directory=".",
 )
