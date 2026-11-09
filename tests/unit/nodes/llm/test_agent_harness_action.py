@@ -13,11 +13,11 @@ from pydag.nodes.llm.AgentHarnessAction import AgentHarnessAction
 @pytest.fixture(autouse=True)
 def popen(monkeypatch):
     """Keep every test independent of an installed/authenticated harness."""
-    monkeypatch.setattr("pydag.nodes.llm.AgentHarnessAction.shutil.which", lambda _: "codex")
+    monkeypatch.setattr("pydag.nodes.llm.AgentHarnessAction.shutil.which", lambda _: "C:/Program Files/Codex/codex.cmd")
     mock = MagicMock()
     process = mock.return_value
     process.__enter__.return_value = process
-    process.communicate.return_value = ('{"type":"turn.completed"}\n', "diagnostic\n")
+    process.communicate.return_value = ("final answer\n", "diagnostic\n")
     process.returncode = 0
     monkeypatch.setattr("pydag.nodes.llm.AgentHarnessAction.subprocess.Popen", mock)
     return mock
@@ -45,12 +45,12 @@ def test_literal_prompt_runs_once_and_captures_output(action, popen, output_keys
     action.execute()
 
     popen.assert_called_once_with(
-        ["codex", "exec", "--skip-git-repo-check", "--json", "--sandbox", "workspace-write", "literal task"],
+        ["C:/Program Files/Codex/codex.cmd", "exec", "--skip-git-repo-check", "--sandbox", "workspace-write", "literal task"],
         cwd=action.working_directory, stdin=subprocess.DEVNULL,
         stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, bufsize=1,
     )
     data = action.get_data()
-    assert data[output_keys[0] if output_keys else "stdout"] == ['{"type":"turn.completed"}\n']
+    assert data[output_keys[0] if output_keys else "stdout"] == ["final answer\n"]
     assert data["stderr"] == ["diagnostic\n"]
     assert data["exit_code"] == [0]
     assert parent.get_buffer().size() == 2
@@ -67,7 +67,7 @@ def test_prompt_key_runs_per_selected_row(action, popen, persistent, n):
     action.output_keys = ["harness_result"]
     action.n, action.persistent = n, persistent
     selected = prompts[:n or None]
-    output_pairs = [(f'{{"task":"{prompt}"}}\n', f"{prompt} diagnostic\n") for prompt in selected]
+    output_pairs = [(f"{prompt} answer\n", f"{prompt} diagnostic\n") for prompt in selected]
     popen.return_value.communicate.side_effect = output_pairs
     action.install()
     action.execute()

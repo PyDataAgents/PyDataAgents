@@ -1,6 +1,4 @@
 """Live Codex test; requires an installed, authenticated CLI."""
-import json
-
 from pydag.nodes.buffers.LinkBufferAction import LinkBufferAction
 from pydag.nodes.llm.AgentHarnessAction import AgentHarnessAction
 
@@ -20,6 +18,4 @@ def test_live_codex_uses_parent_prompt(tmp_path):
 
     data = action.get_data()
     assert data["exit_code"] == [0], data["stderr"]
-    events = [json.loads(line) for line in data["harness_result"][0].splitlines() if line.strip()]
-    assert any(event.get("type") == "turn.completed" for event in events)
-    assert any(event.get("item", {}).get("text", "").strip() == "harness-ok" for event in events)
+    assert data["harness_result"][0].strip() == "harness-ok"

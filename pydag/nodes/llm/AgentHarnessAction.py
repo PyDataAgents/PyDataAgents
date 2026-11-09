@@ -26,14 +26,14 @@ class AgentHarnessAction(BufferNode, Action):
 
     Each invocation writes one row containing stdout, stderr, and exit_code.
     ``output_keys`` may rename stdout only (empty means ``stdout``). Stdout is
-    the raw JSONL event stream from ``codex exec --json``, not just its answer.
+    the final agent answer as text; progress and diagnostics remain in stderr.
     """
 
     harness : str = field(default=SupportedHarnessCLI.CODEX.value, metadata={"description": "agent harness to execute"})
     prompt : str = field(default=None, metadata={"description": "literal prompt to execute once; mutually exclusive with prompt_key"})
     working_directory : str = field(default=None, metadata={"description": "existing, accessible working directory for the agent harness process"})
     prompt_key : str = field(default=None, metadata={"description": "parent-buffer key containing a non-empty string prompt per row; mutually exclusive with prompt"})
-    output_keys : list[str] = field(default_factory=list, metadata={"description": "optional single stdout destination key; empty defaults to stdout (raw JSONL); stderr and exit_code are reserved"})
+    output_keys : list[str] = field(default_factory=list, metadata={"description": "optional single final-answer destination key; empty defaults to stdout; stderr and exit_code are reserved"})
     
     def _on_install(self, agent : Agent = None):
         if (self.prompt is None) == (self.prompt_key is None):
@@ -85,10 +85,10 @@ class AgentHarnessAction(BufferNode, Action):
 
     @staticmethod
     def _execute_codex(prompt: str, project_dir: str) -> subprocess.Popen:        
+        # Omit --json so stdout contains only the final answer; progress stays on stderr.
         return subprocess.Popen(
             [
-                "codex", "exec", "--skip-git-repo-check",
-                "--json",
+                shutil.which("codex") or "codex", "exec", "--skip-git-repo-check",
                 "--sandbox", "workspace-write",
                 prompt,
             ],
