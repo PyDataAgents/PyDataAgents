@@ -29,7 +29,7 @@ dependencies = [
     "APScheduler",
     "pwdlib", 
     "pwdlib[argon2]",
-    "quickjs",
+    "quickjs-ng>=0.18.0.1",
 ]
 
 [project.optional-dependencies]
