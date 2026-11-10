@@ -1,4 +1,5 @@
 import subprocess
+import sys
 from contextlib import nullcontext
 from unittest.mock import MagicMock
 
@@ -8,6 +9,9 @@ from pydag.agents.AgentElementException import AgentElementException
 from pydag.nodes.NodeException import NodeException
 from pydag.nodes.buffers.LinkBufferAction import LinkBufferAction
 from pydag.nodes.llm.AgentHarnessAction import AgentHarnessAction
+
+
+REAL_POPEN = subprocess.Popen
 
 
 @pytest.fixture(autouse=True)
@@ -45,10 +49,11 @@ def test_literal_prompt_runs_once_and_captures_output(action, popen, output_keys
     action.execute()
 
     popen.assert_called_once_with(
-        ["C:/Program Files/Codex/codex.cmd", "exec", "--skip-git-repo-check", "--sandbox", "workspace-write", "literal task"],
-        cwd=action.working_directory, stdin=subprocess.DEVNULL,
-        stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, bufsize=1,
+        ["C:/Program Files/Codex/codex.cmd", "exec", "--skip-git-repo-check", "--sandbox", "workspace-write", "-"],
+        cwd=action.working_directory, stdin=subprocess.PIPE,
+        stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, encoding="utf-8", errors="replace", bufsize=1,
     )
+    popen.return_value.communicate.assert_called_once_with(input="literal task")
     data = action.get_data()
     assert data[output_keys[0] if output_keys else "stdout"] == ["final answer\n"]
     assert parent.get_buffer().size() == 2
@@ -70,7 +75,7 @@ def test_prompt_key_runs_per_selected_row(action, popen, persistent, n):
     action.install()
     action.execute()
 
-    assert [call.args[0][-1] for call in popen.call_args_list] == selected
+    assert [call.kwargs["input"] for call in popen.return_value.communicate.call_args_list] == selected
     data = action.get_data()
     assert data["harness_result"] == [stdout for stdout, _ in output_pairs]
     assert "stdout" not in data
@@ -177,7 +182,7 @@ def test_literal_instruction(action, popen, instruction, keyed_prompt):
     action.install()
     action.execute()
 
-    assert [call.args[0][-1] for call in popen.call_args_list] == [
+    assert [call.kwargs["input"] for call in popen.return_value.communicate.call_args_list] == [
         f"Instruction:\n{instruction}\n\nPrompt:\n{prompt}" if instruction else prompt
         for prompt in prompts
     ]
@@ -206,7 +211,7 @@ def test_instruction_key_uses_same_selected_rows(action, popen, keyed_prompt, pe
     for row in rows[:n or None]:
         prompt = row["task"] if keyed_prompt else action.prompt
         expected.append(f"Instruction:\n{row['rules']}\n\nPrompt:\n{prompt}" if row["rules"] else prompt)
-    assert [call.args[0][-1] for call in popen.call_args_list] == expected
+    assert [call.kwargs["input"] for call in popen.return_value.communicate.call_args_list] == expected
     assert action.get_data()["stdout"] == ["final answer\n"] * len(expected)
     assert parent.get_buffer().size() == (len(rows) if persistent else len(rows) - len(expected))
 
@@ -229,3 +234,27 @@ def test_invalid_instruction_rows_do_not_launch_harness(action, popen, rows, inp
         action.execute()
     popen.assert_not_called()
     assert action.get_buffer().size() == 0
+
+
+@pytest.mark.parametrize("keyed_prompt", [False, True])
+def test_multiline_stdin_and_utf8_output(action, popen, keyed_prompt):
+    prompt = "Roses bloom.\n\n  Violets glow.\nGr\u00fc\u00dfe \U0001f339\n"
+    action.instruction = "Keep every line break.\nPreserve indentation."
+    if keyed_prompt:
+        action.prompt, action.prompt_key = None, "task"
+        action.add_parent(_parent([{"task": prompt}]))
+    else:
+        action.prompt = prompt
+    # Echo stdin as bytes and emit UTF-8 diagnostics plus an invalid byte.
+    popen.side_effect = lambda command, **options: REAL_POPEN(
+        [sys.executable, "-c",
+         "import sys; sys.stdout.buffer.write(sys.stdin.buffer.read()); "
+         "sys.stderr.buffer.write(bytes.fromhex('e29c9320ff'))"],
+        **options,
+    )
+    action.install()
+    action.execute()
+
+    assert action.get_data()["stdout"] == [
+        f"Instruction:\n{action.instruction}\n\nPrompt:\n{prompt}"
+    ]

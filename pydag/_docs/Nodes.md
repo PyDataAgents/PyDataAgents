@@ -2932,7 +2932,9 @@ remain available after input filtering, as must instruction keys. Non-string
 instructions also raise `NodeException` before any harness is launched. With
 literal inputs only, parent data is not read. Non-empty instructions are prepended
 as `Instruction:\n{instruction}\n\nPrompt:\n{prompt}`; empty instructions leave
-the prompt unchanged.
+the prompt unchanged. Prompts are sent through stdin to preserve multiline text
+on Windows, Linux, and macOS. Process streams use UTF-8 with replacement for
+invalid bytes.
 
 Each invocation appends one result row with stdout, `stderr`, and `exit_code`.
 Stdout preserves the raw JSONL event stream from `codex exec --json`, including

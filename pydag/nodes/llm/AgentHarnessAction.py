@@ -88,8 +88,8 @@ class AgentHarnessAction(BufferNode, Action):
         stdout_key = self.output_keys[0] if self.output_keys else "stdout"
         for prompt in prompts:
             try:
-                with self._execute_codex(prompt, self.working_directory) as process:
-                    stdout, stderr = process.communicate()
+                with self._execute_codex(self.working_directory) as process:
+                    stdout, stderr = process.communicate(input=prompt)
             except OSError as exc:
                 raise NodeException(f"Could not execute harness '{self.harness}': {exc}") from exc
             self.add_data({stdout_key: stdout})
@@ -100,19 +100,21 @@ class AgentHarnessAction(BufferNode, Action):
             raise NodeException("prompt must be a non-empty string")
 
     @staticmethod
-    def _execute_codex(prompt: str, project_dir: str) -> subprocess.Popen:        
+    def _execute_codex(project_dir: str) -> subprocess.Popen:
         # Omit --json so stdout contains only the final answer; progress stays on stderr.
         return subprocess.Popen(
             [
                 shutil.which("codex") or "codex", "exec", "--skip-git-repo-check",
                 "--sandbox", "workspace-write",
-                prompt,
+                "-",  # Read multiline prompts from stdin, including through Windows .cmd wrappers.
             ],
             cwd=project_dir,
-            stdin=subprocess.DEVNULL,
+            stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             text=True,
+            encoding="utf-8",
+            errors="replace",
             bufsize=1,
         )
 
