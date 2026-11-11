@@ -37,7 +37,7 @@ class AgentHarnessAction(BufferNode, Action):
     prompt : str = field(default=None, metadata={"description": "literal prompt to execute once, or per row when instruction_key is configured; mutually exclusive with prompt_key"})
     working_directory : str = field(default=None, metadata={"description": "existing, accessible working directory for the agent harness process"})
     prompt_key : str = field(default=None, metadata={"description": "parent-buffer key containing a non-empty string prompt per row; mutually exclusive with prompt"})
-    instruction : str = field(default="", metadata={"description": "literal instructions for answer rules, format, style, constraints, and priorities; defaults to empty; mutually exclusive with instruction_key when non-empty"})
+    instruction : str = field(default=None, metadata={"description": "literal instructions for answer rules, format, style, constraints, and priorities; defaults to empty; mutually exclusive with instruction_key when non-empty"})
     instruction_key : str = field(default=None, metadata={"description": "parent-buffer key containing string instructions per row; mutually exclusive with non-empty instruction"})
     output_keys : list[str] = field(default_factory=list, metadata={"description": "optional single final-answer destination key; empty defaults to stdout; stderr and exit_code are reserved"})
     
@@ -48,7 +48,7 @@ class AgentHarnessAction(BufferNode, Action):
             self._validate_prompt(self.prompt)
         if self.prompt_key is not None and (not isinstance(self.prompt_key, str) or not self.prompt_key.strip()):
             raise NodeException("prompt_key must be a non-empty string")
-        if not isinstance(self.instruction, str):
+        if self.instruction is not None and not isinstance(self.instruction, str):
             raise NodeException("instruction must be a string")
         if self.instruction_key is not None:
             if self.instruction:
