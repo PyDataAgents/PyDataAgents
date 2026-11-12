@@ -1,4 +1,6 @@
 from dataclasses import dataclass, field
+import zipfile
+import xml.etree.ElementTree as ET
 
 from pydag.services.MappingService import MappingService
 
@@ -110,7 +112,7 @@ VVB301_SCHEMA = {
 class IOLinkService(MappingService):
     
     host : str = field()
-    iodd_file : str = field()
+    iodd_path : str = field()
     port : int = field()
     scaling : list[int] = field()
     
@@ -119,8 +121,181 @@ class IOLinkService(MappingService):
         self._pdin_schema : dict = None
     
     @staticmethod
-    def _parse_schema() -> dict:
-        pass
+    def _parse_iodd_schema(iodd_path : str, process_data_id: str = "PDIn") -> dict:
+        """
+        Parses an IO-Link IODD zip file, extracts process data fields, 
+        automatically maps 'exponent_from' relationships, and retrieves invalid value codes.
+        """
+        xml_content = None
+
+        # 1. Handle IODD ZIP archive or direct XML file
+        if zipfile.is_zipfile(iodd_path):
+            with zipfile.ZipFile(iodd_path, 'r') as z:
+                xml_files = [f for f in z.namelist() if f.lower().endswith('.xml') and not f.lower().startswith('iodd-ml')]
+                if not xml_files:
+                    xml_files = [f for f in z.namelist() if f.lower().endswith('.xml')]
+                if not xml_files:
+                    raise ValueError("No XML files found inside the IODD archive.")
+                
+                main_xml = next((f for f in xml_files if 'iodd' in f.lower() or 'device' in f.lower() or len(xml_files) == 1), xml_files[0])
+                with z.open(main_xml) as f:
+                    xml_content = f.read()
+        else:
+            with open(iodd_path, 'rb') as f:
+                xml_content = f.read()
+
+        root = ET.fromstring(xml_content)
+        
+        def strip_ns(tag):
+            return tag.split('}')[-1] if '}' in tag else tag
+
+        # 2. Extract text mappings (to resolve human-readable names from TextIds)
+        texts = {}
+        datatypes = {}
+        
+        for elem in root.iter():
+            tag = strip_ns(elem.tag)
+            if tag in ('PrimaryLanguage', 'Text'):
+                t_id = elem.get('id')
+                value = elem.get('value')
+                if t_id and value:
+                    texts[t_id] = value
+            elif tag == 'DatatypeCollection':
+                for dt in elem:
+                    dt_id = dt.get('id')
+                    if dt_id:
+                        datatypes[dt_id] = dt
+
+        def resolve_name(elem):
+            for attr in ['name', 'id']:
+                val = elem.get(attr)
+                if val in texts:
+                    return texts[val]
+                if val:
+                    return val
+            text_id = elem.get('textId')
+            if text_id in texts:
+                return texts[text_id]
+            return "unknown_field"
+
+        # 3. Locate target ProcessData element
+        pd_collection = None
+        for elem in root.iter():
+            if strip_ns(elem.tag) == 'ProcessDataCollection':
+                pd_collection = elem
+                break
+
+        if pd_collection is None:
+            raise ValueError("ProcessDataCollection not found in IODD XML.")
+
+        target_pd = None
+        for pd in pd_collection:
+            if strip_ns(pd.tag) == 'ProcessData' and pd.get('id') == process_data_id:
+                target_pd = pd
+                break
+                
+        if target_pd is None:
+            for pd in pd_collection:
+                if strip_ns(pd.tag) == 'ProcessData':
+                    target_pd = pd
+                    break
+
+        if target_pd is None:
+            raise ValueError(f"ProcessData '{process_data_id}' not found.")
+
+        bit_length = int(target_pd.get('bitLength', 0))
+        fields = []
+
+        # 4. Resolve Datatype structure (RecordT)
+        datatype_elem = None
+        for child in target_pd:
+            tag = strip_ns(child.tag)
+            if tag == 'RecordT':
+                datatype_elem = child
+                break
+            elif 'Ref' in tag:
+                ref_id = child.get('datatypeId') or child.get('idRef')
+                if ref_id in datatypes:
+                    datatype_elem = datatypes[ref_id]
+
+        if datatype_elem is None:
+            for child in target_pd.iter():
+                if strip_ns(child.tag) == 'RecordT':
+                    datatype_elem = child
+                    break
+
+        # 5. Parse individual fields (RecordItems) & constraints
+        raw_fields = []
+        if datatype_elem is not None:
+            for item in datatype_elem:
+                if strip_ns(item.tag) == 'RecordItem':
+                    name = resolve_name(item)
+                    bit_length_item = int(item.get('bitLength', 1))
+                    bit_offset_item = int(item.get('bitOffset', 0))
+
+                    field_type = "uint"
+                    scale = None
+                    invalid_values = []
+
+                    for sub in item:
+                        sub_tag = strip_ns(sub.tag)
+                        if 'Integer' in sub_tag and 'U' not in sub_tag:
+                            field_type = "int"
+                        elif 'UInteger' in sub_tag:
+                            field_type = "uint"
+                        elif 'Boolean' in sub_tag:
+                            field_type = "bool"
+                        elif 'Float' in sub_tag:
+                            field_type = "float"
+                            
+                        gradient = sub.get('gradient')
+                        if gradient:
+                            try:
+                                scale = float(gradient)
+                            except ValueError:
+                                pass
+                        
+                        # Look for error / invalid code definitions (e.g., SingleValue constraints)
+                        for constraint in sub.iter():
+                            if strip_ns(constraint.tag) == 'SingleValue':
+                                sv_id = constraint.get('id', '').lower()
+                                # Check if the code represents an error, overload, or invalid state
+                                if any(keyword in sv_id for keyword in ['err', 'inval', 'ov', 'no_val', 'not_a_number', 'dataloss']):
+                                    val_str = constraint.get('value')
+                                    if val_str:
+                                        try:
+                                            invalid_values.append(int(val_str))
+                                        except ValueError:
+                                            pass
+
+                    field_entry = {
+                        "name": name,
+                        "offset": bit_offset_item,
+                        "length": bit_length_item,
+                        "type": field_type
+                    }
+                    if scale and scale != 1.0:
+                        field_entry["scale"] = scale
+                    if invalid_values:
+                        field_entry["invalid"] = sorted(list(set(invalid_values)))
+
+                    raw_fields.append(field_entry)
+
+        # Sort fields descending by bit offset (standard big-endian arrangement)
+        raw_fields.sort(key=lambda x: x["offset"], reverse=True)
+
+        # 6. Post-Processing: Automatically Map 'exponent_from' 
+        field_names = {f["name"] for f in raw_fields}
+        for field in raw_fields:
+            expected_exponent_name = f"{field['name']}_exponent"
+            if expected_exponent_name in field_names:
+                field["exponent_from"] = expected_exponent_name
+
+        return {
+            "bit_length": bit_length,
+            "byte_order": "big",
+            "fields": raw_fields
+        }
         
     @staticmethod    
     def _decode_process_data(hex_data: str, schema: dict) -> dict:
