@@ -2,7 +2,109 @@ from dataclasses import dataclass, field
 
 from pydag.services.MappingService import MappingService
 
-
+VVB301_SCHEMA = {
+    "bit_length": 128,
+    "byte_order": "big",
+    "fields": [
+        {
+            "name": "v_rms",
+            "offset": 112,
+            "length": 16,
+            "type": "int",
+            "exponent_from": "v_rms_exponent",
+        },
+        {
+            "name": "v_rms_exponent",
+            "offset": 104,
+            "length": 8,
+            "type": "int",
+        },
+        {
+            "name": "v_axis",
+            "offset": 100,
+            "length": 4,
+            "type": "uint",
+        },
+        {
+            "name": "a_peak",
+            "offset": 80,
+            "length": 16,
+            "type": "int",
+            "exponent_from": "a_exponent",
+        },
+        {
+            "name": "a_rms",
+            "offset": 64,
+            "length": 16,
+            "type": "int",
+            "exponent_from": "a_exponent",
+        },
+        {
+            "name": "a_exponent",
+            "offset": 56,
+            "length": 8,
+            "type": "int",
+        },
+        {
+            "name": "a_axis",
+            "offset": 52,
+            "length": 4,
+            "type": "uint",
+        },
+        {
+            "name": "crest",
+            "offset": 32,
+            "length": 16,
+            "type": "int",
+            "scale": 0.1,
+            "invalid": [32760, 32764],
+        },
+        {
+            "name": "temperature",
+            "offset": 16,
+            "length": 16,
+            "type": "int",
+            "exponent_from": "temperature_exponent",
+            "invalid": [-32760, 32760, 32764],
+        },
+        {
+            "name": "temperature_exponent",
+            "offset": 8,
+            "length": 8,
+            "type": "int",
+        },
+        {
+            "name": "device_status",
+            "offset": 4,
+            "length": 4,
+            "type": "uint",
+        },
+        {
+            "name": "unbalance",
+            "offset": 3,
+            "length": 1,
+            "type": "bool",
+        },
+        {
+            "name": "v_ou1",
+            "offset": 2,
+            "length": 1,
+            "type": "bool",
+        },
+        {
+            "name": "out2",
+            "offset": 1,
+            "length": 1,
+            "type": "bool",
+        },
+        {
+            "name": "out1",
+            "offset": 0,
+            "length": 1,
+            "type": "bool",
+        },
+    ],
+}
 
 @dataclass
 class IOLinkService(MappingService):
