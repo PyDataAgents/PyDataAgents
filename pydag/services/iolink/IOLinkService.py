@@ -1,8 +1,13 @@
 from dataclasses import dataclass, field
+import json
 import zipfile
 import xml.etree.ElementTree as ET
 
-from pydag.services.MappingService import MappingService
+import urllib3
+
+from pydag.agents.Agent import Agent
+from pydag.buffers.Buffer import Buffer
+from pydag.services.ReadService import ReadService
 
 VVB301_SCHEMA = {
     "bit_length": 128,
@@ -105,20 +110,42 @@ VVB301_SCHEMA = {
             "length": 1,
             "type": "bool",
         },
-    ],
+    ]
 }
 
 @dataclass
-class IOLinkService(MappingService):
+class IOLinkService(ReadService):
     
-    host : str = field()
-    iodd_path : str = field()
-    port : int = field()
-    scaling : list[int] = field()
+    host : str = field(default=None, metadata={"description": ""})
+    iodd_path : str = field(default=None, metadata={"description": ""})
+    port : int = field(default=1, metadata={"description": ""})
+    scaling : list[int] = field(default_factory=list, metadata={"description": ""})
     
     def __post_init__(self):
         super().__post_init__()
         self._pdin_schema : dict = None
+        self._http : urllib3.PoolManager = None
+    
+    def _on_install(self, agent : Agent = None):
+        super()._on_install()
+        self._pdin_schema = IOLinkService._parse_iodd_schema(self.iodd_path)
+        self._http = urllib3.PoolManager()
+    
+    def _on_uninstall(self, agent : Agent = None):
+        super()._on_uninstall(agent)
+        self._http = None
+        
+    def read_from_source(self):
+        url : str = f"{self.host}/iolinkmaster/port[{self.port}]/iolinkdevice/pdin/getdata"
+        if len(self.get_buffers()) == 1:
+            buffer : Buffer = next(iter(self.get_buffers().values()))
+            response = self._http.request("GET", url)
+            body = response.data
+            s = body.decode("utf-8")
+            json_data = json.loads(s)
+            hex_data = json_data["data"]["value"]
+            d : dict = IOLinkService._decode_process_data(hex_data, self._pdin_schema)
+            buffer.push(d)
     
     @staticmethod
     def _parse_iodd_schema(iodd_path : str, process_data_id: str = "PDIn") -> dict:
