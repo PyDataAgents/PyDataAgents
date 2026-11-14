@@ -1,6 +1,7 @@
 from dataclasses import dataclass, field
 import re
 from typing import TYPE_CHECKING, Any
+import uuid
 from loguru import logger
 
 from ..utils.DataUtils import DataUtils
@@ -20,6 +21,27 @@ SLICE_PATTERN = re.compile(r"^\s*(-?\d*)\s*:\s*(-?\d*)\s*(?::\s*(-?\d*)\s*)?$")
 
 @dataclass
 class BufferNode(Node):
+    """`Node` that stores data in a buffer and retrieves data from parent buffers.
+
+    On installation, this node links to the buffer identified by ``buffer_id``
+    or creates a new buffer. Data can be added to its buffer with
+    :meth:`add_data`. When retrieving parent data, the node combines data from
+    its ``BufferNode`` parents and can filter keys by name, integer index,
+    Python-style index or slice, or value type. ``ignore_keys`` are excluded
+    after selection, and the result can optionally be returned by rows.
+
+    Attributes:
+        buffer_id: ID of the buffer linked to this node; a buffer is created
+            when no ID is supplied.
+        persistent: Whether retrieved data is retained in the parent buffer.
+        n: Amount of data to retrieve from each parent buffer; zero means all.
+        input_keys: Key names, integer indices, or a selector string used to
+            filter parent data. An empty value selects all keys.
+        output_keys: Optional explicit output key names.
+        ignore_keys: Keys removed from the retrieved data.
+        ignore_empty_parents: Whether empty parent data is accepted without
+            raising a ``NodeException``.
+    """
     
     buffer_id : str = field(default=None, metadata={"description": "unique ID of the buffer"})
     persistent : bool = field(default=True, metadata={"description": "specifies whether data is removed (False) from parent or not (True)"})
@@ -42,7 +64,18 @@ class BufferNode(Node):
         Raises:
             StatemachineException: throws an `Exception` if no `buffer` with the specified `buffer_id` can be found in `agent`
         """
-        # check buffer installation
+        self._create_default_buffer(agent)
+    
+    def _create_default_buffer(self, agent : 'Agent' = None, capacity : int = AgentKeywords.INFINITE_CAPACITY, timestamps_enabled : bool = True, index_enabled : bool = True):
+        """ 
+        this method creates a default `Buffer` instance for this `BufferNode` if no `buffer_id` was specified or if the specified `buffer_id` does not exist in the given `agent`
+        
+        Args:   
+            agent (Agent, optional): agent instance. Defaults to None.
+            capacity (int, optional): capacity of the buffer. Defaults to AgentKeywords.INFINITE_CAPACITY
+            timestamps_enabled (bool, optional): whether timestamps are enabled in the buffer. Defaults to True.
+            index_enabled (bool, optional): whether index is enabled in the buffer. Defaults to True.
+        """
         if self._buffer is None:
             if agent is not None:
                 if self.buffer_id is not None:
@@ -51,26 +84,26 @@ class BufferNode(Node):
                     else:
                         self._buffer = DictBuffer(
                                                     id=self.buffer_id,
-                                                    capacity=AgentKeywords.INFINITE_CAPACITY,
-                                                    timestamps_enabled=True,
-                                                    index_enabled=True
+                                                    capacity=capacity,
+                                                    timestamps_enabled=timestamps_enabled,
+                                                    index_enabled=index_enabled
                                                 )
                         agent.add_buffer(self._buffer)
                 else:
                     self._buffer = DictBuffer(
                                                 id=self.id + "-BUFFER",
-                                                capacity=AgentKeywords.INFINITE_CAPACITY,
-                                                timestamps_enabled=True,
-                                                index_enabled=True
+                                                capacity=capacity,
+                                                timestamps_enabled=timestamps_enabled,
+                                                index_enabled=index_enabled
                                             )
                     self.buffer_id = self._buffer.id
                     agent.add_buffer(self._buffer)
             else:
                 self._buffer = DictBuffer(
                     id=self.id + "-BUFFER",
-                    capacity=AgentKeywords.INFINITE_CAPACITY,
-                    timestamps_enabled=True,
-                    index_enabled=True
+                    capacity=capacity,
+                    timestamps_enabled=timestamps_enabled,
+                    index_enabled=index_enabled
                 )
                 self.buffer_id = self._buffer.id            
             self._buffer.install(agent)
@@ -79,7 +112,7 @@ class BufferNode(Node):
         
     def _on_uninstall(self, agent : 'Agent' = None):
         self._buffer : Buffer = None
-        
+            
     def set_buffer(self, buffer : Buffer):
         """
         method to set the buffer and the `Node`'s `buffer_id`
@@ -99,6 +132,26 @@ class BufferNode(Node):
             Buffer: `Buffer` instance
         """
         return self._buffer
+    
+    def get_data(self, by_rows : bool = False, n : int = 0, persistent : bool = True) -> dict | list:
+        """
+        Retrieve data from this node's buffer.
+
+        Args:
+            by_rows (bool): If True, return the data as a list of rows; otherwise,
+                return it as a dictionary of columns.
+            n (int): Number of records to retrieve. The buffer determines how
+                values such as zero are interpreted.
+            persistent (bool): Whether to retrieve persistent buffer data.
+
+        Returns:
+            dict | list: Buffer data as columns, or as rows when ``by_rows`` is True.
+        """
+        data : dict = self._buffer.data(n = n, persistent = persistent)                    
+        if by_rows:
+            return DataUtils.dict_to_list(data)
+        else:
+            return data
         
     def get_parent_data(self, by_rows : bool = False) -> dict | list:
         """ Retrieve data from parent node buffers.

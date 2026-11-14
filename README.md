@@ -447,6 +447,18 @@ pip uninstall pydag -y; pip install git+https://github.com/PyDataAgents/PyDataAg
 
 Project Dependencies can be found in [pyproject.toml](pyproject.toml)
 
+For a local checkout using Conda, create an environment with Python and pip
+before installing (an empty Conda environment can fall back to base Python):
+
+```bash
+conda create -n pydataagents python=3.13 pip
+conda activate pydataagents
+python -m pip install .
+```
+
+JavaScript expressions use `quickjs-ng`, which provides the `quickjs` import
+and prebuilt Windows wheels, avoiding a local C++ build on supported platforms.
+
 or use a pyproject.toml
 ```
 [build-system]

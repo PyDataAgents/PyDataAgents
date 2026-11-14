@@ -179,6 +179,7 @@ class Agent():
             ServiceException: if a `Service` could not be started
             AgentElementException: if a `AgentElement` could not be installed
         """
+        logger.info(f"Releasing {self.__class__.__name__} [{self.id}] ... ")
         if self._service_monitor is not None and self._stop_event.is_set():
             self._service_monitor.join()
             self._service_monitor = None
@@ -188,7 +189,7 @@ class Agent():
 
         self._stop_event.clear()
         self._is_running = True
-        logger.info(f"Started {self.__class__.__name__} application (id='{self.id}')")
+        logger.info(f"Released {self.__class__.__name__} [{self.id}]")
         if stop_when_idle:
             if blocking:
                 self._wait_for_services()
@@ -197,14 +198,13 @@ class Agent():
                     target=self._wait_for_services, daemon=True,
                     name=f"{self.id}-service-monitor")
                 self._service_monitor.start()
-        elif blocking:
+        elif blocking:            
             self._stop_event.wait()  # blocks efficiently until the event is set (for example by terminate)
 
     def _wait_for_services(self):
         """Terminate once all services leave RUNNING, or exit on manual termination."""
         while not self._stop_event.is_set():
-            if not any(service.get_state() == ServiceState.RUNNING
-                       for service in list(self.service_store.values())):
+            if not any(service.get_state() == ServiceState.RUNNING for service in list(self.service_store.values())):
                 self.terminate()
                 return
             if self._stop_event.wait(0.1):
@@ -216,13 +216,16 @@ class Agent():
         Stops all services and uninstalls elements.
         Signals the stop event to unblock any waiting release() call.
         """
+        logger.info(f"Terminating {self.__class__.__name__} [{self.id}] ... ")
         with self._termination_lock:
             if self._stop_event.is_set():
+                logger.info(f"Terminated {self.__class__.__name__} [{self.id}]")
                 return
             self._stop_services()
             self._uninstall_elements()
             self._is_running = False
             self._stop_event.set()
+            logger.info(f"Terminated {self.__class__.__name__} [{self.id}]")
 
     def get_buffer(self, id : str) -> Buffer:
         """ return the `Buffer` specified by `id`, if the specified `Buffer` is not found, the method returns `None

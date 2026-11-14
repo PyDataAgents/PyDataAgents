@@ -1,5 +1,106 @@
 # Nodes Documentation
 
+## IfElseTransition
+
+`pydag.nodes.utils.IfElseTransition` routes parent buffer data to exactly one
+of two children in `SFCService`. Add the true child first and the false child
+second (or use `child_ids=["true_id", "false_id"]`). Use `SFCService` for this
+graph branching; `SimpleStatemachine` only runs a flat sequence.
+
+Install `jsonpath-ng`, also included in `pydag[iiot]`. The dependency is loaded
+only when the node is installed.
+
+```python
+from pydag.buffers.DictBuffer import DictBuffer
+from pydag.nodes.buffers.LinkBufferAction import LinkBufferAction
+from pydag.nodes.buffers.CopyDataAction import CopyDataAction
+from pydag.nodes.utils.IfElseTransition import IfElseTransition
+from pydag.nodes.utils.StopAction import StopAction
+from pydag.services.statemachine.SFCService import SFCService
+from pydag.services.ThreadType import ThreadType
+
+buffer = DictBuffer(index_enabled=False, timestamps_enabled=False)
+buffer.install()
+buffer.push({"temperature": [72, 91]})
+source = LinkBufferAction(id="source")
+source.set_buffer(buffer)
+branch = IfElseTransition(
+    id="temperature_check",
+    json_path="$.temperature[-1]",
+    condition="greater_than",
+    value=80,
+)
+hot = CopyDataAction(id="hot")
+normal = CopyDataAction(id="normal")
+hot_stop, normal_stop = StopAction(), StopAction()
+source.add_child(branch)
+branch.add_child(hot)       # true
+branch.add_child(normal)    # false
+hot.add_child(hot_stop)
+normal.add_child(normal_stop)
+service = SFCService(thread_type=ThreadType.ONLY_ONCE.value)
+for node in (source, branch, hot, normal, hot_stop, normal_stop):
+    service.add_node(node)
+service.install()
+service.start()             # only hot receives the data
+```
+
+The query operates on a JSON round trip of `get_parent_data()`, normally a
+column-oriented object such as `{"temperature": [72, 91]}`. Inherited `n`,
+`input_keys`, and `ignore_keys` select the input. Data must be JSON serializable
+and contain finite numbers. `persistent=True` preserves parent data;
+`persistent=False` consumes it when read, including when later evaluation fails.
+
+Supported conditions are `equals`, `not_equals`, `greater_than`,
+`greater_or_equal`, `less_than`, `less_or_equal`, `contains`, `exists`, `is_null`,
+and `is_not_null`. The last three ignore `value`. `contains` checks whether the
+matched string, list, or object contains `value`. Comparisons use JSON-decoded
+Python values without string-to-number coercion; incompatible comparisons raise
+`NodeException`. A missing path is false, even for `not_equals` or `is_null`;
+an explicit JSON null matches `is_null` and `exists`.
+
+Use `$.temperature[*]` with `match_mode="any"` (default) or `"all"` to combine
+multiple comparisons. No query matches always selects the false branch.
+Malformed queries and invalid configuration fail installation.
+
+Each successful evaluation replaces this node's buffer with the selected input
+payload so its child can read it. `check()` returns **True for both outcomes**
+because either branch advances the workflow; `get_next_children()` returns the
+one selected child. It returns an empty list before evaluation. The scheduler
+executes that child; calling `check()` alone does not execute it. Ordinary
+transitions continue to return all their children from `get_next_children()`.
+
+## `XLookupAction` (in `pydag\nodes\buffers\XLookupAction.py`)
+
+`XLookupAction` converts parent data to a DataFrame and looks up each value in
+`lookup_values` against `lookup_column`, returning values from `return_column`.
+It uses exact matching and the first match; unmatched values become `None` by
+default or the configured `not_found_value`.
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `lookup_values` | `list[Any]` | `[]` | Values to look up |
+| `lookup_column` | `str` | `None` | Parent-data column searched for each lookup value |
+| `return_column` | `str` | `None` | Parent-data column providing the matched result |
+| `not_found_value` | `Any` | `None` | Value to use when a lookup value has no match |
+
+```python
+from pydag.nodes.buffers.XLookupAction import XLookupAction
+
+lookup = XLookupAction(
+    lookup_values=["P-001", "P-999"],
+    lookup_column="catalog_id",
+    return_column="product_name",
+    not_found_value="Unknown",
+)
+lookup.add_parent(source_node)
+lookup.install()
+lookup.execute()
+```
+
+The node writes the results to its own buffer under the `return_column` name.
+This corresponds to exact-match XLOOKUP/XVERWEIS with first-to-last search.
+
 ## Summary
 
 | Class | Description | Icon |
@@ -24,6 +125,7 @@
 | [`CopyBufferAction`](#copybufferaction-in-pydagnodesbufferscopybufferactionpy) | `Action` that copies the entire parent buffer to this `Node`'s `Buffer` whenever executed.The copy procedure makes a deep of all the parent's `Buffer` elements | ![CopyBufferAction](element_icons/CopyBufferAction.png)
 | [`CopyDataAction`](#copydataaction-in-pydagnodesbufferscopydataactionpy) | `Action` that makes a copy of the data in all parent `Buffer`s found amongst this `Node`s parents.If this `Node`'s parents contains more than one `BufferNode`, all data is merged and copied.Before this `Node`s `Buffer` is filled, all other elements are cleared. | ![CopyDataAction](element_icons/CopyDataAction.png)
 | [`DataFrameFilterAction`](#dataframefilteraction-in-pydagnodesbuffersdataframefilteractionpy) |  | ![DataFrameFilterAction](element_icons/DataFrameFilterAction.png)
+| [`XLookupAction`](#xlookupaction-in-pydagnodesbuffersxlookupactionpy) | Adds an exact-match lookup result column to parent buffer data. |
 | [`DataToBuffersAction`](#datatobuffersaction-in-pydagnodesbuffersdatatobuffersactionpy) | `Action` that copies data of the `Buffer` specified via `buffer_id` or found in the first `BufferNode` found amongst this `Node`s parents to all the buffers specified via `buffer_ids`.If this `Node`'s parents contain more than one `BufferNode`, only the first is respected. | ![DataToBuffersAction](element_icons/DataToBuffersAction.png)
 | [`FormatBufferColumnAction`](#formatbuffercolumnaction-in-pydagnodesbuffersformatbuffercolumnactionpy) |  | ![FormatBufferColumnAction](element_icons/FormatBufferColumnAction.png)
 | [`FormattedStringAction`](#formattedstringaction-in-pydagnodesbuffersformattedstringactionpy) | `Action` to compose a formatted string and store it in this `Action`'s bufferusing its parent's buffer to create the new string | ![FormattedStringAction](element_icons/FormattedStringAction.png)
@@ -69,6 +171,7 @@
 | [`HttpPostAction`](#httppostaction-in-pydagnodeshttphttppostactionpy) |      | ![HttpPostAction](element_icons/HttpPostAction.png)
 | [`HttpPutAction`](#httpputaction-in-pydagnodeshttphttpputactionpy) |      | ![HttpPutAction](element_icons/HttpPutAction.png)
 | [`AnonymousPromptAction`](#anonymouspromptaction-in-pydagnodesllmanonymouspromptactionpy) | `BufferNode` `Action` for anonymizing prompts by hashing sensitive information like emails, phone numbers, urls, bank details, addresses and names.The hashing is done with a salt to ensure that the same input will always produce the same output, but different inputs will produce different outputs.This allows for consistent anonymization while preventing reverse engineering of the original data.This class requires the spacy model "de_core_news_lg" to be installed for entity recognition.Download with: python -m spacy download de_core_news_lg  | ![AnonymousPromptAction](element_icons/AnonymousPromptAction.png)
+| [`AgentHarnessAction`](#agentharnessaction-in-pydagnodesllmagentharnessactionpy) | Execute a literal or parent-buffer prompt through an installed CLI harness; stdout destination is configurable. | |
 | [`HuggingFaceAction`](#huggingfaceaction-in-pydagnodesllmhuggingfaceactionpy) |  | ![HuggingFaceAction](element_icons/HuggingFaceAction.png)
 | [`LLMChatAction`](#llmchataction-in-pydagnodesllmllmchatactionpy) | `Action` to chat with a `RAGService` and store the response in its `Buffer`.Usage modes:1. Chat-Only: (default) `RAGService` with `use_rag_context=False`, only `question`.2. Chat-with-RAG-context: `RAGService` with `question`, retrieval enabled.3. Chat-with-local-context: `RAGService` with `question` + `input_context`, `use_rag_context=False`.4. Full-mode-augment: `question` + `input_context` + retrieval enabled, no strict structure enforcement.5. Full-mode-template_fill: same as full augment plus strict structure validation.`instruction_key` and `instruction_value` are used for promptinstructions: the resolved value is passed to `RAGService.chat` as`instruction` and rendered in the prompt's `Instruction:` section. Use`input_context_keys` and `input_context_value` for runtime facts/data thatshould be rendered in `Local Input Context:`.Optional file context can be supplied via `context_files_key` or`context_files_value`. V1 accepts external URLs, local file URLs, localpaths (absolute or relative to the current working directory), data URIs,plain base64 strings, raw bytes, or lists of those values. File inputs aresupported only for OPENAI and AZURE model providers. OLLAMA file processingis not implemented yet; supplying files with OLLAMA emits a warning andcontinues text-only. | ![LLMChatAction](element_icons/LLMChatAction.png)
 | [`LLMOCRAction`](#llmocraction-in-pydagnodesllmllmocractionpy) | `Action` to retrieve text from an image or PDF and store the extracted text in its `Buffer`.The parent Buffer Node is expected to provide file paths to images or PDFs.The allowed input formats for the file paths are:- A fully qualified file path as a string- an image/pdf as a Base64-encoded data URL depending on the model providers, the functionality is implemented in different ways:- Mistral:    The Mistral OCR-3 model is used to extract text from the images or PDFs.    For more information about the Mistral OCR-3 model: https://mistral.ai/news/mistral-ocr-3".    The output has the following format:    {        "documents": <String of extracted text pages creatred from the contents of the origial OCRPageObject returned by Mistral>,        "filepath": <file path for each processed input>    }    Where the original OCRPageObject has the following format:        {        "pages": [ # The content of each page            {            "index": int, # The index of the corresponding page            "markdown": str, # The main output and raw markdown content            "images": list, # Image information when images are extracted            "tables": list, # Table information when using `table_format=html`            "hyperlinks": list, # Hyperlinks detected            "header": str|null, # Header content when using `extract_header=True`            "footer": str|null, # Footer content when using `extract_footer=True`            "dimensions": dict # The dimensions of the page            }        ],        "model": str, # The model used for the OCR        "document_annotation": dict|null, # Document annotation information when used, visit the Annotations documentation for more information        "usage_info": dict # Usage information        }    See https://docs.mistral.ai/capabilities/document_ai/basic_ocr for more details.- Ollama:    Uses the chat api of the Ollama Client- OpenAI: | ![LLMOCRAction](element_icons/LLMOCRAction.png)
@@ -2795,6 +2898,67 @@ anonymous_prompt_action = AnonymousPromptAction(
 	addresses_names=True,
 	lang='de'
 )
+```
+
+[Go to Summary](#summary)
+## `AgentHarnessAction` (in `pydag\nodes\llm\AgentHarnessAction.py`)
+
+Runs a CLI agent harness in an existing working directory. Currently only Codex
+is supported. Install the CLI separately and make `codex` executable on the
+DataAgent process's `PATH`. Configure authentication for the account running the
+DataAgent before execution. PyDataAgents does not install or authenticate the
+harness. See the official [CLI setup](https://learn.chatgpt.com/docs/codex/cli)
+and [automation authentication](https://learn.chatgpt.com/docs/non-interactive-mode).
+
+Installation checks that the harness is supported, its executable is on `PATH`,
+and `working_directory` exists and is accessible. Invalid configuration raises
+`NodeException` inside the installation hook (wrapped by `AgentElementException`
+by the public `install()` method).
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `harness` | `str` | `"codex"` | CLI harness; currently only Codex is supported. |
+| `prompt` | `str` | `None` | Non-empty literal prompt; executed once unless `instruction_key` selects parent rows. |
+| `prompt_key` | `str` | `None` | Literal parent-buffer key containing a non-empty string prompt; one invocation per selected row. Configure exactly one of `prompt` or `prompt_key`. |
+| `instruction` | `str` | `""` | Fixed instructions for answer rules, format, style, constraints, and priorities. Non-empty values are mutually exclusive with `instruction_key`. |
+| `instruction_key` | `str` | `None` | Parent-buffer key containing string instructions per selected row; empty strings are allowed. |
+| `working_directory` | `str` | `None` | Required existing, accessible directory for the CLI process. |
+| `output_keys` | `list[str]` | `[]` | Optional single literal stdout destination; empty means `stdout`. Empty/blank names and `stderr`/`exit_code` are rejected. |
+
+Key-based prompts and instructions use the inherited `input_keys`, `ignore_keys`, `n`, and
+`persistent` controls. Missing parent data, missing keys, and empty/non-string
+prompts raise `NodeException` before any harness is launched. Prompt keys must
+remain available after input filtering, as must instruction keys. Non-string
+instructions also raise `NodeException` before any harness is launched. With
+literal inputs only, parent data is not read. Non-empty instructions are prepended
+as `Instruction:\n{instruction}\n\nPrompt:\n{prompt}`; empty instructions leave
+the prompt unchanged. Prompts are sent through stdin to preserve multiline text
+on Windows, Linux, and macOS. Process streams use UTF-8 with replacement for
+invalid bytes.
+
+Each invocation appends one result row with stdout, `stderr`, and `exit_code`.
+Stdout preserves the raw JSONL event stream from `codex exec --json`, including
+its line breaks; it is not just the final answer. Nonzero exit codes are recorded
+for downstream handling. Process launch failures raise `NodeException`.
+
+```python
+from pydag.nodes.buffers.LinkBufferAction import LinkBufferAction
+from pydag.nodes.llm.AgentHarnessAction import AgentHarnessAction
+
+parent = LinkBufferAction()
+parent.install()
+parent.add_data({"task_prompt": "Analyze the latest machine log and write a maintenance report."})
+
+action = AgentHarnessAction(
+    prompt_key="task_prompt",
+    instruction="Be concise and include recommended next steps.",
+    output_keys=["harness_result"],
+    working_directory=".",
+)
+action.add_parent(parent)
+action.install()  # requires the installed and authenticated Codex CLI
+action.execute()
+result = action.get_data()  # harness_result, stderr, exit_code (plus buffer metadata)
 ```
 
 [Go to Summary](#summary)

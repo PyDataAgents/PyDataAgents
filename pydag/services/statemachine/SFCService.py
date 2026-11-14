@@ -59,7 +59,7 @@ class SFCObserver(Observer):
                                 if isinstance(node, Action):
                                     self._statemachine.deactivate(node)
                             # activate child actions and add new transitions
-                            for node in transition.get_children():
+                            for node in transition.get_next_children():
                                 if isinstance(node, Action):
                                     self._statemachine.activate(node)
                                 elif isinstance(node, Transition):

@@ -128,6 +128,39 @@ class FileUtils:
         else:
             logger.error("Folder " + folder + " does not exist")
             return []
+    
+    @staticmethod
+    def list_folders(folder : str, pattern : Union[str, list[str]] = None, newer_than_seconds : int = None, recursive : bool = False) -> list[str]:
+        """ 
+        List folders in a directory with optional filtering by pattern and modification time.
+        """
+        if os.path.isdir(folder):
+            path = Path(folder)
+            iterator = path.rglob("*") if recursive else path.iterdir()
+            
+            cutoff = time.time() - newer_than_seconds if newer_than_seconds is not None else None
+            # Build initial folder list as strings for consistent downstream filtering
+            folders = [
+                str(f) for f in iterator
+                if f.is_dir() and (cutoff is None or f.stat().st_mtime > cutoff)
+            ]
+
+            # Normalize and apply pattern filters (supports str or list[str])
+            if pattern is not None:
+                patterns = pattern if isinstance(pattern, list) else [pattern]
+                folders = [
+                    f for f in folders
+                    if any(p in f for p in patterns)
+                ]
+
+            if len(folders) == 0:
+                return []
+            else:   
+                return folders
+            
+        else:
+            logger.error("Folder " + folder + " does not exist")
+            return []
         
     @staticmethod
     def get_folder_bytes(folder : str) -> float:
@@ -402,7 +435,6 @@ class FileUtils:
             try:
                 timestamp = dt.timestamp()
                 if platform.system() == 'Windows':
-                    import pywintypes
                     import win32file
                     import win32con
 
@@ -415,7 +447,7 @@ class FileUtils:
                         win32con.FILE_ATTRIBUTE_NORMAL,
                         None
                     )
-                    win32file.SetFileTime(handle, pywintypes.Time(timestamp), None, None)
+                    win32file.SetFileTime(handle, dt, None, None)
                     handle.close()
                 else:
                     logger.error("Setting created date is not supported on this OS.")
