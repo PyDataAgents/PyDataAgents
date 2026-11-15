@@ -1,24 +1,21 @@
 import os
 
+from pydag.buffers.DictBuffer import DictBuffer
 from pydag.services.ThreadType import ThreadType
 from pydag.services.iolink.IOLinkService import IOLinkService
-
-
-def test_iolink_vvb301():
-    host = "https://192.168.1.250"
-    iodd_path = os.path.dirname(__file__) + os.sep + "IODD_VVB301.xml"    
-    ios = IOLinkService(host=host, iodd_path=iodd_path, port=1, thread_type=ThreadType.MILLI_SECOND.value)
-    ios.install()
     
-    print(ios._pdin_schema)
+def test_iolink_service_read_from_source():
+    # TODO
     
-def test_iolink_vvb301_decoding():
-    hex = "002D001407D003D0003200FA00000000"
+    d = DictBuffer()
+    d.install()
     
     host = "https://192.168.1.250"
     iodd_path = os.path.dirname(__file__) + os.sep + "IODD_VVB301.xml"    
     ios = IOLinkService(host=host, iodd_path=iodd_path, port=1, thread_type=ThreadType.MILLI_SECOND.value)
+    ios.add_buffer(d)
     ios.install()
     
-    d = ios._decode_process_data(hex, ios._pdin_schema)
-    print(d)
+    ios.read_from_source()
+    
+    print(d.data())

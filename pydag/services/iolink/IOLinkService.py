@@ -12,6 +12,11 @@ from pydag.services.ServiceException import ServiceException
 
 @dataclass
 class IOLinkService(ReadService):
+    """ A `ReadService`, that reads process data from an IOLink Device via IoT API.
+    The endpoint 'http://{self.host}/iolinkmaster/port[{self.port}]/iolinkdevice/pdin/getdata' is used for data collection.
+    In order to serve the data correctly into `Buffer`s, an IODD schema file has to be provided (as .zip or .xml).
+    The `MappingService` `addresses` property can be used to extract only partial data, by specifying the required keys as list.
+    """
     
     host : str = field(default=None, metadata={"description": ""})
     iodd_path : str = field(default=None, metadata={"description": ""})
@@ -34,16 +39,45 @@ class IOLinkService(ReadService):
         
     def read_from_source(self):
         url : str = f"{self.host}/iolinkmaster/port[{self.port}]/iolinkdevice/pdin/getdata"
+        response = self._http.request("GET", url)
+        body = response.data
+        s = body.decode("utf-8")
+        json_data = json.loads(s)
+        hex_data = json_data["data"]["value"]
+        d : dict = IOLinkService._decode_process_data(hex_data, self._pdin_schema)
+                    
         if len(self.get_buffers()) == 1:
             buffer : Buffer = next(iter(self.get_buffers().values()))
-            response = self._http.request("GET", url)
-            body = response.data
-            s = body.decode("utf-8")
-            json_data = json.loads(s)
-            hex_data = json_data["data"]["value"]
-            d : dict = IOLinkService._decode_process_data(hex_data, self._pdin_schema)
-            buffer.push(d)
-    
+            if len(self.addresses) > 0:
+                nd : dict = {}
+                for address in self.addresses:
+                    if address in d:
+                        nd[address] = d[address]
+                buffer.push(nd)
+            else:
+                buffer.push(d)
+        elif len(self.get_buffers()) > 1:
+            if len(self.addresses) > 0:
+                if len(self.addresses) != len(self.get_buffers()):
+                    raise ServiceException(f"Number of addresses ({len(self.addresses)}) must match the number of {Buffer.__name__}s ({len(self.get_buffers)})")
+                a : int = 0
+                for key, buffer in self.get_buffers().items():
+                    address = self.addresses[a]
+                    v = d[address]
+                    buffer.push({self.addresses[a]: v})
+                    a += 1
+            else:
+                if len(self.get_buffers()) != len(self._pdin_schema["fields"]):
+                    raise ServiceException((f"Number of fields in schema ({len(self._pdin_schema["fields"])}) must match the number of {Buffer.__name__}s ({len(self.get_buffers)})"))
+                schema_iter = iter(self._pdin_schema["fields"])
+                for key, buffer in self.get_buffers().items():
+                    field = next(schema_iter)
+                    v = d[field]
+                    buffer.push({field: v})
+        else:
+            raise ServiceException(f"No {Buffer.__name__}s were specified")
+            
+     
     @staticmethod
     def _parse_iodd_schema(iodd_path : str) -> dict:
         """
