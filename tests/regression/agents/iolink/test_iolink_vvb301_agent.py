@@ -67,3 +67,4 @@ def test_iolink_vvb301_agent():
     aa = AgentApp(agent=ag, with_ui=True)
     aa.create()
     aa.run()
+    

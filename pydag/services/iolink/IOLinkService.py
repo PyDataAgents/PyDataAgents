@@ -21,7 +21,8 @@ class IOLinkService(ReadService):
     host : str = field(default=None, metadata={"description": ""})
     iodd_path : str = field(default=None, metadata={"description": ""})
     port : int = field(default=1, metadata={"description": ""})
-    scaling : list[int] = field(default_factory=list, metadata={"description": ""})
+    scaling : dict[str, int] = field(default_factory=dict, metadata={"description": "scaling key-value-pairs, if predfined scaling shall be defined. The key must contain the name of the corresponding field"})
+    big_endian : bool = field(default=True, metadata={"description": "specifies big endian or little endian byte swaps"})
     
     def __post_init__(self):
         super().__post_init__()
@@ -30,21 +31,21 @@ class IOLinkService(ReadService):
     
     def _on_install(self, agent : Agent = None):
         super()._on_install()
-        self._pdin_schema = IOLinkService._parse_iodd_schema(self.iodd_path)
-        self._http = urllib3.PoolManager()
+        self._http = urllib3.PoolManager()        
+        self._parse_iodd_schema()
     
     def _on_uninstall(self, agent : Agent = None):
         super()._on_uninstall(agent)
         self._http = None
         
     def read_from_source(self):
-        url : str = f"{self.host}/iolinkmaster/port[{self.port}]/iolinkdevice/pdin/getdata"
+        url : str = f"{self.host}/iolinkmaster/port[{str(self.port)}]/iolinkdevice/pdin/getdata"
         response = self._http.request("GET", url)
         body = response.data
         s = body.decode("utf-8")
         json_data = json.loads(s)
         hex_data = json_data["data"]["value"]
-        d : dict = IOLinkService._decode_process_data(hex_data, self._pdin_schema)
+        d : dict = self._decode_process_data(hex_data)
                     
         if len(self.get_buffers()) == 1:
             buffer : Buffer = next(iter(self.get_buffers().values()))
@@ -77,9 +78,7 @@ class IOLinkService(ReadService):
         else:
             raise ServiceException(f"No {Buffer.__name__}s were specified")
             
-     
-    @staticmethod
-    def _parse_iodd_schema(iodd_path : str) -> dict:
+    def _parse_iodd_schema(self):
         """
         Parses an IO-Link IODD zip file, extracts process data fields, 
         automatically maps 'exponent_from' relationships, and retrieves invalid value codes.
@@ -106,8 +105,8 @@ class IOLinkService(ReadService):
         xml_content = None
 
         # 1. Handle IODD ZIP archive or direct XML file
-        if zipfile.is_zipfile(iodd_path):
-            with zipfile.ZipFile(iodd_path, 'r') as z:
+        if zipfile.is_zipfile(self.iodd_path):
+            with zipfile.ZipFile(self.iodd_path, 'r') as z:
                 xml_files = [f for f in z.namelist() if f.lower().endswith('.xml') and not f.lower().startswith('iodd-ml')]
                 if not xml_files:
                     xml_files = [f for f in z.namelist() if f.lower().endswith('.xml')]
@@ -118,7 +117,7 @@ class IOLinkService(ReadService):
                 with z.open(main_xml) as f:
                     xml_content = f.read()
         else:
-            with open(iodd_path, 'rb') as f:
+            with open(self.iodd_path, 'rb') as f:
                 xml_content = f.read()
 
         xml_tree = ET.fromstring(xml_content) 
@@ -232,14 +231,13 @@ class IOLinkService(ReadService):
             if expected_exponent_name in field_names:
                 field["exponent_from"] = expected_exponent_name
 
-        return {
+        self._pdin_schema = {
             "bit_length": bit_length,
-            "byte_order": "big",
+            "byte_order": "big" if self.big_endian else "little",
             "fields": raw_fields
         }
-        
-    @staticmethod    
-    def _decode_process_data(hex_data: str, schema: dict) -> dict:
+            
+    def _decode_process_data(self, hex_data: str) -> dict:
         """
         Decode IO-Link process data using a normalized schema.
 
@@ -255,25 +253,24 @@ class IOLinkService(ReadService):
         hex_data = hex_data.replace(" ", "").replace("0x", "")
 
         if len(hex_data) % 2:
-            raise ValueError("Hex data must contain complete bytes")
+            raise ServiceException("Hex data must contain complete bytes")
 
-        byte_order = schema.get("byte_order", "big")
+        byte_order = self._pdin_schema.get("byte_order", "big")
         raw_bytes = bytes.fromhex(hex_data)
 
-        if len(raw_bytes) * 8 != schema["bit_length"]:
-            raise ValueError(
-                f"Expected {schema['bit_length']} bits, "
+        if len(raw_bytes) * 8 != self._pdin_schema["bit_length"]:
+            raise ServiceException(
+                f"Expected {self._pdin_schema['bit_length']} bits, "
                 f"received {len(raw_bytes) * 8}"
             )
 
         raw_integer = int.from_bytes(raw_bytes, byte_order)
 
         def extract(offset: int, length: int) -> int:
-            shift = schema["bit_length"] - offset - length
-            if shift < 0 or length <= 0:
-                raise ValueError("Invalid field offset or length")
+            if offset < 0 or length <= 0:
+                raise ServiceException("Invalid field offset or length")
 
-            return (raw_integer >> shift) & ((1 << length) - 1)
+            return (raw_integer >> offset) & ((1 << length) - 1)
 
         def convert_signed(value: int, length: int) -> int:
             sign_bit = 1 << (length - 1)
@@ -282,7 +279,7 @@ class IOLinkService(ReadService):
         # First pass: extract raw values.
         result = {}
 
-        for field in schema["fields"]:
+        for field in self._pdin_schema["fields"]:
             name = field["name"]
             length = field["length"]
 
@@ -293,12 +290,13 @@ class IOLinkService(ReadService):
             elif field["type"] == "bool":
                 value = bool(value)
             elif field["type"] != "uint":
-                raise ValueError(f"Unsupported type: {field['type']}")
+                raise ServiceException(f"Unsupported type: {field['type']}")
 
             result[name] = value
 
         # Second pass: apply scaling and invalid-value handling.
-        for field in schema["fields"]:
+        f : int = 0
+        for field in self._pdin_schema["fields"]:
             name = field["name"]
             value = result[name]
 
@@ -317,6 +315,12 @@ class IOLinkService(ReadService):
                 value *= 10 ** exponent
 
             value *= field.get("scale", 1)
+            
+            # apply predefined scaling from properties
+            if len(self.scaling) > 0:
+                if name in self.scaling:
+                    value = value * self.scaling[name]
+            
             result[name] = value
 
         return result

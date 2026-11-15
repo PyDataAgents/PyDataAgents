@@ -172,6 +172,11 @@ class PlotCard(BufferComponent):
     def __init__(self, page : UIPage, buffer : Buffer, input_keys : list[str] = None, n : int = 0):
         super().__init__(page, buffer, input_keys, n)
         self._fig = go.Figure()
+        
+        # add this o keep plot interaction between plot update callbacks
+        self._fig.update_layout(
+            uirevision='constant'
+        )
         if isinstance(buffer, TimedBuffer):
             self._fig.add_trace(go.Scatter(x=[], y=[], mode='lines'))
         else:
@@ -188,6 +193,7 @@ class PlotCard(BufferComponent):
             return
         data = self.get_data()
         n = len(data)
+                
         if n > 0:
             if n == 1:
                 y = next(iter(data.values()))
@@ -207,10 +213,12 @@ class PlotCard(BufferComponent):
                             self._fig.add_trace(go.Scatter(y=[], mode='lines'))
                         while len(self._fig.data) > n:
                             self._fig.pop(-1)
-                    it = iter(data.values())           
-                    for i in range(0, n): 
-                        y = next(it) 
+                    it = iter(data.items())           
+                    for i in range(0, n):
+                        k, y = next(it) 
                         self._fig.data[i].y = y
+                        self._fig.data[i].name = str(k)
+                        
             self._ui_plot.update()
 
 

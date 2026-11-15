@@ -21,7 +21,7 @@ class UIBufferPage(UIPage):
         
         with ui.grid(columns=2).classes("w-full gap-4"):
             for k, b in self.get_agent().buffer_store.items():
-                plot_card = PlotCard(self, b)
+                plot_card = PlotCard(self, b, n = 1000)
                 self.add_ui_component(plot_card)
                 #self._service.get_update_routines().append(plot_card.update)
                 
