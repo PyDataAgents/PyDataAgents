@@ -11,6 +11,7 @@ from ...nodes.Action import Action
 from ...nodes.BufferNode import BufferNode
 from ...nodes.ServiceNode import ServiceNode
 from ...services.llm.RAGService import RAGService
+from pydag.utils.JsonUtils import JsonUtils
 
 
 @dataclass
@@ -37,6 +38,10 @@ class LLMChatAction(BufferNode, ServiceNode, Action):
     supported only for OPENAI and AZURE model providers. OLLAMA file processing
     is not implemented yet; supplying files with OLLAMA emits a warning and
     continues text-only.
+
+    ``output_mode='json'`` extracts ``output_keys[1:]`` from a complete JSON
+    object and inserts the original question locally under ``output_keys[0]``.
+    Extra fields are ignored; invalid output raises NodeException before publication.
     """
 
     template: str = field(
@@ -124,19 +129,34 @@ class LLMChatAction(BufferNode, ServiceNode, Action):
         default_factory=list,
         metadata={"description": "Row keys that should be copied unchanged to the output row."},
     )
-    output_keys: list[str] = field(default_factory=lambda: ["question", "answer"])
+    output_keys: list[str] = field(default_factory=lambda: ["question", "answer"], metadata={"description": "First key names the original question; text mode uses the second for the complete answer, json mode extracts all remaining keys as answer fields"})
+    output_mode: str = field(default="text", metadata={"description": "text stores the complete answer; json extracts required answer fields without changing the prompt; incompatible with template_fill"})
 
     def _on_install(self, agent: Agent = None):
+        if self.output_mode not in ("text", "json"):
+            raise NodeException("output_mode must be either 'text' or 'json'")
         BufferNode._on_install(self, agent)
         ServiceNode._on_install(self, agent)
         BufferNode._validate_keys(self.input_context_keys)
         BufferNode._validate_keys(self.pass_through_keys)
         if not isinstance(self._service, RAGService):
             raise NodeException("referenced service is not an instance of " + RAGService.cname())
-        if len(self.output_keys) < 2:
+        if not isinstance(self.output_keys, list) or len(self.output_keys) < 2:
             raise NodeException(self.cname() + " requires at least 2 output_keys")
         if self.input_context_mode not in {"augment", "template_fill"}:
             raise NodeException("input_context_mode must be either 'augment' or 'template_fill'")
+        if self.output_mode == "json":
+            if self.input_context_mode == "template_fill":
+                raise NodeException("JSON output mode cannot be combined with template_fill")
+            if not isinstance(self.pass_through_keys, list):
+                raise NodeException("JSON pass_through_keys must be a list of strings")
+            keys = self.output_keys + self.pass_through_keys
+            BufferNode._validate_keys(keys)
+            if not isinstance(keys[0], str):
+                raise NodeException("JSON output_keys must contain strings")
+            buffer = self.get_buffer()
+            if {"stderr", "exit_code", getattr(buffer, "timestamps_key", "timestamps"), getattr(buffer, "index_key", "index")}.intersection(keys):
+                raise NodeException("JSON output keys must not use reserved diagnostic or buffer metadata names")
 
     def _on_execute(self):
         self._validate_key_value_conflicts()
@@ -156,9 +176,6 @@ class LLMChatAction(BufferNode, ServiceNode, Action):
             else:
                 return
 
-        question_output_key = self.output_keys[0]
-        answer_output_key = self.output_keys[1]
-
         for row in rows:
             question = self._resolve_question(row)
             instruction = self._resolve_instruction(row)
@@ -175,18 +192,21 @@ class LLMChatAction(BufferNode, ServiceNode, Action):
                 use_internet_context=self.use_internet_access,
                 context_files=context_files,
             )
-            normalized_answer = self._normalize_answer_for_mode(answer, input_context)
-
-            result = {
-                question_output_key: question,
-                answer_output_key: normalized_answer,
-            }
+            result = {self.output_keys[0]: question}
+            if self.output_mode == "json":
+                try:
+                    result.update(JsonUtils.extract_fields(answer, self.output_keys[1:]))
+                except ValueError as exc:
+                    raise NodeException(str(exc)) from exc
+            else:
+                result[self.output_keys[1]] = self._normalize_answer_for_mode(answer, input_context)
             for key in self.pass_through_keys:
                 if key not in row:
                     raise NodeException("missing configured pass_through key '" + key + "' in row data")
                 result[key] = row[key]
 
-            self.add_data(result)
+            # One-element columns keep JSON and pass-through arrays in one row.
+            self.add_data({key: [value] for key, value in result.items()} if self.output_mode == "json" else result)
 
     def _validate_key_value_conflicts(self):
         pairs = [

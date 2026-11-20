@@ -2920,10 +2920,11 @@ by the public `install()` method).
 | `harness` | `str` | `"codex"` | CLI harness; currently only Codex is supported. |
 | `prompt` | `str` | `None` | Non-empty literal prompt; executed once unless `instruction_key` selects parent rows. |
 | `prompt_key` | `str` | `None` | Literal parent-buffer key containing a non-empty string prompt; one invocation per selected row. Configure exactly one of `prompt` or `prompt_key`. |
-| `instruction` | `str` | `""` | Fixed instructions for answer rules, format, style, constraints, and priorities. Non-empty values are mutually exclusive with `instruction_key`. |
+| `instruction` | `str` | `None` | Fixed instructions for answer rules, format, style, constraints, and priorities. None means empty instructions. Non-empty values are mutually exclusive with `instruction_key`. |
 | `instruction_key` | `str` | `None` | Parent-buffer key containing string instructions per selected row; empty strings are allowed. |
 | `working_directory` | `str` | `None` | Required existing, accessible directory for the CLI process. |
-| `output_keys` | `list[str]` | `[]` | Optional single literal stdout destination; empty means `stdout`. Empty/blank names and `stderr`/`exit_code` are rejected. |
+| `output_keys` | `list[str]` | `[]` | Text mode: optional single stdout destination; empty means `stdout`. JSON mode: non-empty list of required answer fields. |
+| `output_mode` | `str` | `"text"` | `text` stores the complete final answer; `json` extracts configured fields from a JSON object. |
 
 Key-based prompts and instructions use the inherited `input_keys`, `ignore_keys`, `n`, and
 `persistent` controls. Missing parent data, missing keys, and empty/non-string
@@ -2936,10 +2937,12 @@ the prompt unchanged. Prompts are sent through stdin to preserve multiline text
 on Windows, Linux, and macOS. Process streams use UTF-8 with replacement for
 invalid bytes.
 
-Each invocation appends one result row with stdout, `stderr`, and `exit_code`.
-Stdout preserves the raw JSONL event stream from `codex exec --json`, including
-its line breaks; it is not just the final answer. Nonzero exit codes are recorded
-for downstream handling. Process launch failures raise `NodeException`.
+Each invocation appends one result row. Text mode stores stdout (the final answer,
+including its line breaks), optionally renamed by `output_keys`. The action does
+not request the CLI JSONL event stream and does not publish stderr or exit codes.
+Text mode retains stdout even for nonzero exit codes; JSON mode raises
+`NodeException` before parsing a failed process's output. Process launch failures
+also raise `NodeException`.
 
 ```python
 from pydag.nodes.buffers.LinkBufferAction import LinkBufferAction
@@ -2958,8 +2961,48 @@ action = AgentHarnessAction(
 action.add_parent(parent)
 action.install()  # requires the installed and authenticated Codex CLI
 action.execute()
-result = action.get_data()  # harness_result, stderr, exit_code (plus buffer metadata)
+result = action.get_data()  # harness_result (plus buffer metadata)
 ```
+
+### JSON field extraction
+
+```python
+action = AgentHarnessAction(
+    prompt="Identify the invoice document and its containing directory.",
+    instruction='Return only a JSON object with fields "file_name" and "path". Use null when unavailable.',
+    working_directory=".",
+    output_mode="json",
+    output_keys=["file_name", "path"],
+)
+action.install()
+action.execute()
+result = action.get_data()
+```
+
+An example final answer is:
+
+```json
+{"file_name": "Invoice_2026.pdf", "path": "C:\\Documents\\Finance"}
+```
+
+JSON mode requires a complete JSON object, allowing surrounding whitespace.
+Markdown fences, surrounding prose, non-object responses, malformed JSON, and
+nonstandard constants (`NaN`, `Infinity`) raise `NodeException`. Every configured
+field must be present; unexpected fields are ignored. Values retain their JSON
+types, including `null` (Python `None`), nested objects, and arrays. Empty and
+non-empty arrays stay in a single cell rather than becoming multiple rows.
+
+Configured names are literal, nonblank, unique strings; names differing only in
+surrounding whitespace are treated as duplicates. `stderr`, `exit_code`, and the
+destination buffer's timestamp/index names are reserved. Text mode keeps its
+existing single-key rules.
+
+All fields are validated before one row is published per invocation. If a later
+input fails, earlier successful rows remain; the failed invocation publishes no
+partial row. Consumed parent data is not restored after failure. The action does
+not retry, repair JSON, generate schemas, or modify prompts. Describe the expected
+format in the instructions. Validation does not establish semantic correctness;
+check application-specific requirements downstream.
 
 [Go to Summary](#summary)
 ## `HuggingFaceAction` (in `pydag\nodes\llm\HuggingFaceAction.py`)
@@ -3056,7 +3099,44 @@ continues text-only.
 | `use_rag_context` | `bool` | `False` | Set to False to disable vector retrieval for this action. |
 | `use_internet_access` | `bool` | `False` | Whether to access the internet to answer a question. |
 | `pass_through_keys` | `list[str]` | `'list()'` | Row keys that should be copied unchanged to the output row. |
-| `output_keys` | `list[str]` | `"lambda: ['question', 'answer']()"` |  |
+| `output_keys` | `list[str]` | `["question", "answer"]` | First key names the original question. Text mode uses the second for the complete answer; JSON mode extracts all remaining keys from the answer. |
+| `output_mode` | `str` | `"text"` | `text` preserves complete-answer behavior; `json` extracts required answer fields. JSON mode cannot be combined with `template_fill`. |
+
+### JSON field extraction
+
+```python
+from pydag.nodes.llm.LLMChatAction import LLMChatAction
+
+action = LLMChatAction(
+    question_value="Identify the invoice document and its containing directory.",
+    instruction_value='Return only a JSON object with fields "file_name" and "path". Use null when unavailable.',
+    input_context_value={"document": "C:\\Documents\\Finance\\Invoice_2026.pdf"},
+    output_mode="json",
+    output_keys=["question", "file_name", "path"],
+)
+action.set_service(rag_service)  # An existing configured RAGService
+action.install()
+action.execute()
+result = action.get_data()  # question, file_name, path, plus buffer metadata
+```
+
+The expected answer is the same `file_name`/`path` JSON object shown for
+`AgentHarnessAction`. The original question is inserted locally under
+`output_keys[0]`; it is not required in the JSON response and cannot be overwritten
+by the model. All subsequent keys are required answer fields. At least two output
+keys are required. With the default `["question", "answer"]`, JSON mode expects
+a field named `answer`.
+
+Parsing, value preservation, ignored extra fields, and per-invocation failure
+behavior follow the strict JSON contract described above. The complete answer is
+not additionally published. Output names and pass-through names must be unique
+across both lists and must not use diagnostic or buffer metadata names. Question,
+extracted values, and pass-through values are published together in one row;
+pass-through arrays also remain single-cell values.
+
+JSON mode cannot be combined with `input_context_mode="template_fill"`; keep
+`output_mode="text"` to retain existing template validation. JSON mode adds no
+model calls and does not validate field types or semantic correctness.
 
 
 ```python
