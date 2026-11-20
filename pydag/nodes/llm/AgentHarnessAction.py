@@ -8,6 +8,7 @@ from pydag.agents.Agent import Agent
 from pydag.nodes.NodeException import NodeException
 from pydag.nodes.Action import Action
 from pydag.nodes.BufferNode import BufferNode
+from pydag.utils.JsonUtils import JsonUtils
 
 class SupportedHarnessCLI(str, enum.Enum):
     CODEX = "codex"
@@ -28,9 +29,10 @@ class AgentHarnessAction(BufferNode, Action):
     Setup: https://learn.chatgpt.com/docs/codex/cli
     Automation authentication: https://learn.chatgpt.com/docs/non-interactive-mode
 
-    Each invocation writes one row containing stdout, stderr, and exit_code.
-    ``output_keys`` may rename stdout only (empty means ``stdout``). Stdout is
-    the final agent answer as text; progress and diagnostics remain in stderr.
+    Each invocation writes one row. Text mode stores the final answer under
+    ``output_keys[0]`` (default ``stdout``). JSON mode extracts all configured
+    keys from a complete JSON object, preserving values including null and arrays.
+    Extra fields are ignored; invalid output raises NodeException before publication.
     """
 
     harness : str = field(default=SupportedHarnessCLI.CODEX.value, metadata={"description": "agent harness to execute"})
@@ -39,7 +41,8 @@ class AgentHarnessAction(BufferNode, Action):
     prompt_key : str = field(default=None, metadata={"description": "parent-buffer key containing a non-empty string prompt per row; mutually exclusive with prompt"})
     instruction : str = field(default=None, metadata={"description": "literal instructions for answer rules, format, style, constraints, and priorities; defaults to empty; mutually exclusive with instruction_key when non-empty"})
     instruction_key : str = field(default=None, metadata={"description": "parent-buffer key containing string instructions per row; mutually exclusive with non-empty instruction"})
-    output_keys : list[str] = field(default_factory=list, metadata={"description": "optional single final-answer destination key; empty defaults to stdout; stderr and exit_code are reserved"})
+    output_keys : list[str] = field(default_factory=list, metadata={"description": "text: optional single stdout destination; json: required answer fields; stderr and exit_code are reserved"})
+    output_mode: str = field(default="text", metadata={"description": "text stores the complete answer; json extracts required output_keys from a JSON object without changing the prompt"})
     
     def _on_install(self, agent : Agent = None):
         if (self.prompt is None) == (self.prompt_key is None):
@@ -55,9 +58,11 @@ class AgentHarnessAction(BufferNode, Action):
                 raise NodeException("Configure either instruction or instruction_key, not both")
             if not isinstance(self.instruction_key, str) or not self.instruction_key.strip():
                 raise NodeException("instruction_key must be a non-empty string")
-        if not isinstance(self.output_keys, list) or len(self.output_keys) > 1:
+        if self.output_mode not in ("text", "json"):
+            raise NodeException("output_mode must be either 'text' or 'json'")
+        if self.output_mode == "text" and (not isinstance(self.output_keys, list) or len(self.output_keys) > 1):
             raise NodeException("output_keys must be empty or contain one stdout destination key")
-        if self.output_keys:
+        if self.output_mode == "text" and self.output_keys:
             key = self.output_keys[0]
             if not isinstance(key, str) or not key.strip() or key in {"stderr", "exit_code"}:
                 raise NodeException("stdout destination must be a non-empty string other than stderr or exit_code")
@@ -70,6 +75,12 @@ class AgentHarnessAction(BufferNode, Action):
         if not os.access(self.working_directory, os.R_OK | os.X_OK):
             raise NodeException("working_directory must be accessible")
         super()._on_install(agent)
+        if self.output_mode == "json":
+            if not isinstance(self.output_keys, list) or not self.output_keys or not isinstance(self.output_keys[0], str):
+                raise NodeException("JSON output_keys must be a non-empty list of strings")
+            buffer = self.get_buffer()
+            if {"stderr", "exit_code", getattr(buffer, "timestamps_key", "timestamps"), getattr(buffer, "index_key", "index")}.intersection(self.output_keys):
+                raise NodeException("JSON output keys must not use reserved diagnostic or buffer metadata names")
     
     def _on_execute(self):
         rows = self.get_parent_data(by_rows=True) if self.prompt_key is not None or self.instruction_key is not None else [{}]
@@ -79,20 +90,29 @@ class AgentHarnessAction(BufferNode, Action):
                 if key is not None and key not in row:
                     raise NodeException(f"Missing configured {name} '{key}' in parent data")
             prompt = row[self.prompt_key] if self.prompt_key is not None else self.prompt
-            instruction = row[self.instruction_key] if self.instruction_key is not None else self.instruction
+            instruction = row[self.instruction_key] if self.instruction_key is not None else (self.instruction or "")
             self._validate_prompt(prompt)
             if not isinstance(instruction, str):
                 raise NodeException("instruction must be a string")
             prompts.append(f"Instruction:\n{instruction}\n\nPrompt:\n{prompt}" if instruction else prompt)
 
-        stdout_key = self.output_keys[0] if self.output_keys else "stdout"
         for prompt in prompts:
             try:
                 with self._execute_codex(self.working_directory) as process:
                     stdout, stderr = process.communicate(input=prompt)
             except OSError as exc:
                 raise NodeException(f"Could not execute harness '{self.harness}': {exc}") from exc
-            self.add_data({stdout_key: stdout})
+            if self.output_mode == "json":
+                if process.returncode != 0:
+                    raise NodeException(f"Harness '{self.harness}' failed with exit code {process.returncode}")
+                try:
+                    result = JsonUtils.extract_fields(stdout, self.output_keys)
+                except ValueError as exc:
+                    raise NodeException(str(exc)) from exc
+                # One-element columns keep JSON arrays in a single buffer row.
+                self.add_data({key: [value] for key, value in result.items()})
+            else:
+                self.add_data({self.output_keys[0] if self.output_keys else "stdout": stdout})
 
     @staticmethod
     def _validate_prompt(prompt: str) -> None:

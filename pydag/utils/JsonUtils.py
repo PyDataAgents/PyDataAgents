@@ -4,9 +4,27 @@ from typing import Any
 from .FileUtils import FileUtils
 
 
+def _reject_constant(value: str) -> None:
+    raise ValueError("Invalid JSON constant: " + value)
+
+
 class JsonUtils:
     """ utility class for collection of helpful json methods
     """
+
+    @staticmethod
+    def extract_fields(payload: str, keys: list[str]) -> dict[str, Any]:
+        """Select required fields from a complete JSON object; raise ValueError on invalid input or missing fields."""
+        try:
+            parsed = json.loads(payload, parse_constant=_reject_constant)
+        except (TypeError, ValueError) as exc:
+            raise ValueError("Expected valid JSON text") from exc
+        if not isinstance(parsed, dict):
+            raise ValueError("Expected a JSON object")
+        try:
+            return {key: parsed[key] for key in keys}
+        except KeyError as exc:
+            raise ValueError("Missing required JSON field: " + exc.args[0]) from exc
     
     @staticmethod
     def read(path : str, encoding : str = "utf-8") -> dict:
