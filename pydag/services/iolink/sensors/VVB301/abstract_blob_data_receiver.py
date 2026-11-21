@@ -206,15 +206,15 @@ class AbstractBlobDataReceiver:
                 y_axis_data = self._unpack_and_scale_rawData(blob[start_index:start_index+axis_data_length],scale_factor)
                 start_index += axis_data_length
                 z_axis_data = self._unpack_and_scale_rawData(blob[start_index:start_index+axis_data_length],scale_factor)
-                raw_data_content[RawData.data_x_axis] = x_axis_data
-                raw_data_content[RawData.data_y_axis] = y_axis_data
-                raw_data_content[RawData.data_z_axis] = z_axis_data
+                raw_data_content[RawData.data_x_axis] = x_axis_data.tolist()
+                raw_data_content[RawData.data_y_axis] = y_axis_data.tolist()
+                raw_data_content[RawData.data_z_axis] = z_axis_data.tolist()
                 data_len = len(x_axis_data)
             else:
                 axis_to_content_key = {MeasuringAxis.X_AXIS_4S: RawData.data_x_axis, MeasuringAxis.X_AXIS_12S: RawData.data_x_axis, MeasuringAxis.Y_AXIS_4S: RawData.data_y_axis,
                                      MeasuringAxis.Y_AXIS_12S: RawData.data_y_axis, MeasuringAxis.Z_AXIS_4S: RawData.data_z_axis, MeasuringAxis.Z_AXIS_12S: RawData.data_z_axis}
                 axis_data = self._unpack_and_scale_rawData(blob[raw_data_expected_header_len:],scale_factor)
-                raw_data_content[axis_to_content_key[raw_data_type]] = axis_data
+                raw_data_content[axis_to_content_key[raw_data_type]] = axis_data.tolist()
                 data_len = len(axis_data)
             #generate the timestamps for the data by using the header and the data length
             delta_us_for_sample = 1000000.0 / header_raw_data[RawData.sample_freq]
