@@ -3444,6 +3444,7 @@ outlook_meeting_action = OutlookMeetingAction(
 | `output_keys` | `list[str]` | `'list()'` | optional explicit output key names written by this node. output_keys are literal names only and do not support selector syntax. If empty, the node uses its default output naming |
 | `ignore_keys` | `list[str]` | `'list()'` | list of keys to ignore when extracting from parent buffers, ignore_keys are applied after input_keys |
 | `ignore_empty_parents` | `bool` | `True` | if True then, empty data returns from parent do not throw a NodeException and just return an empty dict (default: True) |
+| `sample_rate` | `float` | `1.0` | sample rate of the input signals in Hz |
 | `id` | `str` | `"<string>"` | unique identifier of element in DataAgent application |
 | `load_on_install` | `bool` | `False` | specifies whether the AgentElement should try to load from local json config file on install |
 
@@ -3461,10 +3462,15 @@ f_f_t_transform = FFTTransform(
 	output_keys='list()',
 	ignore_keys='list()',
 	ignore_empty_parents=True,
+	sample_rate=1.0,
 	id="<string>",
 	load_on_install=False
 )
 ```
+
+`FFTTransform` writes a one-sided amplitude spectrum as `[frequency_hz, amplitude]`
+pairs for each selected input signal. When `output_keys` is empty, output names
+are the corresponding input names with `_fft` appended.
 
 [Go to Summary](#summary)
 ## `ZScore` (in `pydag\nodes\preprocessing\statistics\ZScore.py`)

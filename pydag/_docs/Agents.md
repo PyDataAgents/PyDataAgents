@@ -109,6 +109,14 @@ Application that stores an `Agent` and provides REST API and UI based on configu
 | `agent` | `Agent` | `'Agent()'` | the `Agent` instance to be used by the `AgentApp` |
 | `ui_pages` | `list[UIPage]` | `'list()'` | list of UIPage instances to be used by the `AgentApp` |
 
+When `with_ui=True`, the default pages include `/plots`, an interactive Plotly
+composer. It can select buffer keys for X/Y/Z axes, add or delete plots and
+traces, configure one to three plot columns, and display 2D and 3D line,
+scatter, surface, and mesh plots. Axis labels can use key names or buffer units.
+Plots refresh on the page timer and display the latest configured `samples` from
+each buffer, so new buffer data appears as it arrives.
+Each plot's three-dot menu opens its title, type, and trace settings; the red X
+deletes that plot.
 
 ```python
 # Example usage of `AgentApp`
