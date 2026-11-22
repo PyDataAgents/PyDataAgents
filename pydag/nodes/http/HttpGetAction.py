@@ -24,4 +24,7 @@ class HttpGetAction(BufferNode, Action):
                 data = data[0].value
             else:
                 data = [match.value for match in data]
-        self.add_data(data)
+        if len(self.output_keys) == 1:
+            self.add_data({self.output_keys[0]: data})
+        else:
+            self.add_data(data)

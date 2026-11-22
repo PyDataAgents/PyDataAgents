@@ -23,7 +23,14 @@ def test_010():
     hga.execute()
     
     print(hga.get_buffer().data())
+
+def test_15():
+    hga = HttpGetAction(url = "https://httpbin.org/get", json_path="$.headers", output_keys=["test"])
+    hga.install()
     
+    hga.execute()
+    
+    print(hga.get_buffer().data())
     
 def test_020():
     
