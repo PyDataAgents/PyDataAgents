@@ -1,0 +1,264 @@
+label_de: Fugenpressung im Zylindrischen Pressverbund
+description_de: Fugenpressung im Zylindrischen Pressverbund
+label_en: Interface pressure in a cylindrical interference fit
+description_en: Interface pressure in a cylindrical interference fit
+id: fugenpressung_zylinderverbund
+name: Fugenpressung im Zylindrischen Pressverbund
+categories:
+    - Maschinenelemente
+    - Welle-Nabe-Verbindung
+tags:
+    - pressure
+    - fit
+    - cylindrical
+
+symbols:
+    p:
+        label_de: Fugenpressung
+        description_de: benötigte Fugenpressung bzw. wirkende Fugenpressung
+        label_en: Interface pressure
+        description_en: Required or actual interface pressure
+        unit: MPa
+    M_t:
+        label_de: Torsionsdrehmoment
+        description_de: zu übertragendes Torsionsdrehmoment bzw. übertragbares Torsionsdrehmoment
+        label_en: Torsional torque
+        description_en: Torque to be transmitted or transmissible torque
+        unit: N*m
+    F_ax:
+        label_de: Axialkraft
+        description_de: zu übertragende Axialkraft bzw. übertragbare Axialkraft
+        label_en: Axial force
+        description_en: Axial force to be transmitted or transmissible axial force
+        unit: N
+    F_ax_res:
+        label_de: Gesamtaxialkraft
+        description_de: zu übertragende Gesamtaxialkraft bzw. übertragbare Gesamtaxialkraft
+        label_en: Total axial force
+        description_en: Total axial force to be transmitted or transmissible total axial force
+        unit: N
+    S_r:
+        label_de: Sicherheitsfaktor gegen Rutschen
+        description_de: Sicherheitsfaktor gegen Rutschen
+        label_en: Safety factor against slipping
+        description_en: Safety factor against slipping
+        unit: "-"
+    D_F:
+        label_de: Trennfugendurchmesser
+        description_de: Nennmass der Trennfuge zwischen Aussen- und Innenteil
+        label_en: Interface diameter
+        description_en: Nominal diameter of the interface between the outer and inner parts
+        unit: mm
+    l_F:
+        label_de: Fugenlänge
+        description_de: Länge der Fuge
+        label_en: Interface length
+        description_en: Length of the interface
+        unit: mm
+    µ_ru:
+        label_de: Reibbeiwert
+        description_de: Reibbeiwert in Umfangsrichtung
+        label_en: Coefficient of friction
+        description_en: Circumferential coefficient of friction
+        unit: "-"
+    D_aI:
+        label_de: Aussendurchmesser Innenteil
+        description_de: Aussendurchmesser Innenteil
+        label_en: Outer diameter of the inner part
+        description_en: Outer diameter of the inner part
+        unit: mm
+    D_iI:
+        label_de: Innendurchmesser Innenteil
+        description_de: Innendurchmesser Innenteil
+        label_en: Inner diameter of the inner part
+        description_en: Inner diameter of the inner part
+        unit: mm
+    D_iA:
+        label_de: Innendurchmesser Aussenteil
+        description_de: Innendurchmesser Aussenteil
+        label_en: Inner diameter of the outer part
+        description_en: Inner diameter of the outer part
+        unit: mm
+    D_aA:
+        label_de: Aussendurchmesser Aussenteil
+        description_de: Aussendurchmesser Aussenteil
+        label_en: Outer diameter of the outer part
+        description_en: Outer diameter of the outer part
+        unit: mm
+    U_i:
+        label_de: Ist-Übermass
+        description_de: Ist-Übermass
+        label_en: Actual interference
+        description_en: Actual interference
+        unit: mm
+    U_w:
+        label_de: wirksames Übermass
+        description_de: wirksames Übermass
+        label_en: Effective interference
+        description_en: Effective interference
+        unit: mm
+    R_zA:
+        label_de: Rauhtiefe Aussenteil
+        description_de: gemittelte Rauhtiefe im Innendurchmesser des Aussenteils
+        label_en: Roughness depth of the outer part
+        description_en: Mean roughness depth at the bore of the outer part
+        unit: µm
+    R_zI:
+        label_de: Rauhtiefe Innenteil
+        description_de: gemittelte Rauhtiefe im Aussendurchmesser des Innenteils
+        label_en: Roughness depth of the inner part
+        description_en: Mean roughness depth at the outside diameter of the inner part
+        unit: µm
+    Q_A:
+        label_de: Durchmesserverhältnis Aussenteil
+        description_de: Durchmesserverhältnis Aussenteil
+        label_en: Diameter ratio of the outer part
+        description_en: Diameter ratio of the outer part
+        unit: "-"
+    Q_I:
+        label_de: Durchmesserverhältnis Innenteil
+        description_de: Durchmesserverhältnis Innenteil
+        label_en: Diameter ratio of the inner part
+        description_en: Diameter ratio of the inner part
+        unit: "-"
+    xi_w:
+        label_de: bezogenes wirksames Übermass
+        description_de: bezogenes wirksames Übermass
+        label_en: Relative effective interference
+        description_en: Relative effective interference
+        unit: "-"
+
+    K:
+        label_de: Hilfsgröße K
+        description_de: Hilfsgrösse zur Berechnung des Zusammenhangs zwischen Fugenpressung und Übermass
+        label_en: Auxiliary quantity K
+        description_en: Auxiliary quantity relating interface pressure to interference
+        unit: "-"
+    E_A:
+        label_de: E-Modul Aussenteil
+        description_de: E-Modul des Aussenteils
+        label_en: Young's modulus of the outer part
+        description_en: Young's modulus of the outer part
+        unit: MPa
+    E_I:
+        label_de: E-Modul Innenteil
+        description_de: E-Modul des Innenteils
+        label_en: Young's modulus of the inner part
+        description_en: Young's modulus of the inner part
+        unit: MPa
+    nu_A:
+        label_de: Querkontraktionszahl Aussenteil
+        description_de: Querkontraktionszahl / Poisson-Zahl des Aussenteils
+        label_en: Poisson's ratio of the outer part
+        description_en: Lateral contraction ratio / Poisson's ratio of the outer part
+        unit: "-"
+    nu_I:
+        label_de: Querkontraktionszahl Innenteil
+        description_de: Querkontraktionszahl / Poisson-Zahl des Innenteils
+        label_en: Poisson's ratio of the inner part
+        description_en: Lateral contraction ratio / Poisson's ratio of the inner part
+        unit: "-"
+    S_pA:
+        label_de: Sicherheit gegen plastische Dehnung Aussenteil
+        description_de: Sicherheit gegen plastische Dehnung Aussenteil
+        label_en: Safety factor against plastic strain in the outer part
+        description_en: Safety factor against plastic strain in the outer part
+        unit: "-"
+    S_pI:
+        label_de: Sicherheit gegen plastische Dehnung Innenteil
+        description_de: Sicherheit gegen plastische Dehnung Innenteil
+        label_en: Safety factor against plastic strain in the inner part
+        description_en: Safety factor against plastic strain in the inner part
+        unit: "-"
+    R_el_A:
+        label_de: Streckgrenze Aussenteils
+        description_de: Streckgrenze des Aussenteils
+        label_en: Yield strength of the outer part
+        description_en: Yield strength of the outer part
+        unit: MPa
+    R_el_I:
+        label_de: Streckgrenze Innenteil
+        description_de: Streckgrenze des Innenteils
+        label_en: Yield strength of the inner part
+        description_en: Yield strength of the inner part
+        unit: MPa
+
+formulas:
+    0:
+        label_de: wirksames Übermass aufgrund von Glättung von Rauheitsspitzen in µm
+        description_de: wirksames Übermass aufgrund von Glättung von Rauheitsspitzen in µm
+        label_en: Effective interference after flattening of surface asperities, in µm
+        description_en: Effective interference after flattening of surface asperities, in µm
+        equation: U_w = U_i - 0.8 * (R_zA + R_zI) / 1000.0
+    1:
+        label_de: bezogenes wirksames Übermass
+        description_de: bezogenes wirksames Übermass
+        label_en: Relative effective interference
+        description_en: Relative effective interference
+        equation: xi_w = U_w / D_F
+    2:
+        label_de: Berechnung der Hilfsgrösse K in Abhängigkeit von Materialkonstanten und Durchmesserverhältnissen
+        description_de: Berechnung der Hilfsgrösse K in Abhängigkeit von Materialkonstanten und Durchmesserverhältnissen
+        label_en: Calculation of the auxiliary quantity K from material constants and diameter ratios
+        description_en: Calculation of the auxiliary quantity K from material constants and diameter ratios
+        equation: K = E_A / E_I * ((1 + Q_I^2) / (1 - Q_I^2) - nu_I) + (1 + Q_A^2) / (1 - Q_A^2) + nu_A
+    3:
+        label_de: erforderliches bezogenes wirksames Übermass für gegebenen Fugendruck
+        description_de: erforderliches bezogenes wirksames Übermass für gegebenen Fugendruck
+        label_en: Required relative effective interference for a given interface pressure
+        description_en: Required relative effective interference for a given interface pressure
+        equation: xi_w = K * p / E_A
+    4:
+        label_de: erforderliche Fugenpressung bei Drehmomentbelastung
+        description_de: erforderliche Fugenpressung bei Drehmomentbelastung
+        label_en: Required interface pressure under torque loading
+        description_en: Required interface pressure under torque loading
+        equation: p = 2 * M_t * 1000.0 * S_r / (pi * D_F^2 * l_F * µ_ru)
+    5:
+        label_de: erforderliche Fugenpressung bei Axialkraftbelastung
+        description_de: erforderliche Fugenpressung bei Axialkraftbelastung
+        label_en: Required interface pressure under axial loading
+        description_en: Required interface pressure under axial loading
+        equation: p = F_ax * S_r / (pi * D_F * l_F * µ_rl)
+    6:
+        label_de: resultierende Ersatz-Gesamtaxiallast bei kombinierter Axial- und Drehmomentbelastung
+        description_de: resultierende Ersatz-Gesamtaxiallast bei kombinierter Axial- und Drehmomentbelastung
+        label_en: Resultant equivalent total axial load under combined axial and torque loading
+        description_en: Resultant equivalent total axial load under combined axial and torque loading
+        equation: F_ax_res = sqrt((2 * M_t * 1000.0 / D_F)^2 + F_ax^2)
+    7:
+        label_de: ist Übermass von Aussendurchmesser Innenteil und Innendurchmesser Aussenteil in µm
+        description_de: ist Übermass von Aussendurchmesser Innenteil und Innendurchmesser Aussenteil in µm
+        label_en: Actual interference between the outer diameter of the inner part and the inner diameter of the outer part, in µm
+        description_en: Actual interference between the outer diameter of the inner part and the inner diameter of the outer part, in µm
+        equation: U_i = |D_aI - D_iA|
+    8:
+        label_de: Durchmesserverhältnis Aussenteil
+        description_de: Durchmesserverhältnis Aussenteil
+        label_en: Diameter ratio of the outer part
+        description_en: Diameter ratio of the outer part
+        equation: Q_A = D_F / D_aA
+    9:
+        label_de: Durchmesserverhältnis Innenteil
+        description_de: Durchmesserverhältnis Innenteil
+        label_en: Diameter ratio of the inner part
+        description_en: Diameter ratio of the inner part
+        equation: Q_I = D_iI / D_F
+    10:
+        label_de: Berechnung des Sicherheitsfaktors gegen plastische Deformation des Aussenteils auf Basis einer gegebenen Fugenpressung
+        description_de: Berechnung des Sicherheitsfaktors gegen plastische Deformation des Aussenteils auf Basis einer gegebenen Fugenpressung
+        label_en: Calculation of the safety factor against plastic deformation of the outer part for a given interface pressure
+        description_en: Calculation of the safety factor against plastic deformation of the outer part for a given interface pressure
+        equation: S_pA = (1 - Q_A^2) / sqrt(3) * R_el_A / p
+    11:
+        label_de: Berechnung des Sicherheitsfaktors gegen plastische Deformation des Innenteils auf Basis einer gegebenen Fugenpressung, je nach Vollmaterial oder Hohlwelle wird unterschieden per Piecewise
+        description_de: Berechnung des Sicherheitsfaktors gegen plastische Deformation des Innenteils auf Basis einer gegebenen Fugenpressung, je nach Vollmaterial oder Hohlwelle wird unterschieden per Piecewise
+        label_en: Calculation of the safety factor against plastic deformation of the inner part for a given interface pressure; Piecewise distinguishes solid and hollow shafts
+        description_en: Calculation of the safety factor against plastic deformation of the inner part for a given interface pressure; Piecewise distinguishes solid and hollow shafts
+        equation: S_pI = Piecewise(((1 - Q_I^2) / sqrt(3) * R_el_I / p, D_iI > 0), (2 / sqrt(3) * R_el_I / p, True))
+
+sources: 
+- https://www.schweizer-fn.de/maschinenelemente/pressverbindung/pressverbindung.php#fugenpressung
+- DIN 7190
+
+    
