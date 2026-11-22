@@ -2,6 +2,8 @@ from dataclasses import dataclass, field
 import jsonpath_ng
 
 import requests
+
+from pydag.nodes.NodeException import NodeException
 from ..Action import Action
 from ..BufferNode import BufferNode
 
@@ -27,4 +29,11 @@ class HttpGetAction(BufferNode, Action):
         if len(self.output_keys) == 1:
             self.add_data({self.output_keys[0]: data})
         else:
-            self.add_data(data)
+            if len(self.output_keys) > 0:
+                if len(data) != len(self.output_keys):
+                    raise NodeException(f"data length ({len(data)}) does not match output_keys ({len(self.output_keys)})")
+                else:
+                    #TODO: requires testing
+                    self.add_data(dict(zip(self.output_keys, data)))
+            else:
+                self.add_data(data)
