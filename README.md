@@ -1,532 +1,358 @@
 ﻿# PyDataAgents
-![PyDataAgents Logo](pydag/_docs/pydataagents_logo.png)
-<br>is an IIoT Python framework to build autonomous Data Agents for common industrial protocols
-(ADS, serial, TCP/IP), data sources (OPC UA, MQTT), and sinks (InfluxDB, SQL, SQLite), as well as cloud services such as LLM APIs, Microsoft Graph, and more.<br>
-![PyDataAgents Sources and Sinks](pydag/_docs/pydataagents_sources_and_sinks.png)
 
+![PyDataAgents logo](pydag/_docs/pydataagents_logo.png)
 
-DataAgents are autonomous software robots that interact with industrial data systems (e.g. Filesysten, ERP, MES, SCADA, historians, PLC/robot controllers) through openly accessible APIs.
-Their primary purpose is to automate data-centric work such as data transformation, data visualization, process supervision, and other intelligent actions across connected systems.
-DataAgents consist of standardized building blocks that are assembled to form a software robot.
+**Your data. Your workflows. Your way.**
 
-Like physical robots in production, DataAgents mainly operate autonomously in the background to increase efficiency, consistency, and speed—executing routine tasks, monitoring conditions, and triggering actions without continuous human intervention.
+**Build continuous data processing and automation workflows?with or without AI, with or without a UI, on your own machine or a company server.** PyDataAgents gives you the flexibility to assemble the application you need: connect industrial equipment and business systems, transform incoming data, and trigger actions through reusable Python components.
 
+Start with a local automation script, keep a data pipeline running in the background, or add an interactive interface and REST API. Combine buffers, services, and workflow nodes to control how data moves, when processing happens, and which actions follow. Add AI for tasks that benefit from it, and run the application in the environment that fits your needs.
 
-Example use-cases:
+A **Data Agent** is the application you build from these components. It can monitor signals, transfer data, process documents, or coordinate conditional workflows. PyDataAgents is an Industrial Internet of Things (IIoT) framework at its core, with building blocks for broader data processing and automation.
 
-*Sensor-data preprocessing for dashboards*
-Continuously ingest sensor streams, clean and aggregate the data (e.g., filtering outliers, resampling), compute KPIs, and publish the results to a dashboard or BI layer.
+**Experimental, with testing in place.** The project targets Python **3.11+** and remains experimental at its current stage. The repository includes unit tests and regression scenarios; the local quickstart and YAML/API setup below have been verified. Integration coverage and requirements vary by component, operating system, and external system.
 
-*Document synchronization with classification and metadata enrichment*
-Sync documents between two file systems (or DMS/SharePoint/S3), automatically classify file types and content, extract key fields (e.g., order number, supplier, machine ID), and write standardized metadata back to the target system.
+[Get started](#quickstart) · [Architecture](#how-it-works) · [Integrations](#integrations-and-optional-dependencies) · [Documentation](#documentation-and-examples) · [Contributing](Contribute.md)
 
-*Machine-condition classification (OK/NOK) from controller signals*
-Read PLC or machine controller values, apply rule-based or ML-based thresholds, label each cycle as OK/NOK, and store results for traceability and quality reporting.
+## Why PyDataAgents?
 
-*Object recognition with automated database update*
-Identify objects from camera images or scanner data, map them to a product/material class, and write the classification result into an ERP/MES database for tracking and downstream processing.
+- **Compose around data:** reuse buffers to connect acquisition, transformation, and output components without putting all logic in one script.
+- **Connect industrial and business systems:** implementations cover protocols such as OPC UA, ADS, S7, and MQTT alongside files, databases, HTTP, and Microsoft Graph.
+- **Choose how work runs:** execute a sequence once, schedule repeated processing, or build a graph with actions and transitions.
+- **Add application interfaces:** wrap an agent with a FastAPI REST API and a NiceGUI interface for inspecting and managing its components.
+- **Extend the same component model:** implement a connector, processing node, or reusable service using the framework's base classes and dataclass configuration.
+- **Add AI where useful:** combine model calls, retrieval, file context, or a separately installed coding-agent CLI with buffer-based workflows.
 
-*Robot/IoT sensor integration with real-time transformation*
-Connect robot sensors to an external information system, transform units and formats, enrich with context (cell, shift, work order), and route the data to the correct endpoint (ERP/MES/historian).
+Typical applications include collecting controller values for storage, preparing sensor data for visualization, and extracting document content for subsequent processing. These are applications you assemble from components; endpoints, business rules, and deployment configuration remain specific to your system.
 
-*Automated anomaly detection with alerting and ticket creation*
-Monitor process signals and detect anomalies. When detected, automatically notify responsible teams.
+## Contents
 
-*Predictive maintenance feature generation and scheduling*
-Extract relevant features from vibration/temperature/current signals, update a predictive model and automatically schedule inspections or maintenance actions in the maintenance system based on risk thresholds.
+- [Installation](#installation)
+- [Quickstart](#quickstart)
+- [How it works](#how-it-works)
+- [Configuration and application interfaces](#configuration-and-application-interfaces)
+- [Integrations and optional dependencies](#integrations-and-optional-dependencies)
+- [Extending the framework](#extending-the-framework)
+- [Documentation and examples](#documentation-and-examples)
+- [Development and support](#development-and-support)
+- [License](#license)
 
-## Important Concepts
-- `Agent` lifecycle:
-  An `Agent` installs all registered elements, starts services via `release(...)`, and can be shut down cleanly via `terminate()`.
-- `Buffer` as data backbone:
-  Buffers are the primary data exchange mechanism between services and nodes.
-- `Service` concept:
-  Services are long-running, usually background components (e.g. data streams, schedulers, observers, model/tool providers) that encapsulate reusable runtime capabilities.
-- `Node` / `Action` concept:
-  Nodes represent compact workflow steps. `Action` nodes execute tasks, `Transition` nodes evaluate flow conditions, and both are composed to build deterministic automation pipelines.
-- `MappingService` as orchestrator:
-  `MappingService` links buffers with respective data source or sinks and executes recurring data transfer logic.
-- `StatemachineService` for workflows:
-  Complex automation flows are built from small `Action` and `Transition` nodes.
+## Installation
 
-
-## How to Contribute?
-Have a look at [Contribute.md](Contribute.md)
-
-
-
-## Architecture
-The core element of the framework is a [(data)agent](pydag/agents/Agent.py).
-<br>An agent can consist of one or more of the following [AgentElements](pydag/agents/AgentElement.py):
-- buffers
-- services
-- actions and transitions (nodes)
-<br>Each [AgentElement](pydag/agents/AgentElement.py) is dedicated to a specific task within the framework.
-<br>These tasks are highlighted below.
-
-### Agent
-To create an `Agent` application, instantiate an `Agent` object with one or more of the elements described in the following sections.
-The `Agent` application follows a clear lifecycle from initialization to runtime.
-
-```python
-from pydag.agents.Agent import Agent
-
-agent = Agent(id = "G1")
-
-agent.add_buffer(...) # add a buffer
-agent.add_service(...) # add a service
-
-buf = agent.get_buffer(id) # get a buffer reference
-s = agent.get_service(id) # get a service reference
-
-buffers = agent.buffer_store    # get a reference to all buffers stored in a dict[str, Buffer]
-services = agent.service_store    # get a reference to all services stored in a dict[str, Service]
-
-agent.release() # starts an agent application and blocks until finished (runs forever)
-
-# alternative 1: non-blocking agent call
-agent.release(blocking=False) # non-blocking call
-
-# alternative 2: terminate and clean up once no service is running
-agent.release(stop_when_idle=True)
-
-# alternative 3: the same automatic cleanup in the background
-agent.release(blocking=False, stop_when_idle=True)
-
-# terminate the agent if required (e.g. from another thread)
-agent.terminate() # terminates the agent and stops all services
-
-```
-
-or 
-
-```python
-from pydag.agents.Agent import Agent
-
-agent = Agent.load_from("config.yaml")
-agent.release()
-
-...
-
-```
-
-### AgentApp
-An `Agent` can be wrapped in an `AgentApp` to provide it with UI or REST-API.
-This is done by using the libraries FastAPI and NiceGUI
-
-```python
-
-  from pydag.agents.Agent import Agent
-  from pydag.agents.app.AgentApp import AgentApp
-
-  agent = Agent()
-
-  ... # create `AgentElement`s here
-
-  app = AgentApp(port=8092, with_ui=True, with_api=True, dark_mode=False)
-  app.set_agent(agent)
-  app.create()
-  app.run()
-
-```
-
-or
-
-```python
-  from pydag.agents.app.AgentApp import AgentApp
-
-  file_path = "app_template.yaml"
-  aa = AgentApp.load(file_path)
-  aa.create()
-  aa.run()
-
-```
-
-### AgentElement
-All elements within an `Agent` application are derived from `AgentElement`.
-<br>This class defines core functions that should be called by each subclass implementation.
-<br>These functions are:
-- install(agent : `Agent`): method used to connect the `AgentElement` with its `Agent` and initialize required internal objects
-- uninstall(agent : `Agent`): method used to undo any previous installations
-- save(): method used to the current `AgentElement` configuration to file (the file is generated with the element's id as filename in current working directory)
-- load(): configures the `AgentElement` from file, if a file with the `AgentElement`'s id as filename is present in current working directory
-- config_options(): returns all configuration properties as dictionary
-
-<br>In order to ensure a consistent interface and behavior of all `AgentElement`s, a couple of interface methods are defined as abstract, private methods and must be implemented by each subclass:
-- _on_install(agent : `Agent`): internal method called by install(...)
-- _on_uninstall(agent : `Agent`): internal method called by uninstall(...)
-
-The parent class also ensures a unique identifier for each `AgentElement` and the type declaration (fully qualified class path).
-All `AgentElement` classes are supposed to be annotated with `@dataclass` and `field` declarations for their respective configuration properties. If these are used correctly, properties can be set via configuration files or API and the method `config_options()` exports the configuration properties where needed. These properties are also used for auto-generated documentation.
-
-In addition to defining basic interface methods, `AgentElement` classes can also include a `__post_init__()` method that is called after dataclass initialization. This method can be used to initialize internal objects. By convention, `__post_init__()` should contain internal objects required for the specific `AgentElement` but not part of its configuration properties. By convention, all configuration properties should be defined as dataclass fields and internal objects should be initialized in `__post_init__()` with a leading `_`.
-
-### Buffer
-An overview of all available buffers and their usage is given [here](pydag/_docs/Buffers.md).
-<br>A `Buffer` is the central element for data streaming and temporary storage inside an `Agent` application.
-<br>All `Buffer`s follow the FIFO principle and are specified with a maximum `capacity` and optional datatypes.
-<br>Whenever data is transferred, it moves through a buffer.
-<br>The following methods are the standard way to interact with all `Buffer`s:
-- push(elements): method to push new data elements to the buffer
-- data(n : int, persistent : bool) -> any: method to retrieve data from the
-- size() -> int: method to get the current size of the buffer
-- data_with_meta(n : int, persistent : bool) -> dict: method to retrieve data along with all meta data in a defined json schema as dictionary
-- clear(): method to clear the buffer content
-
-<br>In order to ensure a consistent interface and behavior of all `Buffer`s, a couple of interface methods are defined as abstract, private methods and must be implemented by each subclass:
-- _on_push(elements): internal method called by push(...)
-- _on_data(n : int, persistent : bool) -> any: internal method called by data(...)
-
-On top of that, the interface methods from `AgentElement` must be implemented as well (_on_install(...), _on_uninstall(...)).
-
-```python
-from pydag.buffers.ListBuffer import ListBuffer
-
-buffer = ListBuffer(
-    id = "BUF-1",
-    capacity = 10,
-    datatype = "FLOAT",
-    description = "this is a float buffer",
-    unit = "mA",
-    initial_values = [0.02, 0.089]
-)
-
-buffer.install(agent)
-
-# for a list buffer, only lists of single values of primitives or a single primitive can be pushed
-elements = [1.0, 2.23, 9.01]
-buffer.push(elements) # push new elements to buffer
-
-buffer.data(n=0, persistent=True) # get buffer data (all or n samples); return type depends on the buffer implementation
-
-buffer.size() # returns the size of the buffer --> int: number of samples
-       
-buffer.data_with_meta(n = 0, persistent = True) # returns buffer data and metadata in a defined JSON schema
-
-```
-
-```python
-from pydag.buffers.DictBuffer import DictBuffer
-
-buffer = DictBuffer(
-    id = "BUF-1",
-    capacity = 10,
-    datatype = "FLOAT",
-    description = "this is a float buffer",
-    unit = "mA",
-    initial_values = {"A": [0.02], "B": [0.089]}
-)
-
-buffer.install(agent)
-
-# for a dict buffer, only dictionaries or list of dictionaries can be pushed
-elements = {"A": 1.89, "B": 423.09}
-buffer.push(elements) # push new elements to buffer
-
-elements = [{"A": 1.89, "B": 423.09}, {"A": 5.67, "B": 123.45}]
-buffer.push(elements) # push new elements to buffer
-
-buffer.data(n=0, persistent=True) # get buffer data (all or n samples); return type depends on the buffer implementation
-
-buffer.size() # returns the size of the buffer --> int: number of samples
-       
-buffer.data_with_meta(n = 0, persistent = True) # returns buffer data and metadata in a defined JSON schema
-
-```
-
-### Service
-An overview of all available services and their usage is given [here](pydag/_docs/Services.md).
-<br>In general, `Service`s are standalone micro applications within the `Agent`. Their tasks include observing resources (filesystem, agent state, ...), background daemon services (copy files from one folder to another, ...), providing reusable resources for other `AgentElement`s (browser, vector store, LLM model, ...). `Service`s usually have no direct interaction with other parts of the `Agent` and run in a closed loop.
-
-If one of the following criteria is met, a `Service` should be implemented (instead of a `Node`):
-- the process/task is running in the background continuously or on a defined interval
-- the process/task needs to access other elements of the `Agent` during runtime (e.g. `Buffer`s, etc.); `Node`s do not have access to other `AgentElement`s except for other `Node`s within a `StatemachineService` and the `Agent` itself during `install()`
-- the process/task needs to provide an API endpoint for external applications
-- optional: the process/task implements a third party library that requires credentials and this object can be reused in other `Node`s
-
-<br>Each `Service` has the methods:
-- install(agent : `Agent`): method used to connect the `Service` with its `Agent` and initialize required internal objects
-- uninstall(agent : `Agent`): method used to undo any previous installations
-- start()
-- stop()
-Additionally, all services must spawn as a background task (means the start() method should start the logic in a separate thread), the start() method must be non-blocking
-
-<br>In order to ensure a consistent interface and behavior of all `Service`s, a couple of interface methods are defined as abstract, private methods and must be implemented by each subclass:
-- _on_install(agent : `Agent`): internal method called by install(...)
-- _on_uninstall(agent : `Agent`): internal method called by uninstall(...)
-- _on_start(): internal method called by start(...)
-- _on_stop(): internal method called by stop(...)
-
-
-```python
-from pydag.services.documents.CopyFileService import CopyFileService
-
-s1 = CopyFileService(
-    id = "S1",
-    source_folders = ["c:\\fake\\path"],
-    target_folder  = "c:\\other\\fake\\path",
-    move = True,
-    older_than_milliseconds = 2000,
-    observing_time = 3600,
-    auto_start = True
-)
-
-s1.install(agent)
-s1.start()
-
-...
-# something else happens
-...
-
-s1.stop()
-
-```
-
-#### MappingService
-A special service is the `MappingService`.
-<br>In general a `MappingService` defines the interaction between a data source or sink and one or more `Buffer`s in terms of how often, how many samples and which data/information (`addresses`) in the source or sink are being accessed.
-<br>The mapping defines this interaction and is used as data model to instantiate a background thread that runs for every specified `MappingService` and acquires or transfers data from `Buffer`s to or from source/sinks using the respective logic. You can view a `MappingService` as the recipe of a specific data connection to or from a system.
-
-Examples for `MappingService`'s are:
-- OpcUAService
-- S7Service
-- MQTTService
-- InfluxDbService
-- SQLService
-- CsvReadService
-- CsvWriteService
-- ...
-
-```python
-from pydag.services.mappings.MappingService import MappingService
-
-m1 = OpcUaService(
-    id="M1",
-    endpoint="localhost:4048"
-    addresses=["ns=1;i=10012"],
-    buffer_ids=["B1"],
-    thread_type=ThreadType.MILLI_SECOND.value,
-    mapping_type=MappingType.READ.value,
-    observing_time=1000,
-    n=1,
-    persistent=False,
-    auto_start=True
-)
-
-# or
-
-buf = DictBuffer(id="B2")
-
-m2 = CsvWriteService(
-    id="M2",
-    folder="/c/fake/path/"
-    thread_type=ThreadType.MILLI_SECOND.value,
-    mapping_type=MappingType.WRITE.value,
-    observing_time=1000,
-    n=0,
-    persistent=False
-)
-m2.add_buffer(buf)
-
-```
-
-
-### Nodes - Actions and Transitions
-With a special `Service`, called `StatemachineService`, a number of predefined `Action`s and `Transition`s can be executed.
-<br>The `StatemachineService` is a `Service` container to define workflows with various small, compact and closed tasks.
-<br>Each task, the so called `Action`s are `execute`d based on their graph-based connection (children and parents).
-<br>Whether and how often an `Action` is executed, can be controlled via `Transition`s and the connection of the `Action` and `Transition` `Node`s. The execution logic for these `Node`s is based on the Sequential Function Chart logic for PLC's [Wikipedia](https://en.wikipedia.org/wiki/Sequential_function_chart). These `Node`s can be used to define statemachines, workflows, signal processing pipelines, data transformation pipelines and more.
-<br>An overview of all `Action`s and `Transition`s is given [here](pydag/_docs/Actions%20and%20Transitions.md)
-
-If one of the following criteria is met, a `Node` should be implemented (instead of a `Service`):
-- the process/task is a single, compact task that can be executed and finished quickly (within milliseconds or a few seconds)
-- the process/task requires input data from other processes/tasks or generates output data for other processes/tasks
-- the process/task needs to be executed based on certain conditions or in a defined order with other processes/tasks (`StatemachineService`)
-- the process/task provides data transformations on `Buffer` data (such as FFT, RMS, filtering, etc.)
-
-<br>All `Action`s can be executed by the following method:
-- execute()
-This method's purpose is to execute the single task that this `Action` was dedicated to. Within the `execute()` implementation, other `AgentElement`s can be accessed (e.g. `Buffer`s, etc.). This way `Action`s can retrieve data from previous `Action`s or `Buffer`s, or generate data and store it in `Buffer`s.
-<br>All `Transition`s can be executed by using the method:
-- check() -> bool
-
-<br>In order to ensure a consistent interface and behavior of all `Node`s, a couple of interface methods are defined as abstract, private methods and must be implemented by each subclass:
-- _on_install(agent : `Agent`): internal method called by install(...)
-- _on_uninstall(agent : `Agent`): internal method called by uninstall(...)
-- _on_execute(): internal method called by execute() (for `Action`s)
-- _on_check() -> bool: internal method called by check() (for `Transition`s)
-
-There are the following specialized `Node`s for specific functionalities:
-- `BufferNode`: base node type, that provides access to `Buffer`s or provides an internal `Buffer` for data intermediate/temporary storage
-- `ServiceNode`: base node type, that provides access to `Service`s
-- `TransformNode`: ...
-- `LearningNode`: ...
-
-To create a `StatemachineService` with `Action`s and `Transition`s, the following code snippet can be used as a template:
-
-```python
-
-# create an agent (as mentioned above)
-agent = Agent(...)
-
-# create a statemachine service
-service = SimpleStatemachine()
-
-a1 = StartAction()
-a2 = CountAction()
-a3 = StopAction()
-a1.add_child(a2)
-a2.add_child(a3)
-
-service.add_node(a1)
-service.add_node(a2)
-service.add_node(a3)
-
-# Force ONLY_ONCE execution semantics
-service.thread_type = ThreadType.ONLY_ONCE.value
-service.install()
-
-# start the statemachine service (or releasing an Agent will start the Statemachines as well)
-service.start()
-
-
-# alternative: release the agent
-agent.add_service(service)
-agent.release()
-
-
-```
-
-## The use of coding assistants
-You should use coding assistants to support you in your development! Everything else is inefficient as long as you can't find you name in a list of the best programmers on the planet.
-Though, the get the most out of you agent and the best results for this repo, please follow the following general rules on how to treat your coding assistant which are taken from Ethan Mollicks book Co-Intelligence:
-1. Always use the AI
-2. Be the human in the loop
-3. Treat AI as a person and tell it exactly how to behave and what you expect and not expect from it
-4. Assume this is the worst AI you will ever use
-
-Additional to the above ruleset, here are a few 'Musts', 'Do's' and 'Dont's' for which you should and which you should better not use your coding assistant (for now; this might change in the future).
-**Musts**
-- Make shure you know what you expect as the result and define a clear list of acceptance criteria
-- You must define the scaffold of your solution
-- You must be able to understand and follow the implementations of your coding assistant
-
-**Do's**
-- Ask the coding assistant to review your ideas and challenge it.
-- Ask the coding assistant to check existing code for weak points and potential improvements.
-- Let the assistant explain things.
-- Let the assistant write documentation, comments and docstrings to your code.
-- Let the assistant propose variable names.
-- Ask the assistant for good ways on how to construct single methods.
-- Let the coding assistant write tests for your code (but make sure you have understood what to test and you are only using the assistant to make life easier to fill gaps in your testing plan).
-- Let the agent directly Write code snippets, single functions and methods as long as they are either boilerplate code or if they are short enough such that you can directly reason that everything is valid.
-- Create a slightly adjusted version of an existing method. E.g. you already have a node which does e.g. regression and you want to have a very similar node which does e.g. classification then everything besides a few lines of code stays the same.
-- Give the agent tasks which you would give to a junior developer as a task for max. 3 days before the next code review.
-- Slice the elephant. Implement a created plan (which you can develop together with the assistant) step by step and make sure each step is tested and you understood what has been done.
-
-**Dont's**
-- Don't let the agent implement huge parts in one run. You will receive more code than you can understand, test and further develop. The problem is, that you loose the overwiew about the funcionalities and mechanics of your code. Once this happes you are flying blind and all you can do is to hope that your coding agent knows what to do. Currently this fails at the latest, once the assistant is running out of context.
-- Dont't let the assistant do major refactorings in one step (see the fist bulletpoint for why this is not a good strategy).
-- Don't give the steering wheel to the assistant or to put it in another way: Don't change roles with the assistant (see rule number 2 above).
-- Don't let the assistant get too far ahead. This risks you loosing track of things (see the first bulletpoint in this list).
-- Don't underestimate but also don't overestimate the capabilities of you assistant. It is a very powerful coding machine but your assistant has a very low emotional intelligence quotient.
-
-## Installation and Usage
-In order to install `pydag` - pyd(ata)ag(ents), use pip:
-```bash
-pip install git+https://github.com/PyDataAgents/PyDataAgents.git
-
-# this will install the default branch, for a specific branch use
-
-pip install git+https://github.com/PyDataAgents/PyDataAgents.git@<branch>
-
-# if the repo was installed already, use an uninstall before installing again
-
-pip uninstall pydag -y; pip install git+https://github.com/PyDataAgents/PyDataAgents.git
-```
-
-Project Dependencies can be found in [pyproject.toml](pyproject.toml)
-
-For a local checkout using Conda, create an environment with Python and pip
-before installing (an empty Conda environment can fall back to base Python):
+The repository is named **PyDataAgents**; its Python distribution and import package are named **`pydag`**. Start with a local checkout:
 
 ```bash
-conda create -n pydataagents python=3.13 pip
+git clone https://github.com/PyDataAgents/PyDataAgents.git
+cd PyDataAgents
+```
+
+Choose either a Python virtual environment or a Conda environment.
+
+### Python virtual environment
+
+```bash
+python -m venv .venv
+```
+
+Activate the environment using the command for your shell:
+
+```powershell
+# Windows PowerShell
+.\.venv\Scripts\Activate.ps1
+```
+
+```bash
+# Linux / macOS (bash or zsh)
+source .venv/bin/activate
+```
+
+Then install the base package:
+
+```bash
+python -m pip install .
+```
+
+### Conda environment
+
+If you use Anaconda or Miniconda, run these commands from the checkout in a terminal with Conda initialized (for example, Anaconda Prompt on Windows):
+
+```bash
+conda create -n pydataagents python=3.11 pip
 conda activate pydataagents
 python -m pip install .
 ```
 
-JavaScript expressions use `quickjs-ng`, which provides the `quickjs` import
-and prebuilt Windows wheels, avoiding a local C++ build on supported platforms.
+Create the environment with both Python and pip so installation uses the intended environment. Reactivate it with `conda activate pydataagents` in each new terminal before running your application. Use this environment directly; there is no need to create the `.venv` above as well.
 
-or use a pyproject.toml
-```
-[build-system]
-requires = ["setuptools>=82"]
-build-backend = "setuptools.build_meta"
+### Optional components
 
-[project]
-name = "a_pydataagent_project"
-version = "0.0.1"
-description = "A PyDataAgents Project"
-readme = "README.md"
-requires-python = ">=3.11"
-license = { file = "LICENSE" }
-dependencies = [
-    "pydag @ git+https://github.com/PyDataAgents/PyDataAgents.git"
-]
+The base installation is sufficient for the quickstart below. Install extras only for the components you plan to use. For example, from the checkout:
 
-[tool.setuptools.packages.find]
-where = ["."]
-include = ["<REPO_ROOT>*"]
-namespaces = true
+```bash
+python -m pip install ".[iiot]"
+# Or combine industrial connectors and the application UI:
+python -m pip install ".[iiot,ui]"
 ```
 
-# Optional Dependencies
-Optional dependencies are managed in pyproject.toml.
-You can choose from the following additional dependencies:
-- docs
-- db
-- iiot
-- office
-- browser
-- dsp
-- llm
-- ocr
-- cad
-- sim
-- test
+See [integrations and optional dependencies](#integrations-and-optional-dependencies) before installing extras. Python packages do not supply every required driver, executable, credential, or external service. Environment setup commands above do not imply that every integration supports every operating system.
 
-and add them to your project build via:
+## Quickstart
 
+Run a local workflow that reads three temperature samples from a buffer and logs them once. It requires no hardware, network connection, credentials, or optional extras.
+
+Save this as `quickstart.py`:
+
+```python
+from pydag.agents.Agent import Agent
+from pydag.buffers.DictBuffer import DictBuffer
+from pydag.nodes.buffers.LinkBufferAction import LinkBufferAction
+from pydag.nodes.utils.PrintBufferAction import PrintBufferAction
+from pydag.services.statemachine.SimpleStatemachine import SimpleStatemachine
+from pydag.services.ThreadType import ThreadType
+
+agent = Agent(id="local-demo")
+samples = DictBuffer(
+    id="samples",
+    initial_values={"temperature": [21.5, 22.0, 23.5]},
+)
+agent.add_buffer(samples)
+
+source = LinkBufferAction(id="source", buffer_id="samples")
+show = PrintBufferAction(id="show", input_keys=["temperature"])
+source.add_child(show)
+
+workflow = SimpleStatemachine(
+    id="print-once",
+    thread_type=ThreadType.ONLY_ONCE.value,
+)
+workflow.add_node(source)
+workflow.add_node(show)
+agent.add_service(workflow)
+
+try:
+    agent.release(stop_when_idle=True)
+finally:
+    agent.terminate()
 ```
-...
 
-dependencies = [
-    "pydag[llm] @ git+https://github.com/PyDataAgents/PyDataAgents.git"
-]
+Run it in your activated environment:
 
-...
-
-```
-or 
-```
-...
-
-dependencies = [
-    "pydag[llm,cad,docs] @ git+https://github.com/PyDataAgents/PyDataAgents.git"
-]
-
-...
-
+```bash
+python quickstart.py
 ```
 
-## Examples and Testing
-All unit tests and examples are found in [unit](tests/unit) and [regression](tests/regression) folders.
+Among the lifecycle log messages, you will see these three records, with log timestamps and prefixes:
+
+```text
+{'temperature': 21.5}
+{'temperature': 22.0}
+{'temperature': 23.5}
+```
+
+`release()` installs the registered components and starts the workflow. `LinkBufferAction` exposes the existing buffer to the next node; `PrintBufferAction` reads its parent's temperature column. Nodes are added in execution order because `SimpleStatemachine` executes a flat sequence. The parent-child connection defines where the print node gets its input.
+
+`ONLY_ONCE` runs the sequence once. `stop_when_idle=True` terminates the agent when no registered service reports `RUNNING`, so this example exits on its own. Termination uninstalls buffers and clears their in-memory contents; read or export results before shutdown if you need to retain them.
+
+## How it works
+
+### Components and data flow
+
+An `Agent` owns buffers and services. Workflow services own their nodes and install them as part of the agent lifecycle.
+
+```mermaid
+flowchart LR
+    Source[Machine, file, or external API] --> Input[Input service]
+    Input --> B1[Buffer]
+    B1 --> Workflow[Workflow nodes]
+    Workflow --> B2[Buffer]
+    B2 --> Output[Output service]
+    Output --> Sink[Database, file, or external API]
+```
+
+This is a common composition pattern. Choose input and output services for the systems you actually use; workflows can also work entirely on local buffers, as in the quickstart.
+
+| Building block | Responsibility |
+| --- | --- |
+| [`Agent`](pydag/agents/Agent.py) | Registers components, installs them, starts eligible services, and coordinates termination. |
+| [`AgentElement`](pydag/agents/AgentElement.py) | Provides element identity, configuration inspection, installation, and uninstallation hooks. |
+| [`Buffer`](pydag/buffers/Buffer.py) | Exchanges and temporarily stores data through a common public interface. |
+| [`Service`](pydag/services/Service.py) | Provides a runtime capability, connection, or background task with start/stop behavior. |
+| [`ObserverService`](pydag/services/ObserverService.py) | Executes observers using an interval, schedule, trigger, or another supported execution mode. |
+| [`MappingService`](pydag/services/MappingService.py) | Connects external addresses and agent buffers for supported transfer operations. |
+| [`Action`](pydag/nodes/Action.py) / [`Transition`](pydag/nodes/Transition.py) | Performs a workflow step or evaluates whether execution can advance. |
+
+### Agent lifecycle
+
+Constructing and registering components describes an application. Releasing the agent installs its buffers and services, then starts services whose `auto_start` setting is true. Installation can initialize connections and resources; it is more than configuration validation.
+
+| Call | Behavior |
+| --- | --- |
+| `agent.release()` | Starts the application and blocks until termination. |
+| `agent.release(blocking=False)` | Starts the application and returns control to the caller. |
+| `agent.release(stop_when_idle=True)` | Blocks until no registered service reports `RUNNING`, then terminates. |
+| `agent.release(blocking=False, stop_when_idle=True)` | Monitors service states and performs idle termination in a background thread. |
+| `agent.terminate()` | Stops services, uninstalls components, and releases a waiting `release()` call. |
+
+Use idle termination for finite services such as the quickstart. It checks service states, not whether buffers contain data or every possible background resource has finished. For an ongoing application, use explicit termination and place cleanup in a `finally` block.
+
+### Buffers and data selection
+
+Use `push(...)` to add data, `data(n=0, persistent=True)` to read it, `size()` to inspect its size, and `clear()` to remove its contents. `data_with_meta(...)` adds the buffer's metadata representation.
+
+For list and dictionary buffers, `n=0` retrieves all available samples. `persistent=True` keeps the retrieved values; `persistent=False` consumes them. This controls reads from memory and does **not** enable storage on disk. If multiple consumers share a buffer, decide which may consume its values.
+
+| Buffer family | Useful for |
+| --- | --- |
+| [`ListBuffer`](pydag/buffers/ListBuffer.py) | A capacity-limited sequence exposed as a dictionary keyed by buffer ID. |
+| [`DictBuffer`](pydag/buffers/DictBuffer.py) | Column-oriented records such as `{"temperature": [21.5, 22.0]}`, with optional timestamp and index columns. |
+| [`TimedBuffer`](pydag/buffers/TimedBuffer.py) | Values with corresponding timestamps. |
+| [`SignalBuffer`](pydag/buffers/SignalBuffer.py) / [`SampledBuffer`](pydag/buffers/SampledBuffer.py) | Periodically sampling configured synthetic signals, one value or a batch at a time. |
+| [`DatasetBuffer`](pydag/buffers/DatasetBuffer.py) | Loading supported datasets for processing and experiments; some sources need additional dependencies or downloads. |
+
+List and dictionary buffers discard older values when their configured capacity is exceeded; `capacity=-1` means unlimited capacity. Data shapes and metadata differ between implementations. See the [buffer reference](pydag/_docs/Buffers.md) and the concrete class before connecting components.
+
+### Mappings and execution modes
+
+A mapping connects `buffer_ids` with external `addresses`, such as protocol addresses, database queries, or topics. Address syntax and pairing rules belong to each connector.
+
+`MappingType` defines `READ`, `WRITE`, `SUB`, and `PUB`. A connector implements only a subset: for example, MQTT uses subscription and write behavior, while SQL implements reading and writing. Check the concrete service rather than assuming all four operations are supported.
+
+Important settings include `n` for sample selection, `persistent` for retaining values read for output, and `thread_type` / `observing_time` for execution timing. Observer modes include one-shot execution, intervals, cron expressions, and explicit triggers. Units depend on the selected mode: for example, `SECOND` uses seconds and `MILLI_SECOND` uses milliseconds. These are Python scheduling mechanisms, with no hard real-time guarantee.
+
+### Workflows, tasks, and models
+
+- **`SimpleStatemachine`:** visits active nodes in insertion order. An action executes its task; a false transition stops the current pass. Parent-child links support data relationships but do not turn this executor into a branching graph scheduler.
+- **`SFCService`:** executes connected actions and transitions using Sequential Function Chart logic. Use it for graph-based control flow, including supported branching and joins. Register all nodes and connect their children; see the [workflow documentation](pydag/_docs/Nodes.md).
+- **`BufferNode`:** links an existing buffer or creates one for intermediate results. It reads parent data using `n`, `persistent`, `input_keys`, and `ignore_keys`; selectors can choose names, positions, slices, or supported value types. `output_keys` names results where the concrete node supports it.
+- **`ServiceNode`:** gives a node access to a reusable service, such as a browser or model provider.
+- **[`TaskRunnerService`](pydag/services/tasks/TaskRunnerService.py):** combines conventional Python callables and action/buffer-node steps in a configured sequence with input/output mappings. It defaults to triggered execution and `auto_start=False`.
+- **[`DataModelService`](pydag/services/datamodel/DataModelService.py):** manages dataclass-based computation models and relationships between model variables, with associated API and UI components.
+
+## Configuration and application interfaces
+
+### Python and YAML composition
+
+Use Python composition as shown in the quickstart, or load an application configuration through `AgentApp.load(...)`. The loader accepts a YAML file path or a configuration dictionary. `AgentApp.save(...)` writes YAML, and `config_options()` exposes configuration values.
+
+Element IDs connect services, buffers, and nodes. Serialized `type` values identify the Python modules used to construct components, for example `pydag.buffers.DictBuffer`. Preserve these identifiers when reusing saved configurations.
+
+The repository includes [application YAML examples](tests/regression/agents/app). A minimal local configuration, saved as `agent.yaml`, is:
+
+```yaml
+host: localhost
+port: 8081
+with_api: true
+with_ui: false
+agent:
+  id: local-agent
+  buffer_store:
+    readings:
+      type: pydag.buffers.DictBuffer
+      id: readings
+      initial_values:
+        temperature: [21.5, 22.0, 23.5]
+```
+
+Install `.[ui]` before using `AgentApp`: its module imports NiceGUI even when `with_ui` is false. Save this launcher as `app.py`:
+
+```python
+from pydag.agents.app.AgentApp import AgentApp
+
+if __name__ == "__main__":
+    app = AgentApp.load("agent.yaml")
+    app.create()
+    try:
+        app.run()
+    finally:
+        app.shutdown()
+```
+
+Run `python app.py` and open `http://localhost:8081/docs` for the API documentation. This server runs until stopped; use Ctrl+C in the terminal. Enable `with_ui: true` to add the default buffer and agent-management pages.
+
+The example binds to localhost and does not configure API authentication. `AgentApp` supports API-key configuration through `api_key_file`; configure authentication and deployment access controls before exposing management endpoints beyond your machine. [`AgentStoreApp`](pydag/agents/app/AgentStoreApp.py) provides a UI for managing an `AgentStore` containing multiple agents.
+
+### Persistence
+
+Application YAML describes composition and configuration. Separately, `AgentElement.save(...)` and `load(...)` use per-element JSON files. Their path argument is a directory prefix concatenated with the element ID and `.json`; supply the appropriate trailing path separator.
+
+`Agent(with_persistence=True)` adds an `AgentPersistService` that periodically saves registered buffers and services marked with `load_on_install=True`. The service creates the save folder, and buffer serialization includes current values as initial values. This is separate from YAML export and from the `persistent` read flag. See the [persistence implementation](pydag/services/utils/AgentPersistService.py) before choosing restart and retention behavior.
+
+## Integrations and optional dependencies
+
+The following are representative implementations, not a guarantee that every external system or operation is supported. Follow the component's configuration and inspect its relevant examples before connecting to a live system.
+
+Extras below are installed from the checkout using `python -m pip install ".[extra]"`; combine them with commas when needed.
+
+| Area | Representative components | Extra / external requirements |
+| --- | --- | --- |
+| Industrial controllers and messaging | [OPC UA](pydag/services/opcua/OpcUaService.py), [ADS](pydag/services/ads/AdsService.py), [S7](pydag/services/s7/S7Service.py), [MQTT](pydag/services/mqtt/MQTTService.py), [IO-Link](pydag/services/iolink/IOLinkService.py) | `iiot`; reachable servers, brokers, or controllers; protocol-specific drivers and configuration. |
+| Socket and serial communication | [TCP, UDP, WebSocket, and serial services](pydag/services/socket) | `iiot` supplies serial and WebSocket dependencies; endpoints or serial hardware as applicable. |
+| Databases | [SQLService](pydag/services/db/SQLService.py), [InfluxDbService](pydag/services/db/InfluxDbService.py) | `db`; an ODBC driver and connection string for SQL, or an InfluxDB instance and credentials. |
+| Files and documents | [Document services](pydag/services/documents), [CSV services](pydag/services/csv), [document actions](pydag/nodes/documents) | `docs` for document parsing, spreadsheets, templates, and file watching; format-specific prerequisites may apply. |
+| Microsoft 365 | [MSGraphService](pydag/services/office/MSGraphService.py), [Outlook actions](pydag/nodes/office) | `office`; application registration, permissions, and authentication for the target tenant. |
+| HTTP | [HttpService](pydag/services/http/HttpService.py), [HTTP actions](pydag/nodes/http) | HTTP components use `urllib3` supplied by `iiot`; endpoint-specific authentication and configuration. |
+| Browser automation | [BrowserAutomationService](pydag/services/webbrowser/BrowserAutomationService.py), [browser actions](pydag/nodes/webbrowser) | `browser`; a supported installed browser and Selenium driver setup. |
+| OCR | [OCRAction](pydag/nodes/vision/OCRAction.py) | `ocr`; Tesseract and Poppler executables (`pdfinfo`, `pdftoppm`) on PATH. |
+| Signal processing and features | [FFTTransform](pydag/nodes/preprocessing/frequency/FFTTransform.py), [feature extractors](pydag/nodes/featureextraction), [dimensionality reduction](pydag/nodes/dimreduction) | FFT uses base dependencies; advanced components may require `dsp`, model downloads, and additional component-specific packages. |
+| Application UI and visualization | [AgentApp](pydag/agents/app/AgentApp.py), [UI pages](pydag/agents/ui), [PlotlifyAction](pydag/nodes/documents/PlotlifyAction.py) | `ui` for NiceGUI/Plotly; rendering workflow graphs additionally requires the Graphviz `dot` executable on PATH. |
+| Language models and retrieval | [LLMService](pydag/services/llm/LLMService.py), [RAGService](pydag/services/llm/RAGService.py), [LLMChatAction](pydag/nodes/llm/LLMChatAction.py) | `llm`; provider credentials or a local model server, and embedding/model resources as applicable. |
+| Coding-agent execution | [AgentHarnessAction](pydag/nodes/llm/AgentHarnessAction.py) | Separately installed and authenticated Codex CLI on PATH, plus an accessible working directory. |
+| SFTP transfers | [SFTPAction](pydag/nodes/sftp/SFTPAction.py) | `sftp`; an SSH/SFTP server and authentication. |
+
+LLM functionality includes configurable providers, message history, file context, and optional internet context. Provider support varies by operation: inspect `LLMService` for file handling and provider constraints. Internet context requires a Tavily key. `AgentHarnessAction` invokes the external CLI under the account running the agent; configure its working directory and permissions accordingly.
+
+Additional `cad` and `sim` dependency groups support specialized engineering work; inspect the relevant implementation and platform requirements before installing them. Optional extras are dependency bundles, not feature-certification or compatibility guarantees. See [pyproject.toml](pyproject.toml) for exact dependencies.
+
+## Extending the framework
+
+Choose the base class that matches the component's responsibility:
+
+- A `Buffer` for a new storage or data representation.
+- A `Service`, `ObserverService`, or mapping base for connections, reusable resources, and background work.
+- An `Action` or `Transition` for a workflow step; combine with `BufferNode` or `ServiceNode` when it needs data or a shared service.
+
+Follow nearby dataclass patterns: configuration belongs in fields with useful metadata, while connections and other runtime objects belong in private instance attributes. Call `super().__post_init__()` when overriding initialization and preserve superclass lifecycle hooks. Start services without blocking the caller; stop background work and release resources during shutdown or uninstallation.
+
+Use public buffer APIs for data exchange. Add focused tests and documentation for new behavior, and preserve public IDs and type paths used in saved configurations. The [repository guidance](AGENTS.md) and [contribution guide](Contribute.md) describe these conventions in more detail.
+
+## Documentation and examples
+
+| Resource | Start here for |
+| --- | --- |
+| [Agents](pydag/_docs/Agents.md) | Agent composition and application classes. |
+| [Buffers](pydag/_docs/Buffers.md) | Storage types, signals, and buffer configuration. |
+| [Services](pydag/_docs/Services.md) | Connectors, reusable capabilities, and service configuration. |
+| [Nodes](pydag/_docs/Nodes.md) | Documented workflow nodes, branching, and data operations. |
+| [Agent scenarios](tests/regression/agents) | Examples of complete compositions, including application YAML. |
+| [Unit tests](tests/unit) | Focused examples and expected component behavior. |
+| [Source](pydag) | Current public signatures and implementation details. |
+
+Some reference pages are generated and may contain incomplete examples. Use the concrete source and relevant tests to confirm arguments. Regression scenarios and even some unit tests require live systems, local files, credentials, downloads, or a GUI; inspect them before running.
+
+## Development and support
+
+For an editable installation with the test dependencies, run from the checkout:
+
+```bash
+python -m pip install -e ".[test]"
+```
+
+Install only the additional extras needed for your change. Start with relevant tests, for example:
+
+```bash
+python -m pytest tests/unit/services/statemachine/test_simple_statemachine.py
+```
+
+The full-suite command is:
+
+```bash
+python -m pytest
+```
+
+Inspect environmental requirements first. The [contribution guide](Contribute.md) requires all tests to pass before opening a PR. Develop changes on a dedicated branch, submit a pull request for review, and **never push directly to `develop`**.
+
+For bugs, questions, or feature requests, use [GitHub Issues](https://github.com/PyDataAgents/PyDataAgents/issues). Include the component, Python/OS versions, a minimal reproduction, expected behavior, and relevant logs with credentials removed.
 
 ## License
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details
 
-## What's new? | Upcoming Features
-- prompt based generation of Agents
-  in form of executable scripts, a CLI or REST API (as Developer Feature)
+PyDataAgents is available under the [MIT License](LICENSE).
