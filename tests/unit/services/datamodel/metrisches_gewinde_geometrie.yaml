@@ -94,6 +94,7 @@ lookups:
         description_en: Discrete mapping from TABLE_METRIC_SCREWS without interpolation; unknown diameters return nan
         source: xlsx
         endpoint: metrisches_gewinde_geometrie.xlsx
-        query: "'Major Diameter D [mm]'=D"
+        target: "Pitch P [mm]"
+        query: "'Major Diameter D [mm]'==D"
 sources:
     - ./metrisches_gewinde_geometrie.xlsx, TABLE_METRIC_SCREWS, Spalten Major Diameter D [mm] und Pitch P [mm]; widersprüchliche Zeile M27 ausgelassen

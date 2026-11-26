@@ -1,5 +1,7 @@
 import os
 
+import pandas as pd
+
 from pydag.services.datamodel.formula_engine import FormulaEngine
 from pydag.services.datamodel.formula_models import FormulaSet, SymbolInput
 from pydag.services.datamodel.formula_registries import FormulaRegistry
@@ -92,3 +94,9 @@ def test_combine_set():
     C = (A & B) | D
     print(C)
     assert C == set(["A", "B", "D"])
+    
+def test_df_filter():
+    d = {"A": [1, 2, 3], "B": ["a", "b", "c"], "C": [1.1, 2.2, 3.3]}
+    df = pd.DataFrame(d)
+    result = df.loc[df["B"]=="b", "A"].values[0]
+    print(result)
