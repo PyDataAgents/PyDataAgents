@@ -59,7 +59,7 @@ docs = [
   "watchdog",
   "vobject",
   "psutil",
-  "docxtpl",
+  "docform",
   "bs4",
   "lxml",
 ]

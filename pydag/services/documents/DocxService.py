@@ -1,5 +1,6 @@
 from dataclasses import dataclass, field
 
+from docform import DocxTemplate
 
 from ..ServiceException import ServiceException
 from ...agents.Agent import Agent
@@ -24,13 +25,13 @@ class DocxService(WriteService):
     def _on_install(self, agent : Agent = None):
         super()._on_install(agent)
         if FileUtils.exists_file(self.template_path):
-            from docxtpl import DocxTemplate
             self._doc = DocxTemplate(self.template_path)
         else:
             raise ServiceException(f"{self.__class__.__name__} template file does not exist: {self.template_path}")
         
     def _on_uninstall(self, agent : Agent = None):
         super()._on_uninstall(agent)
+        self._doc = None
 
     def write_to_sink(self):
         """ Write data from buffers to the document.
