@@ -12,7 +12,7 @@ class DataType(str, enum.Enum):
     STRING = ("STRING", None)   # Variable length
     FLOAT  = ("FLOAT", 8)       # 8 bytes (double precision)
     INT    = ("INT", 4)         # 4 bytes (int32)
-    OBJECT = ("OBJECT", None)   # Depends on object
+    OBJECT = ("OBJECT", None)   # Depends on object, can be a dict
     IMAGE  = ("IMAGE", None)    # Depends on resolution/format
     BYTE   = ("BYTE", 1)        # 1 byte
     BOOL   = ("BOOL", 1)        # 1 byte
