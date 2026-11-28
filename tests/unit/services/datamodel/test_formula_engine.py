@@ -100,3 +100,9 @@ def test_df_filter():
     df = pd.DataFrame(d)
     result = df.loc[df["B"]=="b", "A"].values[0]
     print(result)
+    
+def test_df_filter2():
+    d = {"A": [1, 2, 3], "B": ["a", "b", "c"], "C": [1.1, 2.2, 3.3]}
+    df = pd.DataFrame(d)
+    result = df.query("A > 1 and B == 'b'")["C"].iloc[0]
+    print(result)

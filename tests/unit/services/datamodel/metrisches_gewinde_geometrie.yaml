@@ -88,13 +88,13 @@ formulas:
 
 lookups:
     P:
-        label_de: Steigung aus Durchmessertabelle
         description_de: Diskrete Zuordnung aus TABLE_METRIC_SCREWS ohne Interpolation; unbekannte Durchmesser ergeben nan
-        label_en: Pitch from diameter table
         description_en: Discrete mapping from TABLE_METRIC_SCREWS without interpolation; unknown diameters return nan
         source: xlsx
-        endpoint: metrisches_gewinde_geometrie.xlsx
+        endpoint: "[metrisches_gewinde_geometrie.xlsx]Tabelle1!TABLE_METRIC_SCREWS"
         target: "Pitch P [mm]"
-        query: "'Major Diameter D [mm]'==D"
+        query: "'Major Diameter D [mm]'==@D"
+        return_type: single
+
 sources:
     - ./metrisches_gewinde_geometrie.xlsx, TABLE_METRIC_SCREWS, Spalten Major Diameter D [mm] und Pitch P [mm]; widersprüchliche Zeile M27 ausgelassen
